@@ -1,0 +1,15 @@
+{
+  "name": "linguagens-formais",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Autoestudos de Linguagens Formais e Autômatos com diagramas animados.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "astro": "^5.13.0"
+  }
+}

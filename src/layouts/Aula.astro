@@ -1,0 +1,33 @@
+---
+import Base from './Base.astro';
+import { curso, url } from '../data/aulas.js';
+const { aula } = Astro.props;
+---
+<Base title={`${aula.titulo} · ${curso.titulo}`} description={aula.resumo}>
+  <div class="progress" id="progress"></div>
+  <div id="pop" role="dialog" aria-live="polite"></div>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><marker id="mnarrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mnarrow"/></marker></defs></svg>
+
+  <div class="layout">
+    <aside class="side">
+      <details class="side-box" id="side-box" open>
+        <summary>Nesta aula</summary>
+        <a class="side-back" href={url('/')}>← Todas as aulas</a>
+        <p class="side-course">{curso.titulo}</p>
+        <p class="side-aula"><i>Aula {aula.numero}</i>{aula.titulo}</p>
+        <nav class="toc side-group" aria-label="Nesta aula">
+          <ol>
+            {aula.secoes.map(([id, nome], i) => (
+              <li><a href={`#${id}`}><i>{String(i + 1).padStart(2, '0')}</i>
+                {id === 'glossario' ? <span>{nome} (<span id="gl-count">0</span> termos)</span> : <span>{nome}</span>}
+              </a></li>
+            ))}
+          </ol>
+        </nav>
+      </details>
+    </aside>
+    <main class="content">
+      <slot />
+    </main>
+  </div>
+</Base>

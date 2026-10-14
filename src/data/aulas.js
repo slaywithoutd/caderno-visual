@@ -1,14 +1,24 @@
-/* Catálogo de aulas. Para adicionar uma aula nova:
-   1. crie src/aulas/<slug>/ com conteudo.html, figuras.js e glossario.js;
-   2. crie src/pages/aulas/<slug>.astro (copie o da aula 01);
-   3. adicione a entrada abaixo. */
-export const curso = {
-  titulo: 'Linguagens Formais e Autômatos',
-  subtitulo: 'Autoestudos com diagramas que se montam passo a passo.',
+/* Catálogo do caderno: áreas (matérias) e suas aulas.
+   Para adicionar uma aula:
+   1. crie src/aulas/<area>/<slug>/ com conteudo.html, figuras.js, loops.js e glossario.js;
+   2. crie src/pages/<area>/<slug>.astro (copie o de lfa/01-conceitos);
+   3. adicione a aula na lista abaixo (e a área, se for nova). */
+export const site = {
+  titulo: 'Caderno visual',
+  subtitulo: 'Autoestudos reescritos como texto curto, desenhos e diagramas que se montam.',
 };
+
+export const areas = [
+  {
+    slug: 'lfa',
+    titulo: 'Linguagens Formais e Autômatos',
+    descricao: 'Alfabetos, gramáticas, autômatos e a Hierarquia de Chomsky.',
+  },
+];
 
 export const aulas = [
   {
+    area: 'lfa',
     slug: '01-conceitos',
     numero: '01',
     titulo: 'Conceitos de linguagens formais',
@@ -28,6 +38,9 @@ export const aulas = [
     ],
   },
 ];
+
+export const areaDe = (aula) => areas.find((a) => a.slug === aula.area);
+export const hrefAula = (aula) => url(`/${aula.area}/${aula.slug}`);
 
 export const url = (p = '') => {
   const base = import.meta.env.BASE_URL.replace(/\/$/, '');

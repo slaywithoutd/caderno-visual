@@ -1,6 +1,6 @@
-import { S, H, esc, reduce } from '../../lib/dom.js';
-import { StepFig } from '../../lib/stepfig.js';
-import { drawMachine } from '../../lib/machine.js';
+import { S, H, esc, reduce } from '../../../lib/dom.js';
+import { StepFig } from '../../../lib/stepfig.js';
+import { drawMachine } from '../../../lib/machine.js';
 
 /* ============ Fig 1: Σ* ============ */
 (function(){

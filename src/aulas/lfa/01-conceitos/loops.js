@@ -1,5 +1,5 @@
-import { S } from '../../lib/dom.js';
-import { loop, ease, lerp, fatia, clamp01 } from '../../lib/loop.js';
+import { S } from '../../../lib/dom.js';
+import { loop, ease, lerp, fatia, clamp01 } from '../../../lib/loop.js';
 
 /* Animações em loop da aula 01. Cada uma é montada num <aside data-loop="nome"> do conteúdo
    e redesenhada a partir de t ∈ [0,1). Diferente das figuras passo a passo, não têm controles. */

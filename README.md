@@ -1,7 +1,9 @@
-# Linguagens Formais e Autômatos
+# Caderno visual
 
-Autoestudos de LFA em formato de post: texto curto, desenhos na margem, figuras passo a passo
-e animações em loop. Cada aula vira uma página; a home lista todas.
+Autoestudos de todas as matérias em formato de post: texto curto, desenhos na margem, figuras
+passo a passo e animações em loop. Cada matéria é uma área; cada aula vira uma página; a home lista tudo.
+
+Site: https://slaywithoutd.github.io/caderno-visual/
 
 ## Rodar
 
@@ -11,18 +13,18 @@ npm run dev      # http://localhost:4321
 npm run build    # gera dist/
 ```
 
-Para publicar num subcaminho (ex.: GitHub Pages em `/linguagens-formais`), rode o build com `BASE_PATH=/linguagens-formais`.
+O deploy no GitHub Pages roda sozinho a cada push na `main` (`.github/workflows/deploy.yml`), com `BASE_PATH=/caderno-visual`.
 
 ## Estrutura
 
 ```
 src/
-  data/aulas.js              catálogo de aulas (home + sidebar)
+  data/aulas.js              áreas e aulas (home + sidebar)
   layouts/Base.astro         <head>, fontes, CSS global
   layouts/Aula.astro         sidebar flutuante, sumário, popover do glossário
   pages/index.astro          home com a lista de aulas
-  pages/aulas/<slug>.astro   página de cada aula
-  aulas/<slug>/
+  pages/<area>/<slug>.astro  página de cada aula
+  aulas/<area>/<slug>/
     conteudo.html            texto da aula (HTML puro)
     figuras.js               figuras passo a passo da aula
     loops.js                 animações em loop da aula
@@ -45,6 +47,6 @@ src/
 
 ## Adicionar uma aula
 
-1. Crie `src/aulas/<slug>/` com `conteudo.html`, `figuras.js`, `loops.js` e `glossario.js`.
-2. Copie `src/pages/aulas/01-conceitos.astro` para `src/pages/aulas/<slug>.astro` e troque os imports.
-3. Adicione a aula em `src/data/aulas.js`.
+1. Crie `src/aulas/<area>/<slug>/` com `conteudo.html`, `figuras.js`, `loops.js` e `glossario.js`.
+2. Copie `src/pages/lfa/01-conceitos.astro` para `src/pages/<area>/<slug>.astro` e troque os imports.
+3. Adicione a aula em `src/data/aulas.js` (e a área, se for uma matéria nova).

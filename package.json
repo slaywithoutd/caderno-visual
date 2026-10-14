@@ -1,9 +1,9 @@
 {
-  "name": "linguagens-formais",
+  "name": "caderno-visual",
   "type": "module",
   "version": "0.1.0",
   "private": true,
-  "description": "Autoestudos de Linguagens Formais e Autômatos com diagramas animados.",
+  "description": "Caderno visual: autoestudos com texto curto, desenhos e diagramas animados.",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",

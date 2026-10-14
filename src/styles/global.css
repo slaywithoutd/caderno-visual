@@ -166,7 +166,7 @@ figure.fig{margin:2.6rem 0;clear:both}
 .fig-stage svg{width:100%;height:auto;display:block;overflow:visible}
 .fig-side{position:relative;min-width:0;align-self:stretch;min-height:220px}
 .fig-side .lab{font-size:.72rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);height:24px}
-ol.fig-notes{list-style:none;margin:0;padding:0 6px 0 0;position:absolute;top:46px;bottom:0;left:0;right:0;overflow-y:auto;font-size:.84rem;line-height:1.55;counter-reset:n;color:var(--fg2);scrollbar-width:thin;overscroll-behavior:contain}
+ol.fig-notes{list-style:none;margin:0;padding:0 6px 0 0;position:absolute;top:26px;bottom:0;left:0;right:0;overflow-y:auto;font-size:.84rem;line-height:1.55;counter-reset:n;color:var(--fg2);scrollbar-width:thin;overscroll-behavior:contain}
 ol.fig-notes li{counter-increment:n;position:relative;padding:7px 4px 7px 30px;cursor:pointer;border-left:2px solid transparent;transition:color .3s}
 ol.fig-notes li::before{content:counter(n);position:absolute;left:4px;top:8px;width:18px;height:18px;border-radius:50%;font-family:var(--f-mono);font-size:.64rem;display:grid;place-items:center;background:var(--surface2);color:var(--muted)}
 ol.fig-notes li.fut{display:none}
@@ -175,22 +175,24 @@ ol.fig-notes li.cur{color:var(--fg);border-left-color:var(--accent);animation:no
 ol.fig-notes li.cur::before{background:var(--accent);color:var(--bg)}
 ol.fig-notes li.past::before{color:var(--accent)}
 @keyframes noteIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-/* controles no topo da coluna de passos */
-.fig-side .fig-ctrl{display:block;width:auto;margin:0;color:var(--muted)}
-.fc-row{display:flex;align-items:center;gap:6px;height:30px}
-.fc-lab{font-size:.72rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
-.fig-ctrl .count{font-family:var(--f-mono);font-size:.72rem;color:var(--muted)}
-.fc-btns{margin-left:auto;display:flex;gap:0}
+/* barra de controles acima da animação */
+.fig-ctrl{display:flex;align-items:center;gap:10px;width:var(--mw);margin:0 0 14px;padding:4px 10px 4px 4px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+.fc-btns{display:flex;gap:0}
 .ib{width:28px;height:28px;display:grid;place-items:center;border:0;border-radius:50%;background:none;color:var(--muted);cursor:pointer;padding:0}
 .ib svg{width:16px;height:16px}
 .ib:hover{background:var(--surface2);color:var(--fg)}
 .ib.main{color:var(--fg)}
 .ib:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
-.fc-track{position:relative;height:2px;background:var(--line);border-radius:2px;margin:4px 0 10px;overflow:hidden}
+.fc-track{position:relative;flex:1;height:3px;background:var(--line);border-radius:3px;overflow:hidden}
 .fc-done{position:absolute;inset:0 auto 0 0;width:0;background:var(--line2);transition:width .35s ease}
 .fc-tick{position:absolute;inset:0 auto 0 0;width:0;background:var(--accent)}
 @keyframes fc-tick{from{width:0}to{width:100%}}
-figure.fig.hot .fc-lab{color:var(--accent)}
+.fig-ctrl .count{font-family:var(--f-mono);font-size:.74rem;color:var(--muted);min-width:36px;text-align:right}
+.fc-hint{font-size:.72rem;color:var(--muted);transition:opacity .25s}
+figure.fig.hot .fc-hint{opacity:0}
+figure.fig.hot .fig-ctrl{border-color:var(--accent)}
+@media (max-width:1100px){.fig-ctrl{width:100%}}
+@media (max-width:560px){.fc-hint{display:none}}
 figcaption{font-size:.82rem;color:var(--muted);line-height:1.5}
 @media (max-width:1100px){.fig-body{grid-template-columns:1fr;row-gap:18px}.fig-side{min-height:0}ol.fig-notes{position:static;max-height:260px}}
 

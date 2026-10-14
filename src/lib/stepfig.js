@@ -10,18 +10,17 @@ const IC={
 };
 const canHover=matchMedia('(hover: hover)').matches;
 
-/* Figura passo a passo. Os controles ficam no topo da coluna "Passos", grudados nas notas,
-   para ficar claro a que animação pertencem. Com o mouse em cima, avança na hora e segue
-   sozinha; a linha fina sob os controles mostra quanto falta para o próximo passo. */
+/* Figura passo a passo. Os controles ficam numa barra logo acima da animação (como um player).
+   Com o mouse em cima, avança na hora e segue sozinha; a linha da barra mostra quanto falta
+   para o próximo passo. */
 export class StepFig{
   constructor(root,{notes,render,speed=1700}){
-    this.root=root;this.render=render;this.speed=speed;this.i=0;this.timer=null;this.hold=false;
+    this.root=root;this.render=render;this.speed=speed;this.i=0;this.timer=null;this.hold=false;this.hovering=false;
     this.notesEl=root.querySelector('.fig-notes');
-    const side=root.querySelector('.fig-side');
-    side.querySelector('.lab')?.remove();
+    const body=root.querySelector('.fig-body');
     this.ctrl=root.querySelector('.fig-ctrl');
-    side.prepend(this.ctrl);
-    this.ctrl.innerHTML=`<div class="fc-row"><span class="fc-lab">Passos</span><span class="count"></span><span class="fc-btns"><button class="ib" data-a="reset" aria-label="Reiniciar" title="Reiniciar">${IC.reset}</button><button class="ib" data-a="prev" aria-label="Passo anterior" title="Anterior">${IC.prev}</button><button class="ib main" data-a="play" aria-label="Animar" title="${canHover?'Passe o mouse na figura para animar':'Animar'}">${IC.play}</button><button class="ib" data-a="next" aria-label="Próximo passo" title="Próximo">${IC.next}</button></span></div><div class="fc-track" aria-hidden="true"><span class="fc-done"></span><span class="fc-tick"></span></div>`;
+    body.parentNode.insertBefore(this.ctrl,body);
+    this.ctrl.innerHTML=`<span class="fc-btns"><button class="ib main" data-a="play" aria-label="Animar" title="${canHover?'Passe o mouse na figura para animar':'Animar'}">${IC.play}</button><button class="ib" data-a="prev" aria-label="Passo anterior" title="Anterior">${IC.prev}</button><button class="ib" data-a="next" aria-label="Próximo passo" title="Próximo">${IC.next}</button><button class="ib" data-a="reset" aria-label="Reiniciar" title="Reiniciar">${IC.reset}</button></span><div class="fc-track" aria-hidden="true"><span class="fc-done"></span><span class="fc-tick"></span></div><span class="count"></span><span class="fc-hint">${canHover?'passe o mouse':'toque ▶'}</span>`;
     this.playBtn=this.ctrl.querySelector('[data-a=play]');this.countEl=this.ctrl.querySelector('.count');
     this.done=this.ctrl.querySelector('.fc-done');this.tick=this.ctrl.querySelector('.fc-tick');
     this.ctrl.addEventListener('click',e=>{const a=e.target.closest('button')?.dataset.a;if(!a)return;
@@ -30,10 +29,13 @@ export class StepFig{
       if(a==='next'){this.stop();this.hold=true;this.go(this.i+1);}
       if(a==='reset'){this.stop();this.hold=false;this.go(0);if(this.hovering)this.play();}
     });
-    /* anima só enquanto o mouse está sobre a animação ou os passos */
-    const zone=root.querySelector('.fig-body')||root;
-    zone.addEventListener('mouseenter',()=>{this.hovering=true;root.classList.add('hot');if(!this.hold&&!reduce)this.play(true);});
-    zone.addEventListener('mouseleave',()=>{this.hovering=false;root.classList.remove('hot');this.stop();this.hold=false;});
+    /* anima só enquanto o mouse está sobre a figura (barra, animação ou passos).
+       pointermove cobre o caso em que a página rola por baixo do mouse parado e o
+       navegador não dispara pointerenter. */
+    const entrar=()=>{if(this.hovering)return;this.hovering=true;root.classList.add('hot');if(!this.hold&&!reduce)this.play(true);};
+    root.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')entrar();});
+    root.addEventListener('pointermove',e=>{if(e.pointerType==='mouse')entrar();});
+    root.addEventListener('pointerleave',e=>{if(e.pointerType!=='mouse')return;this.hovering=false;root.classList.remove('hot');this.stop();this.hold=false;});
     this.setSteps(notes);
   }
   setSteps(notes){

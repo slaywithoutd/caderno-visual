@@ -4,7 +4,7 @@
 import Aula from '../../../layouts/Aula.astro';
 import Glossario from '../../../components/Glossario.astro';
 import Cartoes from '../../../components/Cartoes.astro';
-import { aulas, materia, modulo, hrefRevisao, glossarioGlobal, hrefGlossario } from '../../../lib/catalogo.js';
+import { aulas, materia, modulo, hrefRevisao, glossarioGlobal, hrefGlossario, tempoAula, comTempo } from '../../../lib/catalogo.js';
 
 export function getStaticPaths() {
   return aulas.map((a) => ({ params: { modulo: a.modulo, materia: a.materia, aula: a.slug }, props: { aula: a } }));
@@ -12,6 +12,7 @@ export function getStaticPaths() {
 const { aula } = Astro.props;
 const mat = materia(aula.modulo, aula.materia);
 const mod = modulo(aula.modulo);
+const conteudo = comTempo(aula.conteudo, tempoAula(aula));
 
 const temRevisao = aula.cartoes.length || aula.cola.length;
 const temNotas = aula.notas.length || aula.anexos.length;
@@ -36,7 +37,7 @@ function nomeNota(n) { return n.frontmatter.titulo || n.arquivo.replace(/\.md$/,
 ---
 <Aula titulo={aula.titulo} rotulo={`Aula ${aula.numero}`} materia={mat} modulo={mod} secoes={secoes} descricao={aula.resumo}>
   <div data-aula={aula.id} id="aula-root">
-    <Fragment set:html={aula.conteudo} />
+    <Fragment set:html={conteudo} />
   </div>
 
   {temRevisao && (

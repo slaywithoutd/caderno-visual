@@ -81,3 +81,44 @@ export function destaquesProva(aula) {
   }
   return [...doConteudo, ...dasNotas];
 }
+
+/* Tempo de leitura estimado, calculado sozinho no build (nenhuma aula precisa informar).
+   - texto: palavras do conteúdo, notas e cartões a 180 palavras/min (texto técnico em português);
+   - figura passo a passo: +1,5 min cada (é para assistir e mexer);
+   - animação em loop: +0,25 min cada;
+   - cartão de revisão: +0,5 min cada (tempo de pensar na resposta antes de abrir).
+   O glossário não conta (é consulta). */
+const PALAVRAS_MIN = 180, MIN_FIGURA = 1.5, MIN_LOOP = 0.25, MIN_CARTAO = 0.5;
+const contarPalavras = (html) => html
+  .replace(/<svg[\s\S]*?<\/svg>/g, ' ').replace(/<script[\s\S]*?<\/script>/g, ' ')
+  .replace(/<[^>]+>/g, ' ').replace(/&[a-z#0-9]+;/gi, ' ')
+  .split(/\s+/).filter((w) => /[\p{L}\p{N}]/u.test(w)).length;
+
+export function tempoLeitura({ html = '', extras = '', figuras = null, loops = null, cartoes = 0 }) {
+  const palavras = contarPalavras(html) + contarPalavras(extras);
+  const nFig = figuras ?? (html.match(/<figure class="fig"/g) || []).length;
+  const nLoop = loops ?? (html.match(/data-loop="/g) || []).length;
+  const min = palavras / PALAVRAS_MIN + nFig * MIN_FIGURA + nLoop * MIN_LOOP + cartoes * MIN_CARTAO;
+  return { minutos: Math.max(1, Math.ceil(min)), palavras, figuras: nFig, loops: nLoop, cartoes };
+}
+
+export const tempoAula = (a) => tempoLeitura({
+  html: a.conteudo,
+  extras: [...a.notas.map((n) => n.raw), ...a.cartoes.flat(), ...a.cola.flat()].join(' '),
+  cartoes: a.cartoes.length,
+});
+
+export const formatarTempo = (m) => (m < 60 ? `${m} min` : `${Math.floor(m / 60)} h${m % 60 ? ` ${m % 60} min` : ''}`);
+
+/* linha "tempo de leitura" mostrada logo abaixo do título de toda página de leitura */
+export function htmlTempo(t, rotulo = 'Leitura') {
+  const partes = [`${rotulo}: ~${formatarTempo(t.minutos)}`];
+  if (t.figuras) partes.push(`${t.figuras} ${t.figuras === 1 ? 'figura passo a passo' : 'figuras passo a passo'}`);
+  if (t.loops) partes.push(`${t.loops} ${t.loops === 1 ? 'animação' : 'animações'} em loop`);
+  if (t.cartoes) partes.push(`${t.cartoes} ${t.cartoes === 1 ? 'cartão' : 'cartões'}`);
+  const icone = '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.6V8l2.4 1.6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
+  return `<div class="leitura" title="${t.palavras} palavras a ${PALAVRAS_MIN}/min, +${MIN_FIGURA} min por figura e +${MIN_LOOP} min por loop, +${MIN_CARTAO} min por cartão">${icone}<span>${partes.join(' · ')}</span></div>`;
+}
+
+/* coloca a linha de tempo logo depois do título (dentro do primeiro <header> do conteúdo) */
+export const comTempo = (html, t, rotulo) => html.replace('</header>', `${htmlTempo(t, rotulo)}\n</header>`);

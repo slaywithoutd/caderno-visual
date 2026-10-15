@@ -214,6 +214,10 @@ Não pergunte à dona "o que você já sabe?". Coloque a base na página, recolh
 - Figura passo a passo anima só com o mouse em cima e avança na hora em que ele entra.
 - Nenhuma animação roda (nem com o mouse em cima, nem loop) sem que **pelo menos 80%** dela esteja na
   tela (`fracaoVisivel` em `src/lib/dom.js`). Loops começam do início quando aparecem e congelam ao sair.
+- Toda página de leitura (aula, revisão, glossário) mostra o **tempo de leitura** logo abaixo do título,
+  e a home mostra o de cada aula. É calculado no build (`tempoLeitura` em `src/lib/catalogo.js`:
+  180 palavras/min + 1,5 min por figura passo a passo + 0,25 por loop + 0,5 por cartão). Nunca escreva o
+  tempo à mão; página nova de leitura usa `htmlTempo`/`comTempo`.
 - Glossário é global: termos de aulas anteriores viram link nas próximas; a home linka o glossário coletivo (`/glossario`).
 - Passos surgem um por vez; a coluna de passos tem a altura da figura e rola por dentro.
 - Modo leitura (a dona é míope): botão de óculos no canto inferior direito. Liga `html.lendo`: o conteúdo

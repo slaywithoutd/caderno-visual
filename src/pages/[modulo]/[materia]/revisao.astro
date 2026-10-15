@@ -6,7 +6,7 @@
 import Aula from '../../../layouts/Aula.astro';
 import Glossario from '../../../components/Glossario.astro';
 import Cartoes from '../../../components/Cartoes.astro';
-import { modulos, aulasDe, destaquesProva, glossarioGlobal, hrefGlossario } from '../../../lib/catalogo.js';
+import { modulos, aulasDe, destaquesProva, glossarioGlobal, hrefGlossario, tempoLeitura, htmlTempo } from '../../../lib/catalogo.js';
 
 export function getStaticPaths() {
   return modulos.flatMap((mod) => mod.materias
@@ -25,11 +25,14 @@ const secoes = [
   ['glossario', 'Glossário'],
 ];
 const total = prova.reduce((n, x) => n + x.itens.length, 0);
+/* revisar = ler destaques, responder cartões e passar pela cola (o glossário é consulta) */
+const tempo = tempoLeitura({ html: [...prova.flatMap((x) => x.itens.map((i) => i.html)), ...lista.flatMap((a) => [...a.cartoes.flat(), ...a.cola.flat()])].join(' '), figuras: 0, loops: 0, cartoes: lista.reduce((n, a) => n + a.cartoes.length, 0) });
 ---
 <Aula titulo="Revisão para a prova" rotulo={`${lista.length} ${lista.length === 1 ? 'aula' : 'aulas'}`} materia={mat} modulo={mod} secoes={secoes} descricao={`Revisão de ${mat.titulo}`}>
   <header class="hero prose" id="top">
     <div class="kicker">{mod.titulo} · {mat.titulo}</div>
     <h1>Revisão para a prova</h1>
+    <Fragment set:html={htmlTempo(tempo, 'Revisão')} />
     <p class="lede">Tudo o que as aulas marcaram como importante, num lugar só: {total} destaques, {lista.reduce((n, a) => n + a.cartoes.length, 0)} cartões e {Object.keys(termos).length} termos.</p>
   </header>
 

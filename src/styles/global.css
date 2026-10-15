@@ -494,3 +494,7 @@ details.base .def{background:var(--surface2)}
 .def p.formal::before{content:'Formalmente';color:var(--muted)}
 .def p.simples{font-size:1.02em;color:var(--fg)}
 .def p.nota-formal{font-size:.88em;color:var(--muted);border-top:1px dashed var(--line);padding-top:8px}
+
+/* tempo de leitura (calculado no build, abaixo do título de toda página de leitura) */
+.leitura{display:flex;align-items:center;gap:8px;font-size:.88rem;color:var(--muted);margin:-.2rem 0 1rem}
+.leitura svg{width:16px;height:16px;flex:0 0 auto}

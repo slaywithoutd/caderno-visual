@@ -2,14 +2,16 @@
 /* Glossário coletivo: todos os termos de todas as aulas, com a aula de onde cada um veio. */
 import Aula from '../layouts/Aula.astro';
 import Glossario from '../components/Glossario.astro';
-import { aulas, glossarioGlobal, modulos } from '../lib/catalogo.js';
+import { aulas, glossarioGlobal, modulos, tempoLeitura, htmlTempo } from '../lib/catalogo.js';
 const total = Object.keys(glossarioGlobal).length;
+const tempo = tempoLeitura({ html: Object.values(glossarioGlobal).map((e) => `${e.t} ${e.d} ${e.a || ''}`).join(' '), figuras: 0, loops: 0 });
 const nMaterias = new Set(aulas.map((a) => `${a.modulo}/${a.materia}`)).size;
 ---
 <Aula titulo="Glossário coletivo" rotulo={`${total} termos`} materia={{ titulo: 'Todas as matérias' }} modulo={{ titulo: modulos.map((m) => m.titulo).join(', ') }} secoes={[['glossario', 'Glossário']]} descricao="Todos os termos de todas as aulas do caderno.">
   <header class="hero prose" id="top">
     <div class="kicker">Caderno visual</div>
     <h1>Glossário coletivo</h1>
+    <Fragment set:html={htmlTempo(tempo, 'Ler tudo')} />
     <p class="lede">{total} termos de {aulas.length} {aulas.length === 1 ? 'aula' : 'aulas'} em {nMaterias} {nMaterias === 1 ? 'matéria' : 'matérias'}. Cada cartão mostra de qual aula o termo veio.</p>
   </header>
   <Glossario termos={glossarioGlobal} titulo="Todos os termos" intro="Busque pelo nome, pela sigla ou por uma palavra da definição." />

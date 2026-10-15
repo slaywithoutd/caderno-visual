@@ -4,28 +4,82 @@
   <div class="hero-sym"><span>Σ = <b>{a, b}</b></span><span>w = <b>aabb</b></span><span>S <b>⇒</b> aSb</span><span>a, ε <b>→</b> A</span><span>Tipo 3 <b>⊊</b> Tipo 2</span></div>
 </header>
 
+<!-- ============ 0 ============ -->
+<section class="chap" id="antes">
+ <div class="prose">
+  <span class="num">01</span>
+  <h2>Antes de começar: conjuntos e notação</h2>
+  <div class="src"><span class="base-tag">Base · fora dos autoestudos</span></div>
+  <p>Os vídeos e o livro escrevem quase tudo com notação de conjuntos e não param para explicar. Esta seção é o "dicionário" para ler o resto. Se você já domina, pule para a <a href="#palavras">seção 2</a>.</p>
 
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><ellipse class="k" cx="120" cy="78" rx="112" ry="66"/><text class="tm st" x="22" y="30">A = {1, 2, 3, 4}</text><ellipse class="acf" cx="150" cy="88" rx="56" ry="36"/><text class="ta" x="176" y="62">B</text><text x="64" y="94">1</text><text x="96" y="66">2</text><text x="140" y="96">3</text><text x="168" y="104">4</text><text class="tm" x="120" y="138">B = {3, 4} ⊆ A</text></svg>Conjunto é um saco de coisas. B está dentro de A: B é subconjunto de A.</aside>
+  <h3>Conjuntos</h3>
+  <ul class="b">
+    <li><b>Conjunto</b>: uma coleção de coisas, sem ordem e sem repetição. Escreve-se entre chaves: <code>{a, b}</code> é o mesmo que <code>{b, a}</code>.</li>
+    <li><code>x ∈ A</code>: "x <b>pertence</b> a A", x é um dos elementos de A. <code>x ∉ A</code>: não pertence.</li>
+    <li><code>B ⊆ A</code>: B é <b>subconjunto</b> de A, tudo que está em B também está em A. <code>B ⊊ A</code>: subconjunto e A tem algo a mais.</li>
+    <li><code>∅</code> ou <code>{ }</code>: o <b>conjunto vazio</b>, sem nenhum elemento.</li>
+    <li><code>A ∪ B</code> (<b>união</b>): o que está em A ou em B. <code>A ∩ B</code> (<b>interseção</b>): o que está nos dois. <code>A − B</code>: o que está em A e não em B.</li>
+    <li>Um conjunto pode ser <b>finito</b> (dá para listar tudo) ou <b>infinito</b> (a lista nunca acaba, como os números naturais).</li>
+  </ul>
+
+  <h3>Descrever um conjunto por uma regra</h3>
+  <p>Quando o conjunto é infinito, não dá para listar. Usa-se a forma <code>{ x | condição }</code>, que se lê "o conjunto dos x <b>tais que</b> a condição vale".</p>
+  <div class="formula">{ aⁿbⁿ | n ≥ 0 } = { ε, ab, aabb, aaabbb, … }</div>
+  <ul class="b">
+    <li>Lê-se: "as palavras formadas por n letras a seguidas de n letras b, para todo n a partir de 0".</li>
+    <li><code>aⁿ</code> aqui <b>não</b> é potência de número: é "a letra a repetida n vezes". <code>a³ = aaa</code>.</li>
+    <li><code>n ≥ 0</code> diz quais valores n pode assumir.</li>
+  </ul>
+
+  <h3>Como ler os símbolos que vão aparecer</h3>
+ </div>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>Símbolo</th><th>Leia como</th><th>Exemplo</th></tr></thead>
+      <tbody>
+        <tr><td><code>Σ</code> (sigma)</td><td>o alfabeto, as "letras" permitidas</td><td><code>Σ = {a, b}</code></td></tr>
+        <tr><td><code>w</code>, <code>u</code>, <code>v</code></td><td>uma palavra qualquer (letra minúscula do fim do alfabeto)</td><td><code>w = abba</code></td></tr>
+        <tr><td><code>ε</code> (épsilon)</td><td>a palavra vazia, sem nenhuma letra</td><td><code>|ε| = 0</code></td></tr>
+        <tr><td><code>|w|</code></td><td>o tamanho de w, quantas letras ela tem</td><td><code>|abba| = 4</code></td></tr>
+        <tr><td><code>L</code></td><td>uma <b>linguagem</b> (um conjunto de palavras)</td><td><code>L = {ab, aabb}</code></td></tr>
+        <tr><td><code>G</code></td><td>uma <b>gramática</b> (regras que geram uma linguagem)</td><td><code>G = (V, T, P, S)</code></td></tr>
+        <tr><td><code>M</code></td><td>uma máquina (um autômato)</td><td><code>M = (Q, Σ, δ, q₀, F)</code></td></tr>
+        <tr><td><code>L(G)</code>, <code>L(M)</code></td><td>a linguagem que G gera / que M aceita</td><td><code>L(G) = { aⁿbⁿ | n ≥ 0 }</code></td></tr>
+        <tr><td><code>(x, y, z)</code></td><td>uma <b>tupla</b>: lista em que a ordem importa</td><td>4 itens = quádrupla, 6 = 6-upla</td></tr>
+        <tr><td><code>∃</code> / "existe"</td><td>pelo menos um</td><td>"existe um ramo que aceita"</td></tr>
+        <tr><td><code>∀</code> / "para todo"</td><td>todos, sem exceção</td><td>"para todo i ≥ 0"</td></tr>
+        <tr><td><code>⇔</code> / "se e somente se"</td><td>as duas frases são verdadeiras juntas ou falsas juntas</td><td>"LLC ⇔ tem AP"</td></tr>
+      </tbody>
+    </table>
+  </div>
+ <div class="prose">
+  <p>Convenção dos livros: letras do começo do alfabeto (<code>a, b, c</code>) são <b>símbolos</b>; letras do fim (<code>u, v, w, x, y, z</code>) são <b>palavras</b>; maiúsculas (<code>S, A, B</code>) são <b>variáveis</b> de gramática.</p>
+ </div>
+</section>
+
+<hr class="sep">
 
 <!-- ============ 1 ============ -->
 <section class="chap" id="palavras">
  <div class="prose">
-  <span class="num">01</span>
+  <span class="num">02</span>
   <h2>Alfabeto, palavra e linguagem</h2>
   <div class="src"><span class="bk">Menezes · cap. 2 · p. 54–58</span></div>
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 170"><rect class="k" x="64" y="4" width="36" height="34" rx="6"/><text x="82" y="21">a</text><rect class="k" x="108" y="4" width="36" height="34" rx="6"/><text x="126" y="21">b</text><text class="tm" x="190" y="21">Σ = teclas</text><line class="s" x1="10" y1="80" x2="230" y2="80"/><circle class="bl" cx="50" cy="80" r="16"/><text x="50" y="80">a</text><circle class="bl" cx="96" cy="80" r="16"/><text x="96" y="80">b</text><circle class="bl" cx="142" cy="80" r="16"/><text x="142" y="80">b</text><circle class="bl" cx="188" cy="80" r="16"/><text x="188" y="80">a</text><text class="tm" x="120" y="114">palavra = contas num fio</text><rect class="k" x="88" y="132" width="64" height="30" rx="15" stroke-dasharray="4 3"/><text class="tm" x="120" y="147">ε (vazio)</text></svg>Alfabeto é o conjunto de peças; palavra é uma fila finita delas. ε é o fio sem contas.</aside>
-  <p>Toda a teoria é construída com três peças. Se você entender essas três, o resto do capítulo vira notação.</p>
+  <p>A matéria inteira trata de uma pergunta: <b>quais sequências de símbolos são válidas?</b> Um compilador faz isso com programas, um validador de e-mail faz com endereços. Para estudar isso com precisão, a teoria começa com três peças.</p>
   <ul class="b">
-    <li><b>Símbolo</b> (ou caractere): uma entidade abstrata, sem definição formal. Ex.: <code>a</code>, <code>0</code>, <code>+</code>.</li>
-    <li><b>Alfabeto Σ</b>: um conjunto <b>finito</b> de símbolos. Ex.: <code>Σ = {a, b}</code>, <code>{0,1}</code>. O conjunto vazio também é um alfabeto.</li>
-    <li><b>Palavra</b> (cadeia, sentença): uma sequência <b>finita</b> de símbolos do alfabeto, justapostos. Ex.: <code>abba</code>.</li>
-    <li><b>Palavra vazia ε</b>: a sequência sem nenhum símbolo. Ela existe sobre qualquer alfabeto.</li>
-    <li><b>Comprimento |w|</b>: o número de símbolos. <code>|abba| = 4</code>, <code>|ε| = 0</code>.</li>
+    <li><b>Símbolo</b>: qualquer marca que dá para distinguir de outra. Uma letra, um dígito, um sinal: <code>a</code>, <code>0</code>, <code>+</code>. A teoria não define símbolo além disso.</li>
+    <li><b>Alfabeto</b> (Σ): o conjunto de símbolos que podem ser usados. Precisa ser <b>finito</b>. Ex.: <code>Σ = {a, b}</code> ou <code>Σ = {0, 1}</code>.</li>
+    <li><b>Palavra</b> (também chamada cadeia ou sentença): uma sequência <b>finita</b> de símbolos do alfabeto, um do lado do outro. Ex.: <code>abba</code>. A ordem importa: <code>ab ≠ ba</code>.</li>
+    <li><b>Palavra vazia</b> (ε): a sequência com zero símbolos. Parece estranho, mas é como a string <code>""</code> em programação. Alguns livros escrevem <b>λ</b>.</li>
+    <li><b>Comprimento</b> (<code>|w|</code>): quantos símbolos a palavra tem. <code>|abba| = 4</code>, <code>|ε| = 0</code>.</li>
   </ul>
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="k" x="6" y="6" width="228" height="138" rx="12"/><text class="tm st" x="18" y="22">Σ*</text><ellipse class="acf" cx="150" cy="84" rx="66" ry="44"/><text class="ta" x="150" y="62">L</text><text x="132" y="88" class="tm">aa</text><text x="168" y="98" class="tm">aba</text><text x="150" y="112" class="tm">bb</text><text class="tm" x="44" y="64">ε</text><text class="tm" x="58" y="104">ab</text><text class="tm" x="40" y="126">baa</text></svg>Toda linguagem é um recorte de Σ*. Aqui, L = palíndromos.</aside>
-  <p>Agora pegue todas as palavras possíveis sobre Σ. Isso tem um nome:</p>
+  <p>Agora junte <b>todas</b> as palavras que dá para formar com um alfabeto. Esse conjunto tem nome:</p>
   <ul class="b">
-    <li><b>Σ*</b>: todas as palavras sobre Σ, <b>incluindo</b> ε.</li>
-    <li><b>Σ⁺</b>: todas as palavras sobre Σ, <b>exceto</b> ε. Ou seja, Σ⁺ = Σ* − {ε}.</li>
+    <li><b>Σ*</b> (lê-se "sigma estrela"): todas as palavras possíveis sobre Σ, de qualquer tamanho, <b>incluindo</b> ε. É sempre infinito (se Σ tiver pelo menos um símbolo), mas cada palavra dentro dele é finita.</li>
+    <li><b>Σ⁺</b> ("sigma mais"): o mesmo, <b>sem</b> a palavra vazia. Σ⁺ = Σ* − {ε}.</li>
   </ul>
  </div>
 
@@ -44,44 +98,49 @@
  <div class="prose">
   <div class="def key">
     <span class="lab">Definição · Linguagem formal</span>
-    <p>Uma <b>linguagem formal</b> L sobre Σ é <b>qualquer subconjunto</b> de Σ*. Só isso. Pode ser finita, infinita ou vazia.</p>
+    <p class="simples">Uma linguagem é uma <b>escolha de palavras</b>: um grupo de palavras que você considera "válidas". As outras ficam de fora.</p>
+    <p class="formal">Uma <b>linguagem formal</b> L sobre Σ é qualquer subconjunto de Σ*, ou seja, <code>L ⊆ Σ*</code>. Pode ser finita, infinita ou vazia.</p>
     <ul class="b">
-      <li><code>∅</code> e <code>{ε}</code> são linguagens diferentes: a primeira não tem palavra nenhuma, a segunda tem uma (a vazia).</li>
+      <li>Exemplo: com Σ = {a, b}, "as palavras que começam com a" é uma linguagem: {a, aa, ab, aaa, …}.</li>
       <li>Σ* e Σ⁺ também são linguagens sobre Σ.</li>
-      <li>O conjunto dos palíndromos sobre {a,b} é uma linguagem infinita.</li>
-      <li>Uma linguagem de programação (Pascal, C) é o conjunto de todos os programas válidos. Cada programa é uma palavra.</li>
+      <li>Uma linguagem de programação é o conjunto de todos os programas válidos. Cada programa é uma palavra (bem longa) sobre o alfabeto dos caracteres do teclado.</li>
     </ul>
   </div>
 
   <p class="prova"><code>∅ ≠ {ε}</code>: ∅ não tem nenhuma palavra; {ε} tem exatamente uma, a vazia. As duas são linguagens.</p>
 
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 120"><rect class="k" x="40" y="40" width="160" height="34" rx="6"/><text x="70" y="57">a</text><text x="102" y="57">b</text><text x="138" y="57">b</text><text x="170" y="57">a</text><path class="bl" style="fill:none;stroke-width:3" d="M54 30 H118"/><text class="tb" x="86" y="18">prefixo ab</text><path class="gr" style="fill:none;stroke-width:3" d="M122 84 H186"/><text x="154" y="100" style="fill:var(--green);font-weight:600">sufixo ba</text><path class="am" style="fill:none;stroke-width:3" d="M90 112 H150"/><text class="tam" x="214" y="112">bb</text></svg>Prefixo = começo, sufixo = fim, subpalavra = qualquer pedaço contínuo.</aside>
   <h3>Prefixo, sufixo e subpalavra</h3>
   <ul class="b">
-    <li><b>Prefixo</b>: qualquer sequência inicial. Prefixos de <code>abb</code>: ε, a, ab, abb.</li>
-    <li><b>Sufixo</b>: qualquer sequência final. Sufixos de <code>abb</code>: ε, b, bb, abb.</li>
-    <li><b>Subpalavra</b>: qualquer prefixo de um sufixo (um trecho contínuo). Toda palavra é prefixo, sufixo e subpalavra de si mesma.</li>
+    <li><b>Prefixo</b>: um pedaço do <b>começo</b> da palavra. Prefixos de <code>abb</code>: ε, a, ab, abb.</li>
+    <li><b>Sufixo</b>: um pedaço do <b>fim</b>. Sufixos de <code>abb</code>: ε, b, bb, abb.</li>
+    <li><b>Subpalavra</b>: qualquer pedaço <b>contínuo</b> de dentro da palavra, sem pular letras. <code>bb</code> é subpalavra de <code>abba</code>; <code>aa</code> não é (teria que pular os b).</li>
+    <li>Toda palavra é prefixo, sufixo e subpalavra de si mesma, e ε também é as três coisas.</li>
   </ul>
+  <div class="def">
+    <span class="lab">Versão formal (como está no livro)</span>
+    <p>y é subpalavra de w se existem palavras x e z com <code>w = xyz</code>. Prefixo é o caso em que x = ε; sufixo, quando z = ε. Por isso o livro diz "subpalavra é qualquer prefixo de um sufixo": corte um fim e depois um começo, sobra um pedaço do meio.</p>
+  </div>
 
-  <h3>Concatenação</h3>
+  <h3>Concatenação: juntar palavras</h3>
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 140"><rect class="bl" x="6" y="10" width="64" height="32" rx="6"/><text x="38" y="26">ab</text><text class="tm" x="84" y="26">·</text><rect class="am" x="98" y="10" width="64" height="32" rx="6"/><text x="130" y="26">ba</text><line class="s" x1="120" y1="52" x2="120" y2="72" marker-end="url(#mnarrow)"/><rect class="bl" x="56" y="82" width="64" height="32" rx="6"/><text x="88" y="98">ab</text><rect class="am" x="120" y="82" width="64" height="32" rx="6"/><text x="152" y="98">ba</text><text class="tm" x="120" y="132">vagões engatados: abba</text></svg>A ordem dos vagões importa: ab·ba ≠ ba·ab.</aside>
   <ul class="b">
-    <li><b>Concatenação</b> <code>vw</code>: junta as duas palavras. Se v = ab e w = ba, então vw = abba.</li>
-    <li>É <b>associativa</b>: v(wt) = (vw)t.</li>
-    <li>ε é o <b>elemento neutro</b>: εw = wε = w.</li>
-    <li>Não é comutativa: ab·ba ≠ ba·ab.</li>
-    <li><b>Concatenação sucessiva</b> wⁿ: w concatenada com ela mesma n vezes. Por definição <code>w⁰ = ε</code> e <code>wⁿ = wⁿ⁻¹w</code>.</li>
-    <li>|vw| = |v| + |w|.</li>
-    <li><b>Reverso</b> wᴿ: a palavra de trás para frente. Se w = abc, wᴿ = cba. Palíndromo é quando w = wᴿ.</li>
+    <li><b>Concatenação</b> <code>vw</code> (às vezes <code>v·w</code>): escreve v e logo depois w. Se v = ab e w = ba, então vw = abba. É o <code>+</code> de strings em programação.</li>
+    <li><b>Associativa</b>: tanto faz por onde você começa a juntar. <code>(ab·c)·d = ab·(c·d) = abcd</code>.</li>
+    <li>ε é o <b>elemento neutro</b>: juntar com nada não muda nada. <code>εw = wε = w</code>.</li>
+    <li><b>Não é comutativa</b>: trocar a ordem muda o resultado. <code>ab·ba = abba</code>, mas <code>ba·ab = baab</code>.</li>
+    <li>O tamanho soma: <code>|vw| = |v| + |w|</code>.</li>
+    <li><b>Concatenação sucessiva</b> <code>wⁿ</code>: w repetida n vezes. <code>(ab)³ = ababab</code>. Por definição, <code>w⁰ = ε</code> (repetir zero vezes dá a palavra vazia).</li>
+    <li><b>Reverso</b> <code>wᴿ</code>: a palavra de trás para frente. Se w = abc, wᴿ = cba. Um <b>palíndromo</b> é uma palavra igual ao próprio reverso, como <code>abba</code>.</li>
   </ul>
 
   <h3>Operações sobre linguagens</h3>
-  <p>Como linguagens são conjuntos, valem as operações de conjunto, mais duas próprias:</p>
+  <p>Linguagens são conjuntos de palavras, então dá para fazer com elas tudo que se faz com conjuntos, e mais duas operações próprias:</p>
   <ul class="b">
-    <li><b>União, interseção, diferença</b>: L₁ ∪ L₂, L₁ ∩ L₂, L₁ − L₂.</li>
-    <li><b>Concatenação de linguagens</b>: <code>L₁L₂ = { uv | u ∈ L₁ e v ∈ L₂ }</code>. Ex.: {a, b}·{c} = {ac, bc}.</li>
-    <li><b>Fecho de Kleene de uma linguagem</b>: <code>L* = L⁰ ∪ L¹ ∪ L² ∪ …</code>, com L⁰ = {ε}. É o mesmo "*" de Σ*, aplicado a L.</li>
+    <li><b>União, interseção, diferença</b>: L₁ ∪ L₂ (palavras que estão em uma ou na outra), L₁ ∩ L₂ (nas duas), L₁ − L₂ (na primeira e não na segunda).</li>
+    <li><b>Concatenação de linguagens</b> L₁L₂: todas as combinações "uma palavra de L₁ seguida de uma de L₂". Ex.: {a, b}·{c} = {ac, bc}. Formalmente <code>L₁L₂ = { uv | u ∈ L₁ e v ∈ L₂ }</code>.</li>
+    <li><b>Fecho de Kleene</b> L*: juntar palavras de L quantas vezes quiser, inclusive nenhuma. Se L = {ab}, então L* = {ε, ab, abab, …}. Formalmente <code>L* = L⁰ ∪ L¹ ∪ L² ∪ …</code>, com L⁰ = {ε}. É o mesmo "*" de Σ*.</li>
   </ul>
-  <p>Alguns livros escrevem a palavra vazia como <b>λ</b> em vez de ε. É a mesma coisa.</p>
   <p>Experimente:</p>
  </div>
 
@@ -99,27 +158,30 @@
 <!-- ============ 2 ============ -->
 <section class="chap" id="gramaticas">
  <div class="prose">
-  <span class="num">02</span>
+  <span class="num">03</span>
   <h2>Gramáticas: regras que geram palavras</h2>
   <div class="src"><span class="bk">Menezes · cap. 2 · p. 58–63</span></div>
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 144"><rect class="k" x="20" y="6" width="200" height="132" rx="10"/><text class="tm st" x="34" y="24">RECEITA G</text><line class="s" x1="34" y1="34" x2="206" y2="34"/><text class="st" x="34" y="54"><tspan class="tb" style="fill:var(--blue)">S</tspan> → a<tspan style="fill:var(--blue)">S</tspan>b</text><text class="st" x="34" y="78"><tspan style="fill:var(--blue)">S</tspan> → ε</text><text class="tm st" x="34" y="104">V = {S}  T = {a, b}</text><text class="tm st" x="34" y="122">começa em S</text></svg>Uma descrição finita que fabrica infinitas palavras.</aside>
-  <p>Uma linguagem infinita não cabe numa lista. Precisamos de uma descrição <b>finita</b> que produza todas as palavras dela. A gramática faz isso: é um conjunto de regras de substituição.</p>
+  <p>Uma linguagem infinita não cabe numa lista. Precisamos de uma descrição <b>finita</b> que consiga produzir todas as palavras dela, e nenhuma outra. A gramática é essa descrição.</p>
   <div class="def key">
     <span class="lab">Definição · Gramática</span>
-    <p>Uma gramática é uma quádrupla <code>G = (V, T, P, S)</code>:</p>
+    <p class="simples">Uma gramática é uma <b>receita de substituições</b>. Você começa com um símbolo especial e vai trocando pedaços seguindo as regras, até sobrar só letras "de verdade". Cada resultado possível é uma palavra da linguagem.</p>
+    <p class="formal">Uma gramática é uma quádrupla <code>G = (V, T, P, S)</code>:</p>
     <ul class="b">
-      <li><b class="v">V</b>: conjunto finito de <b>variáveis</b> (não-terminais). Aqui em azul: <span class="v">S, N, D, E</span>.</li>
-      <li><b class="t">T</b>: conjunto finito de <b>terminais</b>, disjunto de V. São os símbolos que aparecem nas palavras finais.</li>
-      <li><b>P</b>: conjunto finito de <b>regras de produção</b> α → β. Lê-se "α pode ser trocado por β". α tem pelo menos uma variável.</li>
-      <li><b>S</b> ∈ V: a <b>variável inicial</b>.</li>
+      <li><b class="v">V</b>: as <b>variáveis</b> (ou não-terminais), símbolos de rascunho que ainda vão ser trocados. Escritas em maiúscula; aqui em azul: <span class="v">S, N, D, E</span>.</li>
+      <li><b class="t">T</b>: os <b>terminais</b>, os símbolos que aparecem na palavra final (o alfabeto da linguagem). V e T não têm símbolo em comum.</li>
+      <li><b>P</b>: as <b>regras de produção</b>, escritas <code>α → β</code> e lidas "α pode ser trocado por β". α e β são sequências de variáveis e terminais; α tem pelo menos uma variável.</li>
+      <li><b>S</b>: a <b>variável inicial</b>, de onde tudo começa (S ∈ V).</li>
     </ul>
   </div>
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 170"><rect class="bl" x="70" y="6" width="100" height="30" rx="6"/><text x="120" y="21">S</text><rect class="bl" x="70" y="50" width="100" height="30" rx="6"/><text x="120" y="65">aSb</text><rect class="bl" x="70" y="94" width="100" height="30" rx="6"/><text x="120" y="109">aaSbb</text><rect class="gr" x="70" y="138" width="100" height="30" rx="6"/><text x="120" y="153">aabb</text><line class="s" x1="120" y1="37" x2="120" y2="48" marker-end="url(#mnarrow)"/><line class="s" x1="120" y1="81" x2="120" y2="92" marker-end="url(#mnarrow)"/><line class="s" x1="120" y1="125" x2="120" y2="136" marker-end="url(#mnarrow)"/><text class="tm st" x="178" y="42">⇒</text><text class="tm st" x="178" y="86">⇒</text><text class="tm st" x="178" y="130">⇒ ε</text></svg>Cada ⇒ é um passo. Termina quando não sobra variável (azul).</aside>
   <ul class="b">
-    <li>Abreviação: <code>S → aSb | ε</code> significa duas regras, <code>S → aSb</code> e <code>S → ε</code>.</li>
-    <li><b>Passo de derivação</b> <code>⇒</code>: aplicar uma regra uma vez. Se α → β está em P, então <code>uαv ⇒ uβv</code>.</li>
-    <li><code>⇒*</code> é zero ou mais passos. <code>⇒⁺</code> é um ou mais passos.</li>
-    <li>Uma <b>forma sentencial</b> é qualquer coisa que aparece no meio do caminho (mistura de variáveis e terminais).</li>
+    <li>Abreviação: <code>S → aSb | ε</code> são duas regras, <code>S → aSb</code> e <code>S → ε</code>. A barra <code>|</code> se lê "ou".</li>
+    <li><b>Passo de derivação</b> (<code>⇒</code>): aplicar uma regra uma vez. Exemplo: com a regra S → aSb, a sequência <code>aSb</code> vira <code>aaSbb</code> (trocamos o S do meio). Escreve-se <code>aSb ⇒ aaSbb</code>.</li>
+    <li>Na forma geral do livro: se <code>α → β</code> é uma regra, então <code>uαv ⇒ uβv</code>. Ou seja, o que está em volta (u e v) fica igual; só o pedaço α é trocado.</li>
+    <li><code>⇒*</code>: zero ou mais passos. <code>⇒⁺</code>: um ou mais passos.</li>
+    <li><b>Forma sentencial</b>: qualquer sequência que aparece no meio do caminho, misturando variáveis e terminais, como <code>aaSbb</code>.</li>
+    <li><b>Derivação mais à esquerda</b>: em cada passo, troca-se a variável mais à esquerda. É só uma convenção para todos fazerem na mesma ordem.</li>
   </ul>
   <p>Veja a derivação acontecendo. A cada passo, a variável mais à esquerda é trocada, e a árvore cresce embaixo:</p>
  </div>
@@ -142,15 +204,25 @@
  <div class="prose">
   <div class="def key">
     <span class="lab">Definição · Linguagem gerada</span>
-    <p>A linguagem gerada por G (Menezes escreve <code>GERA(G)</code> ou <code>L(G)</code>) é o conjunto de palavras <b>só de terminais</b> que dá para derivar a partir de S:</p>
+    <p class="simples">A linguagem de uma gramática é o conjunto de todas as palavras que dá para fabricar com ela, começando em S e parando quando só sobram terminais.</p>
+    <p class="formal">O livro escreve <code>GERA(G)</code> ou <code>L(G)</code>:</p>
     <div class="formula">L(G) = { w ∈ T* | S ⇒⁺ w }</div>
+    <p>Lê-se: "as palavras w feitas só de terminais tais que, partindo de S, chega-se em w em um ou mais passos".</p>
   </div>
   <ul class="b">
-    <li>Exemplo do livro, <b>duplo balanceamento</b>: <code>G = ({S}, {a,b}, {S → aSb, S → ε}, S)</code> gera <code>{ aⁿbⁿ | n ≥ 0 }</code> = {ε, ab, aabb, aaabbb, …}.</li>
-    <li>Exemplo do livro, <b>números naturais</b>: <code>N → D | DN</code> e <code>D → 0 | 1 | … | 9</code> geram qualquer sequência de dígitos.</li>
-    <li>Duas gramáticas são <b>equivalentes</b> se geram a mesma linguagem: <code>L(G₁) = L(G₂)</code>. As regras podem ser bem diferentes.</li>
-    <li>Ideia chave do capítulo: gramática é um formalismo <b>gerador</b> (produz palavras). Autômato é um formalismo <b>reconhecedor</b> (diz sim/não para uma palavra). Os dois lados vão se encontrar na Hierarquia de Chomsky.</li>
+    <li>Exemplo do livro, <b>duplo balanceamento</b>: <code>G = ({S}, {a,b}, {S → aSb, S → ε}, S)</code> gera <code>{ aⁿbⁿ | n ≥ 0 }</code> = {ε, ab, aabb, aaabbb, …}. Cada uso de S → aSb coloca um a e um b ao mesmo tempo; por isso a quantidade é sempre igual.</li>
+    <li>Exemplo do livro, <b>números naturais</b>: <code>N → D | DN</code> e <code>D → 0 | 1 | … | 9</code> geram qualquer sequência de dígitos. N é "um número" e D é "um dígito".</li>
+    <li>Duas gramáticas são <b>equivalentes</b> se geram a mesma linguagem, <code>L(G₁) = L(G₂)</code>, mesmo com regras diferentes.</li>
   </ul>
+  <div class="def">
+    <span class="lab">Gerar × reconhecer</span>
+    <ul class="b">
+      <li>Um <b>formalismo</b> é um jeito preciso, com regras fixas, de descrever uma linguagem.</li>
+      <li>A gramática é um formalismo <b>gerador</b>: ela fabrica as palavras.</li>
+      <li>Um <b>autômato</b> (uma máquina abstrata, que aparece na próxima seção) é um formalismo <b>reconhecedor</b>: recebe uma palavra e responde "sim, pertence" ou "não pertence".</li>
+      <li>A matéria toda gira em torno de qual gramática corresponde a qual máquina. O mapa completo é a Hierarquia de Chomsky, na seção 8.</li>
+    </ul>
+  </div>
  </div>
 </section>
 
@@ -159,31 +231,50 @@
 <!-- ============ 3 ============ -->
 <section class="chap" id="naoregulares">
  <div class="prose">
-  <span class="num">03</span>
+  <span class="num">04</span>
   <h2>O limite das linguagens regulares</h2>
   <div class="src"><a class="vd" href="https://www.youtube.com/watch?v=xlw0dFJ9CPY" target="_blank" rel="noopener">Vídeo · LFA Aula 11 · Linguagens não-regulares ↗</a></div>
+  <p>O vídeo é a aula 11 de outro curso e começa assumindo que você já viu autômatos finitos e linguagens regulares. A caixa abaixo resume o que ele pressupõe.</p>
+
+  <details class="base" open>
+   <summary><span class="base-tag">Base</span> Autômato finito e linguagem regular em 3 minutos</summary>
+<aside class="mn loop" data-loop="afd" data-ms="7000" data-still="0.9" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Este AFD aceita as palavras que terminam em a. Ele lê "baba" letra por letra e termina em q1, um estado final.</aside>
+   <ul class="b">
+    <li>Um <b>autômato finito</b> (AF) é uma máquina bem simples que lê uma palavra da esquerda para a direita, uma letra por vez, e no fim diz <b>aceito</b> ou <b>rejeito</b>.</li>
+    <li>Ela tem um número finito de <b>estados</b> (desenhados como círculos: q0, q1…). Estar num estado é a única coisa que ela "lembra".</li>
+    <li>As <b>transições</b> (setas) dizem: "estando no estado q, se ler a letra x, vá para o estado r".</li>
+    <li>Um estado é o <b>estado inicial</b> (seta solta apontando para ele). Alguns são <b>estados finais</b> (círculo duplo).</li>
+    <li>A palavra é <b>aceita</b> se, depois de ler tudo, a máquina está num estado final.</li>
+    <li><b>AFD</b> (determinístico): para cada estado e letra existe exatamente uma seta. <b>AFN</b> (não determinístico): pode haver várias opções, ou nenhuma; a palavra é aceita se <b>alguma</b> escolha de caminho termina num estado final. Os dois reconhecem exatamente as mesmas linguagens.</li>
+   </ul>
+   <div class="def key">
+    <span class="lab">Definição · Linguagem regular</span>
+    <p class="simples">Uma linguagem é <b>regular</b> quando dá para construir um autômato finito que aceita exatamente as palavras dela.</p>
+    <p class="formal">L é regular ⇔ existe um AF M com <code>L(M) = L</code>. Equivalente: existe uma <b>expressão regular</b> que descreve L, como <code>a*b*</code> ("zero ou mais a, depois zero ou mais b"; o * quer dizer "repita quantas vezes quiser, inclusive nenhuma").</p>
+   </div>
+  </details>
+
 <aside class="mn loop" data-loop="memoria" data-ms="9000" data-still="0.55" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>O AFD leu vários a, mas só sabe em qual estado está. Contar até n exigiria n estados.</aside>
-  <p>Relembrando: uma linguagem é <b>regular</b> se algum autômato finito (AFD ou AFN) a reconhece, ou, equivalentemente, se uma expressão regular a descreve. O ponto fraco de um autômato finito é a memória: ele só "lembra" em qual estado está, e são finitos.</p>
+  <p>O ponto fraco do autômato finito é a memória: ele só sabe em qual estado está, e o número de estados é fixo. Isso cria um limite do que ele consegue reconhecer.</p>
   <ul class="b">
     <li>Um AFD com 5 estados consegue distinguir no máximo 5 "situações".</li>
-    <li>Para reconhecer <code>aⁿbⁿ</code>, ele precisaria lembrar quantos <code>a</code> leu. Esse número pode ser 6, 100, 10⁹… Não cabe em uma quantidade fixa de estados.</li>
+    <li>Para reconhecer <code>aⁿbⁿ</code>, ele precisaria lembrar quantos <code>a</code> leu, para depois conferir os b. Esse número pode ser 6, 100, um bilhão… não cabe numa quantidade fixa de estados.</li>
     <li>Conclusão intuitiva: linguagens que exigem <b>contar sem limite</b> ou <b>casar pares</b> não são regulares.</li>
   </ul>
   <h3>Exemplos clássicos de linguagens não-regulares</h3>
   <ul class="b">
-    <li><code>{ aⁿbⁿ | n ≥ 0 }</code>: mesma quantidade de a e b.</li>
-    <li><code>{ wwᴿ | w ∈ {a,b}* }</code>: palíndromos de tamanho par.</li>
-    <li>Parênteses balanceados: <code>(()(()))</code>.</li>
-    <li><code>{ w | w tem o mesmo número de a e b }</code>.</li>
-    <li><code>{ aᵖ | p é primo }</code>, <code>{ ww | w ∈ {a,b}* }</code>.</li>
+    <li><code>{ aⁿbⁿ | n ≥ 0 }</code>: a mesma quantidade de a e b, com os a antes. No vídeo aparece como <code>0ⁿ1ⁿ</code>: é a mesma linguagem com outros símbolos.</li>
+    <li><code>{ wwᴿ | w ∈ {a,b}* }</code>: uma palavra seguida do seu reverso, ou seja, palíndromos de tamanho par (<code>abba</code>, <code>aa</code>).</li>
+    <li>Parênteses balanceados: <code>(()(()))</code>. Cada ( precisa de um ) depois.</li>
+    <li><code>{ w | w tem o mesmo número de a e b }</code>, em qualquer ordem.</li>
+    <li><code>{ aᵖ | p é primo }</code> e <code>{ ww | w ∈ {a,b}* }</code> (uma palavra repetida duas vezes, como <code>abab</code>).</li>
   </ul>
-  <p>No vídeo aparece como <code>0ⁿ1ⁿ</code>; aqui uso a e b, é a mesma linguagem com outros símbolos.</p>
   <div class="def warn">
     <span class="lab">Pegadinha do vídeo</span>
     <p>"Tem que contar" precisa ser contagem <b>ilimitada que será comparada depois</b>. A linguagem das cadeias binárias com o mesmo número de ocorrências de <code>01</code> e de <code>10</code> parece exigir contagem, mas é <b>regular</b>: essas ocorrências se alternam, então basta saber o primeiro e o último símbolo. Um AFD faz isso com poucos estados.</p>
   </div>
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 145"><rect class="k" x="14" y="70" width="60" height="50" rx="6"/><text class="tm" x="44" y="134">q0</text><rect class="k" x="90" y="70" width="60" height="50" rx="6"/><text class="tm" x="120" y="134">q1</text><rect class="k" x="166" y="70" width="60" height="50" rx="6"/><text class="tm" x="196" y="134">q2</text><circle class="bl" cx="34" cy="95" r="9"/><circle class="am" cx="54" cy="95" r="9"/><circle class="bl" cx="120" cy="95" r="9"/><circle class="bl" cx="196" cy="95" r="9"/><text class="tm" x="120" y="20">4 pombos, 3 casas</text><text class="tam" x="44" y="50">2 aqui!</text></svg>Ler p símbolos visita p+1 estados. Com p estados, algum repete.</aside>
-  <p>Intuição não é prova. A ferramenta para provar é o <b>lema do bombeamento</b>. Ele vem de uma observação simples sobre caminhos dentro de um AFD: se a palavra é maior do que o número de estados, algum estado se repete, e isso cria um laço.</p>
+  <p>Intuição não é prova. A ferramenta para provar é o <b>lema do bombeamento</b>. Ele vem de uma observação simples, o <b>princípio da casa dos pombos</b>: se 4 pombos entram em 3 casas, alguma casa fica com 2. No autômato, os "pombos" são os passos de leitura e as "casas" são os estados. Se a palavra é maior do que o número de estados, algum estado é visitado duas vezes, e o trecho lido entre as duas visitas é um <b>laço</b> que dá para repetir.</p>
  </div>
 
   <figure class="fig" id="fig-pump">
@@ -206,26 +297,28 @@
 <aside class="mn loop" data-loop="bombeia" data-ms="14000" data-still="0.3" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Com 0, 1, 2 ou 3 voltas no laço y, o caminho ainda termina aceitando.</aside>
   <div class="def key">
     <span class="lab">Lema do bombeamento · linguagens regulares</span>
-    <p>Se L é regular, então existe um número <b>p</b> (o comprimento de bombeamento) tal que <b>toda</b> palavra w ∈ L com <code>|w| ≥ p</code> pode ser dividida em <code>w = xyz</code> com:</p>
+    <p class="simples">Em toda linguagem regular, qualquer palavra comprida o bastante tem, perto do começo, um pedaço que você pode repetir quantas vezes quiser (ou apagar) e a palavra continua na linguagem.</p>
+    <p class="formal">Se L é regular, então <b>existe</b> um número p (o <b>comprimento de bombeamento</b>) tal que <b>toda</b> palavra w ∈ L com <code>|w| ≥ p</code> pode ser dividida em três pedaços <code>w = xyz</code> com:</p>
     <ul class="b">
-      <li><code>|y| ≥ 1</code> (o laço lê pelo menos um símbolo);</li>
-      <li><code>|xy| ≤ p</code> (a repetição acontece dentro dos p primeiros símbolos);</li>
-      <li><code>xyⁱz ∈ L</code> para <b>todo</b> i ≥ 0 (dá para repetir o laço quantas vezes quiser, ou pular).</li>
+      <li><code>|y| ≥ 1</code>: o pedaço repetível tem pelo menos uma letra;</li>
+      <li><code>|xy| ≤ p</code>: ele está entre as p primeiras letras;</li>
+      <li><code>xyⁱz ∈ L</code> <b>para todo</b> i ≥ 0: repetir y i vezes (ou apagar, com i = 0) mantém a palavra em L. <code>xy²z = xyyz</code>.</li>
     </ul>
+    <p>Pense em p como o número de estados do AFD: palavras com p letras ou mais obrigatoriamente passam por um laço.</p>
   </div>
   <h3>Para que serve</h3>
   <ul class="b">
-    <li>O lema diz: regular ⇒ bombeável. Ele <b>não</b> serve para provar que algo é regular.</li>
-    <li>Usamos a contrapositiva: se L <b>não</b> é bombeável, L <b>não</b> é regular.</li>
-    <li>A prova é sempre por contradição: suponha que L é regular, aplique o lema, chegue em um absurdo.</li>
+    <li>O lema diz: "se é regular, então é bombeável". Ele <b>não</b> serve para provar que algo é regular.</li>
+    <li>Ele serve pelo caminho inverso, a <b>contrapositiva</b>: "se <b>não</b> é bombeável, <b>não</b> é regular". É a mesma lógica de "se choveu, a rua está molhada; a rua está seca, então não choveu".</li>
+    <li>A prova é feita <b>por contradição</b>: você supõe que L é regular, aplica o lema e chega numa coisa impossível. Logo a suposição era falsa.</li>
   </ul>
   <p class="prova">O lema do bombeamento só prova que uma linguagem <b>não</b> é regular. Para aⁿbⁿ: escolha <code>w = aᵖbᵖ</code>; como <code>|xy| ≤ p</code>, y só tem a, e <code>xy²z</code> sai de L.</p>
   <h3>Receita: provar que L não é regular</h3>
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 184"><text class="tm" x="60" y="12">adversário</text><text class="tm" x="180" y="12">você</text><line class="s" x1="120" y1="22" x2="120" y2="176" stroke-dasharray="3 4"/><rect class="rd" x="20" y="26" width="80" height="28" rx="14"/><text x="60" y="40">p</text><rect class="gr" x="140" y="64" width="80" height="28" rx="14"/><text x="180" y="78">w</text><rect class="rd" x="20" y="102" width="80" height="28" rx="14"/><text x="60" y="116">xyz</text><rect class="gr" x="140" y="140" width="80" height="28" rx="14"/><text x="180" y="154">i</text></svg>Ele joga 1 e 3, você joga 2 e 4. Você ganha se vencer toda divisão.</aside>
-  <p>Pense num jogo contra um adversário que defende que L é regular. Você só ganha se vencer <b>qualquer</b> jogada dele.</p>
+  <p>Pense num jogo contra um adversário que defende que L é regular. Onde o lema diz "existe", quem escolhe é ele; onde diz "para todo", você precisa ganhar em qualquer caso.</p>
   <ul class="b">
-    <li><b>1. Adversário</b> escolhe p. Você não sabe o valor, trate como genérico.</li>
-    <li><b>2. Você</b> escolhe uma palavra w ∈ L com |w| ≥ p. Escolha uma que deixe o adversário sem saída. Para aⁿbⁿ: <code>w = aᵖbᵖ</code>.</li>
+    <li><b>1. Adversário</b> escolhe p. Você não sabe o valor, então trata p como um número qualquer.</li>
+    <li><b>2. Você</b> escolhe uma palavra w ∈ L com |w| ≥ p. Escolha uma que deixe o adversário sem saída. Para aⁿbⁿ: <code>w = aᵖbᵖ</code> (p letras a seguidas de p letras b).</li>
     <li><b>3. Adversário</b> divide w = xyz respeitando |y| ≥ 1 e |xy| ≤ p. Você precisa considerar <b>todas</b> as divisões possíveis.</li>
     <li><b>4. Você</b> escolhe um i e mostra que xyⁱz ∉ L.</li>
     <li>Como funcionou para toda divisão, L não satisfaz o lema. Contradição: L não é regular.</li>
@@ -254,9 +347,9 @@
       <div class="fig-side"><div class="lab">Por que sempre falha</div>
         <ol class="fig-notes">
           <li class="past">Como <code>|xy| ≤ p</code> e w começa com p letras a, o pedaço <b>y fica inteiro dentro dos a</b>. O adversário não tem como colocar b em y.</li>
-          <li class="past">Logo <code>y = aᵏ</code> com k ≥ 1.</li>
+          <li class="past">Logo y é só letras a: <code>y = aᵏ</code>, com k ≥ 1.</li>
           <li class="past">Com i = 2, a palavra vira <code>aᵖ⁺ᵏbᵖ</code>: mais a do que b. Não está em L.</li>
-          <li class="past">Com i = 0 também funciona: <code>aᵖ⁻ᵏbᵖ</code>.</li>
+          <li class="past">Com i = 0 também funciona: <code>aᵖ⁻ᵏbᵖ</code>, menos a do que b.</li>
           <li class="past">Mude p para 1 e veja: mesmo no menor caso, nenhuma divisão sobrevive.</li>
           <li class="cur">Isso vale para toda divisão. Contradição: <b>aⁿbⁿ não é regular</b>.</li>
         </ol>
@@ -274,7 +367,7 @@
       <li>Achar que "passar no lema" prova que L é regular. Existem linguagens não-regulares que passam.</li>
     </ul>
   </div>
-  <p>Fechamento do vídeo: se nem aⁿbⁿ cabe num autômato finito, precisamos de um formalismo mais forte. Gramáticas livres do contexto (gerador) e autômatos com pilha (reconhecedor) resolvem exatamente esse tipo de linguagem.</p>
+  <p>Fechamento do vídeo: se nem aⁿbⁿ cabe num autômato finito, precisamos de algo mais forte. As gramáticas livres do contexto (para gerar) e os autômatos com pilha (para reconhecer) resolvem exatamente esse tipo de linguagem.</p>
  </div>
 </section>
 
@@ -283,27 +376,28 @@
 <!-- ============ 4 ============ -->
 <section class="chap" id="llc">
  <div class="prose">
-  <span class="num">04</span>
+  <span class="num">05</span>
   <h2>Linguagens livres do contexto</h2>
   <div class="src"><span class="bk">Menezes · cap. 6 · p. 153–156</span></div>
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 112"><text x="120" y="70" style="font-size:22px;letter-spacing:4px">( ( ) ( ( ) ) )</text><path class="ac" d="M28 54 Q120 -10 212 54"/><path class="s" d="M52 56 Q66 34 82 56"/><path class="s" d="M106 56 Q142 18 186 56"/><path class="am" style="fill:none" d="M130 58 Q146 40 162 58"/><text class="tm" x="120" y="104">cada ( casa com um )</text></svg>Duplo balanceamento: o último que abriu é o primeiro a fechar.</aside>
-  <p>O Menezes abre o capítulo dizendo que as linguagens livres do contexto (LLC) cobrem um universo maior que o das regulares, e que o exemplo típico é o <b>duplo balanceamento</b>: estruturas que abrem e fecham em pares.</p>
+  <p>As linguagens livres do contexto (LLC) são uma classe <b>maior</b> que a das regulares: toda linguagem regular é LLC, e algumas LLC (como aⁿbⁿ) não são regulares. O exemplo típico é o <b>duplo balanceamento</b>: estruturas que abrem e fecham em pares, uma dentro da outra.</p>
   <ul class="b">
-    <li>Parênteses em expressões aritméticas.</li>
-    <li>Blocos <code>begin … end</code>, <code>{ … }</code>, <code>if … then … else</code>.</li>
-    <li>Por isso as LLC são a base de <b>analisadores sintáticos</b> (parsers), compiladores e tradutores.</li>
+    <li>Parênteses em expressões aritméticas: <code>(2 + (3 * 4))</code>.</li>
+    <li>Blocos em programação: <code>{ … }</code>, <code>begin … end</code>, <code>if … then … else</code>.</li>
+    <li>Por isso as LLC são a base dos <b>analisadores sintáticos</b> (parsers): a parte do <b>compilador</b> que confere se o programa está escrito na estrutura certa, antes de traduzi-lo.</li>
   </ul>
-  <p>Dois formalismos descrevem as LLC:</p>
+  <p>Dois formalismos descrevem as LLC, um de cada lado:</p>
   <ul class="b">
-    <li><b>Gramática livre do contexto (GLC)</b>: formalismo gerador.</li>
-    <li><b>Autômato com pilha (AP)</b>: formalismo reconhecedor. É um autômato finito com uma pilha como memória extra.</li>
+    <li><b>Gramática livre do contexto (GLC)</b>: gera as palavras.</li>
+    <li><b>Autômato com pilha (AP)</b>: reconhece. É um autômato finito com uma pilha como memória extra (seção 6).</li>
   </ul>
 
   <div class="def key">
     <span class="lab">Definição · Gramática livre do contexto</span>
-    <p>Uma gramática <code>G = (V, T, P, S)</code> em que <b>toda</b> regra tem a forma</p>
+    <p class="simples">É uma gramática em que toda regra troca <b>uma única variável</b> por alguma coisa. Nada de regras do tipo "troque aAb por…".</p>
+    <p class="formal">Uma gramática <code>G = (V, T, P, S)</code> em que toda regra tem a forma</p>
     <div class="formula">A → α &nbsp;&nbsp;onde A ∈ V e α ∈ (V ∪ T)*</div>
-    <p>Do lado esquerdo vai <b>exatamente uma variável</b>, sozinha. Do lado direito vai qualquer coisa, inclusive ε.</p>
+    <p>Lê-se: do lado esquerdo, exatamente uma variável sozinha; do lado direito, qualquer sequência de variáveis e terminais, inclusive vazia (ε).</p>
     <p><b>Linguagem livre do contexto</b> = linguagem gerada por alguma GLC.</p>
   </div>
 
@@ -312,32 +406,33 @@
   <h3>Por que "livre do contexto"?</h3>
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><text class="tm st" x="6" y="14">livre do contexto</text><rect class="bl" x="98" y="28" width="40" height="30" rx="6"/><text class="tb" x="118" y="43">A</text><text class="tm" x="170" y="43">→ α</text><text class="tm" x="58" y="43">? ? ?</text><line class="s" x1="6" y1="76" x2="234" y2="76" stroke-dasharray="3 4"/><text class="tm st" x="6" y="96">sensível ao contexto</text><rect class="k" x="58" y="110" width="30" height="30" rx="6"/><text x="73" y="125">a</text><rect class="bl" x="92" y="110" width="30" height="30" rx="6"/><text class="tb" x="107" y="125">A</text><rect class="k" x="126" y="110" width="30" height="30" rx="6"/><text x="141" y="125">b</text><text class="tm" x="196" y="125">→ aab</text></svg>Em cima, A troca em qualquer lugar. Embaixo, só entre a e b.</aside>
   <ul class="b">
-    <li>Como o lado esquerdo é só <code>A</code>, a variável pode ser substituída <b>não importa o que está em volta dela</b>.</li>
-    <li>Compare com uma regra <b>sensível</b> ao contexto como <code>aAb → aab</code>: ali A só vira a quando está entre a e b.</li>
-    <li>Toda gramática regular é livre do contexto. A recíproca é falsa: S → aSb é GLC e não é regular.</li>
+    <li>"Contexto" aqui são os símbolos em volta da variável.</li>
+    <li>Como o lado esquerdo é só <code>A</code>, a variável pode ser trocada <b>não importa o que está em volta dela</b>.</li>
+    <li>Compare com uma regra <b>sensível</b> ao contexto como <code>aAb → aab</code>: ali A só pode virar a quando está entre um a e um b.</li>
+    <li>Toda <b>gramática regular</b> (regras só do tipo <code>A → aB</code> ou <code>A → a</code>, que geram exatamente as linguagens regulares) também é livre do contexto. A volta é falsa: <code>S → aSb</code> é GLC e gera aⁿbⁿ, que não é regular.</li>
   </ul>
 
   <h3>Exemplos do livro</h3>
   <ul class="b">
-    <li><b>Duplo balanceamento</b>: <code>S → aSb | ε</code> gera <code>{ aⁿbⁿ | n ≥ 0 }</code>. O a e o b que entram juntos ficam "casados" pela mesma regra. É assim que a GLC faz o que o AFD não consegue.</li>
-    <li><b>Expressões aritméticas</b>: <code>E → E+E | E*E | (E) | x</code> gera <code>x</code>, <code>x*(x+x)</code>, <code>((x))</code>…</li>
+    <li><b>Duplo balanceamento</b>: <code>S → aSb | ε</code> gera <code>{ aⁿbⁿ | n ≥ 0 }</code>. O a e o b entram juntos pela mesma regra, então ficam "casados". É assim que a GLC faz o que o AFD não consegue.</li>
+    <li><b>Expressões aritméticas</b>: <code>E → E+E | E*E | (E) | x</code> gera <code>x</code>, <code>x*(x+x)</code>, <code>((x))</code>… Aqui E é "uma expressão" e x representa um número qualquer.</li>
   </ul>
 
   <h3>BNF: a mesma coisa com outra roupa</h3>
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 84"><text class="st" x="6" y="18"><tspan style="fill:var(--blue)">E</tspan> → E + E | x</text><text class="tm" x="120" y="46">≡</text><text class="st" x="6" y="74" style="font-size:11.5px"><tspan style="fill:var(--blue)">⟨expr⟩</tspan> ::= ⟨expr⟩ + ⟨expr⟩ | x</text></svg>Mesma gramática: só muda a notação.</aside>
-  <p>A <b>Backus-Naur Form</b> é a notação usada para especificar linguagens de programação (começou com o ALGOL). Ela é uma GLC escrita assim:</p>
+  <p>A <b>Backus-Naur Form</b> (BNF) é a notação usada para especificar linguagens de programação desde a linguagem ALGOL, nos anos 1960. Ela é uma GLC escrita de um jeito mais legível:</p>
   <ul class="b">
-    <li>variáveis entre <code>⟨ ⟩</code>, com nomes legíveis;</li>
+    <li>variáveis entre <code>⟨ ⟩</code>, com nomes que dizem o que são;</li>
     <li><code>::=</code> no lugar de →.</li>
   </ul>
   <div class="formula">⟨expr⟩ ::= ⟨expr⟩ + ⟨expr⟩ | ⟨expr⟩ * ⟨expr⟩ | ( ⟨expr⟩ ) | x</div>
 
   <h3>Árvore de derivação</h3>
   <ul class="b">
-    <li>A raiz é a variável inicial. Cada nó interno é uma variável; seus filhos são o lado direito da regra aplicada.</li>
-    <li>As folhas, lidas da esquerda para a direita, formam a palavra.</li>
-    <li>A árvore ignora a <b>ordem</b> em que as regras foram aplicadas e mostra só a <b>estrutura</b>. Por isso, para GLC ela é a representação natural de uma derivação.</li>
-    <li>Se uma mesma palavra tem duas árvores diferentes, a gramática é <b>ambígua</b>. Compare os dois botões "x+x*x" abaixo.</li>
+    <li>É o desenho de uma derivação. A raiz é a variável inicial; cada variável trocada ganha como filhos os símbolos da regra usada.</li>
+    <li>As folhas (as pontas de baixo), lidas da esquerda para a direita, formam a palavra.</li>
+    <li>A árvore ignora a <b>ordem</b> em que as regras foram aplicadas e mostra só a <b>estrutura</b>, isto é, quem está dentro de quem.</li>
+    <li>Se uma mesma palavra tem duas árvores diferentes, a gramática é <b>ambígua</b>. Isso é ruim para um compilador: <code>x+x*x</code> pode virar (x+x)*x ou x+(x*x), que dão resultados diferentes. Compare os dois botões "x+x*x" abaixo.</li>
   </ul>
  </div>
 
@@ -362,31 +457,34 @@
 <!-- ============ 5 ============ -->
 <section class="chap" id="ap">
  <div class="prose">
-  <span class="num">05</span>
+  <span class="num">06</span>
   <h2>Autômatos com pilha</h2>
   <div class="src"><a class="vd" href="https://www.youtube.com/watch?v=-rfslM7ouzY" target="_blank" rel="noopener">Vídeo · Autômatos com pilha ↗</a></div>
 <aside class="mn loop" data-loop="pilha" data-ms="8000" data-still="0.4" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Cada a empilha um A; cada b tira um. Sobrou só o $: mesma quantidade.</aside>
-  <p>Um autômato com pilha (AP, ou PDA em inglês) é um <b>autômato finito não determinístico + uma pilha</b>. A pilha é memória ilimitada, mas com acesso restrito: só dá para mexer no topo.</p>
+  <p>O autômato finito falhou com aⁿbⁿ por falta de memória. A solução é dar a ele uma memória extra, mas de um tipo bem específico: uma <b>pilha</b>.</p>
   <ul class="b">
-    <li><b>Empilhar</b> (push): coloca um símbolo no topo.</li>
-    <li><b>Desempilhar</b> (pop): tira o símbolo do topo.</li>
-    <li>Último a entrar é o primeiro a sair (LIFO). Isso combina com balanceamento: o último <code>(</code> aberto é o primeiro a ser fechado.</li>
+    <li>Uma <b>pilha</b> é como uma pilha de pratos: você só coloca e tira pratos de cima. Cabe quantos quiser, mas só o de cima é acessível.</li>
+    <li><b>Empilhar</b> (push): coloca um símbolo no topo. <b>Desempilhar</b> (pop): tira o símbolo do topo.</li>
+    <li>O último a entrar é o primeiro a sair. Isso combina com balanceamento: o último <code>(</code> aberto é o primeiro a ser fechado.</li>
   </ul>
+  <p>Um <b>autômato com pilha</b> (AP, ou PDA em inglês) é um autômato finito <b>não determinístico</b> com uma pilha. Lembrando da caixa da seção 4: não determinístico quer dizer que, em algum momento, a máquina pode ter mais de uma opção, e a palavra é aceita se <b>alguma</b> sequência de escolhas der certo.</p>
 
   <div class="def key">
     <span class="lab">Definição formal (notação do vídeo)</span>
-    <p>Um AP é uma 6-upla <code>M = (Q, Σ, Γ, δ, q₀, F)</code>:</p>
+    <p class="simples">Um AP é descrito por seis coisas: os estados, as letras que ele lê, os símbolos que ele pode guardar na pilha, as regras de movimento, onde ele começa e onde ele aceita.</p>
+    <p class="formal">Um AP é uma 6-upla <code>M = (Q, Σ, Γ, δ, q₀, F)</code>:</p>
     <ul class="b">
-      <li><b>Q</b>: estados (finito). <b>q₀</b>: estado inicial. <b>F ⊆ Q</b>: estados de aceitação.</li>
-      <li><b>Σ</b>: alfabeto de <b>entrada</b>.</li>
-      <li><b>Γ</b>: alfabeto da <b>pilha</b>. Pode ter símbolos que não estão em Σ, como <code>$</code> ou <code>A</code>.</li>
-      <li><b>δ: Q × Σ_ε × Γ_ε → 𝒫(Q × Γ_ε)</b>: a função de transição. Recebe estado, símbolo lido (ou ε) e topo da pilha (ou ε), e devolve um <b>conjunto</b> de opções (por isso é não determinístico).</li>
+      <li><b>Q</b>: o conjunto (finito) de estados. <b>q₀</b>: o estado inicial. <b>F ⊆ Q</b>: os estados de aceitação.</li>
+      <li><b>Σ</b>: o alfabeto de <b>entrada</b> (as letras da palavra).</li>
+      <li><b>Γ</b> (gama): o <b>alfabeto da pilha</b>, os símbolos que podem ir para a pilha. Pode ter símbolos que não estão em Σ, como <code>$</code> ou <code>A</code>.</li>
+      <li><b>δ</b> (delta): a <b>função de transição</b>, as regras de movimento. Ela recebe três coisas (o estado atual, a letra lida ou ε, o símbolo do topo da pilha ou ε) e devolve um <b>conjunto de opções</b> de (próximo estado, o que empilhar).</li>
     </ul>
+    <p class="nota-formal">No livro isso aparece como <code>δ: Q × Σ_ε × Γ_ε → 𝒫(Q × Γ_ε)</code>. Tradução: <code>×</code> forma pares ou trios (um estado, uma letra, um símbolo); <code>Σ_ε</code> é Σ mais a opção ε ("não ler nada"); <code>𝒫(…)</code> é o <b>conjunto das partes</b>, "um conjunto qualquer de…", e é isso que permite várias opções ao mesmo tempo.</p>
   </div>
 
   <h3>Lendo uma transição <code>a, b → c</code></h3>
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 100"><text x="120" y="60" style="font-size:24px">a , b → c</text><line class="s" x1="64" y1="44" x2="64" y2="22"/><text class="tm" x="64" y="12">lê</text><line class="s" x1="112" y1="44" x2="112" y2="22"/><text class="tm" x="112" y="12">desempilha</text><line class="s" x1="180" y1="44" x2="180" y2="22"/><text class="tm" x="180" y="12">empilha</text><text class="tm" x="64" y="92">entrada</text><text class="tm" x="146" y="92">pilha</text><path class="s" d="M40 78 H88"/><path class="s" d="M100 78 H194"/></svg>Qualquer um dos três pode ser ε (não faz nada).</aside>
-  <p>Na seta entre dois estados aparece <code>a, b → c</code>: "lê <b>a</b> da entrada, troca <b>b</b> do topo da pilha por <b>c</b>". Qualquer um dos três pode ser ε:</p>
+  <p>No desenho do AP, cada seta tem um rótulo <code>a, b → c</code>: "lê <b>a</b> da entrada, tira <b>b</b> do topo da pilha e coloca <b>c</b> no lugar". Qualquer um dos três pode ser ε, que aqui quer dizer "nada":</p>
  </div>
   <div class="tbl prose">
     <table>
@@ -402,8 +500,9 @@
   </div>
  <div class="prose">
   <ul class="b">
-    <li>Se o topo não for o símbolo pedido, a transição <b>não pode</b> ser usada naquele ramo.</li>
-    <li>O AP não tem teste "pilha vazia?" embutido. O truque é empilhar <code>$</code> no começo: ver <code>$</code> no topo significa "pilha vazia".</li>
+    <li>Se o topo da pilha não for o símbolo pedido, aquela seta <b>não pode</b> ser usada naquele momento.</li>
+    <li>Uma transição que não lê nada (com ε na entrada) é uma <b>ε-transição</b>: a máquina muda de estado "de graça".</li>
+    <li>O AP não tem um teste "a pilha está vazia?". O truque é empilhar um <code>$</code> logo no começo: quando o <code>$</code> aparece no topo, a pilha está vazia.</li>
   </ul>
 
   <p class="prova">Transição <code>a, b → c</code>: lê a, desempilha b, empilha c (cada um pode ser ε). Use <code>$</code> para saber quando a pilha está vazia.</p>
@@ -411,17 +510,17 @@
   <h3>Computação: configurações</h3>
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 110"><text x="120" y="30" style="font-size:20px">( q , w , γ )</text><line class="s" x1="80" y1="44" x2="44" y2="76"/><line class="s" x1="120" y1="44" x2="120" y2="76"/><line class="s" x1="160" y1="44" x2="196" y2="76"/><rect class="am" x="14" y="78" width="60" height="26" rx="13"/><text class="tm" x="44" y="91">estado</text><rect class="k" x="84" y="78" width="72" height="26" rx="13"/><text class="tm" x="120" y="91">falta ler</text><rect class="bl" x="166" y="78" width="60" height="26" rx="13"/><text class="tm" x="196" y="91">pilha</text></svg>Uma fotografia completa da máquina num instante.</aside>
   <ul class="b">
-    <li>Uma <b>configuração</b> ou <b>descrição instantânea (ID)</b> é uma fotografia da máquina: a tripla <code>(q, w, γ)</code> = (estado, entrada que falta ler, conteúdo da pilha).</li>
-    <li>Convenção do vídeo: a pilha é escrita na horizontal com o <b>topo à direita</b>. <code>$AA</code> quer dizer $ no fundo e A no topo.</li>
-    <li>Um movimento entre IDs se escreve com a catraca: <code>(q2, abb, $A) ⊢ (q3, bb, $)</code>. <code>⊢*</code> é zero ou mais movimentos.</li>
-    <li>Como δ devolve um conjunto, a computação vira uma <b>árvore de ramos</b>. Ramos que travam (nenhuma transição possível) simplesmente morrem.</li>
+    <li>Uma <b>configuração</b> (ou <b>descrição instantânea</b>, ID) é uma fotografia da máquina: <code>(q, w, γ)</code> = (estado atual, o que falta ler, conteúdo da pilha).</li>
+    <li>Convenção do vídeo: a pilha é escrita deitada, com o <b>topo à direita</b>. <code>$AA</code> quer dizer $ no fundo e A no topo.</li>
+    <li>Um passo da máquina se escreve com o símbolo <code>⊢</code> (catraca): <code>(q2, abb, $A) ⊢ (q3, bb, $)</code>. <code>⊢*</code> é zero ou mais passos.</li>
+    <li>Como pode haver várias opções, a execução vira uma <b>árvore de ramos</b>: cada escolha abre um caminho. Ramos que travam (nenhuma seta possível) simplesmente morrem.</li>
   </ul>
   <div class="def">
     <span class="lab">Dois critérios de aceitação</span>
     <ul class="b">
-      <li><b>Por estado final</b>: algum ramo consome a entrada toda e para em q ∈ F. O que sobrou na pilha não importa. É o critério usado nas figuras.</li>
-      <li><b>Por pilha vazia</b>: algum ramo consome a entrada toda e deixa a pilha vazia.</li>
-      <li>Para APs não determinísticos os dois critérios reconhecem as mesmas linguagens.</li>
+      <li><b>Por estado final</b>: algum ramo lê a entrada toda e termina num estado de F. O que sobrou na pilha não importa. É o critério usado nas figuras.</li>
+      <li><b>Por pilha vazia</b>: algum ramo lê a entrada toda e deixa a pilha vazia.</li>
+      <li>Para APs não determinísticos, os dois critérios reconhecem as mesmas linguagens.</li>
     </ul>
   </div>
   <p>O AP abaixo reconhece <code>{ aⁿbⁿ | n ≥ 0 }</code>. Troque a entrada e acompanhe a pilha:</p>
@@ -449,9 +548,9 @@
 
  <div class="prose">
   <ul class="b">
-    <li>Com <code>aabbb</code>, sobra um b quando a pilha já está no <code>$</code>: não há transição <code>b, $ → …</code>, o ramo morre.</li>
-    <li>Com <code>abab</code>, depois de ir para q3 não existe transição lendo a. Rejeita.</li>
-    <li>q1 é de aceitação para aceitar ε (n = 0).</li>
+    <li>Com <code>aabbb</code>, sobra um b quando a pilha já está no <code>$</code>: não há seta <code>b, $ → …</code>, o ramo morre.</li>
+    <li>Com <code>abab</code>, depois de ir para q3 não existe seta lendo a. Rejeita.</li>
+    <li>q1 é de aceitação para aceitar ε (o caso n = 0).</li>
   </ul>
  </div>
 </section>
@@ -461,26 +560,27 @@
 <!-- ============ 6 ============ -->
 <section class="chap" id="apex">
  <div class="prose">
-  <span class="num">06</span>
+  <span class="num">07</span>
   <h2>Mais exemplos: projetando APs</h2>
   <div class="src"><a class="vd" href="https://www.youtube.com/watch?v=wXtbxHn81mQ" target="_blank" rel="noopener">Vídeo · APs: mais exemplos ↗</a></div>
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 130"><rect class="bl" x="14" y="40" width="32" height="32" rx="6"/><text x="30" y="56">a</text><rect class="bl" x="50" y="40" width="32" height="32" rx="6"/><text x="66" y="56">b</text><rect class="bl" x="86" y="40" width="32" height="32" rx="6"/><text x="102" y="56">b</text><rect class="am" x="122" y="40" width="32" height="32" rx="6"/><text x="138" y="56">b</text><rect class="am" x="158" y="40" width="32" height="32" rx="6"/><text x="174" y="56">b</text><rect class="am" x="194" y="40" width="32" height="32" rx="6"/><text x="210" y="56">a</text><line class="ac" x1="120" y1="28" x2="120" y2="84" stroke-dasharray="3 3"/><text class="ta" x="120" y="18">meio?</text><path class="s" d="M102 76 Q120 96 138 76"/><path class="s" d="M66 76 Q120 116 174 76"/><path class="s" d="M30 76 Q120 136 210 76"/></svg>Empilha a 1ª metade; a 2ª sai na ordem inversa e confere.</aside>
-  <p>Projetar um AP é responder: <b>o que eu preciso lembrar, e em que ordem vou conferir?</b> A pilha devolve as coisas ao contrário, então ela é perfeita para conferir algo "espelhado".</p>
+  <p>Projetar um AP é responder duas perguntas: <b>o que eu preciso lembrar, e em que ordem vou conferir?</b> A pilha devolve as coisas na ordem inversa, então ela é perfeita para conferir algo "espelhado".</p>
   <h3>Palíndromos pares: { wwᴿ }</h3>
   <ul class="b">
     <li>Empilha cada símbolo da primeira metade.</li>
     <li>No meio, passa para o estado de conferência.</li>
-    <li>Cada símbolo da segunda metade tem que ser igual ao topo. Desempilha.</li>
-    <li>O problema: <b>como saber onde é o meio?</b> Não sabe. O AP <b>chuta</b> com uma ε-transição. Como ele é não determinístico, existe um ramo que chuta certo, e basta um ramo aceitar.</li>
-    <li>Isso mostra que AP não determinístico é <b>mais forte</b> que o determinístico: wwᴿ não tem AP determinístico.</li>
+    <li>Cada símbolo da segunda metade tem que ser igual ao topo da pilha; se for, desempilha.</li>
+    <li>O problema: <b>como saber onde é o meio?</b> A máquina não sabe. Ela <b>chuta</b>, usando uma ε-transição. Como é não determinística, ela tenta todos os chutes ao mesmo tempo, e basta um ramo acertar.</li>
+    <li>Um AP <b>determinístico</b> (sem escolhas, uma única opção por passo) não consegue reconhecer wwᴿ. Ou seja, para APs o não determinismo dá mais poder. Para autômatos finitos, não dava.</li>
   </ul>
 <aside class="mn loop" data-loop="ramos" data-ms="9000" data-still="0.95" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>O AP tenta todos os "meios" ao mesmo tempo. Só o ramo que chuta a posição 2 aceita abba.</aside>
   <h3>{ aⁱbʲcᵏ | i = j ou i = k }</h3>
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 140"><circle class="k" cx="36" cy="70" r="20"/><text x="36" y="70">q2</text><path class="s" d="M56 62 Q100 20 150 26" marker-end="url(#mnarrow)"/><path class="s" d="M56 78 Q100 120 150 114" marker-end="url(#mnarrow)"/><rect class="gr" x="152" y="12" width="82" height="28" rx="14"/><text class="tm" x="193" y="26">testa i = j</text><rect class="gr" x="152" y="100" width="82" height="28" rx="14"/><text class="tm" x="193" y="114">testa i = k</text><text class="tm" x="100" y="72">ε</text></svg>"Ou" vira dois ramos. Basta um aceitar.</aside>
   <ul class="b">
+    <li>A linguagem: alguns a, depois alguns b, depois alguns c, e o número de a é igual ao de b <b>ou</b> igual ao de c. Ex.: <code>aabbc</code> (2 a, 2 b) e <code>aabcc</code> (2 a, 2 c) estão nela.</li>
     <li>Empilha os a.</li>
-    <li>Chuta qual igualdade vai testar: ramo de cima confere a com b (e ignora c); ramo de baixo ignora b e confere a com c.</li>
-    <li>"Ou" em linguagem costuma virar <b>dois ramos não determinísticos</b>.</li>
+    <li>Chuta qual igualdade vai testar: o ramo de cima confere a com b (e ignora os c); o de baixo ignora os b e confere a com c.</li>
+    <li>"Ou" na definição da linguagem costuma virar <b>dois ramos não determinísticos</b>.</li>
   </ul>
   <p>Escolha a máquina. Na contagem final aparece quantas configurações o simulador explorou: são os ramos do não determinismo.</p>
  </div>
@@ -511,12 +611,12 @@
     <ul class="b">
       <li>Comece empilhando <code>$</code>. Termine com <code>ε, $ → ε</code> indo para o estado final.</li>
       <li>Use um estado por "fase" da palavra (lendo a, lendo b, lendo c).</li>
-      <li>Precisa contar duas coisas ao mesmo tempo contra uma terceira (aⁿbⁿcⁿ)? Uma pilha não basta. Esse é o sinal de que a linguagem não é livre do contexto.</li>
+      <li>Precisa contar duas coisas ao mesmo tempo contra uma terceira (aⁿbⁿcⁿ: mesmo número de a, b e c)? Uma pilha não basta. Esse é o sinal de que a linguagem não é livre do contexto.</li>
     </ul>
   </div>
   <div class="def key">
     <span class="lab">Teorema central</span>
-    <p>Uma linguagem é livre do contexto <b>se e somente se</b> algum autômato com pilha a reconhece. GLC (gerador) e AP (reconhecedor) têm exatamente o mesmo poder.</p>
+    <p>Uma linguagem é livre do contexto <b>se e somente se</b> algum autômato com pilha a reconhece. GLC (gerador) e AP (reconhecedor) têm exatamente o mesmo poder: tudo que uma faz, o outro também faz.</p>
   </div>
  </div>
 </section>
@@ -526,11 +626,21 @@
 <!-- ============ 7 ============ -->
 <section class="chap" id="chomsky">
  <div class="prose">
-  <span class="num">07</span>
+  <span class="num">08</span>
   <h2>Hierarquia de Chomsky</h2>
   <div class="src"><a class="vd" href="https://www.youtube.com/watch?v=VGCkKElmOm8" target="_blank" rel="noopener">Vídeo · LFA Aula 19 · Hierarquia de Chomsky ↗</a></div>
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="gr" x="10" y="116" width="46" height="14" rx="4"/><text class="tm" x="33" y="142">AF</text><text class="tm" x="33" y="108">nada</text><rect class="bl" x="68" y="86" width="46" height="44" rx="4"/><text class="tm" x="91" y="142">AP</text><text class="tm" x="91" y="78">pilha</text><rect class="am" x="126" y="56" width="46" height="74" rx="4"/><text class="tm" x="149" y="142">ALL</text><text class="tm" x="149" y="48">fita=n</text><rect class="rd" x="184" y="26" width="46" height="104" rx="4"/><text class="tm" x="207" y="142">MT</text><text class="tm" x="207" y="18">fita ∞</text></svg>Subir de tipo = dar mais memória à máquina.</aside>
-  <p>Noam Chomsky classificou as gramáticas pelo <b>formato das regras</b>. Quanto mais restrita a regra, menor a classe de linguagens. Cada classe tem uma máquina reconhecedora correspondente. É o mapa que amarra toda a disciplina.</p>
+  <p>Noam Chomsky (linguista) classificou as gramáticas pelo <b>formato das regras</b>. Quanto mais restrita a regra, menor a classe de linguagens que ela gera. Cada classe tem uma máquina que a reconhece. É o mapa que amarra toda a matéria.</p>
+
+  <details class="base" open>
+   <summary><span class="base-tag">Base</span> As duas máquinas que ainda não apareceram</summary>
+   <ul class="b">
+    <li><b>Máquina de Turing</b> (MT): um autômato com uma fita infinita onde ele pode ler, <b>escrever</b> e andar para os dois lados. É o modelo teórico de "qualquer computador": tudo que um programa consegue calcular, uma MT também consegue.</li>
+    <li><b>Autômato linearmente limitado</b> (ALL): uma máquina de Turing que só pode usar a parte da fita onde está a palavra de entrada. Memória proporcional ao tamanho da entrada, não infinita.</li>
+    <li>Reconhecer não é o mesmo que <b>decidir</b>: uma MT pode aceitar as palavras da linguagem mas rodar para sempre nas que não são. Quando ela sempre para com sim ou não, a linguagem é <b>decidível</b>.</li>
+    <li>O <b>problema da parada</b> (dado um programa e uma entrada, ele termina?) é o exemplo famoso: dá para reconhecer os casos em que termina (é só rodar e esperar), mas não existe programa que decida todos os casos.</li>
+   </ul>
+  </details>
  </div>
 
   <figure class="fig" id="fig-chomsky">
@@ -552,7 +662,7 @@
       <thead><tr><th>Tipo</th><th>Classe de linguagens</th><th>Forma das regras</th><th>Reconhecedor</th><th>Exemplo</th></tr></thead>
       <tbody>
         <tr><td><b>0</b></td><td>Recursivamente enumeráveis</td><td><code>α → β</code>, sem restrição (α contém variável)</td><td>Máquina de Turing</td><td>problema da parada</td></tr>
-        <tr><td><b>1</b></td><td>Sensíveis ao contexto</td><td><code>α → β</code> com <code>|α| ≤ |β|</code></td><td>MT com fita limitada (ALL)</td><td><code>aⁿbⁿcⁿ</code>, <code>ww</code></td></tr>
+        <tr><td><b>1</b></td><td>Sensíveis ao contexto</td><td><code>α → β</code> com <code>|α| ≤ |β|</code> (a palavra nunca encolhe)</td><td>MT com fita limitada (ALL)</td><td><code>aⁿbⁿcⁿ</code>, <code>ww</code></td></tr>
         <tr><td><b>2</b></td><td>Livres do contexto</td><td><code>A → α</code></td><td>Autômato com pilha</td><td><code>aⁿbⁿ</code>, <code>wwᴿ</code></td></tr>
         <tr><td><b>3</b></td><td>Regulares</td><td><code>A → aB</code> ou <code>A → a</code> (linear à direita)</td><td>Autômato finito</td><td><code>a*b*</code></td></tr>
       </tbody>
@@ -562,11 +672,12 @@
  <div class="prose">
   <p class="prova">Tipo 3 ⊊ 2 ⊊ 1 ⊊ 0, com AF, AP, ALL e MT. Saiba um exemplo que separa cada nível: <code>aⁿbⁿ</code> é LLC e não regular; <code>aⁿbⁿcⁿ</code> é sensível ao contexto e não LLC.</p>
   <ul class="b">
-    <li>As inclusões são <b>próprias</b>: Tipo 3 ⊊ Tipo 2 ⊊ Tipo 1 ⊊ Tipo 0. Sempre existe uma linguagem no anel de fora que não está no de dentro.</li>
-    <li>Para separar Tipo 3 de Tipo 2 usamos o lema do bombeamento da seção 3 (aⁿbⁿ). Para separar Tipo 2 de Tipo 1 existe um lema do bombeamento para LLC (aⁿbⁿcⁿ).</li>
+    <li>As inclusões são <b>próprias</b> (⊊): todo Tipo 3 é Tipo 2, todo Tipo 2 é Tipo 1, e assim por diante, mas sempre existe uma linguagem no anel de fora que não está no de dentro.</li>
+    <li><b>Recursivamente enumerável</b> é o nome técnico de "existe uma máquina de Turing que aceita as palavras dela". É a classe mais ampla que uma máquina consegue alcançar.</li>
+    <li>Para separar Tipo 3 de Tipo 2 usamos o lema do bombeamento da seção 4 (aⁿbⁿ). Para separar Tipo 2 de Tipo 1 existe um lema do bombeamento para LLC (aⁿbⁿcⁿ).</li>
     <li>Ao subir de tipo, a máquina ganha memória: nenhuma (AF) → pilha (AP) → fita do tamanho da entrada (ALL) → fita infinita (MT).</li>
-    <li>Dentro do Tipo 2 há uma subclasse importante: as <b>LLC determinísticas</b>, reconhecidas por AP determinístico. São elas que os parsers de compiladores usam (gramáticas LL(k) e LR(k)). wwᴿ é LLC mas não é determinística.</li>
-    <li>No Tipo 3, gramática regular, expressão regular, AFD, AFN e AFN-ε têm todos o mesmo poder.</li>
+    <li>Dentro do Tipo 2 há uma subclasse importante: as <b>LLC determinísticas</b>, reconhecidas por AP determinístico. São elas que os parsers de compiladores usam (gramáticas LL(k) e LR(k)). wwᴿ é LLC, mas não é determinística.</li>
+    <li>No Tipo 3, gramática regular, expressão regular, AFD, AFN e AFN-ε (AFN com ε-transições) têm todos o mesmo poder.</li>
     <li>Fora do Tipo 0 ainda existem linguagens que <b>nenhuma</b> máquina de Turing reconhece.</li>
   </ul>
  </div>

@@ -5,6 +5,7 @@ description: Publica o Caderno visual - confere o build, faz commit, envia para 
 
 # Publicar
 
+0. `npm run checar` deve terminar em "Tudo coberto" (termo em negrito sem verbete). Se não, avise antes de publicar.
 1. `MSYS_NO_PATHCONV=1 BASE_PATH=/caderno-visual npx astro build` precisa passar (no Git Bash do
    Windows o `MSYS_NO_PATHCONV=1` evita que `/caderno-visual` vire um caminho do disco). Apague
    `dist/` depois.

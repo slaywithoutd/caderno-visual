@@ -135,6 +135,42 @@ montar.ramos = (svg) => {
   };
 };
 
+/* AFD que aceita palavras terminadas em a: lê "baba" letra por letra */
+montar.afd = (svg) => {
+  svg.setAttribute('viewBox', '0 0 240 200');
+  const w = 'baba', x0 = 72;
+  const cells = [...w].map((c, i) => { const g = S('g', null, svg); S('rect', { class: 'k', x: x0 + i * 26, y: 4, width: 24, height: 24, rx: 4 }, g); S('text', { x: x0 + 12 + i * 26, y: 16 }, g, c); return g; });
+  const P = { q0: [64, 112], q1: [176, 112] };
+  S('path', { class: 's', d: 'M14 112 H40', 'marker-end': 'url(#mnarrow)' }, svg);
+  S('path', { class: 's', d: 'M84 102 Q120 78 154 102', 'marker-end': 'url(#mnarrow)' }, svg);
+  S('text', { class: 'tm', x: 120, y: 80 }, svg, 'a');
+  S('path', { class: 's', d: 'M156 124 Q120 148 86 124', 'marker-end': 'url(#mnarrow)' }, svg);
+  S('text', { class: 'tm', x: 120, y: 150 }, svg, 'b');
+  S('path', { class: 's', d: 'M54 92 C40 58 88 58 74 92', 'marker-end': 'url(#mnarrow)' }, svg);
+  S('text', { class: 'tm', x: 64, y: 58 }, svg, 'b');
+  S('path', { class: 's', d: 'M166 92 C152 58 200 58 186 92', 'marker-end': 'url(#mnarrow)' }, svg);
+  S('text', { class: 'tm', x: 176, y: 58 }, svg, 'a');
+  const est = {};
+  for (const [q, [x, y]] of Object.entries(P)) {
+    est[q] = S('circle', { class: 'k', cx: x, cy: y, r: 20 }, svg);
+    if (q === 'q1') S('circle', { class: 's', cx: x, cy: y, r: 15 }, svg);
+    S('text', { x, y }, svg, q);
+  }
+  const head = S('path', { d: 'M0 0 l-5 8 h10 z', style: 'fill:var(--amber)' }, svg);
+  const nota = S('text', { class: 'tm', x: 120, y: 186 }, svg, '');
+  const caminho = ['q0', 'q0', 'q1', 'q0', 'q1'];
+  return (t) => {
+    const [k, p] = fatia(t, w.length + 2);
+    const lidas = Math.min(k, w.length);
+    cells.forEach((g, i) => { g.style.opacity = i < lidas ? 0.35 : 1; g.firstChild.setAttribute('class', i === k && k < w.length ? 'am' : 'k'); });
+    head.setAttribute('transform', `translate(${x0 + 12 + Math.min(k, w.length - 1) * 26},32)`);
+    head.style.opacity = k < w.length ? 1 : 0;
+    const atual = caminho[k < w.length && p > 0.5 ? k + 1 : lidas];
+    Object.entries(est).forEach(([q, c]) => c.setAttribute('class', q === atual ? (k >= w.length ? 'gr' : 'am') : 'k'));
+    nota.textContent = k >= w.length ? 'terminou em q1 (final): aceita' : `lendo "${w[k]}" em ${caminho[k]}`;
+  };
+};
+
 document.querySelectorAll('[data-loop]').forEach((el) => {
   const f = montar[el.dataset.loop];
   if (!f) return;

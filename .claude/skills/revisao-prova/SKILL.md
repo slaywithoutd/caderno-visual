@@ -17,6 +17,7 @@ Para cada aula da matéria (`src/aulas/<modulo>/<materia>/*`), leia `meta.json`,
 - tópicos sem nenhum `<p class="prova">` ou cartão;
 - `> [!prova]` e `> [!professor]` das notas que ainda não viraram texto (use a skill `integrar-notas`);
 - `> [!duvida]` sem resposta;
+- termos sem verbete (`npm run checar -- <modulo>/<materia>`) e conceitos usados sem explicação;
 - informação da prova que a pessoa trouxer (formato, conteúdo, peso, data, provas antigas).
 
 ## 2. Completar
@@ -39,5 +40,5 @@ Entregue na conversa (não no site, a menos que a pessoa peça):
 
 ## 4. Conferir
 
-Build sem erro e abrir `/<modulo>/<materia>/revisao` no `npm run dev`: contagem de destaques,
+Build sem erro, `npm run checar` limpo, e abrir `/<modulo>/<materia>/revisao` e `/glossario` no `npm run dev`: contagem de destaques,
 cartões e termos coerente, cartões abrindo, glossário com busca.

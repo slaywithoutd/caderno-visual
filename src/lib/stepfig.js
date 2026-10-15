@@ -1,4 +1,9 @@
-import { H, reduce } from './dom.js';
+import { H, reduce, fracaoVisivel, VISIVEL_MIN } from './dom.js';
+
+/* todas as figuras da página, para reavaliar a visibilidade ao rolar */
+const figuras = new Set();
+addEventListener('scroll', () => figuras.forEach((f) => f.conferir()), { passive: true });
+addEventListener('resize', () => figuras.forEach((f) => f.conferir()), { passive: true });
 
 /* ---------- componente de figura passo a passo ---------- */
 const IC={
@@ -20,7 +25,7 @@ export class StepFig{
     const body=root.querySelector('.fig-body');
     this.ctrl=root.querySelector('.fig-ctrl');
     body.parentNode.insertBefore(this.ctrl,body);
-    this.ctrl.innerHTML=`<span class="fc-btns"><button class="ib main" data-a="play" aria-label="Animar" title="${canHover?'Passe o mouse na figura para animar':'Animar'}">${IC.play}</button><button class="ib" data-a="prev" aria-label="Passo anterior" title="Anterior">${IC.prev}</button><button class="ib" data-a="next" aria-label="Próximo passo" title="Próximo">${IC.next}</button><button class="ib" data-a="reset" aria-label="Reiniciar" title="Reiniciar">${IC.reset}</button></span><div class="fc-track" aria-hidden="true"><span class="fc-done"></span><span class="fc-tick"></span></div><span class="count"></span><span class="fc-hint">${canHover?'passe o mouse':'toque ▶'}</span>`;
+    this.ctrl.innerHTML=`<span class="fc-btns"><button class="ib main" data-a="play" aria-label="Animar" title="${canHover?'Passe o mouse na figura para animar':'Animar'}">${IC.play}</button><button class="ib" data-a="prev" aria-label="Passo anterior" title="Anterior">${IC.prev}</button><button class="ib" data-a="next" aria-label="Próximo passo" title="Próximo">${IC.next}</button><button class="ib" data-a="reset" aria-label="Reiniciar" title="Reiniciar">${IC.reset}</button></span><div class="fc-track" aria-hidden="true"><span class="fc-done"></span><span class="fc-tick"></span></div><span class="count"></span><span class="fc-hint">${canHover?'passe o mouse':'toque ▶'}</span><span class="fc-longe">role até ver a figura</span>`;
     this.playBtn=this.ctrl.querySelector('[data-a=play]');this.countEl=this.ctrl.querySelector('.count');
     this.done=this.ctrl.querySelector('.fc-done');this.tick=this.ctrl.querySelector('.fc-tick');
     this.ctrl.addEventListener('click',e=>{const a=e.target.closest('button')?.dataset.a;if(!a)return;
@@ -32,11 +37,21 @@ export class StepFig{
     /* anima só enquanto o mouse está sobre a figura (barra, animação ou passos).
        pointermove cobre o caso em que a página rola por baixo do mouse parado e o
        navegador não dispara pointerenter. */
-    const entrar=()=>{if(this.hovering)return;this.hovering=true;root.classList.add('hot');if(!this.hold&&!reduce)this.play(true);};
+    /* só anima com o mouse em cima E com pelo menos 80% da figura na tela */
+    const entrar=()=>{if(this.hovering)return;this.hovering=true;root.classList.add('hot');this.conferir();};
     root.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')entrar();});
     root.addEventListener('pointermove',e=>{if(e.pointerType==='mouse')entrar();});
     root.addEventListener('pointerleave',e=>{if(e.pointerType!=='mouse')return;this.hovering=false;root.classList.remove('hot');this.stop();this.hold=false;});
+    figuras.add(this);
     this.setSteps(notes);
+  }
+  /* começa quando dá para ver a figura; pausa se ela sair da tela */
+  conferir(){
+    const f=fracaoVisivel(this.root.querySelector('.fig-body')||this.root);
+    this.root.classList.toggle('longe',f<VISIVEL_MIN);
+    if(!this.hovering||this.hold||reduce)return;
+    if(f>=VISIVEL_MIN&&!this.timer)this.play(true);
+    else if(f<0.5&&this.timer)this.stop();
   }
   setSteps(notes){
     this.notes=notes;this.notesEl.innerHTML='';

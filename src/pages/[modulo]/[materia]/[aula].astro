@@ -4,7 +4,7 @@
 import Aula from '../../../layouts/Aula.astro';
 import Glossario from '../../../components/Glossario.astro';
 import Cartoes from '../../../components/Cartoes.astro';
-import { aulas, materia, modulo, hrefRevisao } from '../../../lib/catalogo.js';
+import { aulas, materia, modulo, hrefRevisao, glossarioGlobal, hrefGlossario } from '../../../lib/catalogo.js';
 
 export function getStaticPaths() {
   return aulas.map((a) => ({ params: { modulo: a.modulo, materia: a.materia, aula: a.slug }, props: { aula: a } }));
@@ -83,7 +83,7 @@ function nomeNota(n) { return n.frontmatter.titulo || n.arquivo.replace(/\.md$/,
     </Fragment>
   )}
 
-  <Glossario termos={aula.glossario} num={num('glossario')} />
+  <Glossario termos={glossarioGlobal} listar={Object.keys(aula.glossario)} global={hrefGlossario} num={num('glossario')} intro={`Os termos desta aula. Termos de aulas anteriores também viram link no texto e abrem no <a href="${hrefGlossario}">glossário coletivo</a>. Os blocos <b>"pra ir além"</b> não são necessários para a prova.`} />
 
   {temFontes && (
     <section class="fontes" id="fontes">
@@ -105,15 +105,14 @@ function nomeNota(n) { return n.frontmatter.titulo || n.arquivo.replace(/\.md$/,
 
 <script>
   import { initChrome } from '../../../lib/chrome.js';
-  import { initGlossary } from '../../../lib/glossary.js';
+  import { initGlossarioDaPagina } from '../../../lib/glossary.js';
   import { initCartoes } from '../../../lib/cartoes.js';
   import { initOculos } from '../../../lib/oculos.js';
   const entradas = import.meta.glob('../../../aulas/*/*/*/index.js');
   const id = document.getElementById('aula-root').dataset.aula;
   const carregar = entradas[`../../../aulas/${id}/index.js`];
-  const termos = JSON.parse(document.getElementById('gl-data').textContent);
   (carregar ? carregar() : Promise.resolve()).finally(() => {
-    initGlossary(termos);
+    initGlossarioDaPagina();
     initCartoes();
     initChrome();
     initOculos();

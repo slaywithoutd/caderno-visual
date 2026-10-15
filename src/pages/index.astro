@@ -1,12 +1,14 @@
 ---
 import Base from '../layouts/Base.astro';
-import { site, modulos, aulasDe, hrefRevisao } from '../lib/catalogo.js';
+import { site, modulos, aulasDe, hrefRevisao, hrefGlossario, glossarioGlobal } from '../lib/catalogo.js';
+const nTermos = Object.keys(glossarioGlobal).length;
 ---
 <Base title={site.titulo} description={site.subtitulo}>
   <main class="home">
     <header class="home-head">
       <h1>{site.titulo}</h1>
       <p class="home-sub">{site.subtitulo}</p>
+      <a class="home-gl" href={hrefGlossario}><span>Glossário coletivo</span><span class="muted">{nTermos} termos de todas as aulas</span><span aria-hidden="true">→</span></a>
     </header>
 
     {modulos.map((mod) => (
@@ -54,7 +56,10 @@ import { site, modulos, aulasDe, hrefRevisao } from '../lib/catalogo.js';
 <style>
   .home{max-width:880px;margin:0 auto;padding:clamp(48px,10vh,104px) 24px 96px}
   .home h1{font-size:clamp(2rem,5vw,2.9rem);margin:0 0 .5rem}
-  .home-sub{font-size:1.1rem;color:var(--fg2);margin:0 0 3rem;max-width:560px}
+  .home-sub{font-size:1.1rem;color:var(--fg2);margin:0 0 1.4rem;max-width:560px}
+  .home-gl{display:inline-flex;gap:12px;align-items:baseline;padding:10px 16px;border:1px solid var(--line);border-radius:999px;text-decoration:none;color:var(--fg);font-weight:500;margin-bottom:3rem;transition:border-color .2s,background .2s}
+  .home-gl:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .home-gl .muted{font-weight:400;font-size:.88rem}
   .mod-title{font-size:.78rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 18px}
   .home-area{margin-bottom:2.6rem}
   .area-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:4px}

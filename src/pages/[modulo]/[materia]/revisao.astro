@@ -6,7 +6,7 @@
 import Aula from '../../../layouts/Aula.astro';
 import Glossario from '../../../components/Glossario.astro';
 import Cartoes from '../../../components/Cartoes.astro';
-import { modulos, aulasDe, destaquesProva } from '../../../lib/catalogo.js';
+import { modulos, aulasDe, destaquesProva, glossarioGlobal, hrefGlossario } from '../../../lib/catalogo.js';
 
 export function getStaticPaths() {
   return modulos.flatMap((mod) => mod.materias
@@ -17,6 +17,7 @@ const { mod, mat } = Astro.props;
 const lista = aulasDe(mod.slug, mat.slug);
 const prova = lista.map((a) => ({ aula: a, itens: destaquesProva(a) })).filter((x) => x.itens.length);
 const termos = Object.assign({}, ...lista.map((a) => a.glossario));
+const listar = Object.keys(termos);
 const secoes = [
   ['prova', 'Cai na prova'],
   ['cartoes', 'Cartões'],
@@ -70,15 +71,15 @@ const total = prova.reduce((n, x) => n + x.itens.length, 0);
     ))}
   </section>
 
-  <Glossario termos={termos} num="04" intro="Os termos de todas as aulas desta matéria, juntos." />
+  <Glossario termos={glossarioGlobal} listar={listar} global={hrefGlossario} num="04" intro="Os termos de todas as aulas desta matéria, juntos." />
 </Aula>
 
 <script>
   import { initChrome } from '../../../lib/chrome.js';
-  import { initGlossary } from '../../../lib/glossary.js';
+  import { initGlossarioDaPagina } from '../../../lib/glossary.js';
   import { initCartoes } from '../../../lib/cartoes.js';
   import { initOculos } from '../../../lib/oculos.js';
-  initGlossary(JSON.parse(document.getElementById('gl-data').textContent));
+  initGlossarioDaPagina();
   initCartoes();
   initChrome();
   initOculos();

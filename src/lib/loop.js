@@ -1,23 +1,29 @@
-import { reduce } from './dom.js';
+import { reduce, fracaoVisivel, VISIVEL_MIN } from './dom.js';
 
 /* Animação em loop ("gif"): uma função pura do tempo.
-   loop(el, ms, frame, still) chama frame(t) com t ∈ [0, 1) a cada quadro, só enquanto
-   el está visível. Como o desenho depende apenas de t, o fim emenda no começo sem salto.
-   Com "reduzir movimento" ligado, desenha um único quadro parado em t = still. */
+   loop(el, ms, frame, still) chama frame(t) com t ∈ [0, 1). O relógio de cada loop só anda
+   enquanto pelo menos 80% do elemento está na tela, então a animação começa do início quando
+   você chega nela e para onde estava quando você sai. Como o desenho depende apenas de t, o fim
+   emenda no começo sem salto. Com "reduzir movimento", desenha um único quadro em t = still. */
 const ativos = new Set();
-let rodando = false;
+let rodando = false, ultimo = 0;
 
 function tick(agora) {
-  for (const L of ativos) if (L.visivel) L.frame(((agora - L.t0) % L.ms) / L.ms);
+  const dt = ultimo ? agora - ultimo : 0;
+  ultimo = agora;
+  for (const L of ativos) {
+    const ver = fracaoVisivel(L.el) >= VISIVEL_MIN;
+    if (!ver) continue;
+    L.tempo += dt;
+    L.frame((L.tempo % L.ms) / L.ms);
+  }
   requestAnimationFrame(tick);
 }
 
 export function loop(el, ms, frame, still = 0.5) {
   if (reduce) { frame(still); return; }
-  const L = { el, ms, frame, visivel: false, t0: performance.now() };
-  ativos.add(L);
+  ativos.add({ el, ms, frame, tempo: 0 });
   frame(0);
-  new IntersectionObserver(([e]) => { L.visivel = e.isIntersecting; }, { rootMargin: '80px' }).observe(el);
   if (!rodando) { rodando = true; requestAnimationFrame(tick); }
 }
 

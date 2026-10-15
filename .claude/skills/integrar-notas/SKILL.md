@@ -33,9 +33,10 @@ Leia todo o `notas/` (markdown, o texto dos PDFs com a skill de PDF, e as fotos)
    texto e avise a pessoa do que mudou. Se a notação do professor for diferente da dos vídeos,
    prefira a do professor (é a da prova) e cite a outra.
 3. **Ênfase do professor**: vire `<p class="prova">` no ponto certo do texto (além do callout).
-4. Termos novos → `glossario.js`. Perguntas que o professor fez ou exemplos de prova → `revisao.js`.
-5. Exemplo resolvido no quadro que ajuda a entender → considere uma figura passo a passo.
-6. Não apague os arquivos de `notas/`: eles são o registro original.
+4. Termos novos → `glossario.js` (confira antes no glossário global se já existem; rode `npm run checar`). Perguntas que o professor fez ou exemplos de prova → `revisao.js`.
+5. Se o professor usou um conceito que o caderno ainda não explica, crie uma caixa **Base** (ver `CLAUDE.md`).
+6. Exemplo resolvido no quadro que ajuda a entender → considere uma figura passo a passo.
+7. Não apague os arquivos de `notas/`: eles são o registro original.
 
 ## Conferir
 

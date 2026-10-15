@@ -22,6 +22,8 @@ as aulas. Nunca edite o `conteudo.html` de cada aula para corrigir aparência.
 | glossário e popover | `src/lib/glossary.js` |
 | desenho de autômatos | `src/lib/machine.js` |
 | callouts das notas | `src/lib/callouts.mjs` |
+| regra dos 80% visível para animar | `fracaoVisivel` e `VISIVEL_MIN` em `src/lib/dom.js` |
+| glossário coletivo | `src/pages/glossario.astro` |
 | modo leitura (óculos) e sua animação | `src/lib/oculos.js` + bloco "modo leitura" no fim de `global.css` |
 
 Componente novo reaproveitável: crie em `src/lib/` (JS) ou `src/components/` (Astro), estilo em

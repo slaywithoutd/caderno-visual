@@ -469,3 +469,28 @@ html.lendo #pop{font-size:1.15rem;width:460px}
 ::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
 ::view-transition-group(oculos-anim),::view-transition-old(oculos-anim),::view-transition-new(oculos-anim){animation:none}
 ::view-transition-group(oculos-anim){z-index:10}
+
+/* origem do termo no glossário global */
+.gl-origem{font-size:.72rem;padding:2px 9px;border-radius:999px;color:var(--muted);text-decoration:none;border:1px dashed var(--line2);margin-left:auto}
+.gl-origem:hover{color:var(--accent);border-color:var(--accent)}
+.fc-longe{display:none;font-size:.72rem;color:var(--amber)}
+figure.fig.hot.longe .fc-longe{display:inline}
+figure.fig.hot.longe .fc-hint{display:none}
+figure.fig.hot.longe .fig-ctrl{border-color:var(--amber)}
+
+/* "Base": pré-requisitos que os autoestudos assumem; recolhível para quem já sabe */
+.base-tag{display:inline-block;font-size:.68rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:999px;background:var(--green-soft);color:var(--green);border:1px solid var(--green);vertical-align:1px}
+.src .base-tag{font-family:var(--f-body)}
+details.base{margin:1.4rem 0;padding:4px 18px 8px;border:1px solid var(--line);border-left:3px solid var(--green);border-radius:10px;background:var(--surface)}
+details.base > summary{cursor:pointer;padding:10px 0;font-weight:600;color:var(--fg);display:flex;gap:10px;align-items:center}
+details.base > summary::marker{color:var(--muted)}
+details.base[open] > summary{margin-bottom:4px;border-bottom:1px dashed var(--line)}
+details.base .def{background:var(--surface2)}
+
+/* definição em duas camadas: primeiro em palavras simples, depois a formal */
+.def p.simples,.def p.formal{position:relative}
+.def p.simples::before,.def p.formal::before{display:block;font-size:.68rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:2px}
+.def p.simples::before{content:'Em palavras simples';color:var(--green)}
+.def p.formal::before{content:'Formalmente';color:var(--muted)}
+.def p.simples{font-size:1.02em;color:var(--fg)}
+.def p.nota-formal{font-size:.88em;color:var(--muted);border-top:1px dashed var(--line);padding-top:8px}

@@ -35,6 +35,8 @@ src/aulas/<modulo>/<materia>/<aula>/
 src/pages/index.astro            home: módulos → matérias → aulas
 src/pages/[modulo]/[materia]/[aula].astro     página de qualquer aula (não precisa copiar)
 src/pages/[modulo]/[materia]/revisao.astro    revisão da matéria (gerada)
+src/pages/glossario.astro        glossário coletivo de todas as aulas (gerado)
+scripts/checar-termos.mjs        confere se todo termo em negrito tem verbete (npm run checar)
 src/lib/                         peças reaproveitáveis (stepfig, loop, machine, glossary, catalogo, oculos…)
 src/styles/global.css            todo o visual (tokens no topo)
 ```
@@ -90,7 +92,21 @@ Cada seção:
 - Tabela: `<div class="tbl prose"><table>…</table></div>`.
 - **Cai na prova**: `<p class="prova">frase curta e direta</p>`. Vai também para a revisão da matéria. Use 3 a 6 por aula, só no que realmente cai.
 - Variáveis de gramática: `<span class="v">S</span>`; terminais: `<span class="t">a</span>`.
-- Termos do glossário viram link sozinhos (primeira ocorrência por seção). Não marque à mão.
+- Termos do glossário viram link sozinhos (primeira ocorrência por seção), usando o **glossário global**:
+  um termo definido numa aula anterior continua virando link nas próximas. Não marque à mão.
+- **Negrito = termo** que o leitor precisa entender. Todo termo em negrito precisa de verbete em algum
+  `glossario.js` (confira com `npm run checar`). Para ênfase comum, reescreva a frase em vez de negritar.
+- **Base** (pré-requisito que as fontes assumem e não explicam): caixa recolhível, aberta por padrão.
+  ```html
+  <details class="base" open>
+   <summary><span class="base-tag">Base</span> Autômato finito em 3 minutos</summary>
+   …bullets, .def, desenhos…
+  </details>
+  ```
+  Uma seção inteira de base (como "Antes de começar") usa `<span class="base-tag">Base · fora dos autoestudos</span>` no `.src`.
+- **Definição em duas camadas** dentro de `.def.key`: `<p class="simples">` (em palavras simples, com
+  exemplo) e depois `<p class="formal">` (como está no livro). Notação pesada vai num `<p class="nota-formal">`
+  logo abaixo, traduzida símbolo por símbolo.
 
 ### Desenho de margem (estático)
 
@@ -144,7 +160,8 @@ export default {
 };
 ```
 
-Toda chave em `see` precisa existir. `m` em minúsculas, do mais específico ao mais geral. Evite formas
+Se a chave já existe em outra aula, **não** redefina: o glossário global usa a primeira definição (a da aula
+mais antiga). Toda chave em `see` precisa existir (em qualquer aula). `m` em minúsculas, do mais específico ao mais geral. Evite formas
 curtas demais que casam com palavras comuns.
 
 ## notas/ (material da aula presencial)
@@ -152,6 +169,32 @@ curtas demais que casam com palavras comuns.
 Markdown no estilo Obsidian. Frontmatter opcional `titulo` e `data`. Callouts viram blocos:
 `> [!prova]`, `> [!professor]`, `> [!duvida]`, `> [!dica]`, `> [!atencao]`. `[!prova]` vai para a revisão.
 PDFs aparecem embutidos; imagens não citadas no markdown viram galeria.
+
+## Para quem escrevemos (perfil do leitor)
+
+A dona do caderno é estudante de computação do Inteli. Considere que ela sabe programar e a matemática
+do ensino médio, e **nada além do que já está em aulas anteriores do caderno**. Os autoestudos muitas vezes
+são aulas soltas de outros cursos ("Aula 11", "Relembrando…") e assumem coisas que ela nunca viu.
+
+Regras que saíram disso (a aula `m8/comp/01-conceitos` é o exemplo de referência):
+
+1. **Nada de "relembrando" sem ter explicado antes.** Antes de escrever uma seção, liste o que a fonte
+   assume (conceitos, notação, nomes). Para cada item: se já está numa aula anterior do caderno, linke; se não,
+   explique numa caixa **Base**. A base pode ir além dos autoestudos: o objetivo é entender os autoestudos.
+2. **Toda notação é traduzida na primeira vez que aparece** (o que é L, w, Σ, ∈, ⊆, `{x | …}`, aⁿ, ⇒, ⊢…).
+   Se a aula usa muita notação nova, abra com uma seção "Antes de começar" com uma tabela "Leia como".
+3. **Definições em duas camadas**: primeiro em palavras simples, com um exemplo concreto; depois a formal.
+   Se a definição formal é contraintuitiva ("subpalavra é prefixo de um sufixo"), explique de onde ela vem.
+4. **Toda palavra que um iniciante não saberia tem verbete no glossário**, mesmo que seja "básica"
+   (conjunto, tupla, compilador, decidível). Rode `npm run checar` antes de publicar.
+5. **Quanto detalhar.** Entra com detalhe: o que a fonte usa para construir o resto, o que cai na prova, e
+   pegadinhas. Entra em uma linha: curiosidades e nomes históricos. Vai para "pra ir além" no glossário:
+   generalizações e casos raros. Na dúvida, pergunte "sem isso ela consegue seguir o próximo parágrafo?".
+6. **Exemplo antes da regra.** Mostre `{a, b}·{c} = {ac, bc}` antes de `L₁L₂ = { uv | … }`.
+7. Releia a aula como alguém que só leu as aulas anteriores do caderno: cada frase precisa ser entendível
+   com o que veio antes dela.
+
+Não pergunte à dona "o que você já sabe?". Coloque a base na página, recolhível: quem sabe, fecha.
 
 ## Como escrever
 
@@ -169,6 +212,9 @@ PDFs aparecem embutidos; imagens não citadas no markdown viram galeria.
 - Texto na coluna de 3/4; a margem de 1/4 recebe desenhos, loops e os passos das figuras.
 - Figuras sem caixa. Barra de controles (play, ‹, ›, reiniciar, progresso) **acima** da figura.
 - Figura passo a passo anima só com o mouse em cima e avança na hora em que ele entra.
+- Nenhuma animação roda (nem com o mouse em cima, nem loop) sem que **pelo menos 80%** dela esteja na
+  tela (`fracaoVisivel` em `src/lib/dom.js`). Loops começam do início quando aparecem e congelam ao sair.
+- Glossário é global: termos de aulas anteriores viram link nas próximas; a home linka o glossário coletivo (`/glossario`).
 - Passos surgem um por vez; a coluna de passos tem a altura da figura e rola por dentro.
 - Modo leitura (a dona é míope): botão de óculos no canto inferior direito. Liga `html.lendo`: o conteúdo
   recebe `zoom: var(--z)` (calculado pela largura da tela em `src/lib/oculos.js`), vai de ponta a
@@ -181,6 +227,7 @@ PDFs aparecem embutidos; imagens não citadas no markdown viram galeria.
 
 ```bash
 npm run dev                                         # http://localhost:4321
+npm run checar                                      # termos em negrito sem verbete no glossário
 MSYS_NO_PATHCONV=1 BASE_PATH=/caderno-visual npx astro build   # igual ao CI (no Git Bash do Windows)
 ```
 

@@ -18,7 +18,14 @@ Leia `CLAUDE.md` antes (estrutura, vocabulário do HTML, estilo de escrita, deci
   diga isso e use os capítulos/título do vídeo e o conhecimento padrão do assunto, sem inventar
   o que o professor teria dito.
 
-## 2. Mapear o conteúdo antes de escrever
+## 2. Mapear o conteúdo e o que ele pressupõe
+
+Leia a seção "Para quem escrevemos" do `CLAUDE.md`: a leitora só sabe o que está nas aulas anteriores
+do caderno. Antes de escrever:
+
+- Liste o que cada fonte **assume** (conceitos, notação, siglas, "relembrando…"). Procure cada item no
+  glossário global e nas aulas anteriores (`src/aulas/**`). O que não estiver lá vira caixa **Base**.
+- Liste a notação nova. Se for muita, abra a aula com "Antes de começar" e uma tabela "Leia como".
 
 Monte para si uma tabela fonte → tópicos (com marcas de tempo, se houver). Ordene as seções pela
 lógica do assunto, não pela ordem da lista de autoestudos. Cada seção ganha um `id` curto.
@@ -32,13 +39,16 @@ lógica do assunto, não pela ordem da lista de autoestudos. Cada seção ganha 
 | `figuras.js` | figuras passo a passo e widgets da aula |
 | `loops.js` | animações em loop (copie o esqueleto de montagem do fim de `m8/comp/01-conceitos/loops.js`) |
 | `index.js` | `import './figuras.js'; import './loops.js';` |
-| `glossario.js` | 30+ termos para uma aula cheia: tudo que aparece em negrito ou que um iniciante não saberia |
+| `glossario.js` | todo termo em negrito ou que um iniciante não saberia. Não redefina termos que já existem em aulas anteriores (o glossário é global) |
 | `revisao.js` | 8–12 `cartoes` (perguntas de prova) e uma `cola` de 8–12 linhas |
 | `notas/.gitkeep` | pasta vazia para o material da aula presencial |
 
 Use a aula `m8/comp/01-conceitos` como referência de densidade e formato.
 
 ## 4. Escrever cada seção
+
+- Exemplo antes da regra; definição em duas camadas (`p.simples` e `p.formal`); notação traduzida na
+  primeira vez. Negrito só para termos, e todo termo em negrito ganha verbete.
 
 - Abra com o porquê em 1–2 frases, depois bullets. Definições formais em `.def.key`.
 - Pegadinhas e erros comuns em `.def.warn`. Marque 3–6 `<p class="prova">` na aula toda.
@@ -55,10 +65,12 @@ Use a aula `m8/comp/01-conceitos` como referência de densidade e formato.
 ## 5. Conferir
 
 1. Cobertura: percorra a tabela fonte → tópicos e confirme que cada item está na página.
-2. `MSYS_NO_PATHCONV=1 BASE_PATH=/caderno-visual npx astro build` sem erro.
-3. `npm run dev` e abra `/<modulo>/<materia>/<slug>` no navegador: sem erros no console, figuras
+2. Compreensão: releia como quem só viu as aulas anteriores do caderno. Achou um termo, sigla ou símbolo
+   não explicado antes? Explique ou crie verbete. `npm run checar` precisa terminar em "Tudo coberto".
+3. `MSYS_NO_PATHCONV=1 BASE_PATH=/caderno-visual npx astro build` sem erro.
+4. `npm run dev` e abra `/<modulo>/<materia>/<slug>` no navegador: sem erros no console, figuras
    animam com o mouse em cima, loops rodam, glossário e popover funcionam, nada vaza para os lados
    em largura de celular (400px).
-4. Diga à pessoa o que entrou, de qual fonte, e o que não deu para cobrir (ex.: vídeo sem transcrição).
+5. Diga à pessoa o que entrou, de qual fonte, e o que não deu para cobrir (ex.: vídeo sem transcrição).
 
 Publicar só quando a pessoa pedir (skill `publicar`).

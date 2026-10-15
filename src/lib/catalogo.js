@@ -46,6 +46,20 @@ export const materia = (m, s) => modulos.find((x) => x.slug === m)?.materias.fin
 export const modulo = (m) => modulos.find((x) => x.slug === m);
 export const aulasDe = (m, s) => aulas.filter((a) => a.modulo === m && a.materia === s);
 export const hrefRevisao = (m, s) => url(`/${m}/${s}/revisao`);
+export const hrefGlossario = url('/glossario');
+
+/* Glossário global: os termos de todas as aulas. Um termo aprendido numa aula continua virando
+   link nas próximas. Se duas aulas definem a mesma chave, vale a primeira (a mais antiga). */
+export const glossarioGlobal = (() => {
+  const G = {};
+  for (const a of aulas) {
+    const mat = materia(a.modulo, a.materia);
+    for (const [k, v] of Object.entries(a.glossario)) {
+      if (!G[k]) G[k] = { ...v, origem: { rotulo: `Aula ${a.numero} · ${mat ? mat.titulo : a.materia}`, href: `${a.href}#gl-${k}` } };
+    }
+  }
+  return G;
+})();
 
 /* Destaques "cai na prova": <p class="prova"> no conteúdo e "> [!prova]" nas notas */
 const inline = (t) => t

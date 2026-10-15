@@ -6,6 +6,10 @@ import { site, url } from '../lib/catalogo.js';
 const { titulo, rotulo, materia, modulo, secoes, descricao = '' } = Astro.props;
 ---
 <Base title={`${titulo} · ${materia.titulo}`} description={descricao}>
+  <script is:inline>
+    /* aplica o modo leitura salvo antes de desenhar a página (evita piscar) */
+    try { if (localStorage.getItem('caderno-lendo') === '1') { var d = document.documentElement; d.classList.add('lendo'); d.style.setProperty('--z', Math.min(2, Math.max(1.2, (innerWidth - 48) / 900)).toFixed(3)); } } catch (e) {}
+  </script>
   <div class="progress" id="progress"></div>
   <div id="pop" role="dialog" aria-live="polite"></div>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><marker id="mnarrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mnarrow"/></marker></defs></svg>
@@ -32,4 +36,10 @@ const { titulo, rotulo, materia, modulo, secoes, descricao = '' } = Astro.props;
       <slot />
     </main>
   </div>
+  <button id="oculos" class="oculos-btn" type="button" aria-pressed="false" aria-label="Modo leitura" title="Colocar os óculos (modo leitura)">
+    <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+      <circle class="lente" cx="9.5" cy="18" r="5.5" /><circle class="lente" cx="22.5" cy="18" r="5.5" />
+      <path d="M15 17.2q1-1.4 2 0" /><path d="M4 17l-1.6-4.5M28 17l1.6-4.5" />
+    </svg>
+  </button>
 </Base>

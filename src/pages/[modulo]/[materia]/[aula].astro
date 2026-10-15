@@ -107,6 +107,7 @@ function nomeNota(n) { return n.frontmatter.titulo || n.arquivo.replace(/\.md$/,
   import { initChrome } from '../../../lib/chrome.js';
   import { initGlossary } from '../../../lib/glossary.js';
   import { initCartoes } from '../../../lib/cartoes.js';
+  import { initOculos } from '../../../lib/oculos.js';
   const entradas = import.meta.glob('../../../aulas/*/*/*/index.js');
   const id = document.getElementById('aula-root').dataset.aula;
   const carregar = entradas[`../../../aulas/${id}/index.js`];
@@ -115,5 +116,6 @@ function nomeNota(n) { return n.frontmatter.titulo || n.arquivo.replace(/\.md$/,
     initGlossary(termos);
     initCartoes();
     initChrome();
+    initOculos();
   });
 </script>

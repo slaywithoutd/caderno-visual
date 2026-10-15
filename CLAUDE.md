@@ -35,7 +35,7 @@ src/aulas/<modulo>/<materia>/<aula>/
 src/pages/index.astro            home: módulos → matérias → aulas
 src/pages/[modulo]/[materia]/[aula].astro     página de qualquer aula (não precisa copiar)
 src/pages/[modulo]/[materia]/revisao.astro    revisão da matéria (gerada)
-src/lib/                         peças reaproveitáveis (stepfig, loop, machine, glossary, catalogo…)
+src/lib/                         peças reaproveitáveis (stepfig, loop, machine, glossary, catalogo, oculos…)
 src/styles/global.css            todo o visual (tokens no topo)
 ```
 
@@ -170,6 +170,12 @@ PDFs aparecem embutidos; imagens não citadas no markdown viram galeria.
 - Figuras sem caixa. Barra de controles (play, ‹, ›, reiniciar, progresso) **acima** da figura.
 - Figura passo a passo anima só com o mouse em cima e avança na hora em que ele entra.
 - Passos surgem um por vez; a coluna de passos tem a altura da figura e rola por dentro.
+- Modo leitura (a dona é míope): botão de óculos no canto inferior direito. Liga `html.lendo`: o conteúdo
+  recebe `zoom: var(--z)` (calculado pela largura da tela em `src/lib/oculos.js`), vai de ponta a
+  ponta, a sidebar some e os desenhos de margem flutuam com o texto contornando. A troca é animada
+  com View Transitions: os óculos crescem do botão até uma lente cobrir a tela, a tela antiga
+  embaça fora das lentes e a ampliada aparece dentro. Todo componente novo precisa funcionar nos
+  dois modos (não use `vh` puro dentro de `.content`: divida por `var(--z)`).
 
 ## Verificar
 

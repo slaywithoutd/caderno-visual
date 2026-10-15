@@ -22,6 +22,7 @@ as aulas. Nunca edite o `conteudo.html` de cada aula para corrigir aparência.
 | glossário e popover | `src/lib/glossary.js` |
 | desenho de autômatos | `src/lib/machine.js` |
 | callouts das notas | `src/lib/callouts.mjs` |
+| modo leitura (óculos) e sua animação | `src/lib/oculos.js` + bloco "modo leitura" no fim de `global.css` |
 
 Componente novo reaproveitável: crie em `src/lib/` (JS) ou `src/components/` (Astro), estilo em
 `global.css`, e documente o markup em `CLAUDE.md` (seção "Vocabulário do conteudo.html").
@@ -39,4 +40,4 @@ Componente novo reaproveitável: crie em `src/lib/` (JS) ou `src/components/` (A
 ## Conferir
 
 Build sem erro. No `npm run dev`, abra a home, **todas** as aulas e uma página de revisão, em
-desktop (1440px) e celular (400px), claro e escuro. Mostre à pessoa um antes/depois em uma frase.
+desktop (1440px) e celular (400px), claro e escuro, com e sem o modo leitura (botão de óculos). Mostre à pessoa um antes/depois em uma frase.

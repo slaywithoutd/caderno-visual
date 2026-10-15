@@ -1,0 +1,13 @@
+---
+/* Cartões de pergunta e resposta (clicar revela). Recebe [[pergunta, resposta], ...]. */
+const { cartoes } = Astro.props;
+---
+<div class="cards">
+  {cartoes.map(([q, a]) => (
+    <button class="card" type="button" aria-expanded="false">
+      <span class="q" set:html={q} />
+      <span class="hint">clique para ver a resposta</span>
+      <span class="a" set:html={a} />
+    </button>
+  ))}
+</div>

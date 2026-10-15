@@ -1,0 +1,19 @@
+---
+/* Seção do glossário. Os cartões são montados no navegador por lib/glossary.js
+   a partir do JSON embutido aqui. */
+const { termos, num, intro = 'Todo termo com sublinhado pontilhado no texto abre aqui como um cartão. Os blocos <b>"pra ir além"</b> não são necessários para a prova: servem para quando a definição curta não bastar.' } = Astro.props;
+const json = JSON.stringify(termos).replace(/</g, '\\u003c');
+---
+<hr class="sep" />
+<section class="chap" id="glossario">
+  <span class="num">{num}</span>
+  <h2>Glossário</h2>
+  <p set:html={intro} />
+  <div class="gl-tools">
+    <input type="text" id="gl-search" placeholder="Buscar termo…" aria-label="Buscar no glossário" />
+    <div class="gl-letters" id="gl-letters"></div>
+  </div>
+  <div id="gl-list"></div>
+  <p class="muted" id="gl-empty" hidden>Nenhum termo encontrado.</p>
+  <script type="application/json" id="gl-data" set:html={json}></script>
+</section>

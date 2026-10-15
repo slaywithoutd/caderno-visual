@@ -1,7 +1,8 @@
 # Caderno visual
 
 Autoestudos de todas as matérias em formato de post: texto curto, desenhos na margem, figuras
-passo a passo e animações em loop. Cada matéria é uma área; cada aula vira uma página; a home lista tudo.
+passo a passo, animações em loop e glossário. Organizado por módulo → matéria → aula, com uma
+página de revisão para a prova por matéria.
 
 Site: https://slaywithoutd.github.io/caderno-visual/
 
@@ -13,40 +14,21 @@ npm run dev      # http://localhost:4321
 npm run build    # gera dist/
 ```
 
-O deploy no GitHub Pages roda sozinho a cada push na `main` (`.github/workflows/deploy.yml`), com `BASE_PATH=/caderno-visual`.
+O deploy no GitHub Pages roda sozinho a cada push na `main` (`.github/workflows/deploy.yml`).
 
-## Estrutura
+## Adicionar coisas
 
-```
-src/
-  data/aulas.js              áreas e aulas (home + sidebar)
-  layouts/Base.astro         <head>, fontes, CSS global
-  layouts/Aula.astro         sidebar flutuante, sumário, popover do glossário
-  pages/index.astro          home com a lista de aulas
-  pages/<area>/<slug>.astro  página de cada aula
-  aulas/<area>/<slug>/
-    conteudo.html            texto da aula (HTML puro)
-    figuras.js               figuras passo a passo da aula
-    loops.js                 animações em loop da aula
-    glossario.js             termos do glossário
-  lib/
-    stepfig.js               figura passo a passo (anima com o mouse em cima)
-    loop.js                  animação em loop: frame(t), t ∈ [0,1)
-    machine.js               desenho de autômatos em SVG
-    glossary.js              glossário, termos clicáveis e popover
-    chrome.js                sumário ativo, progresso, sidebar no celular
-```
+- **Aula nova:** uma pasta `src/aulas/<modulo>/<materia>/<NN-slug>/` com `meta.json` e `conteudo.html`
+  (mais `figuras.js`, `loops.js`, `glossario.js`, `revisao.js`). A página aparece sozinha.
+- **Material da aula presencial:** jogue em `notas/` dentro da pasta da aula. Markdown no estilo
+  Obsidian (`> [!prova]`, `> [!professor]`, `> [!duvida]`), PDFs de slides e fotos. Dá para subir
+  pelo próprio site do GitHub ("Add file → Upload files").
+- **Matéria ou módulo novo:** `src/data/estrutura.js`.
 
-## Dois tipos de animação
+Detalhes de formato, componentes e estilo de escrita: [`CLAUDE.md`](CLAUDE.md).
 
-- **Passo a passo** (`StepFig`): para processos com estados discretos que o leitor quer
-  controlar (derivação, simulação de AP). Notas surgem na margem a cada passo.
-- **Em loop** (`loop`): para mostrar uma ideia sem controles, como um gif. A função de desenho
-  recebe só `t ∈ [0,1)`, então o fim emenda no começo; pausa fora da tela e respeita
-  "reduzir movimento".
+## Skills (Claude Code)
 
-## Adicionar uma aula
-
-1. Crie `src/aulas/<area>/<slug>/` com `conteudo.html`, `figuras.js`, `loops.js` e `glossario.js`.
-2. Copie `src/pages/lfa/01-conceitos.astro` para `src/pages/<area>/<slug>.astro` e troque os imports.
-3. Adicione a aula em `src/data/aulas.js` (e a área, se for uma matéria nova).
+Em `.claude/skills/`: `nova-aula`, `integrar-notas`, `revisao-prova`, `ajustar-visual`, `publicar`.
+Abra o Claude Code nesta pasta e peça em linguagem natural (ex.: "cria a aula 02 de comp com estes
+links e transcrições") ou chame pelo nome (`/nova-aula`).

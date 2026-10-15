@@ -1,0 +1,83 @@
+---
+/* Revisão para a prova de uma matéria: junta o que todas as aulas marcaram.
+   - "Cai na prova": <p class="prova"> do conteúdo + "> [!prova]" das notas
+   - cartões e cola de todas as aulas (revisao.js)
+   - glossário único (glossario.js de todas as aulas) */
+import Aula from '../../../layouts/Aula.astro';
+import Glossario from '../../../components/Glossario.astro';
+import Cartoes from '../../../components/Cartoes.astro';
+import { modulos, aulasDe, destaquesProva } from '../../../lib/catalogo.js';
+
+export function getStaticPaths() {
+  return modulos.flatMap((mod) => mod.materias
+    .filter((mat) => aulasDe(mod.slug, mat.slug).length)
+    .map((mat) => ({ params: { modulo: mod.slug, materia: mat.slug }, props: { mod, mat } })));
+}
+const { mod, mat } = Astro.props;
+const lista = aulasDe(mod.slug, mat.slug);
+const prova = lista.map((a) => ({ aula: a, itens: destaquesProva(a) })).filter((x) => x.itens.length);
+const termos = Object.assign({}, ...lista.map((a) => a.glossario));
+const secoes = [
+  ['prova', 'Cai na prova'],
+  ['cartoes', 'Cartões'],
+  ['cola', 'Cola'],
+  ['glossario', 'Glossário'],
+];
+const total = prova.reduce((n, x) => n + x.itens.length, 0);
+---
+<Aula titulo="Revisão para a prova" rotulo={`${lista.length} ${lista.length === 1 ? 'aula' : 'aulas'}`} materia={mat} modulo={mod} secoes={secoes} descricao={`Revisão de ${mat.titulo}`}>
+  <header class="hero prose" id="top">
+    <div class="kicker">{mod.titulo} · {mat.titulo}</div>
+    <h1>Revisão para a prova</h1>
+    <p class="lede">Tudo o que as aulas marcaram como importante, num lugar só: {total} destaques, {lista.reduce((n, a) => n + a.cartoes.length, 0)} cartões e {Object.keys(termos).length} termos.</p>
+  </header>
+
+  <section class="chap" id="prova">
+    <span class="num">01</span>
+    <h2>Cai na prova</h2>
+    {prova.length === 0 && <p class="muted">Nenhum destaque ainda. Marque com <code>&lt;p class="prova"&gt;</code> no conteúdo ou <code>&gt; [!prova]</code> nas notas.</p>}
+    {prova.map(({ aula, itens }) => (
+      <div class="rev-grupo prose">
+        <h3><a href={aula.href}>Aula {aula.numero} · {aula.titulo}</a></h3>
+        <ul class="rev-prova">
+          {itens.map((it) => <li><span class={`origem ${it.origem}`}>{it.origem === 'aula' ? 'da aula' : 'autoestudo'}</span><span set:html={it.html} /></li>)}
+        </ul>
+      </div>
+    ))}
+  </section>
+
+  <hr class="sep" />
+  <section class="chap" id="cartoes">
+    <span class="num">02</span>
+    <h2>Cartões</h2>
+    {lista.filter((a) => a.cartoes.length).map((a) => (
+      <Fragment>
+        <h3><a href={a.href}>Aula {a.numero} · {a.titulo}</a></h3>
+        <Cartoes cartoes={a.cartoes} />
+      </Fragment>
+    ))}
+  </section>
+
+  <hr class="sep" />
+  <section class="chap" id="cola">
+    <span class="num">03</span>
+    <h2>Cola</h2>
+    {lista.filter((a) => a.cola.length).map((a) => (
+      <div class="prose">
+        <h3>Aula {a.numero} · {a.titulo}</h3>
+        <div class="cheat">{a.cola.map(([t, x]) => <div><b set:html={t} />: <span set:html={x} /></div>)}</div>
+      </div>
+    ))}
+  </section>
+
+  <Glossario termos={termos} num="04" intro="Os termos de todas as aulas desta matéria, juntos." />
+</Aula>
+
+<script>
+  import { initChrome } from '../../../lib/chrome.js';
+  import { initGlossary } from '../../../lib/glossary.js';
+  import { initCartoes } from '../../../lib/cartoes.js';
+  initGlossary(JSON.parse(document.getElementById('gl-data').textContent));
+  initCartoes();
+  initChrome();
+</script>

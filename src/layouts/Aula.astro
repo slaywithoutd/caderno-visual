@@ -1,10 +1,11 @@
 ---
+/* Layout das páginas de leitura (aula e revisão): sidebar flutuante com sumário,
+   barra de progresso, popover do glossário e o miolo da página. */
 import Base from './Base.astro';
-import { site, areaDe, url } from '../data/aulas.js';
-const { aula } = Astro.props;
-const area = areaDe(aula);
+import { site, url } from '../lib/catalogo.js';
+const { titulo, rotulo, materia, modulo, secoes, descricao = '' } = Astro.props;
 ---
-<Base title={`${aula.titulo} · ${area.titulo}`} description={aula.resumo}>
+<Base title={`${titulo} · ${materia.titulo}`} description={descricao}>
   <div class="progress" id="progress"></div>
   <div id="pop" role="dialog" aria-live="polite"></div>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><marker id="mnarrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mnarrow"/></marker></defs></svg>
@@ -12,13 +13,13 @@ const area = areaDe(aula);
   <div class="layout">
     <aside class="side">
       <details class="side-box" id="side-box" open>
-        <summary>Nesta aula</summary>
+        <summary>Nesta página</summary>
         <a class="side-back" href={url('/')}>← {site.titulo}</a>
-        <p class="side-course">{area.titulo}</p>
-        <p class="side-aula"><i>Aula {aula.numero}</i>{aula.titulo}</p>
-        <nav class="toc side-group" aria-label="Nesta aula">
+        <p class="side-course">{modulo.titulo} · {materia.titulo}</p>
+        <p class="side-aula"><i>{rotulo}</i>{titulo}</p>
+        <nav class="toc side-group" aria-label="Nesta página">
           <ol>
-            {aula.secoes.map(([id, nome], i) => (
+            {secoes.map(([id, nome], i) => (
               <li><a href={`#${id}`}><i>{String(i + 1).padStart(2, '0')}</i>
                 {id === 'glossario' ? <span>{nome} (<span id="gl-count">0</span> termos)</span> : <span>{nome}</span>}
               </a></li>

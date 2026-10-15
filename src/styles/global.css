@@ -393,3 +393,45 @@ footer{margin:4rem 0 0;padding-top:1.5rem;border-top:1px solid var(--line);color
 .mn.loop svg g,.mn.loop svg circle,.mn.loop svg text{transition:none}
 .fig-side > .lab{height:24px}
 .fig-side > .lab + ol.fig-notes{top:26px}
+
+/* destaques "cai na prova" no texto e callouts das notas (> [!prova], > [!professor] …) */
+p.prova,.callout{position:relative;border-radius:10px;padding:12px 16px 12px 16px;margin:1.3rem 0;font-size:.95rem;color:var(--fg2);clear:none}
+p.prova{width:var(--mw);background:var(--amber-soft);border-left:3px solid var(--amber)}
+.prose p.prova{width:auto}
+p.prova::before,.callout-lab{display:block;font-size:.7rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);margin-bottom:4px}
+p.prova::before{content:'Cai na prova'}
+.callout{background:var(--surface2);border-left:3px solid var(--line2)}
+.callout > p:last-child{margin-bottom:0}
+.callout.prova{background:var(--amber-soft);border-left-color:var(--amber)}
+.callout.professor{background:var(--blue-soft);border-left-color:var(--blue)}
+.callout.professor .callout-lab{color:var(--blue)}
+.callout.duvida{background:var(--red-soft);border-left-color:var(--red)}
+.callout.duvida .callout-lab{color:var(--red)}
+.callout.dica .callout-lab,.callout.atencao .callout-lab{color:var(--muted)}
+
+/* Da aula: notas em markdown, slides e fotos */
+.da-aula .nota{width:var(--mw);margin:1.6rem 0;padding-top:1rem;border-top:1px dashed var(--line)}
+.nota-head{display:flex;justify-content:space-between;gap:12px;font-size:.78rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem}
+.nota-corpo h1,.nota-corpo h2{font-size:1.2rem;margin:1.4rem 0 .5rem}
+.nota-corpo h3{font-size:1.05rem}
+.nota-corpo ul,.nota-corpo ol{padding-left:1.25em;color:var(--fg2)}
+.nota-corpo li{margin:.3em 0}
+.nota-corpo img{border-radius:8px;border:1px solid var(--line)}
+.nota-corpo pre{background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:10px 14px;overflow-x:auto;font-size:.85rem}
+.nota-corpo pre code{border:0;background:none;padding:0;white-space:pre}
+.nota-corpo table{margin:1rem 0}
+.anexo-pdf{width:var(--mw);margin:1.4rem 0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.anexo-pdf summary{padding:10px 14px;cursor:pointer;font-size:.88rem;font-weight:500;display:flex;gap:12px;align-items:center}
+.anexo-pdf summary a{margin-left:auto;font-size:.8rem;font-weight:400}
+.anexo-pdf iframe{border:0;display:block;width:100%;height:min(75vh,640px);border-top:1px solid var(--line);background:var(--surface2)}
+.galeria{width:var(--mw);display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin:1.4rem 0}
+.galeria img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;border:1px solid var(--line);display:block}
+
+/* página de revisão */
+.rev-grupo h3 a{color:inherit;text-decoration:none}
+.rev-grupo h3 a:hover{color:var(--accent)}
+.rev-prova{list-style:none;padding:0;margin:0 0 1.5rem;display:grid;gap:8px}
+.rev-prova li{display:flex;gap:12px;align-items:baseline;padding:10px 14px;border-radius:8px;background:var(--amber-soft);color:var(--fg2);font-size:.95rem}
+.origem{flex:0 0 auto;font-size:.66rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:999px;background:var(--surface);color:var(--muted);border:1px solid var(--line)}
+.origem.aula{color:var(--blue);border-color:var(--blue)}
+#cartoes h3 a,#cola h3{color:inherit;text-decoration:none}

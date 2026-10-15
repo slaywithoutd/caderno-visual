@@ -1,7 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { site, areas, aulas, hrefAula } from '../data/aulas.js';
-const porArea = areas.map((area) => ({ area, lista: aulas.filter((a) => a.area === area.slug) }));
+import { site, modulos, aulasDe, hrefRevisao } from '../lib/catalogo.js';
 ---
 <Base title={site.titulo} description={site.subtitulo}>
   <main class="home">
@@ -10,29 +9,43 @@ const porArea = areas.map((area) => ({ area, lista: aulas.filter((a) => a.area =
       <p class="home-sub">{site.subtitulo}</p>
     </header>
 
-    {porArea.map(({ area, lista }) => (
-      <section class="home-area" id={area.slug} aria-labelledby={`h-${area.slug}`}>
-        <div class="area-head">
-          <h2 id={`h-${area.slug}`}>{area.titulo}</h2>
-          <p>{area.descricao}</p>
-        </div>
-        <ol class="aula-list">
-          {lista.map((a) => (
-            <li>
-              <a class="aula-row" href={hrefAula(a)}>
-                <span class="aula-num">{a.numero}</span>
-                <span class="aula-body">
-                  <span class="aula-title">{a.titulo}</span>
-                  <span class="aula-resumo">{a.resumo}</span>
-                  <span class="aula-tags">{a.topicos.map((t) => <span>{t}</span>)}</span>
-                </span>
-                <span class="aula-meta">{a.fontes}</span>
-                <span class="aula-go" aria-hidden="true">→</span>
-              </a>
-            </li>
-          ))}
-          <li class="aula-next"><span class="aula-num">{String(lista.length + 1).padStart(2, '0')}</span><span>Próxima aula em breve</span></li>
-        </ol>
+    {modulos.map((mod) => (
+      <section class="home-mod" aria-labelledby={`h-${mod.slug}`}>
+        <h2 class="mod-title" id={`h-${mod.slug}`}>{mod.titulo}</h2>
+        {mod.materias.map((mat) => {
+          const lista = aulasDe(mod.slug, mat.slug);
+          return (
+            <section class="home-area" id={`${mod.slug}-${mat.slug}`}>
+              <div class="area-head">
+                <div>
+                  <h3>{mat.titulo}</h3>
+                  {mat.descricao && <p>{mat.descricao}</p>}
+                </div>
+                {!!lista.length && <a class="rev-link" href={hrefRevisao(mod.slug, mat.slug)}>Revisão para a prova →</a>}
+              </div>
+              {lista.length === 0 ? (
+                <p class="area-vazia">Nenhuma aula ainda.</p>
+              ) : (
+                <ol class="aula-list">
+                  {lista.map((a) => (
+                    <li>
+                      <a class="aula-row" href={a.href}>
+                        <span class="aula-num">{a.numero}</span>
+                        <span class="aula-body">
+                          <span class="aula-title">{a.titulo}</span>
+                          <span class="aula-resumo">{a.resumo}</span>
+                          <span class="aula-tags">{(a.topicos || []).map((t) => <span>{t}</span>)}</span>
+                        </span>
+                        <span class="aula-meta">{a.tema}</span>
+                        <span class="aula-go" aria-hidden="true">→</span>
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </section>
+          );
+        })}
       </section>
     ))}
   </main>
@@ -41,11 +54,14 @@ const porArea = areas.map((area) => ({ area, lista: aulas.filter((a) => a.area =
 <style>
   .home{max-width:880px;margin:0 auto;padding:clamp(48px,10vh,104px) 24px 96px}
   .home h1{font-size:clamp(2rem,5vw,2.9rem);margin:0 0 .5rem}
-  .home-sub{font-size:1.1rem;color:var(--fg2);margin:0 0 3.5rem;max-width:560px}
-  .home-area{margin-bottom:3.5rem}
-  .area-head{padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:4px}
-  .area-head h2{font-size:1.25rem;margin:0 0 2px}
+  .home-sub{font-size:1.1rem;color:var(--fg2);margin:0 0 3rem;max-width:560px}
+  .mod-title{font-size:.78rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 18px}
+  .home-area{margin-bottom:2.6rem}
+  .area-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:4px}
+  .area-head h3{font-size:1.25rem;margin:0 0 2px}
   .area-head p{font-size:.9rem;color:var(--muted);margin:0}
+  .rev-link{font-size:.85rem;text-decoration:none;white-space:nowrap}
+  .area-vazia{color:var(--muted);font-size:.92rem;padding:14px 8px;margin:0}
   .aula-list{list-style:none;margin:0;padding:0}
   .aula-list li{border-bottom:1px solid var(--line)}
   .aula-row{display:grid;grid-template-columns:48px minmax(0,1fr) auto 24px;gap:6px 20px;align-items:start;padding:22px 8px;text-decoration:none;color:inherit;border-radius:10px;transition:background .2s}
@@ -59,7 +75,5 @@ const porArea = areas.map((area) => ({ area, lista: aulas.filter((a) => a.area =
   .aula-tags span{font-size:.74rem;padding:2px 9px;border-radius:999px;background:var(--surface2);color:var(--muted);border:1px solid var(--line)}
   .aula-meta{font-size:.8rem;color:var(--muted);padding-top:5px;white-space:nowrap}
   .aula-go{color:var(--muted);padding-top:2px;transition:transform .2s,color .2s}
-  .aula-next{display:flex;gap:20px;padding:20px 8px;color:var(--muted);font-size:.95rem}
-  .aula-next .aula-num{width:48px;padding-top:0}
-  @media (max-width:640px){.aula-row{grid-template-columns:36px minmax(0,1fr)}.aula-meta,.aula-go{display:none}.aula-next{gap:6px}.aula-next .aula-num{width:36px}}
+  @media (max-width:640px){.aula-row{grid-template-columns:36px minmax(0,1fr)}.aula-meta,.aula-go{display:none}.area-head{flex-direction:column;align-items:flex-start}}
 </style>

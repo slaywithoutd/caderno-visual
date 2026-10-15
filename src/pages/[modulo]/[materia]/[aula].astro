@@ -1,0 +1,119 @@
+---
+/* Página de qualquer aula. Tudo vem da pasta src/aulas/<modulo>/<materia>/<aula>/:
+   conteudo.html (texto), revisao.js (cartões e cola), notas/ (Da aula), glossario.js, meta.json (fontes). */
+import Aula from '../../../layouts/Aula.astro';
+import Glossario from '../../../components/Glossario.astro';
+import Cartoes from '../../../components/Cartoes.astro';
+import { aulas, materia, modulo, hrefRevisao } from '../../../lib/catalogo.js';
+
+export function getStaticPaths() {
+  return aulas.map((a) => ({ params: { modulo: a.modulo, materia: a.materia, aula: a.slug }, props: { aula: a } }));
+}
+const { aula } = Astro.props;
+const mat = materia(aula.modulo, aula.materia);
+const mod = modulo(aula.modulo);
+
+const temRevisao = aula.cartoes.length || aula.cola.length;
+const temNotas = aula.notas.length || aula.anexos.length;
+const temFontes = !!aula.fontes?.length;
+const temCola = !!aula.cola.length;
+const extras = [
+  temRevisao && ['revisao', 'Revisão rápida'],
+  temNotas && ['da-aula', 'Da aula'],
+  ['glossario', 'Glossário'],
+  aula.fontes?.length && ['fontes', 'Fontes'],
+].filter(Boolean);
+const secoes = [...aula.secoes, ...extras];
+const num = (id) => String(secoes.findIndex(([s]) => s === id) + 1).padStart(2, '0');
+
+/* imagens já citadas dentro de alguma nota não se repetem na galeria */
+const citadas = aula.notas.map((n) => n.raw).join('\n');
+const pdfs = aula.anexos.filter((x) => x.tipo === 'pdf');
+const fotos = aula.anexos.filter((x) => x.tipo === 'imagem' && !citadas.includes(x.arquivo));
+const temFotos = !!fotos.length;
+const notas = aula.notas.map((n) => ({ Corpo: n.Content, nome: nomeNota(n), data: n.frontmatter.data }));
+function nomeNota(n) { return n.frontmatter.titulo || n.arquivo.replace(/\.md$/, '').replace(/[-_]/g, ' '); }
+---
+<Aula titulo={aula.titulo} rotulo={`Aula ${aula.numero}`} materia={mat} modulo={mod} secoes={secoes} descricao={aula.resumo}>
+  <div data-aula={aula.id} id="aula-root">
+    <Fragment set:html={aula.conteudo} />
+  </div>
+
+  {temRevisao && (
+    <Fragment>
+      <hr class="sep" />
+      <section class="chap" id="revisao">
+        <span class="num">{num('revisao')}</span>
+        <h2>Revisão rápida</h2>
+        <p>Tente responder antes de abrir cada cartão. Tudo isto também aparece na <a href={hrefRevisao(aula.modulo, aula.materia)}>revisão de {mat.titulo}</a>.</p>
+        <Cartoes cartoes={aula.cartoes} />
+        {temCola && (
+          <Fragment>
+            <h3>Cola de uma página</h3>
+            <div class="cheat">{aula.cola.map(([t, x]) => <div><b set:html={t} />: <span set:html={x} /></div>)}</div>
+          </Fragment>
+        )}
+      </section>
+    </Fragment>
+  )}
+
+  {temNotas && (
+    <Fragment>
+      <hr class="sep" />
+      <section class="chap da-aula" id="da-aula">
+        <span class="num">{num('da-aula')}</span>
+        <h2>Da aula</h2>
+        <p class="muted">Anotações, slides e fotos da aula presencial. Destaques marcados como <b>cai na prova</b> também vão para a revisão da matéria.</p>
+        {notas.map(({ Corpo, nome, data }) => (
+          <article class="nota">
+            <div class="nota-head">{nome}{data && <span>{data}</span>}</div>
+            <div class="nota-corpo"><Corpo /></div>
+          </article>
+        ))}
+        {pdfs.map((p) => (
+          <details class="anexo-pdf" open>
+            <summary>{p.arquivo} <a href={p.url} target="_blank" rel="noopener">abrir em nova aba ↗</a></summary>
+            <iframe src={p.url} title={p.arquivo} loading="lazy"></iframe>
+          </details>
+        ))}
+        {temFotos && (
+          <div class="galeria">{fotos.map((f) => <a href={f.url} target="_blank" rel="noopener"><img src={f.url} alt={f.arquivo} loading="lazy" /></a>)}</div>
+        )}
+      </section>
+    </Fragment>
+  )}
+
+  <Glossario termos={aula.glossario} num={num('glossario')} />
+
+  {temFontes && (
+    <section class="fontes" id="fontes">
+      <h3>Fontes desta aula</h3>
+      <ul>
+        {aula.fontes.map((f) => (
+          <li>
+            <span class="fk">{f.tipo}</span>
+            {f.url ? <a href={f.url} target="_blank" rel="noopener">{f.titulo}</a> : <span>{f.titulo}</span>}
+            {f.duracao && <span class="muted">· {f.duracao}</span>}
+            {f.secao && <a href={`#${f.secao}`}>ver seção</a>}
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+  {aula.observacao && <footer>{aula.observacao}</footer>}
+</Aula>
+
+<script>
+  import { initChrome } from '../../../lib/chrome.js';
+  import { initGlossary } from '../../../lib/glossary.js';
+  import { initCartoes } from '../../../lib/cartoes.js';
+  const entradas = import.meta.glob('../../../aulas/*/*/*/index.js');
+  const id = document.getElementById('aula-root').dataset.aula;
+  const carregar = entradas[`../../../aulas/${id}/index.js`];
+  const termos = JSON.parse(document.getElementById('gl-data').textContent);
+  (carregar ? carregar() : Promise.resolve()).finally(() => {
+    initGlossary(termos);
+    initCartoes();
+    initChrome();
+  });
+</script>

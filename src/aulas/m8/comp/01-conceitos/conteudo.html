@@ -53,6 +53,8 @@
     </ul>
   </div>
 
+  <p class="prova"><code>∅ ≠ {ε}</code>: ∅ não tem nenhuma palavra; {ε} tem exatamente uma, a vazia. As duas são linguagens.</p>
+
   <h3>Prefixo, sufixo e subpalavra</h3>
   <ul class="b">
     <li><b>Prefixo</b>: qualquer sequência inicial. Prefixos de <code>abb</code>: ε, a, ab, abb.</li>
@@ -217,6 +219,7 @@
     <li>Usamos a contrapositiva: se L <b>não</b> é bombeável, L <b>não</b> é regular.</li>
     <li>A prova é sempre por contradição: suponha que L é regular, aplique o lema, chegue em um absurdo.</li>
   </ul>
+  <p class="prova">O lema do bombeamento só prova que uma linguagem <b>não</b> é regular. Para aⁿbⁿ: escolha <code>w = aᵖbᵖ</code>; como <code>|xy| ≤ p</code>, y só tem a, e <code>xy²z</code> sai de L.</p>
   <h3>Receita: provar que L não é regular</h3>
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 184"><text class="tm" x="60" y="12">adversário</text><text class="tm" x="180" y="12">você</text><line class="s" x1="120" y1="22" x2="120" y2="176" stroke-dasharray="3 4"/><rect class="rd" x="20" y="26" width="80" height="28" rx="14"/><text x="60" y="40">p</text><rect class="gr" x="140" y="64" width="80" height="28" rx="14"/><text x="180" y="78">w</text><rect class="rd" x="20" y="102" width="80" height="28" rx="14"/><text x="60" y="116">xyz</text><rect class="gr" x="140" y="140" width="80" height="28" rx="14"/><text x="180" y="154">i</text></svg>Ele joga 1 e 3, você joga 2 e 4. Você ganha se vencer toda divisão.</aside>
   <p>Pense num jogo contra um adversário que defende que L é regular. Você só ganha se vencer <b>qualquer</b> jogada dele.</p>
@@ -303,6 +306,8 @@
     <p>Do lado esquerdo vai <b>exatamente uma variável</b>, sozinha. Do lado direito vai qualquer coisa, inclusive ε.</p>
     <p><b>Linguagem livre do contexto</b> = linguagem gerada por alguma GLC.</p>
   </div>
+
+  <p class="prova">GLC: toda regra é <code>A → α</code>, com uma única variável sozinha do lado esquerdo. LLC = gerada por GLC = reconhecida por AP.</p>
 
   <h3>Por que "livre do contexto"?</h3>
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><text class="tm st" x="6" y="14">livre do contexto</text><rect class="bl" x="98" y="28" width="40" height="30" rx="6"/><text class="tb" x="118" y="43">A</text><text class="tm" x="170" y="43">→ α</text><text class="tm" x="58" y="43">? ? ?</text><line class="s" x1="6" y1="76" x2="234" y2="76" stroke-dasharray="3 4"/><text class="tm st" x="6" y="96">sensível ao contexto</text><rect class="k" x="58" y="110" width="30" height="30" rx="6"/><text x="73" y="125">a</text><rect class="bl" x="92" y="110" width="30" height="30" rx="6"/><text class="tb" x="107" y="125">A</text><rect class="k" x="126" y="110" width="30" height="30" rx="6"/><text x="141" y="125">b</text><text class="tm" x="196" y="125">→ aab</text></svg>Em cima, A troca em qualquer lugar. Embaixo, só entre a e b.</aside>
@@ -400,6 +405,8 @@
     <li>Se o topo não for o símbolo pedido, a transição <b>não pode</b> ser usada naquele ramo.</li>
     <li>O AP não tem teste "pilha vazia?" embutido. O truque é empilhar <code>$</code> no começo: ver <code>$</code> no topo significa "pilha vazia".</li>
   </ul>
+
+  <p class="prova">Transição <code>a, b → c</code>: lê a, desempilha b, empilha c (cada um pode ser ε). Use <code>$</code> para saber quando a pilha está vazia.</p>
 
   <h3>Computação: configurações</h3>
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 110"><text x="120" y="30" style="font-size:20px">( q , w , γ )</text><line class="s" x1="80" y1="44" x2="44" y2="76"/><line class="s" x1="120" y1="44" x2="120" y2="76"/><line class="s" x1="160" y1="44" x2="196" y2="76"/><rect class="am" x="14" y="78" width="60" height="26" rx="13"/><text class="tm" x="44" y="91">estado</text><rect class="k" x="84" y="78" width="72" height="26" rx="13"/><text class="tm" x="120" y="91">falta ler</text><rect class="bl" x="166" y="78" width="60" height="26" rx="13"/><text class="tm" x="196" y="91">pilha</text></svg>Uma fotografia completa da máquina num instante.</aside>
@@ -553,6 +560,7 @@
   </div>
 
  <div class="prose">
+  <p class="prova">Tipo 3 ⊊ 2 ⊊ 1 ⊊ 0, com AF, AP, ALL e MT. Saiba um exemplo que separa cada nível: <code>aⁿbⁿ</code> é LLC e não regular; <code>aⁿbⁿcⁿ</code> é sensível ao contexto e não LLC.</p>
   <ul class="b">
     <li>As inclusões são <b>próprias</b>: Tipo 3 ⊊ Tipo 2 ⊊ Tipo 1 ⊊ Tipo 0. Sempre existe uma linguagem no anel de fora que não está no de dentro.</li>
     <li>Para separar Tipo 3 de Tipo 2 usamos o lema do bombeamento da seção 3 (aⁿbⁿ). Para separar Tipo 2 de Tipo 1 existe um lema do bombeamento para LLC (aⁿbⁿcⁿ).</li>
@@ -563,61 +571,3 @@
   </ul>
  </div>
 </section>
-
-<hr class="sep">
-
-<!-- ============ revisão ============ -->
-<section class="chap" id="revisao">
- <div class="prose">
-  <span class="num">08</span>
-  <h2>Revisão rápida</h2>
-  <p>Tente responder antes de abrir cada cartão.</p>
- </div>
- <div class="cards" id="cards"></div>
- <div class="prose">
-  <h3>Cola de uma página</h3>
-  <div class="cheat">
-    <div><b>Linguagem</b>: qualquer subconjunto de Σ*. ∅ ≠ {ε}.</div>
-    <div><b>Σ*</b> inclui ε; <b>Σ⁺</b> = Σ* − {ε}. w⁰ = ε.</div>
-    <div><b>Gramática</b>: G = (V, T, P, S). L(G) = { w ∈ T* | S ⇒⁺ w }.</div>
-    <div><b>Equivalentes</b>: L(G₁) = L(G₂).</div>
-    <div><b>Bombeamento</b>: w = xyz, |y| ≥ 1, |xy| ≤ p, xyⁱz ∈ L ∀i ≥ 0. Só prova que <i>não</i> é regular.</div>
-    <div><b>GLC</b>: regras A → α. Gera LLC. Árvore de derivação; duas árvores = ambígua.</div>
-    <div><b>BNF</b>: ⟨var⟩ ::= … é uma GLC.</div>
-    <div><b>AP</b>: (Q, Σ, Γ, δ, q₀, F), transição a, b → c. Aceita se algum ramo lê tudo e para em F.</div>
-    <div><b>Truque do $</b>: marca fundo da pilha, testa "vazia".</div>
-    <div><b>GLC ⇔ AP</b>. AP não determinístico &gt; determinístico (wwᴿ).</div>
-    <div><b>Chomsky</b>: 3 Reg/AF ⊊ 2 LLC/AP ⊊ 1 LSC/ALL ⊊ 0 RE/MT.</div>
-  </div>
- </div>
-</section>
-
-<hr class="sep">
-
-<section class="chap" id="glossario">
-  <span class="num">09</span>
-  <h2>Glossário</h2>
-  <p>Todo termo com sublinhado pontilhado no texto abre aqui como um cartão. Os blocos <b>"pra ir além"</b> não são necessários para a prova: servem para quando a definição curta não bastar.</p>
-  <div class="gl-tools">
-    <input type="text" id="gl-search" placeholder="Buscar termo…" aria-label="Buscar no glossário">
-    <div class="gl-letters" id="gl-letters"></div>
-  </div>
-  <div id="gl-list"></div>
-  <p class="muted" id="gl-empty" hidden>Nenhum termo encontrado.</p>
-</section>
-
-<section class="fontes" id="fontes">
-  <h3>Fontes desta aula</h3>
-  <ul>
-    <li><span class="fk">Livro</span>Menezes, cap. 2 · Linguagens e gramáticas (p. 54–63) <a href="#palavras">seções 1–2</a></li>
-    <li><span class="fk">Vídeo</span><a href="https://www.youtube.com/watch?v=xlw0dFJ9CPY" target="_blank" rel="noopener">LFA Aula 11 · Linguagens não-regulares</a> · 34 min <a href="#naoregulares">seção 3</a></li>
-    <li><span class="fk">Livro</span>Menezes, cap. 6 · Linguagens livres do contexto (p. 153–156) <a href="#llc">seção 4</a></li>
-    <li><span class="fk">Vídeo</span><a href="https://www.youtube.com/watch?v=-rfslM7ouzY" target="_blank" rel="noopener">Autômatos com pilha</a> · 30 min <a href="#ap">seção 5</a></li>
-    <li><span class="fk">Vídeo</span><a href="https://www.youtube.com/watch?v=wXtbxHn81mQ" target="_blank" rel="noopener">APs: mais exemplos</a> · 21 min <a href="#apex">seção 6</a></li>
-    <li><span class="fk">Vídeo</span><a href="https://www.youtube.com/watch?v=VGCkKElmOm8" target="_blank" rel="noopener">LFA Aula 19 · Hierarquia de Chomsky</a> · 5 min <a href="#chomsky">seção 7</a></li>
-  </ul>
-</section>
-
-<footer>
-  Material de estudo baseado em: Paulo Blauth Menezes, <i>Linguagens Formais e Autômatos</i>, cap. 2 (p. 54–63) e cap. 6 (p. 153–156); e nos vídeos listados nas fontes acima. A notação dos APs segue a dos vídeos (estilo Sipser, com aceitação por estado final). Confira os exemplos no livro.
-</footer>

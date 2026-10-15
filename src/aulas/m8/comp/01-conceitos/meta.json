@@ -1,0 +1,25 @@
+{
+  "numero": "01",
+  "titulo": "Conceitos de linguagens formais",
+  "tema": "Linguagens Formais e Autômatos",
+  "resumo": "Alfabeto, palavra e gramática; o limite das linguagens regulares; linguagens livres do contexto, autômatos com pilha e a Hierarquia de Chomsky.",
+  "topicos": ["Σ* e linguagens", "Gramáticas", "Lema do bombeamento", "GLC", "Autômato com pilha", "Chomsky"],
+  "secoes": [
+    ["palavras", "Alfabeto, palavra e linguagem"],
+    ["gramaticas", "Gramáticas e derivação"],
+    ["naoregulares", "Linguagens não-regulares"],
+    ["llc", "Livres do contexto"],
+    ["ap", "Autômatos com pilha"],
+    ["apex", "Mais exemplos de AP"],
+    ["chomsky", "Hierarquia de Chomsky"]
+  ],
+  "fontes": [
+    { "tipo": "Livro", "titulo": "Menezes, Linguagens Formais e Autômatos, cap. 2 · Linguagens e gramáticas (p. 54–63)", "secao": "palavras" },
+    { "tipo": "Vídeo", "titulo": "LFA Aula 11 · Linguagens não-regulares", "url": "https://www.youtube.com/watch?v=xlw0dFJ9CPY", "duracao": "34 min", "secao": "naoregulares" },
+    { "tipo": "Livro", "titulo": "Menezes, Linguagens Formais e Autômatos, cap. 6 · Linguagens livres do contexto (p. 153–156)", "secao": "llc" },
+    { "tipo": "Vídeo", "titulo": "Autômatos com pilha", "url": "https://www.youtube.com/watch?v=-rfslM7ouzY", "duracao": "30 min", "secao": "ap" },
+    { "tipo": "Vídeo", "titulo": "APs: mais exemplos", "url": "https://www.youtube.com/watch?v=wXtbxHn81mQ", "duracao": "21 min", "secao": "apex" },
+    { "tipo": "Vídeo", "titulo": "LFA Aula 19 · Hierarquia de Chomsky", "url": "https://www.youtube.com/watch?v=VGCkKElmOm8", "duracao": "5 min", "secao": "chomsky" }
+  ],
+  "observacao": "A notação dos APs segue a dos vídeos (estilo Sipser, com aceitação por estado final). Confira os exemplos no livro."
+}

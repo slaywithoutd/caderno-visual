@@ -11,6 +11,8 @@ Leia `CLAUDE.md` antes (estrutura, vocabulário do HTML, estilo de escrita, deci
 ## 1. Entender o pedido
 
 - Matéria e módulo (ex.: `m8/comp`). Se a matéria não existir em `src/data/estrutura.js`, adicione.
+- Eixo: o `tema` do meta.json tem de ser igual ao título de um eixo da matéria em `estrutura.js`. Assunto
+  novo que não é continuação de nenhum eixo? Crie o eixo lá (veja "Eixos" no `CLAUDE.md`).
 - Número e slug: olhe as aulas que já existem na pasta da matéria e use o próximo `NN`.
   Slug `NN-assunto-curto`, sem acento.
 - Fontes: para cada link de vídeo, tente título e duração (página do YouTube). Transcrição da

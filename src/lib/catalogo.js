@@ -48,6 +48,25 @@ export const aulasDe = (m, s) => aulas.filter((a) => a.modulo === m && a.materia
 export const hrefRevisao = (m, s) => url(`/${m}/${s}/revisao`);
 export const hrefGlossario = url('/glossario');
 
+/* Eixos: uma matéria pode ter mais de um eixo (ex.: Computação = linguagens formais + arquitetura e SO).
+   Cada aula entra no eixo cujo título é igual ao "tema" do meta.json (sem diferença de maiúsculas e
+   acentos). Aula com tema fora da lista forma um grupo próprio. Eixo sem aula não aparece. */
+const norm = (s = '') => s.toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').trim();
+export function eixosDe(m, s) {
+  const defs = materia(m, s)?.eixos || [];
+  const grupos = defs.map((e) => ({ ...e, aulas: [] }));
+  for (const a of aulasDe(m, s)) {
+    let g = grupos.find((x) => norm(x.titulo) === norm(a.tema));
+    if (!g) {
+      g = { slug: norm(a.tema || 'outras').replace(/[^a-z0-9]+/g, '-'), titulo: a.tema || 'Outras aulas', descricao: '', aulas: [] };
+      grupos.push(g);
+    }
+    g.aulas.push(a);
+  }
+  return grupos.filter((g) => g.aulas.length);
+}
+export const hrefRevisaoEixo = (m, s, e) => url(`/${m}/${s}/revisao/${e}`);
+
 /* Glossário global: os termos de todas as aulas. Um termo aprendido numa aula continua virando
    link nas próximas. Se duas aulas definem a mesma chave, vale a primeira (a mais antiga). */
 export const glossarioGlobal = (() => {

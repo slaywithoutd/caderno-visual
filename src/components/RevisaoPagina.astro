@@ -1,0 +1,87 @@
+---
+/* Página de revisão para a prova: junta o que um conjunto de aulas marcou.
+   Usada pela revisão da matéria inteira e pela revisão de cada eixo.
+   - "Cai na prova": <p class="prova"> do conteúdo + "> [!prova]" das notas
+   - cartões e cola das aulas (revisao.js)
+   - glossário das aulas (no glossário global) */
+import Aula from '../layouts/Aula.astro';
+import Glossario from './Glossario.astro';
+import Cartoes from './Cartoes.astro';
+import { destaquesProva, glossarioGlobal, hrefGlossario, tempoLeitura, htmlTempo } from '../lib/catalogo.js';
+
+const { mod, mat, lista, kicker, titulo = 'Revisão para a prova', descricao, outras = [] } = Astro.props;
+const prova = lista.map((a) => ({ aula: a, itens: destaquesProva(a) })).filter((x) => x.itens.length);
+const termos = Object.assign({}, ...lista.map((a) => a.glossario));
+const listar = Object.keys(termos);
+const secoes = [
+  ['prova', 'Cai na prova'],
+  ['cartoes', 'Cartões'],
+  ['cola', 'Cola'],
+  ['glossario', 'Glossário'],
+];
+const total = prova.reduce((n, x) => n + x.itens.length, 0);
+const nCartoes = lista.reduce((n, a) => n + a.cartoes.length, 0);
+/* revisar = ler destaques, responder cartões e passar pela cola (o glossário é consulta) */
+const tempo = tempoLeitura({ html: [...prova.flatMap((x) => x.itens.map((i) => i.html)), ...lista.flatMap((a) => [...a.cartoes.flat(), ...a.cola.flat()])].join(' '), figuras: 0, loops: 0, cartoes: nCartoes });
+const temOutras = outras.length > 0;
+---
+<Aula titulo={titulo} rotulo={`${lista.length} ${lista.length === 1 ? 'aula' : 'aulas'}`} materia={mat} modulo={mod} secoes={secoes} descricao={descricao}>
+  <header class="hero prose" id="top">
+    <div class="kicker">{kicker}</div>
+    <h1>{titulo}</h1>
+    <Fragment set:html={htmlTempo(tempo, 'Revisão')} />
+    <p class="lede">Tudo o que as aulas marcaram como importante, num lugar só: {total} destaques, {nCartoes} cartões e {listar.length} termos.</p>
+    {temOutras && <p class="rev-eixos">{outras.map((o) => <a href={o.href}>{o.rotulo}</a>)}</p>}
+  </header>
+
+  <section class="chap" id="prova">
+    <span class="num">01</span>
+    <h2>Cai na prova</h2>
+    {prova.length === 0 && <p class="muted">Nenhum destaque ainda. Marque com <code>&lt;p class="prova"&gt;</code> no conteúdo ou <code>&gt; [!prova]</code> nas notas.</p>}
+    {prova.map(({ aula, itens }) => (
+      <div class="rev-grupo prose">
+        <h3><a href={aula.href}>Aula {aula.numero} · {aula.titulo}</a></h3>
+        <ul class="rev-prova">
+          {itens.map((it) => <li><span class={`origem ${it.origem}`}>{it.origem === 'aula' ? 'da aula' : 'autoestudo'}</span><span set:html={it.html} /></li>)}
+        </ul>
+      </div>
+    ))}
+  </section>
+
+  <hr class="sep" />
+  <section class="chap" id="cartoes">
+    <span class="num">02</span>
+    <h2>Cartões</h2>
+    {lista.filter((a) => a.cartoes.length).map((a) => (
+      <Fragment>
+        <h3><a href={a.href}>Aula {a.numero} · {a.titulo}</a></h3>
+        <Cartoes cartoes={a.cartoes} />
+      </Fragment>
+    ))}
+  </section>
+
+  <hr class="sep" />
+  <section class="chap" id="cola">
+    <span class="num">03</span>
+    <h2>Cola</h2>
+    {lista.filter((a) => a.cola.length).map((a) => (
+      <div class="prose">
+        <h3>Aula {a.numero} · {a.titulo}</h3>
+        <div class="cheat">{a.cola.map(([t, x]) => <div><b set:html={t} />: <span set:html={x} /></div>)}</div>
+      </div>
+    ))}
+  </section>
+
+  <Glossario termos={glossarioGlobal} listar={listar} global={hrefGlossario} num="04" intro="Os termos de todas as aulas desta revisão, juntos." />
+</Aula>
+
+<script>
+  import { initChrome } from '../lib/chrome.js';
+  import { initGlossarioDaPagina } from '../lib/glossary.js';
+  import { initCartoes } from '../lib/cartoes.js';
+  import { initOculos } from '../lib/oculos.js';
+  initGlossarioDaPagina();
+  initCartoes();
+  initChrome();
+  initOculos();
+</script>

@@ -16,7 +16,7 @@ as aulas. Nunca edite o `conteudo.html` de cada aula para corrigir aparência.
 | estrutura da página da aula (ordem das seções geradas, rodapé) | `src/pages/[modulo]/[materia]/[aula].astro` |
 | sidebar, popover, cabeçalho comum | `src/layouts/Aula.astro`, `src/layouts/Base.astro` |
 | home | `src/pages/index.astro` |
-| página de revisão | `src/pages/[modulo]/[materia]/revisao.astro` |
+| página de revisão (matéria e eixo) | `src/components/RevisaoPagina.astro` (rotas em `src/pages/[modulo]/[materia]/revisao*`) |
 | figura passo a passo (controles, hover, passos) | `src/lib/stepfig.js` |
 | animação em loop | `src/lib/loop.js` |
 | glossário e popover | `src/lib/glossary.js` |

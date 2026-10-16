@@ -1,0 +1,638 @@
+<header class="hero prose" id="top">
+  <div class="kicker">Do silício ao sistema operacional · Aula 04</div>
+  <h1>Processos e threads: como um computador parece fazer tudo ao mesmo tempo</h1>
+  <div class="hero-sym"><span>modo <b>usuário</b> → <b>núcleo</b></span><span>PCB = <b>contexto</b> + estado</span><span>pronto <b>⇄</b> executando</span><span>q / (q + s)</span><span><b>1:1</b> · N:1 · M:N</span></div>
+</header>
+
+<!-- ============ 1 ============ -->
+<section class="chap" id="antes">
+ <div class="prose">
+  <span class="num">01</span>
+  <h2>Antes de começar: o que o sistema operacional faz</h2>
+  <div class="src"><span class="base-tag">Base · fora dos autoestudos</span></div>
+  <p>As aulas 02 e 03 olharam para o hardware: CPU, registradores, memória, cache, pipeline. Esta é a primeira aula sobre o software que manda nesse hardware. O livro de Machado &amp; Maia abre a Parte II assumindo que você já sabe o que um sistema operacional faz e como ele conversa com a máquina. Esta seção cobre isso.</p>
+
+  <h3>Escalas de tempo que vão aparecer</h3>
+ </div>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>Unidade</th><th>Quanto é</th><th>O que acontece nesse tempo</th></tr></thead>
+      <tbody>
+        <tr><td><code>ns</code> (nanossegundo)</td><td>10⁻⁹ s, um bilionésimo de segundo</td><td>um ciclo de clock de uma CPU de 1 GHz; um acesso à cache L1 (~1 ns)</td></tr>
+        <tr><td><code>µs</code> (microssegundo)</td><td>10⁻⁶ s = 1 000 ns</td><td>uma chamada de sistema simples (~0,1 a 1 µs); uma troca de contexto (~1 a 10 µs)</td></tr>
+        <tr><td><code>ms</code> (milissegundo)</td><td>10⁻³ s = 1 000 µs</td><td>uma fatia de tempo de CPU (~1 a 100 ms); uma leitura de HD (~5 a 10 ms); de SSD (~0,1 ms)</td></tr>
+        <tr><td><code>s</code> (segundo)</td><td>1 000 ms</td><td>o que uma pessoa percebe como "demorou"; acima de ~100 ms já dá para notar atraso</td></tr>
+      </tbody>
+    </table>
+  </div>
+ <div class="prose">
+  <p>Guarde a ordem de grandeza: enquanto um HD faz uma leitura (5 ms), uma CPU de 2 GHz passa por 10 milhões de ciclos. Quase tudo nesta aula existe para não desperdiçar esses ciclos.</p>
+
+  <h3>O sistema operacional</h3>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 170"><rect class="k" x="10" y="6" width="66" height="30" rx="6"/><text class="tm" x="43" y="21">navegador</text><rect class="k" x="87" y="6" width="66" height="30" rx="6"/><text class="tm" x="120" y="21">editor</text><rect class="k" x="164" y="6" width="66" height="30" rx="6"/><text class="tm" x="197" y="21">jogo</text><text class="tm st" x="10" y="50">modo usuário</text><line class="s" x1="10" y1="60" x2="230" y2="60" stroke-dasharray="4 3"/><rect class="acf" x="10" y="68" width="220" height="40" rx="8"/><text class="ta" x="120" y="88">núcleo do SO</text><rect class="am" x="10" y="122" width="66" height="34" rx="6"/><text class="tm" x="43" y="139">CPU</text><rect class="am" x="87" y="122" width="66" height="34" rx="6"/><text class="tm" x="120" y="139">memória</text><rect class="am" x="164" y="122" width="66" height="34" rx="6"/><text class="tm" x="197" y="139">disco, rede</text></svg>Os programas não falam com o hardware: pedem ao núcleo, que fala por eles.</aside>
+  <ul class="b">
+    <li><b>Sistema operacional</b> (SO): o programa que fica entre os seus programas e o hardware. Windows, Linux, macOS, Android e iOS são sistemas operacionais.</li>
+    <li>Primeiro papel, <b>máquina estendida</b>: esconder os detalhes do hardware atrás de serviços simples. Seu código diz "abra o arquivo notas.txt", e o SO cuida de achar os blocos certos no disco.</li>
+    <li>Segundo papel, <b>gerente de recursos</b>: dividir CPU, memória e dispositivos entre vários programas que disputam ao mesmo tempo, sem que um atrapalhe ou espione o outro.</li>
+    <li><b>Núcleo</b> (kernel): a parte do SO que fica sempre carregada na memória e tem acesso total ao hardware. Ele gerencia processos, memória, arquivos e dispositivos. O resto do SO (janelas, utilitários, o interpretador de comandos) são programas comuns.</li>
+  </ul>
+
+  <h3>Modo usuário e modo núcleo</h3>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><ellipse class="k" cx="120" cy="75" rx="112" ry="68"/><text class="tm" x="120" y="20">modo usuário</text><text class="tm" x="120" y="132">seu código: só instruções comuns</text><ellipse class="acf" cx="120" cy="76" rx="58" ry="34"/><text class="ta" x="120" y="70">modo núcleo</text><text class="tm" x="120" y="88">tudo liberado</text></svg>O núcleo roda no anel de dentro. Para entrar nele, só pela porta oficial: chamada de sistema ou interrupção.</aside>
+  <p>Se qualquer programa pudesse mandar comandos direto ao disco ou mexer na memória dos outros, um bug num jogo derrubaria a máquina inteira. Por isso a CPU tem pelo menos dois modos de operação, marcados por um bit num registrador especial.</p>
+  <ul class="b">
+    <li><b>Modo núcleo</b> (também chamado modo kernel, supervisor ou privilegiado): a CPU executa qualquer instrução e acessa qualquer endereço. Só o código do núcleo roda assim.</li>
+    <li><b>Modo usuário</b>: a CPU recusa um grupo de instruções. Todo programa seu roda neste modo.</li>
+    <li><b>Instrução privilegiada</b>: instrução que só pode rodar em modo núcleo. Exemplos: conversar com um dispositivo de E/S, mudar a tabela de páginas da memória virtual (aula 02), desligar interrupções, mudar o bit de modo.</li>
+    <li>Se um programa em modo usuário tenta uma instrução privilegiada, a CPU não executa: ela desvia para o núcleo, que em geral encerra o programa.</li>
+  </ul>
+  <div class="def warn">
+    <span class="lab">Duas palavras "núcleo"</span>
+    <p>Em português, "núcleo" serve para duas coisas: o núcleo do SO (kernel) e cada processador dentro do chip (core). Neste caderno, <i>núcleo</i> sozinho é sempre o kernel. Para o hardware, escrevemos <i>core</i>: "uma CPU com 4 cores".</p>
+  </div>
+
+  <h3>Chamada de sistema: pedir ao núcleo</h3>
+  <p>Se o seu programa não pode falar com o disco, como ele lê um arquivo? Ele pede ao núcleo.</p>
+  <ul class="b">
+    <li><b>Chamada de sistema</b> (system call, syscall): o pedido formal de um programa ao núcleo. Exemplos do Linux: <code>read</code> (ler), <code>write</code> (escrever), <code>open</code> (abrir arquivo), <code>fork</code> (criar processo), <code>exit</code> (terminar).</li>
+    <li>Em geral você não chama direto: <code>print</code> do Python e <code>printf</code> do C são funções de biblioteca que, por baixo, fazem a chamada <code>write</code>.</li>
+    <li>O mecanismo: o programa põe o número do serviço e os argumentos em registradores e executa uma instrução especial de desvio (<code>syscall</code> no x86-64, <code>svc</code> no ARM). A CPU muda para modo núcleo e salta para um endereço fixo, escolhido pelo núcleo. O programa não consegue pular para outro lugar do núcleo.</li>
+    <li>O núcleo confere o pedido (o arquivo existe? você tem permissão?), faz o serviço, devolve o resultado num registrador e volta para o modo usuário, na instrução seguinte.</li>
+    <li>Custa caro em relação a uma função comum: trocar de modo e conferir tudo leva de centenas de ns a alguns µs.</li>
+  </ul>
+
+  <h3>Interrupção: o hardware chama o núcleo</h3>
+  <ul class="b">
+    <li><b>E/S</b> (entrada e saída, ou I/O em inglês): toda troca de dados entre a CPU e o mundo de fora da memória: disco, teclado, tela, rede, sensores.</li>
+    <li>Dispositivos de E/S são lentíssimos perto da CPU. Ficar perguntando "já acabou?" em loop desperdiçaria milhões de ciclos.</li>
+    <li><b>Interrupção</b>: um aviso elétrico que um dispositivo manda para a CPU avisando "aconteceu algo". A CPU termina a instrução atual, guarda o mínimo para poder voltar (o PC e o registrador de status), muda para modo núcleo e executa o <b>tratador de interrupção</b>, a rotina do núcleo para aquele tipo de evento. No fim, volta ao ponto exato onde estava.</li>
+    <li>Exemplos: o disco terminou uma leitura, uma tecla foi pressionada, chegou um pacote de rede.</li>
+    <li><b>Temporizador</b> (timer, relógio): um circuito que interrompe a CPU em intervalos fixos, por exemplo a cada 1 ms. É o que garante ao SO retomar o controle mesmo de um programa que nunca faz chamada de sistema.</li>
+    <li><b>Exceção</b>: a mesma ideia, mas causada pela instrução que está executando: divisão por zero, acesso a endereço proibido, instrução privilegiada em modo usuário.</li>
+    <li>Interrupção é <i>assíncrona</i>: chega a qualquer momento, sem relação com a instrução atual. Exceção é <i>síncrona</i>: acontece sempre no mesmo ponto se você rodar o programa de novo. A chamada de sistema às vezes é chamada de "interrupção de software", porque entra no núcleo pelo mesmo tipo de caminho.</li>
+  </ul>
+  <p>Veja as duas coisas juntas: um programa pede uma leitura de disco, espera, e o disco avisa por interrupção.</p>
+ </div>
+
+  <figure class="fig" id="fig-syscall">
+    <div class="fig-head"><span class="fig-title">Figura 1 · Uma chamada de sistema e uma interrupção, na linha do tempo</span></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <svg id="sc-svg" viewBox="0 0 640 270" role="img" aria-label="Linha do tempo com faixas para o processo P, o processo Q, o núcleo e o disco"></svg>
+        <div class="stage-cap" id="sc-cap"></div>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+
+ <div class="prose">
+  <h3>Multiprogramação</h3>
+<aside class="mn loop" data-loop="multiprog" data-ms="9000" data-still="0.6" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Três programas alternam CPU e E/S. Quando um vai esperar o disco, outro assume: a faixa da CPU quase nunca fica vazia.</aside>
+  <p>Um programa típico alterna: calcula um pouco, espera E/S, calcula mais um pouco. Se só um programa fica na memória por vez (<b>monoprogramação</b>), a CPU fica ociosa em todas as esperas.</p>
+  <ul class="b">
+    <li><b>Multiprogramação</b>: manter vários programas na memória ao mesmo tempo. Quando um para para esperar E/S, o SO entrega a CPU a outro.</li>
+    <li>Conta de exemplo: um programa usa 10 ms de CPU e depois espera 40 ms pelo disco, em ciclo. Sozinho, ocupa a CPU 10 ms a cada 50 ms: 10 / 50 = 20 %.</li>
+    <li>Com 4 programas iguais, enquanto um espera os outros usam a CPU: no melhor caso, 4 × 20 % = 80 % de uso. No pior caso as esperas coincidem e o ganho é menor.</li>
+    <li><b>Tempo compartilhado</b> (time-sharing): multiprogramação mais o temporizador. Cada programa recebe uma fatia curta de CPU (o quantum, assunto da aula 06), por exemplo 10 ms, e é interrompido no fim dela mesmo sem pedir E/S. Para quem está usando, tudo parece rodar ao mesmo tempo.</li>
+  </ul>
+  <p>Para isso funcionar, o SO precisa parar um programa no meio e depois continuar exatamente de onde ele parou, como se nada tivesse acontecido. O que o SO guarda para conseguir isso é o que transforma um programa em processo.</p>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 2 ============ -->
+<section class="chap" id="processo">
+ <div class="prose">
+  <span class="num">02</span>
+  <h2>Programa × processo</h2>
+  <div class="src"><span class="bk">Machado &amp; Maia · cap. 5 · p. 59–78</span></div>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="k" x="8" y="14" width="96" height="112" rx="6"/><text class="tm st" x="18" y="32">RECEITA</text><line class="s" x1="18" y1="48" x2="94" y2="48"/><line class="s" x1="18" y1="62" x2="94" y2="62"/><line class="s" x1="18" y1="76" x2="80" y2="76"/><line class="s" x1="18" y1="90" x2="94" y2="90"/><line class="s" x1="18" y1="104" x2="70" y2="104"/><text class="tm" x="56" y="140">programa</text><rect class="am" x="132" y="14" width="100" height="112" rx="6"/><path class="ac" d="M140 76 H180" marker-end="url(#mnarrow)"/><text class="tam st" x="140" y="32">cozinhando</text><text class="tm st" x="140" y="56">passo 4 de 9</text><text class="tm st" x="186" y="76">aqui</text><circle class="k" cx="156" cy="104" r="10"/><circle class="k" cx="184" cy="104" r="10"/><circle class="k" cx="212" cy="104" r="10"/><text class="tm" x="182" y="140">processo</text></svg>A receita parada no livro é o programa. Você cozinhando, com a página marcada e as panelas no fogo, é o processo.</aside>
+  <p>Um <b>programa</b> é um arquivo: instruções e dados parados no disco, esperando. Um <b>processo</b> é esse programa rodando, com tudo o que muda enquanto ele roda.</p>
+  <div class="def key">
+    <span class="lab">Definição · Processo</span>
+    <p class="simples">Pense numa receita de bolo. A receita no livro é o programa: não faz nada sozinha. Você cozinhando, com a página marcada no passo 4, os ingredientes separados e o forno ligado, é o processo. Duas pessoas fazendo a mesma receita em cozinhas diferentes são dois processos do mesmo programa.</p>
+    <p class="formal">Para Machado &amp; Maia, um processo é o ambiente em que um programa executa: o programa mais tudo o que o SO precisa para interrompê-lo e retomá-lo sem perder nada. Esse ambiente tem três partes: <b>contexto de hardware</b>, <b>contexto de software</b> e <b>espaço de endereçamento</b> (seção 3).</p>
+  </div>
+  <ul class="b">
+    <li>Programa: estático e passivo. Fica no disco (<code>/usr/bin/python3</code>, <code>chrome.exe</code>) e não muda enquanto não for recompilado.</li>
+    <li>Processo: dinâmico e ativo. Fica na memória, tem contexto, nasce, muda de estado e termina.</li>
+    <li>Um programa pode virar vários processos: abra três janelas do bloco de notas e você terá três processos do mesmo programa, cada um com o seu texto.</li>
+    <li>O processo é a unidade que o SO usa para dividir recursos (memória, arquivos, tempo de CPU) e para proteger: um processo não lê a memória de outro.</li>
+  </ul>
+  <p class="prova">Programa é código parado no disco (passivo). Processo é o programa em execução, com contexto de hardware, contexto de software e espaço de endereçamento (ativo). Um programa pode dar origem a vários processos.</p>
+
+  <h3>O que precisa ser guardado para parar e continuar</h3>
+  <p>Imagine o processo A no meio de uma repetição, com o contador <code>i</code> valendo 731, quando o temporizador interrompe e o SO passa a CPU para B. Para A continuar depois sem perceber nada, o SO precisa ter guardado:</p>
+  <ul class="b">
+    <li>em que instrução A parou (o contador de programa);</li>
+    <li>os valores que estavam nos registradores da CPU, inclusive o <code>i = 731</code>, se o compilador deixou <code>i</code> num registrador;</li>
+    <li>a memória de A intacta: B não pode ter escrito nela;</li>
+    <li>os arquivos que A tinha abertos e em que posição de cada um ele estava lendo.</li>
+  </ul>
+  <p>A próxima seção dá nome a cada uma dessas coisas.</p>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 3 ============ -->
+<section class="chap" id="estrutura">
+ <div class="prose">
+  <span class="num">03</span>
+  <h2>Contexto, espaço de endereçamento e PCB</h2>
+  <div class="src"><span class="bk">Machado &amp; Maia · cap. 5 · p. 59–78</span></div>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="k" x="6" y="6" width="228" height="138" rx="10"/><text class="tm st" x="16" y="22">PROCESSO</text><rect class="am" x="16" y="34" width="100" height="48" rx="6"/><text class="tam" x="66" y="50">hardware</text><text class="tm" x="66" y="68">PC, SP, regs</text><rect class="bl" x="124" y="34" width="100" height="48" rx="6"/><text class="tb" x="174" y="50">software</text><text class="tm" x="174" y="68">PID, dono, limites</text><rect class="gr" x="16" y="90" width="208" height="44" rx="6"/><text x="120" y="104" style="fill:var(--green);font-weight:600">espaço de endereçamento</text><text class="tm" x="120" y="122">código · dados · heap · pilha de exec.</text></svg>As três partes de um processo no livro de Machado &amp; Maia.</aside>
+  <p>O livro divide o processo em três partes. As duas primeiras são o <b>contexto</b> do processo; a terceira é a memória dele.</p>
+
+  <h3>Contexto de hardware</h3>
+  <ul class="b">
+    <li><b>Contexto de hardware</b>: o conteúdo dos registradores da CPU no momento em que o processo para. É o que ele "tinha na cabeça".</li>
+    <li>Registradores gerais: guardam os valores intermediários das contas.</li>
+    <li><b>Contador de programa</b> (PC, program counter): o endereço da próxima instrução a executar.</li>
+    <li><b>Apontador de pilha</b> (SP, stack pointer): o endereço do topo da pilha de execução, explicada logo abaixo.</li>
+    <li><b>Registrador de status</b> (PSW, program status word): bits sobre a situação da CPU. A última comparação deu zero? Deu negativo? Houve estouro? A CPU está em modo usuário ou núcleo? Interrupções estão ligadas?</li>
+    <li>Enquanto o processo executa, esses valores moram nos registradores físicos. Quando ele sai da CPU, o SO copia todos para a memória do núcleo. Essa cópia é a troca de contexto da seção 5.</li>
+  </ul>
+
+  <h3>Contexto de software</h3>
+  <ul class="b">
+    <li><b>Contexto de software</b>: as características e os limites do processo, mantidos pelo SO. O livro separa em três grupos.</li>
+    <li>Identificação: o <b>PID</b> (process identifier, um número único para cada processo vivo, como 4182), o <b>dono</b> (o usuário que criou o processo, identificado pelo UID, que define o que ele pode acessar), o PID do processo pai e o nome do programa.</li>
+    <li><b>Quotas</b>: limites de recursos. Máximo de arquivos abertos, de memória, de subprocessos e threads, tamanho do buffer de E/S, tempo de CPU. No Linux, <code>ulimit -n</code> mostra o limite de arquivos abertos (1024 é um valor comum).</li>
+    <li><b>Privilégios</b>: o que o processo pode fazer além do comum, como mudar a prioridade de outros processos, desligar o sistema ou ler arquivos de outros usuários. O administrador (root no Linux) tem todos.</li>
+    <li>Entram aqui também a prioridade de execução e a lista de arquivos abertos.</li>
+  </ul>
+
+  <h3>Espaço de endereçamento</h3>
+<aside class="mn loop" data-loop="enderecos" data-ms="8000" data-still="0.45" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>O heap cresce para cima a cada alocação; a pilha de execução cresce para baixo a cada chamada de função. O espaço livre do meio separa os dois.</aside>
+  <ul class="b">
+    <li><b>Espaço de endereçamento</b>: a faixa de endereços de memória que o processo pode usar, e o que há dentro dela. Cada processo tem o seu, isolado dos outros. Com a memória virtual da aula 02, o endereço 0x4000 de A e o 0x4000 de B levam a lugares físicos diferentes.</li>
+    <li>Quatro regiões, de baixo para cima:</li>
+    <li><b>Código</b> (também chamado texto): as instruções do programa. Só leitura, para um bug não reescrever o próprio programa.</li>
+    <li><b>Dados globais</b>: as variáveis globais e estáticas, que existem do começo ao fim da execução.</li>
+    <li><b>Heap</b>: memória pedida durante a execução, quando o tamanho só é conhecido na hora: <code>malloc</code> em C, <code>new</code> em Java, todo objeto em Python. Cresce para cima.</li>
+    <li><b>Pilha de execução</b> (stack): guarda um bloco para cada chamada de função em andamento, com as <b>variáveis locais</b>, os parâmetros e o endereço para onde voltar. Cada chamada empilha um bloco; cada <code>return</code> tira o bloco do topo. Cresce para baixo, a partir do topo do espaço.</li>
+    <li>Entre o heap e a pilha de execução sobra um espaço livre. Uma recursão sem fim gasta esse espaço até o fim e causa o famoso <i>stack overflow</i>: o SO encerra o processo.</li>
+  </ul>
+  <p>Onde mora cada coisa num programa em C:</p>
+<pre><code>int total = 0;                       // dados globais
+int soma(int n) {                    // as instruções de soma ficam no código
+    int i, s = 0;                    // i e s: pilha de execução
+    int *v = malloc(n * sizeof(int)); // v: pilha de execução; o vetor: heap
+    for (i = 0; i &lt; n; i++) s += v[i];
+    free(v);
+    return s;
+}</code></pre>
+  <div class="def">
+    <span class="lab">Por que "pilha"</span>
+    <p>A pilha de execução segue a mesma regra da pilha da aula 01: o último bloco que entra é o primeiro que sai. Se <code>main</code> chama <code>soma</code>, que chama <code>malloc</code>, a primeira a terminar é <code>malloc</code>, e o bloco dela é o que está no topo.</p>
+  </div>
+
+  <h3>PCB: a ficha do processo no núcleo</h3>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 176"><rect class="acf" x="40" y="6" width="160" height="164" rx="8"/><text class="ta" x="120" y="22">PCB</text><line class="s" x1="40" y1="34" x2="200" y2="34"/><text class="tm st" x="50" y="48">PID     4182</text><text class="tm st" x="50" y="66">estado  pronto</text><text class="tm st" x="50" y="84">PC      0x4A10</text><text class="tm st" x="50" y="102">SP      0x7FF0</text><text class="tm st" x="50" y="120">prior.  20</text><text class="tm st" x="50" y="138">dono    maria</text><text class="tm st" x="50" y="156">arqs    0, 1, 3</text></svg>Uma ficha por processo, guardada na memória do núcleo.</aside>
+  <div class="def key">
+    <span class="lab">Definição · PCB</span>
+    <p class="simples">É a ficha que o núcleo mantém para cada processo, como um prontuário médico: quem é o processo, em que situação está e tudo o que é preciso para retomá-lo de onde parou.</p>
+    <p class="formal">O <b>bloco de controle do processo</b> (PCB, process control block) é a estrutura de dados do núcleo que guarda o contexto de hardware, o contexto de software, as informações sobre o espaço de endereçamento e o estado do processo.</p>
+  </div>
+ </div>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>Campo do PCB</th><th>Exemplo</th><th>Parte</th></tr></thead>
+      <tbody>
+        <tr><td>PID, PID do pai, dono</td><td>4182, 1975, maria</td><td>contexto de software</td></tr>
+        <tr><td>Estado</td><td>pronto</td><td>seção 4</td></tr>
+        <tr><td>PC, SP, registradores, status</td><td>0x4A10, 0x7FF0, R1 = 731, modo usuário</td><td>contexto de hardware</td></tr>
+        <tr><td>Prioridade, quotas, privilégios</td><td>20; até 1024 arquivos; sem root</td><td>contexto de software</td></tr>
+        <tr><td>Mapa da memória</td><td>onde está a tabela de páginas do processo</td><td>espaço de endereçamento</td></tr>
+        <tr><td>Arquivos abertos</td><td>0 teclado, 1 tela, 3 dados.csv</td><td>contexto de software</td></tr>
+        <tr><td>Contabilização</td><td>1,8 s de CPU usados</td><td>contexto de software</td></tr>
+      </tbody>
+    </table>
+  </div>
+ <div class="prose">
+  <ul class="b">
+    <li>O PCB fica na memória do núcleo, fora do alcance do processo. Assim ele não consegue, por exemplo, aumentar a sua prioridade.</li>
+    <li><b>Tabela de processos</b>: a coleção de todos os PCBs do sistema. No Linux, cada PCB é uma <code>struct task_struct</code>. Os comandos <code>ps</code> e <code>top</code> e o Gerenciador de Tarefas do Windows mostram o que está nela.</li>
+    <li>No Linux dá para espiar parte do PCB de um processo em <code>/proc/&lt;PID&gt;/status</code>.</li>
+  </ul>
+  <p class="prova">PCB = contexto de hardware (registradores, PC, SP, status) + contexto de software (PID, dono, prioridade, quotas, privilégios, arquivos abertos) + informações do espaço de endereçamento (código, dados, heap, pilha de execução) + estado.</p>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 4 ============ -->
+<section class="chap" id="estados">
+ <div class="prose">
+  <span class="num">04</span>
+  <h2>Estados do processo</h2>
+  <div class="src"><span class="bk">Machado &amp; Maia · cap. 5 · p. 59–78</span></div>
+  <p>Ao longo da vida, um processo passa por algumas situações bem definidas. O SO anota a situação atual no PCB e decide o que fazer com cada processo olhando para ela.</p>
+  <div class="def key">
+    <span class="lab">Definição · Estados do processo</span>
+    <p class="simples">É como a situação de um paciente num pronto-socorro: chegando (fazendo a ficha), na sala de espera, sendo atendido, esperando um exame ficar pronto, ou de alta.</p>
+    <p class="formal">Os <b>estados do processo</b> são:</p>
+    <ul class="b">
+      <li><i>Novo</i> (criação): o SO está montando o PCB e reservando memória. O processo ainda não disputa a CPU.</li>
+      <li><i>Pronto</i>: tem tudo para executar e só falta a CPU. Espera na <b>fila de prontos</b>.</li>
+      <li><i>Executando</i>: está usando a CPU agora. Com um core, só um processo por vez fica neste estado; com 4 cores, até 4.</li>
+      <li><i>Espera</i> (bloqueado): aguarda um evento de fora: uma E/S terminar, um tempo passar, um recurso ser liberado. Dar a CPU a ele não adianta nada.</li>
+      <li><i>Terminado</i>: acabou. O SO libera os recursos e, por fim, apaga o PCB.</li>
+    </ul>
+  </div>
+
+  <h3>Mudanças de estado</h3>
+ </div>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>Transição</th><th>Quando acontece</th><th>Quem provoca</th></tr></thead>
+      <tbody>
+        <tr><td>novo → pronto</td><td>o SO terminou de criar o processo e o admitiu</td><td>SO</td></tr>
+        <tr><td>pronto → executando</td><td>o escalonador escolheu este processo</td><td>escalonador</td></tr>
+        <tr><td>executando → espera</td><td>o processo pediu E/S ou vai esperar um evento</td><td>o próprio processo, por chamada de sistema</td></tr>
+        <tr><td>espera → pronto</td><td>o evento aconteceu (o disco terminou)</td><td>SO, ao tratar a interrupção</td></tr>
+        <tr><td>executando → pronto</td><td>a fatia de tempo acabou, ou chegou um processo mais prioritário</td><td>SO, pelo temporizador (preempção)</td></tr>
+        <tr><td>executando → terminado</td><td>fim normal, erro fatal ou morto por outro processo</td><td>o processo ou o SO</td></tr>
+      </tbody>
+    </table>
+  </div>
+ <div class="prose">
+  <ul class="b">
+    <li><b>Escalonador</b> (scheduler): a rotina do núcleo que escolhe qual processo pronto vai para a CPU. Os critérios de escolha (ordem de chegada, prioridade, revezamento) são o assunto da aula 06.</li>
+    <li><b>Despachante</b> (dispatcher): a parte que executa a escolha: carrega o contexto do processo escolhido e salta para o PC dele.</li>
+    <li><b>Preempção</b>: tirar a CPU de um processo que ainda queria continuar. Um SO preemptivo usa o temporizador para isso. Sem preempção, um programa preso numa repetição eterna trava a máquina inteira, como acontecia no Windows 3.1, que dependia de cada programa ceder a CPU por conta dele.</li>
+  </ul>
+  <p>Agora acompanhe um processo A do começo ao fim, junto com dois vizinhos, B e C:</p>
+ </div>
+
+  <figure class="fig" id="fig-estados">
+    <div class="fig-head"><span class="fig-title">Figura 2 · A vida de um processo no diagrama de estados</span></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <svg id="est-svg" viewBox="0 0 640 290" role="img" aria-label="Diagrama com os estados novo, pronto, executando, espera e terminado"></svg>
+        <div class="lbl">fila de prontos</div>
+        <div class="trail" id="est-prontos"></div>
+        <div class="lbl">na CPU · em espera</div>
+        <div class="trail" id="est-cpu"></div>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+
+ <div class="prose">
+<aside class="mn loop" data-loop="relogio" data-ms="9000" data-still="0.3" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>A cada volta do temporizador, uma interrupção tira o processo da CPU (preempção) e o manda para o fim da fila de prontos.</aside>
+  <div class="def warn">
+    <span class="lab">Pegadinhas de prova</span>
+    <ul class="b">
+      <li>Espera → executando não existe. Quem sai da espera vai para a fila de prontos e disputa a CPU de novo.</li>
+      <li>Pronto → espera não existe. Só quem está executando consegue pedir E/S, porque pedir é executar uma chamada de sistema.</li>
+      <li>Executando → pronto é involuntário (preempção). Executando → espera é voluntário (o processo pediu algo).</li>
+    </ul>
+  </div>
+  <p class="prova">Transições válidas: novo → pronto, pronto → executando, executando → espera, espera → pronto, executando → pronto (preempção) e executando → terminado. Não existem espera → executando nem pronto → espera.</p>
+
+  <h3>Filas e processos fora da memória</h3>
+  <ul class="b">
+    <li>A fila de prontos é, na prática, uma lista ligada de PCBs. Os processos em espera ficam em outras filas, uma para cada dispositivo ou evento (fila do disco, fila do teclado).</li>
+    <li>Machado &amp; Maia citam um caso a mais: quando falta memória, o SO pode tirar um processo pronto ou em espera da memória e guardá-lo no disco. Ele continua pronto ou em espera, só que fora da memória, e precisa voltar para ela antes de executar. Essa técnica é o swapping, da aula 06.</li>
+  </ul>
+  <div class="def">
+    <span class="lab">Na ponderada · pulseira</span>
+    <p>A tarefa que lê o sensor passa a maior parte do tempo em espera, aguardando a próxima amostra. Exemplo fora do cenário: uma tarefa que acorda a cada 50 ms e calcula por 3 ms fica 47 ms em espera, entra na fila de prontos quando o temporizador a acorda e só calcula quando chega a vez dela. Você vai ter de responder: por quais estados a tarefa do sensor passa a cada amostra, e o que pode deixá-la presa em pronto ou em espera além do prazo de 5 ms.</p>
+  </div>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 5 ============ -->
+<section class="chap" id="troca">
+ <div class="prose">
+  <span class="num">05</span>
+  <h2>Troca de contexto</h2>
+  <div class="src"><span class="bk">Machado &amp; Maia · cap. 5 · p. 59–78</span></div>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="bl" x="10" y="14" width="64" height="80" rx="6"/><text class="tb" x="42" y="30">caderno A</text><text class="tm" x="42" y="56">parou na</text><text class="tm" x="42" y="72">questão 7</text><rect class="am" x="166" y="14" width="64" height="80" rx="6"/><text class="tam" x="198" y="30">caderno B</text><text class="tm" x="198" y="56">parou na</text><text class="tm" x="198" y="72">questão 2</text><circle class="k" cx="120" cy="56" r="20"/><text class="tm" x="120" y="56">prof.</text><path class="s" d="M98 50 H80" marker-end="url(#mnarrow)"/><path class="s" d="M142 62 H160" marker-end="url(#mnarrow)"/><text class="tm" x="120" y="124">anota em A, lê B, continua</text></svg>Um professor particular com dois alunos: antes de trocar, anota onde parou com um e lê onde tinha parado com o outro.</aside>
+  <div class="def key">
+    <span class="lab">Definição · Troca de contexto</span>
+    <p class="simples">Um professor atende dois alunos alternadamente. Antes de passar de um para o outro, anota no caderno do primeiro em que questão parou; depois lê no caderno do segundo onde tinha parado com ele, e continua dali. O tempo gasto anotando e lendo não ensina nada a ninguém.</p>
+    <p class="formal">A <b>troca de contexto</b> (context switch) é a passagem da CPU de um processo para outro: salvar o contexto de hardware do processo que sai no PCB dele, atualizar o estado dele, escolher o próximo, carregar nos registradores o contexto guardado no PCB do próximo e trocar o mapa de memória.</p>
+  </div>
+  <p>Ela acontece sempre que um processo sai da CPU: por preempção (o temporizador interrompeu), porque ele pediu E/S, ou porque terminou. A sequência, com dois processos A e B:</p>
+ </div>
+
+  <figure class="fig" id="fig-troca">
+    <div class="fig-head"><span class="fig-title">Figura 3 · Troca de contexto de A para B</span></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <svg id="tr-svg" viewBox="0 0 640 320" role="img" aria-label="Linha do tempo da CPU, registradores da CPU e os PCBs de A e B"></svg>
+        <div class="stage-cap" id="tr-cap"></div>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+
+ <div class="prose">
+  <h3>Quanto custa</h3>
+  <ul class="b">
+    <li><b>Overhead</b>: o tempo e os recursos gastos com gerenciamento, que não são trabalho útil de nenhum processo. Durante a troca de contexto, a CPU só executa código do núcleo: nenhum processo avança.</li>
+    <li>Custo direto: salvar e carregar registradores, rodar o escalonador, trocar o mapa de memória. Em máquinas atuais fica na faixa de 1 a 10 µs.</li>
+    <li>Custo indireto: a cache e a TLB (aula 02) estão cheias de dados do processo antigo. Os primeiros acessos do novo processo dão miss, e isso pode custar mais do que a troca em si.</li>
+  </ul>
+  <p>Seja q a fatia de tempo que cada processo usa antes de ser trocado e s o tempo de uma troca. A cada ciclo, a CPU trabalha q e perde s:</p>
+  <div class="formula">fração útil = q / (q + s)          overhead = s / (q + s)</div>
+  <ul class="b">
+    <li>Exemplo: q = 4 ms e s = 20 µs = 0,02 ms. Fração útil = 4 / (4 + 0,02) = 4 / 4,02 ≈ 0,995. A CPU trabalha 99,5 % do tempo; o overhead é 0,5 %.</li>
+    <li>Mesma troca com q = 0,1 ms: 0,1 / (0,1 + 0,02) = 0,1 / 0,12 ≈ 0,833. Agora 16,7 % do tempo vai embora em trocas.</li>
+    <li>O outro lado: com n processos revezando, cada um espera os outros n − 1 terminarem a vez deles. O tempo até voltar a executar é, no pior caso, (n − 1) × (q + s). Com 5 processos, q = 4 ms e s = 0,02 ms: 4 × 4,02 = 16,08 ms.</li>
+    <li>Fatia curta: resposta rápida, overhead alto. Fatia longa: overhead baixo, resposta lenta. Mexa nos números:</li>
+  </ul>
+ </div>
+
+  <figure class="fig" id="fig-custo">
+    <div class="fig-head"><span class="fig-title">Figura 4 · Fatia de tempo × custo da troca</span></div>
+    <div class="fig-body">
+      <div class="fig-stage game">
+        <div class="ctl-grid">
+          <div class="ctl"><label for="cu-q">fatia q (ms) <b id="cu-qv"></b></label><input type="range" id="cu-q" min="0" max="12" value="6"></div>
+          <div class="ctl"><label for="cu-s">troca s (µs) <b id="cu-sv"></b></label><input type="range" id="cu-s" min="0" max="8" value="3"></div>
+          <div class="ctl"><label for="cu-n">processos n <b id="cu-nv"></b></label><input type="range" id="cu-n" min="2" max="8" value="4"></div>
+        </div>
+        <div class="legend"><span><i style="background:var(--blue-soft);border:1px solid var(--blue)"></i>trabalho útil</span><span><i style="background:var(--red-soft);border:1px solid var(--red)"></i>troca de contexto</span></div>
+        <svg id="cu-svg" viewBox="0 0 640 120" role="img" aria-label="Linha do tempo da CPU com fatias e trocas"></svg>
+        <div class="out-grid" id="cu-out"></div>
+      </div>
+      <div class="fig-side"><div class="lab">O que observar</div>
+        <ol class="fig-notes">
+          <li class="past">A faixa mostra 20 ms de CPU. Azul é trabalho de algum processo; vermelho é troca.</li>
+          <li class="past">Diminua q até 0,5 ms com s alto: a faixa fica cheia de vermelho.</li>
+          <li class="past">Aumente q: o vermelho some, mas o tempo até a vez voltar cresce.</li>
+          <li class="past">Mais processos não mudam a fração útil, só a espera de cada um.</li>
+          <li class="cur">Não existe fatia perfeita: o escalonador escolhe q pensando no tipo de uso (aula 06).</li>
+        </ol>
+      </div>
+    </div>
+  </figure>
+
+ <div class="prose">
+  <p class="prova">A troca de contexto é overhead: enquanto ela acontece, nenhum processo avança. Fração útil = q / (q + s). Fatia menor dá resposta mais rápida e mais overhead.</p>
+  <div class="def">
+    <span class="lab">Na ponderada · pulseira</span>
+    <p>Exemplo fora do cenário: um monitor cardíaco precisa tratar cada batida em até 20 ms e divide a CPU com outras 3 tarefas, com q = 4 ms e s = 15 µs. No pior caso, a tarefa dele espera (n − 1) × (q + s) = 3 × 4,015 = 12,045 ms antes de começar, e sobram menos de 8 ms para o cálculo. Você vai ter de montar essa conta com os números da pulseira e dizer se o prazo de 5 ms por amostra aguenta.</p>
+  </div>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 6 ============ -->
+<section class="chap" id="tipos">
+ <div class="prose">
+  <span class="num">06</span>
+  <h2>Criação, término e tipos de processo</h2>
+  <div class="src"><span class="bk">Machado &amp; Maia · cap. 5 · p. 59–78</span></div>
+
+  <h3>Como um processo nasce</h3>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 160"><rect class="acf" x="88" y="6" width="64" height="26" rx="6"/><text class="ta" x="120" y="19">init · 1</text><rect class="k" x="20" y="62" width="70" height="26" rx="6"/><text class="tm" x="55" y="75">login · 812</text><rect class="k" x="150" y="62" width="70" height="26" rx="6"/><text class="tm" x="185" y="75">cron · 640</text><rect class="bl" x="20" y="120" width="70" height="26" rx="6"/><text class="tm" x="55" y="133">bash · 901</text><rect class="am" x="110" y="120" width="70" height="26" rx="6"/><text class="tm" x="145" y="133">python · 977</text><path class="s" d="M110 32 L62 60" marker-end="url(#mnarrow)"/><path class="s" d="M130 32 L178 60" marker-end="url(#mnarrow)"/><path class="s" d="M55 88 V118" marker-end="url(#mnarrow)"/><path class="s" d="M90 133 H108" marker-end="url(#mnarrow)"/></svg>Árvore de processos: cada um tem um pai. No Linux, todos descendem do processo 1.</aside>
+  <p>Machado &amp; Maia citam três jeitos de criar um processo:</p>
+  <ul class="b">
+    <li>Logon interativo: ao entrar no sistema com usuário e senha, o SO cria um processo para atender aquele usuário.</li>
+    <li>Pelo <b>shell</b>, o interpretador de comandos: cada comando digitado (<code>ls</code>, <code>python app.py</code>) vira um processo novo.</li>
+    <li>Por outro processo, com uma chamada de sistema: <code>fork</code> no Unix e no Linux, <code>CreateProcess</code> no Windows.</li>
+  </ul>
+  <ul class="b">
+    <li><b>Subprocesso</b> (processo filho): processo criado por outro, o processo pai. Pais e filhos formam uma <b>árvore de processos</b> (veja com <code>pstree</code> no Linux). O filho herda parte do contexto do pai, como o dono e os arquivos abertos.</li>
+    <li>Processo independente: criado sem vínculo com quem o criou. Se o criador termina, ele continua.</li>
+    <li><b>fork</b>: no Unix, cria uma cópia quase idêntica do processo que chamou. Mesmo código, cópia da memória, PID novo. A chamada "retorna duas vezes": no filho devolve 0, no pai devolve o PID do filho.</li>
+    <li><b>exec</b>: troca o programa que o processo está executando por outro, mantendo o mesmo PID. O shell roda cada comando com <code>fork</code> seguido de <code>exec</code> no filho.</li>
+  </ul>
+<pre><code>import os                         # só funciona em Linux e macOS
+pid = os.fork()                   # daqui em diante existem dois processos
+if pid == 0:
+    print("sou o filho, PID", os.getpid())
+    os.execvp("ls", ["ls", "-l"]) # o filho passa a ser o programa ls
+else:
+    print("sou o pai; meu filho tem PID", pid)
+    os.wait()                     # o pai fica em espera até o filho terminar</code></pre>
+  <ul class="b">
+    <li>O livro aponta o lado ruim de dividir uma aplicação em subprocessos: cada criação aloca PCB e espaço de endereçamento novos, o que custa tempo; e como as memórias são separadas, conversar entre processos exige mecanismos do SO (arquivos, pipes, mensagens), que são lentos. Esse problema é o ponto de partida das threads, na seção 7.</li>
+  </ul>
+
+  <h3>Como um processo termina</h3>
+  <ul class="b">
+    <li>Fim normal: o programa chama <code>exit</code> (o <code>return</code> do <code>main</code> faz isso).</li>
+    <li>Erro: uma exceção que o programa não trata, como divisão por zero ou acesso a endereço inválido.</li>
+    <li>Morto por outro processo com permissão para isso (<code>kill</code> no Linux, "Finalizar tarefa" no Windows), pelo fim da sessão do usuário ou por estourar uma quota.</li>
+    <li>O SO fecha os arquivos, libera a memória e apaga o PCB. No Unix, o PCB fica até o pai ler o código de saída do filho; enquanto isso, o filho é um processo zumbi.</li>
+  </ul>
+
+  <h3>Sinais</h3>
+  <ul class="b">
+    <li><b>Sinal</b>: um aviso que o SO entrega a um processo de forma assíncrona, como uma interrupção, só que para processos. Cada sinal tem um número e um nome.</li>
+    <li>Exemplos: <code>Ctrl+C</code> envia SIGINT; <code>kill -9</code> envia SIGKILL, que não pode ser ignorado; acessar memória proibida gera SIGSEGV (o <i>segmentation fault</i>).</li>
+    <li>O processo pode registrar uma função do próprio programa para tratar a maioria dos sinais. Se não registrar, vale a ação padrão, em geral terminar.</li>
+  </ul>
+
+  <h3>Tipos de processo</h3>
+  <ul class="b">
+    <li><b>Foreground</b> (primeiro plano): ligado ao console do usuário, lê do teclado e escreve na tela enquanto roda.</li>
+    <li><b>Background</b> (segundo plano): roda sem conversar direto com o usuário. No Linux, <code>comando &amp;</code> manda para o segundo plano. A saída de um processo pode ser a entrada de outro: <code>ls | sort</code> liga dois processos por um pipe.</li>
+    <li><b>Processo do sistema</b> (daemon no Unix, serviço no Windows): processo que implementa uma função do próprio SO e fica em background. Exemplos: agendador de tarefas (<code>cron</code>), fila de impressão, serviços de rede, auditoria e contabilização de uso.</li>
+  </ul>
+<aside class="mn loop" data-loop="cpuio" data-ms="8000" data-still="0.7" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Em cima, um processo CPU-bound: rajadas longas de CPU. Embaixo, um I/O-bound: rajadas curtas e esperas longas.</aside>
+  <ul class="b">
+    <li><b>CPU-bound</b> (limitado pela CPU): passa a maior parte do tempo calculando. Exemplos: compactar um vídeo, treinar um modelo de aprendizado de máquina, simulação numérica. Ficaria mais rápido com uma CPU mais rápida.</li>
+    <li><b>I/O-bound</b> (limitado por E/S): passa a maior parte do tempo em espera por E/S. Exemplos: editor de texto esperando teclas, servidor web esperando a rede, banco de dados esperando o disco. Ficaria mais rápido com E/S mais rápida.</li>
+    <li>O mesmo processo pode mudar de perfil ao longo da execução. Escalonadores costumam favorecer os I/O-bound: eles usam a CPU por pouco tempo, pedem E/S e liberam a CPU logo (aula 06).</li>
+  </ul>
+  <div class="def">
+    <span class="lab">Na ponderada · pulseira</span>
+    <p>Exemplo fora do cenário: num termostato, ler a temperatura uma vez por segundo e mandar por Wi-Fi é trabalho I/O-bound; aplicar um filtro de 500 coeficientes a cada leitura puxa para CPU-bound. Você vai ter de classificar as tarefas da pulseira (ler sensor, calcular vibração, mandar log por BLE) e usar essa classificação para justificar como elas dividem o processador.</p>
+  </div>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 7 ============ -->
+<section class="chap" id="threads">
+ <div class="prose">
+  <span class="num">07</span>
+  <h2>Threads</h2>
+  <div class="src"><span class="bk">Machado &amp; Maia · cap. 6 · p. 79–92</span></div>
+  <p>Um servidor web atende mil clientes ao mesmo tempo. Com um subprocesso por cliente, são mil PCBs, mil espaços de endereçamento e, para compartilhar a mesma cache de páginas, mil processos conversando por mecanismos lentos do SO. Threads resolvem isso.</p>
+
+  <h3>Monothread e multithread</h3>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="k" x="6" y="10" width="100" height="110" rx="8"/><path class="ac" d="M56 26 C36 50 76 70 56 94 C46 106 56 112 56 112"/><text class="tm" x="56" y="136">monothread</text><rect class="k" x="134" y="10" width="100" height="110" rx="8"/><path class="ac" d="M156 26 C140 50 172 70 156 112"/><path d="M184 26 C200 50 168 76 184 112" style="fill:none;stroke:var(--amber);stroke-width:1.8"/><path d="M212 26 C196 56 226 80 212 112" style="fill:none;stroke:var(--green);stroke-width:1.8"/><text class="tm" x="184" y="136">multithread</text></svg>Cada fio é um fluxo de execução, com o seu PC. Todos os fios da direita moram no mesmo processo.</aside>
+  <ul class="b">
+    <li>Ambiente <b>monothread</b>: cada processo tem um único fluxo de execução, ou seja, um só PC. Para fazer duas coisas ao mesmo tempo, a aplicação precisa de dois processos. Era assim no MS-DOS e nos primeiros Unix.</li>
+    <li>Ambiente <b>multithread</b>: um processo pode ter vários fluxos de execução, todos dentro do mesmo espaço de endereçamento.</li>
+  </ul>
+  <div class="def key">
+    <span class="lab">Definição · Thread</span>
+    <p class="simples">Uma thread (em inglês, "fio") é um fluxo de instruções dentro de um processo. Se o processo é uma casa com móveis e despensa, as threads são as pessoas que moram nela: cada uma faz uma coisa diferente, e todas usam a mesma cozinha.</p>
+    <p class="formal">Uma <b>thread</b> é a menor unidade que o SO escalona. Cada thread tem contexto de hardware (PC, SP, registradores), pilha de execução e estado (pronto, executando, espera) só seus. Ela compartilha com as outras threads do mesmo processo o espaço de endereçamento (código, dados globais, heap) e o contexto de software (arquivos abertos, PID, dono, quotas).</p>
+  </div>
+  <ul class="b">
+    <li>Com threads, o processo vira a unidade de alocação de recursos, e a thread vira a unidade de escalonamento.</li>
+    <li>O núcleo guarda a parte individual de cada thread num <b>TCB</b> (thread control block), um bloco menor que o PCB, ligado a ele.</li>
+  </ul>
+ </div>
+
+  <figure class="fig" id="fig-threads">
+    <div class="fig-head"><span class="fig-title">Figura 5 · Um processo com três threads: o que é de todas e o que é de cada uma</span></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <svg id="th-svg" viewBox="0 0 640 330" role="img" aria-label="Processo com região compartilhada e três colunas de threads"></svg>
+        <div class="stage-cap" id="th-cap"></div>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>Compartilhado por todas as threads do processo</th><th>De cada thread</th></tr></thead>
+      <tbody>
+        <tr><td>código</td><td>PC (contador de programa)</td></tr>
+        <tr><td>dados globais</td><td>registradores e registrador de status</td></tr>
+        <tr><td>heap</td><td>pilha de execução e SP</td></tr>
+        <tr><td>arquivos abertos, PID, dono, quotas</td><td>estado (pronto, executando, espera)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+ <div class="prose">
+  <p class="prova">Threads do mesmo processo compartilham o espaço de endereçamento (código, dados globais, heap) e os arquivos abertos. Cada thread tem PC, registradores, pilha de execução e estado só seus.</p>
+
+  <h3>Por que usar threads</h3>
+  <ul class="b">
+    <li>Criar e trocar é mais barato: não há espaço de endereçamento novo para montar. Trocar entre threads do mesmo processo não troca o mapa de memória, e a cache e a TLB continuam úteis. Criar uma thread costuma ser uma ordem de grandeza mais rápido que criar um processo.</li>
+    <li>Comunicação direta: as threads leem e escrevem as mesmas variáveis globais e o mesmo heap, sem pedir nada ao SO.</li>
+    <li>O programa continua respondendo enquanto uma thread espera E/S. Exemplo clássico: num editor de texto, uma thread trata o teclado, outra confere a ortografia e outra salva o arquivo de tempos em tempos.</li>
+    <li>Aplicações cliente-servidor: uma thread por requisição, todas consultando a mesma cache em memória.</li>
+    <li>Com vários cores, threads do mesmo processo executam de fato ao mesmo tempo, cada uma num core.</li>
+  </ul>
+<pre><code>import threading, time
+
+contador = 0                         # global: as três threads enxergam o mesmo
+
+def tarefa(nome, n):
+    feitos = 0                       # local: na pilha de execução desta thread
+    for _ in range(n):
+        feitos += 1
+        time.sleep(0.01)             # esta thread vai para espera; as outras seguem
+    print(nome, "terminou:", feitos)
+
+ts = [threading.Thread(target=tarefa, args=(f"T{i}", 5)) for i in range(3)]
+for t in ts: t.start()               # três fluxos rodando no mesmo processo
+for t in ts: t.join()                # a thread principal espera as três</code></pre>
+
+  <h3>Concorrência e paralelismo</h3>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 140"><text class="tm st" x="6" y="12">1 core: concorrência</text><rect class="bl" x="6" y="22" width="36" height="22" rx="3"/><rect class="am" x="44" y="22" width="36" height="22" rx="3"/><rect class="bl" x="82" y="22" width="36" height="22" rx="3"/><rect class="am" x="120" y="22" width="36" height="22" rx="3"/><rect class="bl" x="158" y="22" width="36" height="22" rx="3"/><rect class="am" x="196" y="22" width="36" height="22" rx="3"/><text class="tm st" x="6" y="70">2 cores: paralelismo</text><rect class="bl" x="6" y="80" width="226" height="22" rx="3"/><rect class="am" x="6" y="108" width="226" height="22" rx="3"/></svg>Em cima, A e B se revezam num core. Embaixo, cada um tem o seu core e os dois avançam juntos.</aside>
+  <ul class="b">
+    <li><b>Concorrência</b>: várias tarefas em andamento no mesmo intervalo de tempo, revezando a CPU. Num instante qualquer, só uma executa; a alternância rápida dá a impressão de simultaneidade.</li>
+    <li><b>Paralelismo</b>: várias tarefas executando no mesmo instante, em cores diferentes. Exige mais de um core.</li>
+    <li>Todo programa paralelo é concorrente, mas um programa concorrente num único core não tem paralelismo nenhum.</li>
+  </ul>
+  <div class="def warn">
+    <span class="lab">O preço de compartilhar</span>
+    <ul class="b">
+      <li>Não há proteção entre threads do mesmo processo: uma pode estragar os dados da outra, por bug ou por azar na ordem de execução.</li>
+      <li>Duas threads somando 1 no mesmo <code>contador</code> podem perder incrementos. Esse problema, e como evitá-lo, é a aula 05.</li>
+      <li>Um erro fatal numa thread (acesso a endereço inválido, por exemplo) derruba o processo inteiro, com todas as threads.</li>
+    </ul>
+  </div>
+  <div class="def">
+    <span class="lab">Na ponderada · pulseira</span>
+    <p>Exemplo fora do cenário: num leitor de código de barras, uma thread lê o scanner e outra grava no banco de dados. Se o banco demora 200 ms, só a thread do banco fica em espera e a leitura continua. Você vai ter de decidir como dividir o trabalho da pulseira em threads, o que elas compartilham e qual dado compartilhado vai precisar de proteção (aula 05).</p>
+  </div>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 8 ============ -->
+<section class="chap" id="modelos">
+ <div class="prose">
+  <span class="num">08</span>
+  <h2>Threads de usuário, de núcleo e híbridas</h2>
+  <div class="src"><span class="bk">Machado &amp; Maia · cap. 6 · p. 79–92</span></div>
+  <p>Quem cria as threads e decide qual delas roda? Há duas respostas: uma biblioteca dentro do próprio processo, ou o núcleo. O livro chama a primeira de TMU (thread em modo usuário) e a segunda de TMK (thread em modo kernel), e ainda descreve uma mistura das duas.</p>
+
+  <h3>Threads de usuário (ULT)</h3>
+  <ul class="b">
+    <li><b>ULT</b> (user-level thread, a TMU do livro): thread criada e escalonada por uma <b>biblioteca de threads</b> que roda dentro do processo, em modo usuário. O núcleo nem sabe que ela existe: para ele, o processo é monothread.</li>
+    <li>Vantagem: criar e trocar de thread é só uma chamada de função na biblioteca, sem chamada de sistema e sem mudar de modo. Leva nanossegundos.</li>
+    <li>Vantagem: funciona até num SO que não conhece threads, e a aplicação pode escalonar as threads do jeito que preferir.</li>
+    <li>Problema: uma <b>chamada bloqueante</b>, aquela que deixa quem chamou em espera até o serviço terminar (como <code>read</code> do disco), bloqueia o processo inteiro. O núcleo põe "o processo" em espera, e todas as threads param junto.</li>
+    <li>Problema: não há paralelismo. O núcleo só vê uma entidade para escalonar, então ela usa um core por vez.</li>
+    <li>Problema: o temporizador interrompe o processo, não a thread. Se uma thread não cede a vez, a biblioteca não consegue tirá-la. Bibliotecas tentam contornar trocando chamadas bloqueantes por versões não bloqueantes.</li>
+  </ul>
+
+  <h3>Threads de núcleo (KLT)</h3>
+  <ul class="b">
+    <li><b>KLT</b> (kernel-level thread, a TMK do livro): o núcleo cria, conhece e escalona cada thread, por chamadas de sistema. Cada uma tem estado no núcleo.</li>
+    <li>Vantagem: uma thread bloqueada em E/S não trava as outras; o núcleo escalona outra thread do mesmo processo.</li>
+    <li>Vantagem: paralelismo real. Num processador com 4 cores, 4 threads do mesmo processo rodam ao mesmo tempo.</li>
+    <li>Problema: criar, trocar e sincronizar exigem entrar no núcleo, o que é bem mais lento que uma chamada de função. E o núcleo guarda uma estrutura para cada thread, o que limita quantas cabem.</li>
+  </ul>
+
+  <h3>Os três mapeamentos</h3>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><text class="tm" x="40" y="10">N:1</text><text class="tm" x="120" y="10">1:1</text><text class="tm" x="200" y="10">M:N</text><circle class="bl" cx="22" cy="34" r="8"/><circle class="bl" cx="40" cy="34" r="8"/><circle class="bl" cx="58" cy="34" r="8"/><rect class="am" x="30" y="96" width="20" height="20" rx="3"/><path class="s" d="M22 42 L38 94 M40 42 L40 94 M58 42 L42 94"/><circle class="bl" cx="102" cy="34" r="8"/><circle class="bl" cx="120" cy="34" r="8"/><circle class="bl" cx="138" cy="34" r="8"/><rect class="am" x="92" y="96" width="20" height="20" rx="3"/><rect class="am" x="110" y="96" width="20" height="20" rx="3"/><rect class="am" x="128" y="96" width="20" height="20" rx="3"/><path class="s" d="M102 42 V94 M120 42 V94 M138 42 V94"/><circle class="bl" cx="176" cy="34" r="8"/><circle class="bl" cx="194" cy="34" r="8"/><circle class="bl" cx="212" cy="34" r="8"/><circle class="bl" cx="230" cy="34" r="8"/><rect class="am" x="180" y="96" width="20" height="20" rx="3"/><rect class="am" x="206" y="96" width="20" height="20" rx="3"/><path class="s" d="M176 42 L188 94 M194 42 L190 94 M212 42 L216 94 M230 42 L218 94"/><line class="s" x1="4" y1="68" x2="236" y2="68" stroke-dasharray="4 3"/><text class="tm" x="120" y="140">● thread de usuário   ■ thread do núcleo</text></svg>Quantas threads de usuário ficam sobre cada thread do núcleo.</aside>
+  <p>Os <b>modelos de mapeamento</b> dizem quantas threads de usuário ficam penduradas em cada thread do núcleo:</p>
+  <ul class="b">
+    <li><b>N:1</b> (muitos para um): várias ULT sobre uma única entidade do núcleo. É o modelo de ULT puro. Exemplos: as <i>green threads</i> das primeiras versões do Java, a biblioteca GNU Portable Threads.</li>
+    <li><b>1:1</b> (um para um): cada thread que o programa cria é uma KLT. É o modelo do Linux (pthreads, com a biblioteca NPTL), do Windows e do Java atual.</li>
+    <li><b>M:N</b> (muitos para muitos, o modo híbrido do livro): M threads de usuário distribuídas sobre N threads do núcleo, com N ≤ M. Junta troca rápida, paralelismo e tolerância a bloqueio. O preço é a complexidade: dois escalonadores, um na biblioteca e outro no núcleo, que precisam se entender. Exemplos: o Solaris antigo, as goroutines do Go, as threads virtuais do Java 21.</li>
+    <li><b>Scheduler activations</b>: o mecanismo que o livro descreve para fazer o híbrido funcionar. Quando uma thread vai bloquear, o núcleo avisa a biblioteca (uma chamada "de baixo para cima", chamada upcall), e a biblioteca coloca outra thread de usuário para rodar.</li>
+  </ul>
+  <p>Agora veja os três modelos com o mesmo programa: quatro threads, dois cores e uma chamada bloqueante.</p>
+ </div>
+
+  <figure class="fig" id="fig-modelos">
+    <div class="fig-head"><span class="fig-title">Figura 6 · ULT × KLT com uma chamada bloqueante</span><div class="fig-tabs"></div></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <svg id="mo-svg" viewBox="0 0 640 330" role="img" aria-label="Threads de usuário, threads do núcleo e dois cores"></svg>
+        <div class="stage-cap" id="mo-cap"></div>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th></th><th>ULT (N:1)</th><th>KLT (1:1)</th><th>Híbrido (M:N)</th></tr></thead>
+      <tbody>
+        <tr><td>Quem escalona</td><td>a biblioteca</td><td>o núcleo</td><td>os dois</td></tr>
+        <tr><td>Criar e trocar</td><td>muito rápido (ns)</td><td>mais lento (chamada de sistema, µs)</td><td>rápido na maioria das trocas</td></tr>
+        <tr><td>Chamada bloqueante</td><td>bloqueia o processo todo</td><td>bloqueia só a thread</td><td>bloqueia uma KLT; as outras seguem</td></tr>
+        <tr><td>Paralelismo em vários cores</td><td>não</td><td>sim</td><td>sim, até N ao mesmo tempo</td></tr>
+        <tr><td>Exemplos</td><td>green threads, GNU Pth</td><td>Linux, Windows</td><td>Go, Solaris antigo</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+ <div class="prose">
+  <p class="prova">ULT: troca rápida, mas uma chamada bloqueante bloqueia o processo todo e não há paralelismo. KLT: o núcleo escalona cada thread, há paralelismo real e uma thread bloqueada não trava as outras, ao custo de mais overhead.</p>
+  <div class="def">
+    <span class="lab">Na ponderada · pulseira</span>
+    <p>Exemplo fora do cenário: num drone com biblioteca N:1, se a thread de telemetria faz um envio de rádio bloqueante de 30 ms, a thread que controla os motores para junto por 30 ms. Você vai ter de dizer o que acontece com a leitura do sensor quando o envio por BLE bloqueia, conforme o modelo de threads escolhido.</p>
+  </div>
+
+  <h3>Juntando tudo</h3>
+  <ul class="b">
+    <li>O hardware dá ao SO três ferramentas: dois modos de operação, interrupções e o temporizador.</li>
+    <li>Com elas, o SO cria processos, guarda o contexto de cada um no PCB e alterna a CPU entre eles (multiprogramação), pagando o overhead de cada troca de contexto.</li>
+    <li>Threads dividem um processo em vários fluxos que compartilham memória: mais baratas de criar e trocar, mais rápidas para conversar e, com KLT, capazes de usar vários cores.</li>
+    <li>O preço do compartilhamento é a próxima aula: quando duas threads mexem no mesmo dado, a ordem de execução muda o resultado.</li>
+  </ul>
+ </div>
+</section>

@@ -22,7 +22,7 @@ passo a passo, animações em loop e glossário. Serve para estudar no lugar dos
 ## Estrutura
 
 ```
-src/data/estrutura.js            módulos e matérias (m8: comp, mat, negocios, ux, lideranca)
+src/data/estrutura.js            módulos, matérias (m8: comp, mat, negocios, ux, lideranca) e eixos de cada matéria
 src/aulas/<modulo>/<materia>/<aula>/
   meta.json                      título, resumo, tópicos, seções do sumário, fontes   (obrigatório)
   conteudo.html                  texto da aula, só as seções de conteúdo               (obrigatório)
@@ -35,6 +35,8 @@ src/aulas/<modulo>/<materia>/<aula>/
 src/pages/index.astro            home: módulos → matérias → aulas
 src/pages/[modulo]/[materia]/[aula].astro     página de qualquer aula (não precisa copiar)
 src/pages/[modulo]/[materia]/revisao.astro    revisão da matéria (gerada)
+src/pages/[modulo]/[materia]/revisao/[eixo].astro   revisão de cada eixo (gerada se a matéria tem 2+ eixos)
+src/components/RevisaoPagina.astro             o miolo das duas páginas de revisão
 src/pages/glossario.astro        glossário coletivo de todas as aulas (gerado)
 scripts/checar-termos.mjs        confere se todo termo em negrito tem verbete (npm run checar)
 src/lib/                         peças reaproveitáveis (stepfig, loop, machine, glossary, catalogo, oculos…)
@@ -53,7 +55,7 @@ Slug da aula: `NN-assunto-curto` (ex.: `02-automatos-finitos`). `numero` em `met
 {
   "numero": "02",
   "titulo": "Autômatos finitos",
-  "tema": "Linguagens Formais e Autômatos",
+  "tema": "Linguagens formais e autômatos",
   "resumo": "Uma frase com o que a aula cobre.",
   "topicos": ["AFD", "AFN", "Minimização"],
   "secoes": [["afd", "Autômato finito determinístico"], ["afn", "Não determinismo"]],
@@ -64,6 +66,13 @@ Slug da aula: `NN-assunto-curto` (ex.: `02-automatos-finitos`). `numero` em `met
   "observacao": "Opcional: nota de rodapé (notação adotada, ressalvas)."
 }
 ```
+
+**Eixos.** Uma matéria pode ter mais de um eixo (Computação tem "Linguagens formais e autômatos" e
+"Do silício ao sistema operacional"). Os eixos ficam em `materia.eixos` no `estrutura.js`
+(`{ slug, titulo, descricao }`, na ordem do curso). A aula entra no eixo cujo `titulo` é igual ao `tema`
+do meta.json. A home agrupa as aulas por eixo e cada eixo ganha sua revisão (`/<modulo>/<materia>/revisao/<eixo>`).
+Eixo novo: acrescente em `estrutura.js` e use o mesmo título no `tema` das aulas. O número da aula continua
+seguido dentro da matéria (01, 02, …), mesmo trocando de eixo.
 
 `secoes[i][0]` é o `id` de um `<section class="chap">` do `conteudo.html`, na mesma ordem.
 
@@ -93,6 +102,8 @@ Cada seção:
 - Código (ex.: simulador em Python): `<pre><code>…</code></pre>` dentro de um `.prose`; escape `&`, `<` e `>`.
 - **Cai na prova**: `<p class="prova">frase curta e direta</p>`. Vai também para a revisão da matéria. Use 3 a 6 por aula, só no que realmente cai.
 - Variáveis de gramática: `<span class="v">S</span>`; terminais: `<span class="t">a</span>`.
+- Link para outra aula: escreva a partir da raiz, sem o base: `<a href="/m8/comp/02-fundamentos-memoria">aula 02</a>`
+  (a página acrescenta `/caderno-visual` sozinha). Não use `../`.
 - Termos do glossário viram link sozinhos (primeira ocorrência por seção), usando o **glossário global**:
   um termo definido numa aula anterior continua virando link nas próximas. Não marque à mão.
 - **Negrito = termo** que o leitor precisa entender. Todo termo em negrito precisa de verbete em algum

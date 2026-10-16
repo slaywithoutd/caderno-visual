@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { site, modulos, aulasDe, hrefRevisao, hrefGlossario, glossarioGlobal, tempoAula, formatarTempo } from '../lib/catalogo.js';
+import { site, modulos, aulasDe, eixosDe, hrefRevisao, hrefRevisaoEixo, hrefGlossario, glossarioGlobal, tempoAula, formatarTempo } from '../lib/catalogo.js';
 const nTermos = Object.keys(glossarioGlobal).length;
 ---
 <Base title={site.titulo} description={site.subtitulo}>
@@ -16,6 +16,8 @@ const nTermos = Object.keys(glossarioGlobal).length;
         <h2 class="mod-title" id={`h-${mod.slug}`}>{mod.titulo}</h2>
         {mod.materias.map((mat) => {
           const lista = aulasDe(mod.slug, mat.slug);
+          const eixos = eixosDe(mod.slug, mat.slug);
+          const variosEixos = eixos.length > 1;
           return (
             <section class="home-area" id={`${mod.slug}-${mat.slug}`}>
               <div class="area-head">
@@ -23,28 +25,38 @@ const nTermos = Object.keys(glossarioGlobal).length;
                   <h3>{mat.titulo}</h3>
                   {mat.descricao && <p>{mat.descricao}</p>}
                 </div>
-                {!!lista.length && <a class="rev-link" href={hrefRevisao(mod.slug, mat.slug)}>Revisão para a prova →</a>}
+                {!!lista.length && <a class="rev-link" href={hrefRevisao(mod.slug, mat.slug)}>{variosEixos ? 'Revisão da matéria →' : 'Revisão para a prova →'}</a>}
               </div>
-              {lista.length === 0 ? (
-                <p class="area-vazia">Nenhuma aula ainda.</p>
-              ) : (
-                <ol class="aula-list">
-                  {lista.map((a) => (
-                    <li>
-                      <a class="aula-row" href={a.href}>
-                        <span class="aula-num">{a.numero}</span>
-                        <span class="aula-body">
-                          <span class="aula-title">{a.titulo}</span>
-                          <span class="aula-resumo">{a.resumo}</span>
-                          <span class="aula-tags">{(a.topicos || []).map((t) => <span>{t}</span>)}</span>
-                        </span>
-                        <span class="aula-meta"><span>{a.tema}</span><span class="aula-tempo">~{formatarTempo(tempoAula(a).minutos)} de leitura</span></span>
-                        <span class="aula-go" aria-hidden="true">→</span>
-                      </a>
-                    </li>
-                  ))}
-                </ol>
-              )}
+              {lista.length === 0 && <p class="area-vazia">Nenhuma aula ainda.</p>}
+              {eixos.map((eixo) => (
+                <div class="home-eixo">
+                  {variosEixos && (
+                    <div class="eixo-head">
+                      <div>
+                        <h4>{eixo.titulo}</h4>
+                        {eixo.descricao && <p>{eixo.descricao}</p>}
+                      </div>
+                      <a class="rev-link" href={hrefRevisaoEixo(mod.slug, mat.slug, eixo.slug)}>Revisão do eixo →</a>
+                    </div>
+                  )}
+                  <ol class="aula-list">
+                    {eixo.aulas.map((a) => (
+                      <li>
+                        <a class="aula-row" href={a.href}>
+                          <span class="aula-num">{a.numero}</span>
+                          <span class="aula-body">
+                            <span class="aula-title">{a.titulo}</span>
+                            <span class="aula-resumo">{a.resumo}</span>
+                            <span class="aula-tags">{(a.topicos || []).map((t) => <span>{t}</span>)}</span>
+                          </span>
+                          <span class="aula-meta"><span class="aula-tempo">~{formatarTempo(tempoAula(a).minutos)} de leitura</span></span>
+                          <span class="aula-go" aria-hidden="true">→</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              ))}
             </section>
           );
         })}
@@ -66,6 +78,10 @@ const nTermos = Object.keys(glossarioGlobal).length;
   .area-head h3{font-size:1.25rem;margin:0 0 2px}
   .area-head p{font-size:.9rem;color:var(--muted);margin:0}
   .rev-link{font-size:.85rem;text-decoration:none;white-space:nowrap}
+  .home-eixo{margin-top:6px}
+  .eixo-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding:22px 8px 6px}
+  .eixo-head h4{font-size:.8rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);margin:0 0 3px}
+  .eixo-head p{font-size:.86rem;color:var(--muted);margin:0;max-width:560px}
   .area-vazia{color:var(--muted);font-size:.92rem;padding:14px 8px;margin:0}
   .aula-list{list-style:none;margin:0;padding:0}
   .aula-list li{border-bottom:1px solid var(--line)}
@@ -81,5 +97,5 @@ const nTermos = Object.keys(glossarioGlobal).length;
   .aula-meta{font-size:.8rem;color:var(--muted);padding-top:5px;white-space:nowrap;display:flex;flex-direction:column;align-items:flex-end;gap:2px}
   .aula-tempo{font-family:var(--f-mono);font-size:.74rem}
   .aula-go{color:var(--muted);padding-top:2px;transition:transform .2s,color .2s}
-  @media (max-width:640px){.aula-row{grid-template-columns:36px minmax(0,1fr)}.aula-meta,.aula-go{display:none}.area-head{flex-direction:column;align-items:flex-start}}
+  @media (max-width:640px){.aula-row{grid-template-columns:36px minmax(0,1fr)}.aula-meta,.aula-go{display:none}.area-head,.eixo-head{flex-direction:column;align-items:flex-start}}
 </style>

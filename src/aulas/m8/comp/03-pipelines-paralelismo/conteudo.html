@@ -1,0 +1,700 @@
+<header class="hero prose" id="top">
+  <div class="kicker">Do silício ao sistema operacional · Aula 03</div>
+  <h1>Arquitetura de computadores: pipelines e paralelismo</h1>
+  <div class="hero-sym"><span>IF ID <b>EX</b> MEM WB</span><span>CPI = 1 + <b>stalls</b></span><span>RAW · WAR · WAW</span><span>ROB <b>→</b> commit</span></div>
+</header>
+
+<!-- ============ 1 ============ -->
+<section class="chap" id="antes">
+ <div class="prose">
+  <span class="num">01</span>
+  <h2>Antes de começar: o caminho de uma instrução</h2>
+  <div class="src"><span class="base-tag">Base · fora dos autoestudos</span><span class="bk">Hennessy &amp; Patterson · cap. 1 · p. 1–68 (lembrete)</span></div>
+  <p>O capítulo 3 do livro parte do princípio de que você já sabe o que acontece com uma instrução dentro do processador e lê fluentemente o assembly dos exemplos. Esta seção junta esse mínimo. A métrica que vamos melhorar a aula inteira é a da aula 02.</p>
+
+  <div class="def">
+    <span class="lab">Lembrete da aula 02</span>
+    <div class="formula">Tempo de CPU = IC × CPI × tempo de ciclo de clock</div>
+    <ul class="b">
+      <li>IC é quantas instruções o programa executa; CPI, quantos ciclos de clock cada uma gasta em média; o tempo de ciclo é o inverso da frequência (1 GHz → 1 ns).</li>
+      <li>Tudo nesta aula ataca o CPI ou o tempo de ciclo sem mexer no IC: o mesmo programa, executado com mais sobreposição.</li>
+      <li>Vamos usar também IPC = 1 / CPI, instruções por ciclo. Quando o processador termina mais de uma instrução por ciclo, o CPI fica menor que 1 e fica mais fácil falar em IPC.</li>
+      <li>Se precisar rever as definições, estão na <a href="/m8/comp/02-fundamentos-memoria">aula 02</a>.</li>
+    </ul>
+  </div>
+
+  <details class="base" open>
+   <summary><span class="base-tag">Base</span> O que o processador faz com cada instrução</summary>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 120"><text class="tm" x="63" y="10">operação</text><line class="s" x1="63" y1="18" x2="63" y2="30"/><text x="120" y="42" style="font-size:17px">DADD R1, R2, R3</text><line class="s" x1="104" y1="54" x2="72" y2="82"/><line class="s" x1="145" y1="54" x2="170" y2="82"/><line class="s" x1="186" y1="54" x2="170" y2="82"/><rect class="am" x="40" y="84" width="64" height="24" rx="12"/><text class="tm" x="72" y="96">destino</text><rect class="bl" x="130" y="84" width="80" height="24" rx="12"/><text class="tm" x="170" y="96">fontes</text></svg>R1 ← R2 + R3. No assembly do livro, o destino vem primeiro.</aside>
+   <ul class="b">
+    <li>Um programa compilado é uma lista de instruções guardada na memória. O processador guarda num registrador especial, o PC (de <i>program counter</i>; a aula 04 volta a ele), o endereço da próxima instrução.</li>
+    <li>Para cada instrução, ele faz sempre a mesma sequência: busca a instrução na memória, decodifica (descobre qual operação é e lê os registradores de entrada), executa a conta, acessa a memória se for leitura ou escrita de dados, e escreve o resultado num registrador.</li>
+    <li>A conta é feita pela <b>ULA</b> (unidade lógica e aritmética): o circuito que soma, subtrai, compara e faz E/OU bit a bit.</li>
+    <li>Os registradores ficam juntos num <b>banco de registradores</b>: uma memória pequenina dentro do processador, com 32 registradores inteiros (R0 a R31) e 32 de <b>ponto flutuante</b> (F0 a F31), que guardam números com vírgula, como o <code>double</code> de C.</li>
+    <li>Os <b>operandos</b> de uma instrução são os valores que ela usa como entrada.</li>
+    <li>Um <b>desvio</b> é uma instrução que pode mudar o PC: em vez de seguir para a instrução de baixo, o programa pula para outro endereço. É o que um <code>if</code> ou o fim de um <code>for</code> viram depois de compilados.</li>
+   </ul>
+  </details>
+
+  <h3>O assembly dos exemplos</h3>
+  <p>O livro usa a <b>arquitetura MIPS</b> de 64 bits (MIPS64), um conjunto de instruções simples, do tipo RISC, em que cada instrução faz uma coisa só. Leia assim:</p>
+ </div>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>Instrução</th><th>Leia como</th><th>Observação</th></tr></thead>
+      <tbody>
+        <tr><td><code>DADD R1, R2, R3</code></td><td>R1 ← R2 + R3</td><td>D de <i>doubleword</i>, 64 bits. <code>DSUB</code>, <code>AND</code>, <code>OR</code>, <code>XOR</code> seguem o mesmo formato</td></tr>
+        <tr><td><code>DADDUI R1, R1, #-8</code></td><td>R1 ← R1 + (−8)</td><td><code>#</code> marca um número fixo (imediato)</td></tr>
+        <tr><td><code>LD R1, 8(R2)</code></td><td>R1 ← Memória[R2 + 8]</td><td>load: lê da memória para o registrador</td></tr>
+        <tr><td><code>SD R1, 8(R2)</code></td><td>Memória[R2 + 8] ← R1</td><td>store: escreve na memória</td></tr>
+        <tr><td><code>BEQ R1, R2, alvo</code></td><td>se R1 = R2, pule para alvo</td><td><code>BNE</code>: pule se forem diferentes</td></tr>
+        <tr><td><code>L.D F0, 0(R1)</code> / <code>S.D</code></td><td>load / store de um <code>double</code></td><td>registradores F são de ponto flutuante</td></tr>
+        <tr><td><code>ADD.D</code>, <code>SUB.D</code>, <code>MUL.D</code>, <code>DIV.D</code></td><td>soma, subtração, multiplicação e divisão de <code>double</code></td><td>demoram mais ciclos que as inteiras</td></tr>
+        <tr><td>ciclo 1, 2, 3…</td><td>os ciclos de clock, contados a partir do início do trecho</td><td>o livro escreve CC1, CC2…</td></tr>
+        <tr><td><code>ps</code>, <code>ns</code></td><td>picossegundo (10⁻¹² s), nanossegundo (10⁻⁹ s)</td><td>1 ns = 1000 ps</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 2 ============ -->
+<section class="chap" id="pipeline">
+ <div class="prose">
+  <span class="num">02</span>
+  <h2>A ideia do pipeline: sobrepor instruções</h2>
+  <div class="src"><span class="bk">Hennessy &amp; Patterson · cap. 3 · p. 148–150</span><span class="bk">apêndice C · pipelining básico</span></div>
+<aside class="mn loop" data-loop="lavanderia" data-ms="9000" data-still="0.95" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Três cargas, três etapas de 1 h. Uma de cada vez: 9 h. Sobrepondo: 5 h.</aside>
+  <p>Pense numa lavanderia com lavadora, secadora e uma mesa de dobrar, cada etapa levando 1 hora. Fazendo uma carga de cada vez, três cargas levam 9 horas. Mas enquanto a primeira seca, a segunda já pode lavar.</p>
+  <ul class="b">
+    <li>Sobrepondo as etapas, as três cargas ficam prontas em 5 horas. Com muitas cargas, sai uma pronta por hora, três vezes mais que antes.</li>
+    <li>Cada carga continua levando 3 horas do começo ao fim. O que melhorou foi a vazão (cargas por hora); a latência de uma carga ficou igual. São as duas métricas da aula 02.</li>
+    <li>A etapa mais lenta dita o ritmo: se secar levasse 2 horas, sairia uma carga a cada 2 horas, e a lavadora ficaria parada metade do tempo.</li>
+  </ul>
+  <div class="def key">
+    <span class="lab">Definição · Pipeline</span>
+    <p class="simples"><b>Pipeline</b> (ou <i>pipelining</i>) é dividir a execução de uma instrução em etapas e deixar várias instruções em andamento ao mesmo tempo, cada uma numa etapa, como uma linha de montagem. Cada etapa é um <b>estágio</b>.</p>
+    <p class="formal">Técnica de implementação em que a execução de várias instruções é sobreposta. Cada estágio completa uma parte da instrução, e todos avançam juntos a cada ciclo de clock. O tempo de ciclo é o tempo do estágio mais lento.</p>
+  </div>
+
+  <h3>Os 5 estágios do pipeline clássico</h3>
+<aside class="mn loop" data-loop="fluxo" data-ms="10000" data-still="0.55" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>A cada ciclo, todas avançam um estágio e uma nova entra. Com o pipeline cheio, sai uma instrução por ciclo.</aside>
+  <p>O livro usa o pipeline de 5 estágios dos processadores RISC, que é a base de todo o resto do capítulo:</p>
+  <ul class="b">
+    <li><b>IF</b> (<i>instruction fetch</i>, busca): lê a instrução da memória no endereço do PC e soma 4 ao PC (cada instrução MIPS tem 4 bytes).</li>
+    <li><b>ID</b> (<i>instruction decode</i>, decodificação): descobre qual é a instrução e lê os registradores de entrada no banco de registradores.</li>
+    <li><b>EX</b> (<i>execute</i>, execução): a ULA faz a conta, ou calcula o endereço de memória de um load/store (R2 + 8).</li>
+    <li><b>MEM</b> (<i>memory</i>, memória): load lê a memória de dados; store escreve. As outras instruções só passam por aqui.</li>
+    <li><b>WB</b> (<i>write-back</i>, escrita): escreve o resultado no registrador de destino.</li>
+  </ul>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 104"><rect class="bl" x="2" y="30" width="36" height="34" rx="5"/><text x="20" y="47" style="font-size:11px">IF</text><rect class="k" x="48" y="30" width="36" height="34" rx="5"/><text x="66" y="47" style="font-size:11px">ID</text><rect class="am" x="94" y="30" width="36" height="34" rx="5"/><text x="112" y="47" style="font-size:11px">EX</text><rect class="acf" x="140" y="30" width="38" height="34" rx="5"/><text x="159" y="47" style="font-size:11px">MEM</text><rect class="gr" x="188" y="30" width="38" height="34" rx="5"/><text x="207" y="47" style="font-size:11px">WB</text><rect class="rd" x="40" y="24" width="5" height="46"/><rect class="rd" x="86" y="24" width="5" height="46"/><rect class="rd" x="132" y="24" width="5" height="46"/><rect class="rd" x="180" y="24" width="5" height="46"/><text class="tm" x="112" y="10">registradores de pipeline</text><line class="s" x1="64" y1="16" x2="43" y2="22"/><line class="s" x1="160" y1="16" x2="182" y2="22"/><text class="tm" x="112" y="90">IF/ID  ID/EX  EX/MEM  MEM/WB</text></svg>Entre cada par de estágios, um registrador guarda o que a instrução levou de um para o outro.</aside>
+  <ul class="b">
+    <li>Entre um estágio e o seguinte fica um <b>registrador de pipeline</b>, que guarda os resultados do estágio no fim do ciclo para o próximo usar. Eles têm nome: IF/ID, ID/EX, EX/MEM e MEM/WB.</li>
+    <li>O número de estágios é a <b>profundidade do pipeline</b>. Processadores de computador de mesa têm de 10 a 20 estágios; o de 5 é o modelo didático.</li>
+  </ul>
+
+  <h3>Aceleração ideal</h3>
+  <p>Se os estágios estiverem perfeitamente equilibrados, cada um leva 1/k do tempo da instrução inteira, e uma instrução termina a cada ciclo:</p>
+  <div class="formula">tempo por instrução com pipeline = tempo por instrução sem pipeline / número de estágios</div>
+  <ul class="b">
+    <li>Com k estágios, a aceleração ideal é <b>k</b>. Com 5 estágios, até 5 vezes mais instruções por segundo.</li>
+    <li>Essa conta supõe três coisas que não acontecem: estágios de tamanho igual, registradores de pipeline sem custo e nenhuma instrução precisando esperar outra.</li>
+  </ul>
+
+  <h3>Aceleração real: a conta do livro</h3>
+  <p>Exemplo do apêndice C. Um processador sem pipeline tem ciclo de 1 ns. Operações de ULA e desvios gastam 4 ciclos; acessos à memória, 5. Frequências: 40% ULA, 20% desvios, 40% memória. O pipeline acrescenta 0,2 ns por ciclo (registradores de pipeline e diferenças de tempo do clock).</p>
+  <ul class="b">
+    <li><b>1.</b> Tempo médio sem pipeline = 1 ns × (0,40 × 4 + 0,20 × 4 + 0,40 × 5) = 1 ns × 4,4 = 4,4 ns por instrução.</li>
+    <li><b>2.</b> Com pipeline, termina uma instrução por ciclo, e o ciclo fica 1 + 0,2 = 1,2 ns.</li>
+    <li><b>3.</b> Aceleração = 4,4 / 1,2 ≈ 3,7 vezes, e não 5. O overhead de 0,2 ns limita o ganho.</li>
+  </ul>
+  <p>Mexa nos parâmetros e veja onde a aceleração real se afasta da ideal:</p>
+ </div>
+
+  <figure class="fig" id="fig-acel">
+    <div class="fig-head"><span class="fig-title">Figura 1 · Quanto o pipeline acelera</span></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <div class="ctl-grid">
+          <div class="ctl"><label for="ac-k">estágios k <b id="ac-kv"></b></label><input type="range" id="ac-k" min="2" max="16" value="5"></div>
+          <div class="ctl"><label for="ac-o">overhead por ciclo <b id="ac-ov"></b></label><input type="range" id="ac-o" min="0" max="100" step="10" value="20"></div>
+          <div class="ctl"><label for="ac-s">stalls por instrução <b id="ac-sv"></b></label><input type="range" id="ac-s" min="0" max="1" step="0.05" value="0"></div>
+        </div>
+        <svg id="ac-svg" viewBox="0 0 640 250" role="img" aria-label="Aceleração ideal e real em função do número de estágios"></svg>
+        <div class="out-grid" id="ac-out"></div>
+        <div class="verdict" id="ac-ver"></div>
+      </div>
+      <div class="fig-side"><div class="lab">Como ler</div>
+        <ol class="fig-notes">
+          <li class="past">Modelo: sem pipeline, a instrução inteira leva 1000 ps de lógica, num ciclo só.</li>
+          <li class="past">Com k estágios, o ciclo vira <code>1000/k + overhead</code>. O overhead é o tempo dos registradores de pipeline.</li>
+          <li class="past">Stalls por instrução são os ciclos perdidos com hazards (próxima seção). CPI = 1 + stalls.</li>
+          <li class="past">Linha tracejada: aceleração ideal (k). Linha azul: real. Aumente k com overhead 20 ps: o ganho achata.</li>
+          <li class="cur">Repare na latência: uma instrução sozinha fica mais lenta com pipeline (k ciclos com overhead).</li>
+        </ol>
+      </div>
+    </div>
+  </figure>
+
+ <div class="prose">
+  <div class="def warn">
+    <span class="lab">Pegadinha</span>
+    <p>Nenhuma instrução fica mais rápida com pipeline. Cada uma ainda passa pelos 5 estágios e, com o overhead, leva um pouco mais de tempo do começo ao fim. O ganho vem de terminar mais instruções por segundo.</p>
+  </div>
+  <p class="prova">Pipeline aumenta a vazão e não diminui a latência de cada instrução. Aceleração ideal = número de estágios; na prática é menor por causa de estágios desbalanceados, overhead dos registradores de pipeline e hazards.</p>
+  <div class="def">
+    <span class="lab">Na ponderada · pulseira</span>
+    <p>O requisito da pulseira é de latência: cada amostra processada em até 5 ms. O pipeline entra na conta pelo CPI. Exemplo com outros números: um termostato que executa 40 000 instruções por leitura, num processador de 16 MHz (ciclo de 62,5 ns) com CPI 1,3, gasta 40 000 × 1,3 × 62,5 ns = 3,25 ms por leitura. A pergunta que você vai ter de responder é a mesma, com os seus parâmetros: quantas instruções, qual CPI e qual clock, e se o resultado cabe no limite com folga.</p>
+  </div>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 3 ============ -->
+<section class="chap" id="hazards">
+ <div class="prose">
+  <span class="num">03</span>
+  <h2>Hazards: quando a sobreposição dá errado</h2>
+  <div class="src"><span class="bk">Hennessy &amp; Patterson · cap. 3 · p. 148–156</span><span class="bk">apêndice C · hazards</span></div>
+  <p>O pipeline só entrega uma instrução por ciclo se a instrução seguinte puder sempre entrar no ciclo seguinte. Às vezes ela não pode.</p>
+  <div class="def key">
+    <span class="lab">Definição · Hazard</span>
+    <p class="simples">Um <b>hazard</b> (risco) é uma situação em que a próxima instrução não pode executar no ciclo dela sem dar resultado errado. Ela precisa de algo que ainda não está disponível.</p>
+    <p class="formal">Situação que impede a próxima instrução do fluxo de executar no seu ciclo de clock designado. Hazards reduzem o desempenho em relação à aceleração ideal do pipeline.</p>
+  </div>
+  <p>São três tipos, conforme o que falta:</p>
+  <ul class="b">
+    <li><b>Hazard estrutural</b>: falta hardware. Duas instruções querem o mesmo recurso no mesmo ciclo.</li>
+    <li><b>Hazard de dados</b>: falta um valor. A instrução precisa do resultado de uma anterior que ainda não terminou.</li>
+    <li><b>Hazard de controle</b>: falta saber o caminho. Depois de um desvio, o processador não sabe ainda qual instrução buscar.</li>
+  </ul>
+
+  <h3>Hazard estrutural</h3>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 130"><rect class="k" x="80" y="44" width="80" height="42" rx="8"/><text x="120" y="65">memória</text><rect class="bl" x="2" y="10" width="62" height="28" rx="14"/><text class="tm" x="33" y="24">IF instr. 4</text><rect class="acf" x="176" y="10" width="62" height="28" rx="14"/><text class="tm" x="207" y="24">MEM do LD</text><line class="s" x1="50" y1="38" x2="84" y2="50" marker-end="url(#mnarrow)"/><line class="s" x1="190" y1="38" x2="156" y2="50" marker-end="url(#mnarrow)"/><text style="fill:var(--red);font-weight:700;font-size:20px" x="120" y="22">✗</text><text class="tam" x="120" y="108">ciclo 4: as duas ao mesmo tempo</text></svg>Com uma memória só, o load e a busca de uma instrução disputam a mesma porta.</aside>
+  <ul class="b">
+    <li>Exemplo clássico: uma única memória para instruções e dados. No ciclo 4, um LD está em MEM lendo dados e a 4ª instrução atrás dele está em IF buscando código. As duas precisam da memória.</li>
+    <li>Solução: duplicar o recurso. Por isso os processadores têm caches L1 separadas para instruções e para dados (aula 02).</li>
+    <li>O banco de registradores também é disputado: no mesmo ciclo uma instrução escreve (WB) e outra lê (ID). O truque é escrever na primeira metade do ciclo e ler na segunda. Quem lê no mesmo ciclo da escrita já pega o valor novo.</li>
+    <li>Às vezes o projetista aceita o hazard estrutural de propósito, se o recurso for caro e o conflito raro: uma unidade de ponto flutuante sem pipeline, por exemplo.</li>
+  </ul>
+
+  <h3>Stall: a solução que sempre funciona</h3>
+<aside class="mn loop" data-loop="bolha" data-ms="9000" data-still="0.3" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Quando a instrução em ID precisa esperar, ela e a de trás ficam paradas e uma bolha (o tracejado) segue pelo pipeline no lugar dela.</aside>
+  <ul class="b">
+    <li>Qualquer hazard pode ser resolvido segurando a instrução até o problema acabar. Isso é um <b>stall</b> (parada). A instrução parada e as de trás ficam no lugar; as da frente continuam.</li>
+    <li>O "buraco" que anda pelo pipeline no lugar da instrução parada é uma <b>bolha</b>: um ciclo em que aquele estágio não faz trabalho útil. Na prática é uma <b>nop</b> (instrução que não faz nada) inserida pelo hardware.</li>
+    <li>O circuito que detecta o hazard e segura o pipeline chama-se <b>interlock</b>.</li>
+  </ul>
+
+  <h3>A conta: CPI com stalls</h3>
+  <p>Sem hazards, o pipeline termina uma instrução por ciclo (CPI ideal = 1). Cada stall é um ciclo a mais. Então:</p>
+  <div class="formula">CPI com pipeline = CPI ideal + ciclos de stall por instrução = 1 + stalls</div>
+  <div class="formula">Aceleração = profundidade do pipeline / (1 + ciclos de stall por instrução)</div>
+  <p class="nota-formal muted">De onde sai a segunda: aceleração = (CPI sem pipeline × ciclo sem pipeline) / (CPI com pipeline × ciclo com pipeline). Com o mesmo ciclo e CPI sem pipeline igual ao número de estágios (cada instrução gasta um ciclo em cada um), sobra profundidade / (1 + stalls).</p>
+  <p>Exemplo com números. Pipeline de 5 estágios a 1 GHz (ciclo de 1 ns):</p>
+  <ul class="b">
+    <li><b>1.</b> 25% das instruções são loads, e 40% deles são seguidos imediatamente por uma instrução que usa o valor. Cada caso custa 1 stall (próxima seção): 0,25 × 0,40 × 1 = 0,10 ciclo por instrução.</li>
+    <li><b>2.</b> 15% são desvios, cada um com 1 ciclo de penalidade: 0,15 × 1 = 0,15.</li>
+    <li><b>3.</b> CPI = 1 + 0,10 + 0,15 = 1,25.</li>
+    <li><b>4.</b> Aceleração em relação ao mesmo processador sem pipeline = 5 / 1,25 = 4. Os hazards comeram 1 dos 5 possíveis.</li>
+    <li><b>5.</b> Um programa de 10⁹ instruções leva 10⁹ × 1,25 × 1 ns = 1,25 s. É a equação da aula 02 com o CPI que o pipeline realmente consegue.</li>
+  </ul>
+  <p class="prova">CPI do pipeline = 1 + ciclos de stall por instrução. Aceleração = profundidade / (1 + stalls por instrução). Some a contribuição de cada hazard: frequência × ciclos perdidos.</p>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 4 ============ -->
+<section class="chap" id="dados">
+ <div class="prose">
+  <span class="num">04</span>
+  <h2>Hazards de dados, stall e forwarding</h2>
+  <div class="src"><span class="bk">Hennessy &amp; Patterson · cap. 3 · p. 150–156</span><span class="bk">apêndice C · forwarding</span></div>
+  <p>Exemplo do livro: um <code>DADD</code> calcula R1 e as quatro instruções seguintes usam R1. O DADD só escreve R1 no estágio WB, quatro ciclos depois de começar; as outras leem R1 em ID, antes disso.</p>
+<pre><code>DADD R1, R2, R3      ; escreve R1
+DSUB R4, R1, R5      ; lê R1
+AND  R6, R1, R7      ; lê R1
+OR   R8, R1, R9      ; lê R1
+XOR  R10, R1, R11    ; lê R1</code></pre>
+
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 170"><text class="tb" x="20" y="18">RAW</text><rect class="k" x="48" y="6" width="70" height="24" rx="5"/><text class="tm" x="83" y="18">i: escreve R1</text><rect class="k" x="162" y="6" width="70" height="24" rx="5"/><text class="tm" x="197" y="18">j: lê R1</text><line class="ac" x1="120" y1="18" x2="158" y2="18" marker-end="url(#mnarrow)"/><text class="tam" x="20" y="74">WAR</text><rect class="k" x="48" y="62" width="70" height="24" rx="5"/><text class="tm" x="83" y="74">i: lê R1</text><rect class="k" x="162" y="62" width="70" height="24" rx="5"/><text class="tm" x="197" y="74">j: escreve R1</text><line class="s" x1="120" y1="74" x2="158" y2="74" marker-end="url(#mnarrow)"/><text class="tam" x="20" y="130">WAW</text><rect class="k" x="48" y="118" width="70" height="24" rx="5"/><text class="tm" x="83" y="130">i: escreve R1</text><rect class="k" x="162" y="118" width="70" height="24" rx="5"/><text class="tm" x="197" y="130">j: escreve R1</text><line class="s" x1="120" y1="130" x2="158" y2="130" marker-end="url(#mnarrow)"/><text class="tm" x="140" y="44">j precisa do valor de i</text><text class="tm" x="140" y="100">j não pode escrever antes</text><text class="tm" x="140" y="158">a ordem das escritas importa</text></svg>i vem antes de j no programa. O nome diz a ordem que precisa ser respeitada.</aside>
+  <h3>Os três tipos de hazard de dados</h3>
+  <p>Sejam duas instruções, i antes de j no programa. Os nomes dizem qual ordem precisa ser preservada (R de <i>read</i>, leitura; W de <i>write</i>, escrita):</p>
+  <div class="def key">
+    <span class="lab">Definição · RAW, WAR e WAW</span>
+    <p class="simples">Se j usa um registrador que i escreve, j precisa do valor novo. Se j escreve um registrador que i ainda vai ler, j não pode escrever antes da leitura. Se as duas escrevem o mesmo registrador, o valor final tem que ser o de j.</p>
+    <ul class="b">
+      <li><b>RAW</b> (<i>read after write</i>, leitura após escrita): j tenta ler antes de i escrever e pega o valor velho. Vem de uma <b>dependência verdadeira</b>: j realmente precisa do resultado de i. É o caso do exemplo acima, e o mais comum.</li>
+      <li><b>WAR</b> (<i>write after read</i>, escrita após leitura): j escreve antes de i ler, e i lê o valor novo por engano. Vem de uma <b>antidependência</b>.</li>
+      <li><b>WAW</b> (<i>write after write</i>, escrita após escrita): j escreve antes de i, e no fim fica o valor de i. Vem de uma <b>dependência de saída</b>.</li>
+    </ul>
+    <p class="nota-formal">RAR (leitura após leitura) não é hazard: ler duas vezes não muda nada. No pipeline de 5 estágios em ordem, WAR e WAW não acontecem, porque toda instrução lê em ID antes de qualquer posterior escrever em WB, e as escritas saem na ordem. Eles aparecem quando as instruções podem executar fora de ordem (seção 7).</p>
+  </div>
+  <p>Veja o exemplo no diagrama de pipeline: cada linha é uma instrução, cada coluna um ciclo. Compare as quatro abas:</p>
+ </div>
+
+  <figure class="fig" id="fig-pipe">
+    <div class="fig-head"><span class="fig-title">Figura 2 · Hazard RAW no pipeline de 5 estágios</span><div class="fig-tabs"></div></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <svg class="pipe" viewBox="0 0 700 240" role="img" aria-label="Diagrama de pipeline: instruções por ciclo"></svg>
+        <div class="legend"><span><i style="background:var(--blue-soft);border:1px solid var(--blue)"></i>IF</span><span><i style="background:var(--surface);border:1px solid var(--line2)"></i>ID</span><span><i style="background:var(--amber-soft);border:1px solid var(--amber)"></i>EX</span><span><i style="background:var(--accent-soft);border:1px solid var(--accent)"></i>MEM</span><span><i style="background:var(--green-soft);border:1px solid var(--green)"></i>WB</span><span><i style="background:var(--red-soft);border:1px dashed var(--red)"></i>parada (stall)</span></div>
+        <div class="stage-cap"></div>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+
+ <div class="prose">
+  <h3>Forwarding: entregar o valor antes de ele chegar ao registrador</h3>
+  <ul class="b">
+    <li>O DADD calcula R1 no fim do EX (ciclo 3). O valor existe, só ainda não foi gravado no banco de registradores: está no registrador de pipeline EX/MEM.</li>
+    <li><b>Forwarding</b> (adiantamento, ou <i>bypass</i>) são fios extras que levam esse valor direto dos registradores de pipeline EX/MEM e MEM/WB para a entrada da ULA. Um seletor escolhe: se a instrução em EX precisa de um registrador que uma instrução da frente está para escrever, usa o valor adiantado.</li>
+    <li>Com forwarding, a sequência do exemplo roda sem nenhum stall.</li>
+  </ul>
+  <h3>O caso que o forwarding não resolve: load seguido de uso</h3>
+  <ul class="b">
+    <li>Um LD só tem o dado no fim do MEM, um estágio depois do EX. Se a instrução seguinte precisa do valor no EX dela, que acontece no mesmo ciclo do MEM do load, o dado ainda não existe.</li>
+    <li>Forwarding leva valores para a frente no tempo, nunca para trás. O interlock segura a instrução dependente 1 ciclo. Esse é o hazard <b>load-use</b>: custa 1 stall mesmo com forwarding (aba "load-use" da figura).</li>
+    <li>O compilador pode esconder esse stall reordenando o código para pôr uma instrução independente entre o load e o uso. Isso é <b>escalonamento estático</b>, feito pelo compilador antes de o programa rodar.</li>
+  </ul>
+  <p>Exemplo do livro: <code>a = b + c; d = e − f;</code> compilado direto tem dois stalls. Subindo os loads de e e f, eles somem:</p>
+ </div>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>Compilado direto (2 stalls)</th><th>Reordenado (0 stall)</th></tr></thead>
+      <tbody>
+        <tr><td><code>LD Rb, b</code></td><td><code>LD Rb, b</code></td></tr>
+        <tr><td><code>LD Rc, c</code></td><td><code>LD Rc, c</code></td></tr>
+        <tr><td><code>DADD Ra, Rb, Rc</code> ← stall (Rc)</td><td><code>LD Re, e</code> ← subiu</td></tr>
+        <tr><td><code>SD Ra, a</code></td><td><code>DADD Ra, Rb, Rc</code></td></tr>
+        <tr><td><code>LD Re, e</code></td><td><code>LD Rf, f</code> ← subiu</td></tr>
+        <tr><td><code>LD Rf, f</code></td><td><code>SD Ra, a</code></td></tr>
+        <tr><td><code>DSUB Rd, Re, Rf</code> ← stall (Rf)</td><td><code>DSUB Rd, Re, Rf</code></td></tr>
+        <tr><td><code>SD Rd, d</code></td><td><code>SD Rd, d</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+ <div class="prose">
+  <p class="prova">RAW é a única dependência verdadeira. Forwarding resolve quase todo RAW sem esperar; o load seguido de uso ainda custa 1 stall, que o compilador tenta esconder reordenando instruções.</p>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 5 ============ -->
+<section class="chap" id="controle">
+ <div class="prose">
+  <span class="num">05</span>
+  <h2>Hazards de controle e predição de desvios</h2>
+  <div class="src"><span class="bk">Hennessy &amp; Patterson · cap. 3 · p. 162–167</span><span class="bk">cap. 3 · p. 202–213 (BTB e retorno)</span><span class="bk">apêndice C · desvios</span></div>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 132"><text class="tm st" x="2" y="12">ciclo:   1   2   3   4</text><text class="st" x="2" y="36" style="font-size:11px">BEQ</text><rect class="bl" x="44" y="26" width="34" height="20" rx="4"/><rect class="k" x="82" y="26" width="34" height="20" rx="4"/><text class="tm" x="99" y="36">decide</text><text class="st" x="2" y="64" style="font-size:11px">próx.</text><rect class="bl" x="82" y="54" width="34" height="20" rx="4"/><text class="tm" x="99" y="64">IF</text><line style="stroke:var(--red);stroke-width:2" x1="80" y1="52" x2="118" y2="76"/><text class="st" x="2" y="92" style="font-size:11px">certa</text><rect class="gr" x="120" y="82" width="34" height="20" rx="4"/><text class="tm" x="137" y="92">IF</text><text class="tam" x="120" y="122">1 ciclo perdido</text></svg>Enquanto o BEQ decide em ID, o processador já buscou a instrução de baixo. Se o desvio for tomado, ela é jogada fora.</aside>
+  <p>Um <b>desvio condicional</b> (<code>BEQ</code>, <code>BNE</code>) decide entre duas próximas instruções: a de baixo (<b>desvio não tomado</b>) ou a do <b>endereço alvo</b> (<b>desvio tomado</b>). O pipeline precisa buscar a próxima instrução no ciclo seguinte ao IF do desvio, mas a decisão só sai em ID ou depois.</p>
+  <ul class="b">
+    <li>No pipeline de 5 estágios do livro, a comparação e o cálculo do alvo foram antecipados para ID. Mesmo assim, a instrução buscada logo depois do desvio pode ser a errada: perde-se 1 ciclo.</li>
+    <li>Os ciclos perdidos por desvio são a <b>penalidade de desvio</b>. Em pipelines profundos, a decisão sai muitos estágios depois do IF, e a penalidade chega a 10–20 ciclos.</li>
+    <li>Como 15–25% das instruções de um programa típico são desvios, isso pesa muito no CPI.</li>
+  </ul>
+
+  <h3>Soluções que não olham o histórico</h3>
+  <ul class="b">
+    <li><b>Congelar o pipeline</b>: ao ver um desvio, para de buscar até saber a decisão. Simples, sempre paga a penalidade.</li>
+    <li><b>Prever não tomado</b>: continua buscando a instrução de baixo. Se o desvio for tomado, faz um <b>flush</b>: descarta a instrução buscada errada, que vira nop, e busca no alvo. Desvio não tomado sai de graça.</li>
+    <li><b>Prever tomado</b>: busca no alvo assim que ele for conhecido. Só ajuda se o alvo sair antes da decisão.</li>
+    <li><b>Desvio atrasado</b> (<i>delay slot</i>): a instrução logo depois do desvio executa sempre, tomado ou não, e o compilador põe ali algo útil. Era usado no MIPS original; com pipelines profundos e emissão múltipla perdeu o sentido.</li>
+    <li><b>Predição estática</b>: o compilador escolhe uma previsão fixa para cada desvio. Regra comum: desvio para trás (o fim de um laço, que volta ao começo) é tomado; para a frente, não tomado. Com dados de execuções anteriores (perfil), o acerto melhora.</li>
+  </ul>
+  <p>Conta com números. Pipeline com penalidade de 3 ciclos, 20% de desvios, 60% deles tomados, previsão "não tomado":</p>
+  <ul class="b">
+    <li><b>1.</b> Stalls por instrução = 0,20 × 0,60 × 3 = 0,36. CPI = 1,36.</li>
+    <li><b>2.</b> Com um preditor que acerta 90%: 0,20 × 0,10 × 3 = 0,06. CPI = 1,06.</li>
+    <li><b>3.</b> O mesmo programa fica 1,36 / 1,06 ≈ 1,28 vez mais rápido só por prever melhor.</li>
+  </ul>
+
+  <h3>Predição dinâmica: aprender com o passado</h3>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="k" x="2" y="54" width="86" height="28" rx="5"/><text class="tm" x="45" y="68">PC do desvio</text><rect class="am" x="64" y="56" width="20" height="24" rx="3"/><text class="tm" x="74" y="68">bits</text><line class="s" x1="88" y1="68" x2="128" y2="68" marker-end="url(#mnarrow)"/><rect class="k" x="132" y="8" width="70" height="22" rx="3"/><text class="tm" x="167" y="19">01</text><rect class="k" x="132" y="32" width="70" height="22" rx="3"/><text class="tm" x="167" y="43">11</text><rect class="am" x="132" y="56" width="70" height="22" rx="3"/><text x="167" y="67">10</text><rect class="k" x="132" y="80" width="70" height="22" rx="3"/><text class="tm" x="167" y="91">00</text><rect class="k" x="132" y="104" width="70" height="22" rx="3"/><text class="tm" x="167" y="115">11</text><text class="tm" x="220" y="67">→ T</text><text class="tm" x="120" y="142">BHT: os bits baixos do PC escolhem a linha</text></svg>A tabela não guarda o endereço inteiro: dois desvios podem cair na mesma linha.</aside>
+  <ul class="b">
+    <li><b>Predição de desvios</b> dinâmica: o hardware guarda o que cada desvio fez nas últimas vezes e prevê que ele vai repetir. Funciona porque desvios são muito regulares: o de um laço é tomado quase sempre.</li>
+    <li>A estrutura mais simples é a <b>BHT</b> (<i>branch history table</i>, tabela de histórico de desvios): uma memória pequena indexada pelos bits mais baixos do endereço do desvio. Cada linha tem 1 bit: "da última vez, foi tomado?".</li>
+    <li>A tabela não confere o endereço inteiro, então dois desvios diferentes podem usar a mesma linha e atrapalhar um ao outro. Ela dá uma dica, que pode estar errada.</li>
+    <li>Problema do bit único num laço: no fim do laço o desvio não é tomado (erro 1) e o bit vira "não tomado"; na próxima vez que o laço roda, a primeira volta é tomada (erro 2). Dois erros por execução do laço.</li>
+  </ul>
+  <div class="def key">
+    <span class="lab">Definição · Preditor de 2 bits</span>
+    <p class="simples">Cada linha da tabela guarda um contador de 0 a 3. Desvio tomado soma 1, não tomado subtrai 1, sem passar dos limites. Se o contador está em 2 ou 3, prevê tomado; em 0 ou 1, não tomado. A previsão só muda depois de dois erros seguidos.</p>
+    <p class="formal">O <b>preditor de 2 bits</b> é uma máquina de 4 estados (11 e 10 preveem tomado; 01 e 00, não tomado). É o caso n = 2 de um <b>contador saturado</b> de n bits; com mais bits, quase não melhora.</p>
+  </div>
+  <p>Acompanhe o preditor num desvio de laço que volta 3 vezes e sai (T T T N, repetido) e compare com o de 1 bit:</p>
+ </div>
+
+  <figure class="fig" id="fig-pred">
+    <div class="fig-head"><span class="fig-title">Figura 3 · Preditor de 2 bits como máquina de estados</span><div class="fig-tabs"></div></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <svg class="diag" viewBox="0 0 640 210" role="img" aria-label="Máquina de estados do preditor"></svg>
+        <div class="lbl">o que o desvio fez (T = tomado, N = não tomado)</div>
+        <div class="tape"></div>
+        <div class="lbl" style="margin-top:8px">previsões</div>
+        <div class="trail"></div>
+        <div class="stage-cap"></div>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+
+ <div class="prose">
+  <ul class="b">
+    <li>Nos testes do livro (SPEC89, tabela de 4096 linhas), o preditor de 2 bits erra de 1% a 18% dos desvios, conforme o programa. Uma tabela infinita quase não melhora: o limite vem do tipo de informação que a tabela guarda.</li>
+  </ul>
+  <p class="prova">Preditor de 2 bits só muda a previsão depois de dois erros seguidos. Num laço, erra 1 vez por execução (na saída), contra 2 do preditor de 1 bit. Desvio de laço é o exemplo clássico de "tomado" na predição estática.</p>
+
+  <h3>Preditores correlacionados</h3>
+  <p>Às vezes o resultado de um desvio depende de outros desvios que vieram antes. Exemplo do livro (do programa eqntott):</p>
+<pre><code>if (aa == 2) aa = 0;      // desvio b1
+if (bb == 2) bb = 0;      // desvio b2
+if (aa != bb) { … }       // desvio b3: se b1 e b2 zeraram os dois, aa == bb</code></pre>
+  <ul class="b">
+    <li>Um <b>preditor correlacionado</b> (ou de dois níveis) olha também o resultado dos últimos m desvios executados, de qualquer desvio do programa (o histórico global). Para cada combinação desse histórico, há um preditor de n bits separado.</li>
+    <li>Notação (m, n): m desvios de histórico, contadores de n bits. O preditor de 2 bits comum é o (0, 2).</li>
+    <li>Tamanho: bits = 2<sup>m</sup> × n × número de linhas. Conta do livro: um (0, 2) com 4K linhas tem 2⁰ × 2 × 4096 = 8K bits; um (2, 2) com 1K linhas tem 2² × 2 × 1024 = 8K bits. O mesmo orçamento, e o (2, 2) acerta mais.</li>
+  </ul>
+  <h3>Preditores de torneio</h3>
+  <ul class="b">
+    <li>Um <b>preditor de torneio</b> tem dois preditores, um global (histórico de todos os desvios) e um local (histórico só daquele desvio), e um seletor que aprende qual dos dois acerta mais para cada desvio. O seletor é outro contador de 2 bits.</li>
+    <li>Foi a técnica de ponta dos anos 2000 (Alpha 21264); os processadores atuais, como o Core i7, usam combinações parecidas, com vários níveis.</li>
+  </ul>
+  <h3>Além do sentido: para onde desviar</h3>
+  <ul class="b">
+    <li>Saber que o desvio é tomado não basta: é preciso o endereço alvo já no IF. O <b>BTB</b> (<i>branch-target buffer</i>, buffer de destino de desvio) é uma cache que, dado o endereço da instrução que está sendo buscada, devolve o endereço alvo previsto. Se acertar, o desvio tomado custa 0 ciclo.</li>
+    <li>Retornos de função (<code>return</code>) pulam para endereços diferentes conforme quem chamou. O <b>preditor de endereço de retorno</b> é uma pequena pilha (8 a 16 endereços) que empilha o endereço de volta a cada chamada e desempilha no retorno.</li>
+  </ul>
+  <div class="def">
+    <span class="lab">Na ponderada · pulseira</span>
+    <p>Predição faz o tempo de um mesmo trecho de código variar: acertando, o desvio é de graça; errando, paga a penalidade. Para um requisito como "no máximo 5 ms por amostra", o que importa é o pior caso. Exemplo com outros números: 2000 desvios por leitura, 10% de erro e 3 ciclos de penalidade dão 600 ciclos extras, 37,5 µs a 16 MHz; se todos errassem, seriam 6000 ciclos, 375 µs. Você vai ter de dizer, com os seus números, se o pior caso ainda cabe no limite.</p>
+  </div>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 6 ============ -->
+<section class="chap" id="ilp">
+ <div class="prose">
+  <span class="num">06</span>
+  <h2>ILP: dependências e o trabalho do compilador</h2>
+  <div class="src"><span class="bk">Hennessy &amp; Patterson · cap. 3 · p. 148–162</span></div>
+  <p>Todo o capítulo 3 é sobre <b>ILP</b> (<i>instruction-level parallelism</i>, paralelismo no nível de instrução): executar ao mesmo tempo instruções do mesmo programa que não dependem umas das outras. O pipeline é a primeira forma; as próximas seções vão mais longe.</p>
+  <ul class="b">
+    <li>Dentro de um <b>bloco básico</b> (trecho de código sem desvios no meio, com uma entrada no topo e uma saída no fim) há pouco ILP. Com 15–25% de desvios, um bloco tem só 3 a 6 instruções, e elas costumam depender umas das outras.</li>
+    <li>O ILP de verdade está entre blocos, principalmente entre iterações de um laço. Em <code>for (i = 999; i &gt;= 0; i = i − 1) x[i] = x[i] + s;</code> cada iteração mexe num x[i] diferente: as 1000 poderiam rodar ao mesmo tempo.</li>
+  </ul>
+
+  <h3>Três tipos de dependência</h3>
+  <ul class="b">
+    <li><b>Dependência de dados</b> (ou dependência verdadeira): j usa um resultado de i, direta ou indiretamente (por uma cadeia i → k → j). É a origem do RAW. Não há como contornar: j precisa esperar.</li>
+    <li><b>Dependência de nome</b>: duas instruções usam o mesmo registrador ou endereço, mas nenhum valor passa de uma para a outra. A antidependência gera WAR; a dependência de saída gera WAW. Basta usar outro nome (outro registrador) para ela sumir: isso é <b>renomeação de registradores</b>, que o compilador ou o hardware podem fazer.</li>
+    <li><b>Dependência de controle</b>: se uma instrução executa ou não depende de um desvio. Uma instrução de dentro de um <code>if</code> não pode ser movida para antes do <code>if</code> sem cuidado.</li>
+  </ul>
+  <div class="def warn">
+    <span class="lab">Dependência × hazard</span>
+    <p>Dependência é uma propriedade do programa: existe em qualquer processador. Hazard é uma propriedade do pipeline: se uma dependência vira hazard, e quantos ciclos custa, depende do hardware (com forwarding, muitas dependências não causam stall nenhum).</p>
+  </div>
+
+  <h3>Escalonamento pelo compilador e loop unrolling</h3>
+  <p>O livro compila o laço <code>x[i] = x[i] + s</code> e supõe estas esperas mínimas entre uma instrução que produz um valor e a que o usa (o resto é coberto por forwarding):</p>
+ </div>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>Quem produz</th><th>Quem usa</th><th>Ciclos de espera entre elas</th></tr></thead>
+      <tbody>
+        <tr><td>operação de ponto flutuante (<code>ADD.D</code>)</td><td>outra operação de ponto flutuante</td><td>3</td></tr>
+        <tr><td>operação de ponto flutuante</td><td>store de double (<code>S.D</code>)</td><td>2</td></tr>
+        <tr><td>load de double (<code>L.D</code>)</td><td>operação de ponto flutuante</td><td>1</td></tr>
+        <tr><td>load de double</td><td>store de double</td><td>0</td></tr>
+        <tr><td>operação inteira (<code>DADDUI</code>)</td><td>desvio (<code>BNE</code>)</td><td>1</td></tr>
+      </tbody>
+    </table>
+  </div>
+ <div class="prose">
+<pre><code>Loop: L.D    F0, 0(R1)     ; F0 = x[i]
+      ADD.D  F4, F0, F2    ; soma s (que está em F2)
+      S.D    F4, 0(R1)     ; guarda x[i]
+      DADDUI R1, R1, #-8   ; anda para o double anterior (8 bytes)
+      BNE    R1, R2, Loop  ; repete até R1 chegar em R2</code></pre>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="k" x="10" y="8" width="70" height="56" rx="6"/><text class="tm" x="45" y="22">L.D</text><text class="tm" x="45" y="36">ADD.D</text><text class="tm" x="45" y="50">S.D</text><rect class="rd" x="10" y="68" width="70" height="30" rx="6"/><text class="tm" x="45" y="83">DADDUI · BNE</text><line class="s" x1="88" y1="56" x2="118" y2="56" marker-end="url(#mnarrow)"/><rect class="bl" x="124" y="4" width="50" height="22" rx="4"/><rect class="bl" x="178" y="4" width="50" height="22" rx="4"/><rect class="bl" x="124" y="30" width="50" height="22" rx="4"/><rect class="bl" x="178" y="30" width="50" height="22" rx="4"/><text class="tm" x="149" y="15">corpo 1</text><text class="tm" x="203" y="15">corpo 2</text><text class="tm" x="149" y="41">corpo 3</text><text class="tm" x="203" y="41">corpo 4</text><rect class="rd" x="124" y="58" width="104" height="22" rx="4"/><text class="tm" x="176" y="69">DADDUI · BNE uma vez</text><text class="tam" x="176" y="104">4 elementos por volta</text><text class="tm" x="176" y="122">menos controle, mais</text><text class="tm" x="176" y="136">instruções para misturar</text></svg>Desenrolar copia o corpo e paga o controle do laço uma vez a cada 4 elementos.</aside>
+  <ul class="b">
+    <li>Do jeito que está, cada elemento gasta 9 ciclos, e só 3 deles (L.D, ADD.D, S.D) fazem o trabalho. O resto é espera e controle do laço.</li>
+    <li>Reordenar (escalonar) ajuda pouco: são poucas instruções para misturar.</li>
+    <li><b>Loop unrolling</b> (desenrolar o laço): copiar o corpo várias vezes dentro de uma volta só, ajustando os deslocamentos (0, −8, −16, −24) e usando registradores diferentes em cada cópia. O controle do laço passa a ser pago uma vez a cada 4 elementos, e sobram instruções independentes para encaixar nas esperas.</li>
+  </ul>
+ </div>
+
+  <figure class="fig" id="fig-unroll">
+    <div class="fig-head"><span class="fig-title">Figura 4 · Escalonando e desenrolando o laço</span><div class="fig-tabs"></div></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <svg class="lst" viewBox="0 0 640 260" role="img" aria-label="Instruções do laço ciclo a ciclo"></svg>
+        <div class="stage-cap"></div>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+
+ <div class="prose">
+  <ul class="b">
+    <li>Resumo das contas: 9 ciclos por elemento → 7 escalonando → 14 / 4 = 3,5 desenrolando 4 vezes e escalonando. Aceleração de 9 / 3,5 ≈ 2,6 sem mudar o hardware. (Desenrolado mas sem escalonar, seriam 27 ciclos para 4 elementos, 6,75 por elemento.)</li>
+    <li>Para desenrolar, o compilador precisa provar que as iterações são independentes (que o L.D de uma não lê o que o S.D de outra escreveu) e precisa de registradores livres para renomear.</li>
+    <li>Limites: o código cresce (pior para a cache de instruções), faltam registradores se desenrolar demais, e o ganho diminui a cada cópia, porque o controle já está quase todo amortizado.</li>
+    <li>Se o número de iterações n não for múltiplo de k, o compilador gera dois laços: um que roda n mod k vezes o corpo original e outro que roda n / k vezes o corpo desenrolado.</li>
+  </ul>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 7 ============ -->
+<section class="chap" id="tomasulo">
+ <div class="prose">
+  <span class="num">07</span>
+  <h2>Escalonamento dinâmico: o algoritmo de Tomasulo</h2>
+  <div class="src"><span class="bk">Hennessy &amp; Patterson · cap. 3 · p. 167–183</span></div>
+  <p>No pipeline em ordem, uma instrução parada segura todas as de trás, mesmo as que não dependem dela:</p>
+<pre><code>DIV.D F0, F2, F4      ; divisão: dezenas de ciclos
+ADD.D F10, F0, F8     ; depende de F0: precisa esperar
+SUB.D F12, F8, F14    ; não depende de ninguém, mas fica preso atrás do ADD.D</code></pre>
+  <ul class="b">
+    <li><b>Escalonamento dinâmico</b>: o hardware reordena as instruções enquanto o programa roda. Ele busca e decodifica em ordem, mas deixa cada instrução executar assim que os operandos dela estiverem prontos.</li>
+    <li>Isso é <b>execução fora de ordem</b>: o SUB.D executa antes do ADD.D. O programa continua dando o mesmo resultado, porque só se adiantam instruções sem dependência.</li>
+    <li>Vantagens sobre o escalonamento do compilador: lida com esperas que o compilador não prevê (uma falta na cache, aula 02) e roda bem o mesmo binário em processadores diferentes.</li>
+    <li>O preço: executando fora de ordem, WAR e WAW passam a ser possíveis.</li>
+  </ul>
+  <p>Exemplo do livro com as duas dependências de nome:</p>
+ </div>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>Original</th><th>Renomeado (S e T são registradores livres)</th><th>O que mudou</th></tr></thead>
+      <tbody>
+        <tr><td><code>DIV.D F0, F2, F4</code></td><td><code>DIV.D F0, F2, F4</code></td><td></td></tr>
+        <tr><td><code>ADD.D F6, F0, F8</code></td><td><code>ADD.D S, F0, F8</code></td><td>lê F8 (WAR com o SUB.D)</td></tr>
+        <tr><td><code>S.D F6, 0(R1)</code></td><td><code>S.D S, 0(R1)</code></td><td></td></tr>
+        <tr><td><code>SUB.D F8, F10, F14</code></td><td><code>SUB.D T, F10, F14</code></td><td>escrevia F8: agora T</td></tr>
+        <tr><td><code>MUL.D F6, F10, F8</code></td><td><code>MUL.D F6, F10, T</code></td><td>escrevia F6, como o ADD.D (WAW)</td></tr>
+      </tbody>
+    </table>
+  </div>
+ <div class="prose">
+  <div class="def key">
+    <span class="lab">Definição · Renomeação de registradores</span>
+    <p class="simples">Dar um nome novo ao destino de uma instrução quando ele colide com um nome ainda em uso. As dependências de nome somem, e só sobram as verdadeiras.</p>
+    <p class="formal"><b>Renomeação</b>: mapear os registradores da arquitetura para um conjunto maior de locais físicos, de modo que cada escrita tenha um destino próprio. Elimina hazards WAR e WAW; não afeta RAW.</p>
+  </div>
+
+  <h3>As peças do algoritmo</h3>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 200"><rect class="k" x="70" y="2" width="100" height="24" rx="5"/><text class="tm" x="120" y="14">fila de instruções</text><line class="s" x1="100" y1="26" x2="60" y2="50" marker-end="url(#mnarrow)"/><line class="s" x1="140" y1="26" x2="180" y2="50" marker-end="url(#mnarrow)"/><rect class="am" x="14" y="54" width="92" height="20" rx="3"/><rect class="am" x="14" y="76" width="92" height="20" rx="3"/><text class="tm" x="60" y="64">Add1</text><text class="tm" x="60" y="86">Add2</text><rect class="am" x="134" y="54" width="92" height="20" rx="3"/><rect class="am" x="134" y="76" width="92" height="20" rx="3"/><text class="tm" x="180" y="64">Mult1</text><text class="tm" x="180" y="86">Mult2</text><line class="s" x1="60" y1="96" x2="60" y2="112" marker-end="url(#mnarrow)"/><line class="s" x1="180" y1="96" x2="180" y2="112" marker-end="url(#mnarrow)"/><rect class="bl" x="24" y="116" width="72" height="26" rx="13"/><text class="tm" x="60" y="129">somador</text><rect class="bl" x="144" y="116" width="72" height="26" rx="13"/><text class="tm" x="180" y="129">multiplicador</text><line class="s" x1="60" y1="142" x2="60" y2="170"/><line class="s" x1="180" y1="142" x2="180" y2="170"/><line class="ac" x1="6" y1="172" x2="234" y2="172" style="stroke-width:3"/><text class="ta" x="120" y="188">CDB</text><path class="s" d="M6 172 V40 H14" marker-end="url(#mnarrow)"/><path class="s" d="M234 172 V40 H226" marker-end="url(#mnarrow)"/></svg>Instruções esperam nas estações; resultados voltam pelo CDB para quem espera.</aside>
+  <p>O <b>algoritmo de Tomasulo</b> foi criado por Robert Tomasulo para a unidade de ponto flutuante do IBM 360/91 (1967). As ideias dele estão em praticamente todo processador de alto desempenho de hoje.</p>
+  <ul class="b">
+    <li><b>Unidades funcionais</b>: os circuitos que executam as operações (somador, multiplicador, unidade de load/store). Podem trabalhar ao mesmo tempo.</li>
+    <li><b>Estação de reserva</b>: uma "sala de espera" na frente de cada unidade funcional. Cada estação guarda uma instrução emitida e seus operandos: o valor (campos Vj, Vk) se já estiver pronto, ou a <b>etiqueta</b> de quem vai produzi-lo (campos Qj, Qk) se ainda não estiver.</li>
+    <li>A etiqueta é o nome da estação de reserva que vai produzir o valor (Add1, Mult2…). É assim que a renomeação acontece: os operandos passam a ser chamados pela estação, não pelo registrador.</li>
+    <li>Cada registrador tem um campo Qi: a etiqueta da estação que vai escrever nele. Vazio quer dizer que o valor no registrador está atualizado.</li>
+    <li><b>CDB</b> (<i>common data bus</i>, barramento comum de dados): o <b>barramento</b> (conjunto de fios compartilhado) por onde todo resultado sai, junto com a etiqueta de quem o produziu. Toda estação e todo registrador que esperam aquela etiqueta copiam o valor ao mesmo tempo.</li>
+  </ul>
+<aside class="mn loop" data-loop="cdb" data-ms="7000" data-still="0.75" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Load1 transmite o valor com a etiqueta. Quem espera Load1 copia; quem espera outra coisa ignora.</aside>
+  <p>Cada instrução passa por três passos:</p>
+  <ul class="b">
+    <li><b>1.</b> <b>Emissão</b> (<i>issue</i>): a próxima instrução da fila vai para uma estação de reserva livre do tipo certo, sempre em ordem. Operandos prontos são copiados; os pendentes viram etiquetas. O Qi do registrador de destino recebe o nome da estação. Sem estação livre, é hazard estrutural: a emissão para.</li>
+    <li><b>2.</b> Execução: quando os dois operandos estão na estação, a operação vai para a unidade funcional. Aqui a ordem se perde: executa quem fica pronto primeiro. Enquanto espera, a estação vigia o CDB.</li>
+    <li><b>3.</b> Escrita do resultado: o resultado sai no CDB com a etiqueta e chega às estações e aos registradores que esperam por ela.</li>
+  </ul>
+ </div>
+
+  <figure class="fig" id="fig-toma">
+    <div class="fig-head"><span class="fig-title">Figura 5 · Tomasulo simplificado</span></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <div class="lbl">instruções</div>
+        <div class="tbl" style="margin:0" id="tm-ins"></div>
+        <div class="lbl">estações de reserva (Vj, Vk = valores · Qj, Qk = etiquetas que faltam)</div>
+        <div class="tbl" style="margin:0" id="tm-rs"></div>
+        <div class="lbl">registradores (Qi = etiqueta de quem vai escrever)</div>
+        <div class="tbl" style="margin:0" id="tm-reg"></div>
+        <div class="stage-cap" id="tm-cdb"></div>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+
+ <div class="prose">
+  <ul class="b">
+    <li>WAR some porque a estação copia o valor (ou a etiqueta) na emissão: uma escrita posterior no registrador não altera o que ela já guardou.</li>
+    <li>WAW some porque só a última instrução emitida para um registrador fica no Qi dele. Um resultado antigo passa pelo CDB e não é gravado no registrador.</li>
+    <li>A detecção de hazards fica distribuída: cada estação sabe sozinha quando pode executar.</li>
+    <li>Limites: o CDB transmite um resultado por ciclo (mais CDBs custam muitos fios), e o hardware de comparação de etiquetas é grande e gasta energia.</li>
+    <li>Antes de Tomasulo, o CDC 6600 (1964) já executava fora de ordem com um <b>scoreboard</b>, uma tabela central que controla quando cada instrução pode ler e escrever. Ele não renomeia, então para em WAR e WAW.</li>
+  </ul>
+  <p class="prova">Tomasulo: estações de reserva guardam operandos ou a etiqueta de quem vai produzi-los, e os resultados vão pelo CDB a todos que esperam. A renomeação elimina WAR e WAW; só o RAW obriga a esperar. Emissão em ordem, execução fora de ordem.</p>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 8 ============ -->
+<section class="chap" id="especulacao">
+ <div class="prose">
+  <span class="num">08</span>
+  <h2>Especulação e o buffer de reordenação (ROB)</h2>
+  <div class="src"><span class="bk">Hennessy &amp; Patterson · cap. 3 · p. 183–192</span></div>
+  <p>Com bons preditores, o processador já sabe "para onde provavelmente vai" muito antes de o desvio ser decidido. Para aproveitar, precisa também executar as instruções do caminho previsto, além de buscá-las. Só que, se a previsão estiver errada, nada disso pode deixar rastro.</p>
+  <div class="def key">
+    <span class="lab">Definição · Especulação</span>
+    <p class="simples">Apostar no resultado do desvio e executar as instruções do caminho previsto como se a aposta estivesse certa. Os resultados ficam guardados à parte até a aposta ser confirmada; se ela estava errada, são jogados fora.</p>
+    <p class="formal"><b>Especulação</b> em hardware combina três ideias: predição dinâmica de desvios, execução especulativa de instruções antes de os desvios serem resolvidos (com capacidade de desfazer) e escalonamento dinâmico.</p>
+  </div>
+  <p>O Tomasulo puro não serve para isso: ele grava o resultado no registrador assim que a instrução termina. Uma instrução especulativa errada já teria estragado o registrador, e não há como desfazer.</p>
+
+  <h3>O ROB</h3>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="gr" x="20" y="40" width="36" height="40" rx="4"/><rect class="am" x="58" y="40" width="36" height="40" rx="4"/><rect class="am" x="96" y="40" width="36" height="40" rx="4"/><rect class="k" x="134" y="40" width="36" height="40" rx="4"/><rect class="am" x="172" y="40" width="36" height="40" rx="4"/><text class="tm" x="38" y="60">1 ✓</text><text class="tm" x="76" y="60">2</text><text class="tm" x="114" y="60">3 ✓</text><text class="tm" x="152" y="60">4</text><text class="tm" x="190" y="60">5 ✓</text><text class="ta" x="38" y="18">cabeça</text><line class="ac" x1="38" y1="26" x2="38" y2="36" marker-end="url(#mnarrow)"/><text class="tm" x="190" y="18">fim</text><line class="s" x1="190" y1="26" x2="190" y2="36" marker-end="url(#mnarrow)"/><path class="s" d="M38 84 V100 H8" marker-end="url(#mnarrow)"/><text class="tm" x="120" y="104">sai daqui, em ordem</text><text class="tm" x="120" y="128">✓ = terminou, mas só sai</text><text class="tm" x="120" y="142">quando chegar à cabeça</text></svg>O ROB é uma fila: entra pelo fim na ordem do programa, sai pela cabeça na mesma ordem.</aside>
+  <ul class="b">
+    <li>O <b>ROB</b> (<i>reorder buffer</i>, buffer de reordenação) é uma fila onde cada instrução emitida ganha uma entrada, na ordem do programa.</li>
+    <li>Cada entrada guarda: o tipo da instrução (desvio, store ou operação com registrador), o destino (registrador ou endereço de memória), o valor do resultado e se ele já está pronto.</li>
+    <li>Os resultados vão para o ROB, não para os registradores. As etiquetas de renomeação passam a ser os números das entradas do ROB.</li>
+    <li>Uma instrução só é <b>efetivada</b> (o <b>commit</b>) quando chega à cabeça da fila: aí o valor é gravado no registrador ou na memória, e a entrada sai. Por isso o nome em português do passo é efetivação.</li>
+  </ul>
+  <p>Os passos viram quatro: <b>emissão</b> (precisa de estação de reserva e de entrada no ROB livres), execução, escrita do resultado (no CDB, para as estações e para o ROB) e commit. A execução é fora de ordem; o commit é em ordem.</p>
+  <ul class="b">
+    <li><b>Desvio mal previsto</b>: quando o desvio chega à cabeça e a previsão estava errada, o ROB é esvaziado e a busca recomeça no endereço certo. Nada do caminho errado chegou aos registradores ou à memória.</li>
+    <li>Stores só escrevem na memória no commit. Um store especulativo não pode ser desfeito depois de gravado.</li>
+  </ul>
+  <div class="def key">
+    <span class="lab">Definição · Exceção precisa</span>
+    <p class="simples">Uma exceção é um evento causado por uma instrução que obriga o processador a parar o programa e chamar o sistema operacional: divisão por zero, acesso a um endereço inválido, falta de página (aula 02). A exceção é precisa quando, no momento do desvio para o tratador, tudo antes da instrução culpada terminou e nada depois dela mudou o estado.</p>
+    <p class="formal"><b>Exceção precisa</b>: o estado do processador visto pelo tratador é igual ao de uma execução sequencial que parou exatamente na instrução que causou a exceção. Com execução fora de ordem, isso exige <b>commit em ordem</b>: a exceção é só anotada no ROB e tratada quando a instrução chega à cabeça.</p>
+  </div>
+  <p>Veja o ROB com uma instrução que divide por zero no meio de outras que terminam fora de ordem:</p>
+ </div>
+
+  <figure class="fig" id="fig-rob">
+    <div class="fig-head"><span class="fig-title">Figura 6 · ROB: commit em ordem e uma exceção precisa</span></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <div class="lbl">buffer de reordenação</div>
+        <div class="tbl" style="margin:0" id="rb-rob"></div>
+        <div class="lbl">estado visível (registradores e memória)</div>
+        <div class="tbl" style="margin:0" id="rb-reg"></div>
+        <div class="stage-cap" id="rb-cap"></div>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+
+ <div class="prose">
+  <ul class="b">
+    <li>Por que esperar a cabeça para tratar a exceção: se a instrução culpada estava num caminho mal previsto, ela nunca deveria ter executado, e a exceção não pode acontecer.</li>
+    <li>O custo da especulação: trabalho jogado fora a cada erro de predição, que gasta tempo e energia. É um dos motivos para os preditores serem tão sofisticados.</li>
+  </ul>
+  <p class="prova">Execução fora de ordem, commit em ordem. O ROB guarda os resultados especulativos e só os grava em registradores e memória quando a instrução chega à cabeça; por isso desvios mal previstos se desfazem e as exceções são precisas.</p>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 9 ============ -->
+<section class="chap" id="multipla">
+ <div class="prose">
+  <span class="num">09</span>
+  <h2>Emissão múltipla: superescalar e VLIW</h2>
+  <div class="src"><span class="bk">Hennessy &amp; Patterson · cap. 3 · p. 192–202</span><span class="bk">cap. 3 · p. 233–241 (Cortex-A8 e Core i7)</span></div>
+  <p>Mesmo sem nenhum stall, um pipeline que emite uma instrução por ciclo nunca passa de CPI = 1. Para ir além, é preciso emitir várias por ciclo.</p>
+  <ul class="b">
+    <li><b>Emissão múltipla</b>: o processador emite e executa várias instruções no mesmo ciclo, com várias unidades funcionais. O CPI fica abaixo de 1; um processador que emite 4 por ciclo tem IPC máximo 4.</li>
+    <li>Há dois jeitos de decidir quais instruções vão juntas: o hardware decide enquanto o programa roda, ou o compilador decide antes.</li>
+  </ul>
+<aside class="mn loop" data-loop="multi" data-ms="8000" data-still="0.6" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Em cima, o hardware escolhe a cada ciclo quantas instruções emitir. Embaixo, o compilador já entregou pacotes prontos, com nops onde não achou nada.</aside>
+  <ul class="b">
+    <li><b>Superescalar</b>: o hardware olha as próximas instruções e emite de 1 a k por ciclo, conforme as dependências entre elas. Pode ser estático (executa em ordem) ou dinâmico (fora de ordem, com Tomasulo e especulação). O programa é o mesmo de um processador simples.</li>
+    <li><b>VLIW</b> (<i>very long instruction word</i>, palavra de instrução muito longa): o compilador junta operações independentes num pacote grande, com uma vaga para cada unidade funcional. O hardware só executa o pacote, sem checar dependências. Vaga sem operação útil leva uma nop.</li>
+  </ul>
+ </div>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>Abordagem</th><th>Emissão</th><th>Quem acha os hazards</th><th>Escalonamento</th><th>Exemplos (do livro)</th></tr></thead>
+      <tbody>
+        <tr><td>Superescalar estático</td><td>dinâmica</td><td>hardware</td><td>estático (em ordem)</td><td>processadores embarcados MIPS e ARM, como o Cortex-A8</td></tr>
+        <tr><td>Superescalar dinâmico</td><td>dinâmica</td><td>hardware</td><td>dinâmico</td><td>nenhum atual (todos especulam)</td></tr>
+        <tr><td>Superescalar especulativo</td><td>dinâmica</td><td>hardware</td><td>dinâmico, com especulação</td><td>Intel Core i3/i5/i7, AMD Phenom, IBM Power7</td></tr>
+        <tr><td>VLIW</td><td>estática</td><td>principalmente o compilador</td><td>estático</td><td>processadores de sinal (DSP), como os TI C6x</td></tr>
+        <tr><td>EPIC</td><td>principalmente estática</td><td>principalmente o compilador</td><td>principalmente estático</td><td>Itanium</td></tr>
+      </tbody>
+    </table>
+  </div>
+ <div class="prose">
+  <h3>VLIW na prática</h3>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 110"><rect class="bl" x="4" y="30" width="44" height="34" rx="4"/><rect class="bl" x="50" y="30" width="44" height="34" rx="4"/><rect class="am" x="96" y="30" width="44" height="34" rx="4"/><rect class="k" x="142" y="30" width="44" height="34" rx="4"/><rect class="gr" x="188" y="30" width="48" height="34" rx="4"/><text class="tm" x="26" y="47">L.D</text><text class="tm" x="72" y="47">L.D</text><text class="tm" x="118" y="47">ADD.D</text><text class="tm" x="164" y="47">nop</text><text class="tm" x="212" y="47">DADDUI</text><text class="tm" x="49" y="16">2 memória</text><text class="tm" x="141" y="16">2 ponto flut.</text><text class="tm" x="212" y="16">inteira</text><text class="tam" x="120" y="88">uma instrução = 5 operações</text></svg>Um pacote VLIW com 5 vagas, uma por unidade. Vaga vazia vira nop.</aside>
+  <ul class="b">
+    <li>Exemplo do livro: VLIW com 5 vagas por pacote (2 acessos à memória, 2 operações de ponto flutuante, 1 inteira ou desvio), rodando o laço <code>x[i] = x[i] + s</code> desenrolado 7 vezes.</li>
+    <li><b>1.</b> São 7 L.D + 7 ADD.D + 7 S.D + 1 DADDUI + 1 BNE = 23 operações em 9 ciclos: cerca de 2,5 operações por ciclo.</li>
+    <li><b>2.</b> 9 ciclos / 7 elementos ≈ 1,29 ciclo por elemento, contra 3,5 do pipeline simples desenrolado.</li>
+    <li><b>3.</b> Mas 9 pacotes × 5 vagas = 45 vagas, e só 23 têm operação: quase metade são nops.</li>
+    <li>Problemas do VLIW: código maior (desenrolamento e nops), um stall numa unidade para todas (elas andam juntas), e o binário depende do número de vagas: um VLIW novo, com outras unidades, pede recompilação.</li>
+    <li><b>EPIC</b> (Itanium, Intel e HP) foi a tentativa de corrigir isso com mais ajuda do hardware. Não pegou no mercado.</li>
+  </ul>
+  <h3>Superescalar com especulação: o padrão de hoje</h3>
+  <ul class="b">
+    <li>Processadores de computador e de celular de alto desempenho são superescalares especulativos: Tomasulo + ROB + preditores, emitindo 4 a 6 instruções por ciclo.</li>
+    <li>O gargalo é a emissão: para emitir n instruções no mesmo ciclo, o hardware precisa comparar cada uma com todas as anteriores do grupo, o que cresce com n² e precisa caber num ciclo de clock.</li>
+  </ul>
+  <h3>Juntando tudo: dois processadores reais do livro</h3>
+  <ul class="b">
+    <li><b>ARM Cortex-A8</b> (celulares da época): superescalar estático de 2 emissões, em ordem, pipeline de 13 estágios, predição dinâmica com BTB. Desvio mal previsto custa 13 ciclos. Foco em energia baixa.</li>
+    <li><b>Intel Core i7</b> (920): superescalar especulativo. Decodifica até 4 instruções x86 por ciclo, quebrando-as em <b>micro-operações</b> simples no estilo RISC, que passam por renomeação, estações de reserva e um ROB de 128 entradas. Pipeline de 14 estágios; erro de predição custa cerca de 17 ciclos.</li>
+  </ul>
+  <div class="def">
+    <span class="lab">Na ponderada · pulseira</span>
+    <p>Pulseiras e sensores costumam usar microcontroladores, bem mais simples que os processadores de celular. Um ARM Cortex-M típico tem pipeline de 2 ou 3 estágios, executa em ordem, sem especulação nem emissão múltipla. Ele faz menos por ciclo, mas o tempo de cada trecho de código é quase sempre o mesmo, e a energia é bem menor. A pergunta de negócio da Parte B passa por aqui: vale mais um chip potente e imprevisível ou um simples e previsível? Use as ferramentas desta aula para justificar, com as contas da sua Parte A.</p>
+  </div>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 10 ============ -->
+<section class="chap" id="limites">
+ <div class="prose">
+  <span class="num">10</span>
+  <h2>Os limites do ILP e o multithreading</h2>
+  <div class="src"><span class="bk">Hennessy &amp; Patterson · cap. 3 · p. 213–233</span><span class="bk">cap. 3 · p. 241–247 (falácias e conclusões)</span></div>
+  <h3>Quanto ILP existe?</h3>
+  <ul class="b">
+    <li>O livro simula um processador perfeito: renomeação com infinitos registradores, predição de desvios perfeita, sabe sempre se dois acessos à memória colidem, emite quantas instruções quiser por ciclo e olha o programa inteiro de uma vez.</li>
+    <li>Mesmo assim, o paralelismo encontrado nos programas de teste varia muito: de algumas dezenas a pouco mais de cem instruções por ciclo, e os programas de inteiros ficam no lado baixo.</li>
+    <li>Com limites realistas, o número despenca: uma <b>janela de instruções</b> (quantas instruções à frente o hardware consegue examinar) de algumas centenas, um preditor de torneio real e um número finito de registradores de renomeação deixam algo na faixa de 10 ou menos.</li>
+    <li>Processadores reais emitem até 4 a 6 por ciclo e, em programas reais, sustentam bem menos que isso, por causa de erros de predição e faltas na cache.</li>
+    <li>Conclusão do livro: espremer mais ILP custa área e energia demais para o ganho. Junto com o limite de potência da aula 02, foi o que levou a indústria aos processadores multicore e ao paralelismo entre threads.</li>
+  </ul>
+
+  <h3>Multithreading em hardware</h3>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 176"><text class="tm" x="30" y="10">super-</text><text class="tm" x="30" y="22">escalar</text><text class="tm" x="90" y="16">fina</text><text class="tm" x="150" y="16">grossa</text><text class="tm" x="210" y="16">SMT</text><g><rect class="bl" x="10" y="30" width="12" height="14"/><rect class="k" x="24" y="30" width="12" height="14"/><rect class="k" x="38" y="30" width="12" height="14"/><rect class="k" x="10" y="48" width="12" height="14"/><rect class="k" x="24" y="48" width="12" height="14"/><rect class="k" x="38" y="48" width="12" height="14"/><rect class="bl" x="10" y="66" width="12" height="14"/><rect class="bl" x="24" y="66" width="12" height="14"/><rect class="k" x="38" y="66" width="12" height="14"/><rect class="k" x="10" y="84" width="12" height="14"/><rect class="k" x="24" y="84" width="12" height="14"/><rect class="k" x="38" y="84" width="12" height="14"/><rect class="bl" x="10" y="102" width="12" height="14"/><rect class="k" x="24" y="102" width="12" height="14"/><rect class="k" x="38" y="102" width="12" height="14"/></g><g><rect class="bl" x="70" y="30" width="12" height="14"/><rect class="k" x="84" y="30" width="12" height="14"/><rect class="k" x="98" y="30" width="12" height="14"/><rect class="am" x="70" y="48" width="12" height="14"/><rect class="am" x="84" y="48" width="12" height="14"/><rect class="k" x="98" y="48" width="12" height="14"/><rect class="gr" x="70" y="66" width="12" height="14"/><rect class="k" x="84" y="66" width="12" height="14"/><rect class="k" x="98" y="66" width="12" height="14"/><rect class="bl" x="70" y="84" width="12" height="14"/><rect class="bl" x="84" y="84" width="12" height="14"/><rect class="k" x="98" y="84" width="12" height="14"/><rect class="am" x="70" y="102" width="12" height="14"/><rect class="k" x="84" y="102" width="12" height="14"/><rect class="k" x="98" y="102" width="12" height="14"/></g><g><rect class="bl" x="130" y="30" width="12" height="14"/><rect class="k" x="144" y="30" width="12" height="14"/><rect class="k" x="158" y="30" width="12" height="14"/><rect class="bl" x="130" y="48" width="12" height="14"/><rect class="bl" x="144" y="48" width="12" height="14"/><rect class="k" x="158" y="48" width="12" height="14"/><rect class="k" x="130" y="66" width="12" height="14"/><rect class="k" x="144" y="66" width="12" height="14"/><rect class="k" x="158" y="66" width="12" height="14"/><rect class="am" x="130" y="84" width="12" height="14"/><rect class="am" x="144" y="84" width="12" height="14"/><rect class="am" x="158" y="84" width="12" height="14"/><rect class="am" x="130" y="102" width="12" height="14"/><rect class="k" x="144" y="102" width="12" height="14"/><rect class="k" x="158" y="102" width="12" height="14"/></g><g><rect class="bl" x="190" y="30" width="12" height="14"/><rect class="am" x="204" y="30" width="12" height="14"/><rect class="gr" x="218" y="30" width="12" height="14"/><rect class="am" x="190" y="48" width="12" height="14"/><rect class="am" x="204" y="48" width="12" height="14"/><rect class="bl" x="218" y="48" width="12" height="14"/><rect class="gr" x="190" y="66" width="12" height="14"/><rect class="bl" x="204" y="66" width="12" height="14"/><rect class="bl" x="218" y="66" width="12" height="14"/><rect class="bl" x="190" y="84" width="12" height="14"/><rect class="am" x="204" y="84" width="12" height="14"/><rect class="gr" x="218" y="84" width="12" height="14"/><rect class="am" x="190" y="102" width="12" height="14"/><rect class="gr" x="204" y="102" width="12" height="14"/><rect class="bl" x="218" y="102" width="12" height="14"/></g><text class="tm" x="120" y="136">linha = ciclo · coluna = vaga de emissão</text><text class="tm" x="120" y="152">cor = thread · cinza = vaga perdida</text></svg>Com uma thread só, muitas vagas ficam vazias. SMT preenche com instruções de várias threads.</aside>
+  <p>Se um programa sozinho não tem ILP para encher as unidades funcionais, outro programa pode emprestar instruções. Uma thread é um fluxo de execução independente, com PC e registradores próprios (a aula 04 explica em detalhe). Para o hardware, basta saber que instruções de threads diferentes não dependem umas das outras.</p>
+  <ul class="b">
+    <li><b>Multithreading</b> em hardware: o processador guarda o estado de várias threads ao mesmo tempo (um PC e um banco de registradores para cada uma) e compartilha as unidades funcionais entre elas. Trocar de thread custa quase nada.</li>
+    <li><b>Multithreading de granularidade fina</b>: troca de thread a cada ciclo, alternando entre elas. Esconde qualquer espera, mas cada thread individual fica mais lenta. Exemplo: Sun Niagara.</li>
+    <li><b>Multithreading de granularidade grossa</b>: só troca de thread em esperas longas, como uma falta na cache L2. Não atrapalha a thread principal, mas não aproveita esperas curtas.</li>
+    <li><b>SMT</b> (<i>simultaneous multithreading</i>, multithreading simultâneo): num superescalar dinâmico, emite no mesmo ciclo instruções de várias threads. A renomeação e as estações de reserva já resolvem as dependências; basta saber de qual thread cada instrução é. O Hyper-Threading da Intel (2 threads por núcleo no Core i7) e o IBM Power7 (4 threads) usam SMT.</li>
+  </ul>
+
+  <h3>Falácias e armadilhas do capítulo</h3>
+  <ul class="b">
+    <li><i>Falácia</i>: processador com clock maior é mais rápido. O Pentium 4 tinha clock alto com um pipeline muito profundo, mas os erros de predição e o CPI alto faziam o Core i7, com clock menor, ser bem mais rápido e gastar menos energia. A equação da aula 02 tem três fatores.</li>
+    <li><i>Falácia</i>: com a mesma tecnologia e o mesmo conjunto de instruções, é fácil prever qual de dois processadores será mais rápido ou mais econômico. Os comparativos do livro mostram que a ordem muda de programa para programa.</li>
+    <li><i>Armadilha</i>: às vezes "maior e mais simples" ganha de "esperto". Um preditor simples com muitas linhas pode errar menos que um preditor de torneio sofisticado do mesmo tamanho, conforme o programa.</li>
+  </ul>
+ </div>
+</section>

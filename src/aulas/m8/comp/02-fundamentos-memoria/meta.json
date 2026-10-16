@@ -1,0 +1,40 @@
+{
+  "numero": "02",
+  "titulo": "Arquitetura de computadores: fundamentos e memória",
+  "tema": "Do silício ao sistema operacional",
+  "resumo": "Como medir desempenho (equação da CPU, Lei de Amdahl), por que energia travou o clock e trouxe o multicore, confiabilidade e custo do chip, e a hierarquia de memória: localidade, caches, AMAT, memória virtual e TLB.",
+  "topicos": [
+    "Unidades e binário",
+    "Equação da CPU",
+    "Lei de Amdahl",
+    "Potência e Dennard",
+    "Confiabilidade e custo",
+    "Localidade",
+    "Cache e AMAT",
+    "Memória virtual e TLB"
+  ],
+  "secoes": [
+    ["antes", "Antes de começar"],
+    ["computador", "Dentro do computador"],
+    ["desempenho", "Desempenho e equação da CPU"],
+    ["amdahl", "Lei de Amdahl"],
+    ["energia", "Energia e potência"],
+    ["custo", "Confiabilidade e custo"],
+    ["hierarquia", "Hierarquia e localidade"],
+    ["cache", "Como a cache funciona"],
+    ["otimizacoes", "Otimizações de cache"],
+    ["virtual", "Memória virtual e TLB"]
+  ],
+  "fontes": [
+    { "tipo": "Livro", "titulo": "Hennessy & Patterson, Arquitetura de computadores: uma abordagem quantitativa, cap. 1 · Fundamentos do projeto e análise quantitativa, seções 1.1–1.4 (p. 1–68)", "secao": "computador" },
+    { "tipo": "Livro", "titulo": "Hennessy & Patterson, cap. 1 · Medindo desempenho e princípios quantitativos, seções 1.8–1.9", "secao": "desempenho" },
+    { "tipo": "Livro", "titulo": "Hennessy & Patterson, cap. 1 · Lei de Amdahl, seção 1.9", "secao": "amdahl" },
+    { "tipo": "Livro", "titulo": "Hennessy & Patterson, cap. 1 · Tendências de potência e energia, seção 1.5", "secao": "energia" },
+    { "tipo": "Livro", "titulo": "Hennessy & Patterson, cap. 1 · Tendências de custo e dependabilidade, seções 1.6–1.7", "secao": "custo" },
+    { "tipo": "Livro", "titulo": "Hennessy & Patterson, cap. 2 · Projeto da hierarquia de memória, seções 2.1 e 2.3 (p. 69–148)", "secao": "hierarquia" },
+    { "tipo": "Livro", "titulo": "Hennessy & Patterson, cap. 2 · seção 2.1 e Apêndice B (revisão de caches)", "secao": "cache" },
+    { "tipo": "Livro", "titulo": "Hennessy & Patterson, cap. 2 · Dez otimizações avançadas de cache, seção 2.2, e Apêndice B (seis otimizações básicas)", "secao": "otimizacoes" },
+    { "tipo": "Livro", "titulo": "Hennessy & Patterson, cap. 2 · Proteção: memória virtual e máquinas virtuais, seção 2.4", "secao": "virtual" }
+  ],
+  "observacao": "Fonte: tradução brasileira da 5ª edição de Hennessy & Patterson (Elsevier). As seções citadas seguem a numeração do livro; as páginas exatas variam entre impressões. O capítulo 2 pressupõe a revisão de caches do Apêndice B (mapeamento, políticas de escrita, seis otimizações básicas), que aqui entrou nas seções 8 e 9. Latências e frequências nas tabelas e loops são ordens de grandeza típicas, não medidas de uma máquina específica."
+}

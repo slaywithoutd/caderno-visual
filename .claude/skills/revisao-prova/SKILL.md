@@ -7,7 +7,9 @@ description: Prepara o Caderno visual para a prova de uma matéria no fim do mó
 
 A página `/<modulo>/<materia>/revisao` já junta sozinha: `<p class="prova">` de cada
 `conteudo.html`, `> [!prova]` das notas, os `cartoes` e a `cola` de cada `revisao.js` e todos os
-glossários. Esta skill garante que esse material esteja completo e certo.
+glossários. Se a matéria tem mais de um eixo (ex.: Computação), cada eixo tem a sua revisão em
+`/<modulo>/<materia>/revisao/<eixo>`; a prova costuma ser de um eixo, então pergunte-se qual e revise
+só as aulas dele. Esta skill garante que esse material esteja completo e certo.
 
 ## 1. Levantar
 

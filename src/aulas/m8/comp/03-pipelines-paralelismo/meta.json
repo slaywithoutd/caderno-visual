@@ -1,0 +1,42 @@
+{
+  "numero": "03",
+  "titulo": "Arquitetura de computadores: pipelines e paralelismo",
+  "tema": "Do silício ao sistema operacional",
+  "resumo": "Pipeline de 5 estágios, hazards estruturais, de dados e de controle, forwarding e stalls, predição de desvios, loop unrolling, Tomasulo, especulação com ROB, superescalar, VLIW e multithreading.",
+  "topicos": [
+    "Pipeline",
+    "Hazards",
+    "Forwarding",
+    "Predição de desvios",
+    "Loop unrolling",
+    "Tomasulo",
+    "ROB",
+    "Superescalar e VLIW",
+    "Multithreading"
+  ],
+  "secoes": [
+    ["antes", "Antes de começar"],
+    ["pipeline", "A ideia do pipeline"],
+    ["hazards", "Hazards e stalls"],
+    ["dados", "Hazards de dados e forwarding"],
+    ["controle", "Desvios e predição"],
+    ["ilp", "ILP e loop unrolling"],
+    ["tomasulo", "Tomasulo"],
+    ["especulacao", "Especulação e ROB"],
+    ["multipla", "Superescalar e VLIW"],
+    ["limites", "Limites do ILP e multithreading"]
+  ],
+  "fontes": [
+    { "tipo": "Livro", "titulo": "Hennessy & Patterson, Arquitetura de computadores: uma abordagem quantitativa, cap. 1 · Fundamentos do projeto e da análise quantitativa (p. 1–68), só como lembrete", "secao": "antes" },
+    { "tipo": "Livro", "titulo": "Hennessy & Patterson, cap. 3 · seção 3.1 e apêndice C · Pipelining básico (p. 148–150)", "secao": "pipeline" },
+    { "tipo": "Livro", "titulo": "Hennessy & Patterson, cap. 3 · seção 3.1 e apêndice C · Hazards e stalls (p. 148–156)", "secao": "hazards" },
+    { "tipo": "Livro", "titulo": "Hennessy & Patterson, cap. 3 · seção 3.1 e apêndice C · Hazards de dados e forwarding (p. 150–156)", "secao": "dados" },
+    { "tipo": "Livro", "titulo": "Hennessy & Patterson, cap. 3 · seções 3.3 e 3.9 · Predição de desvios, BTB e preditor de retorno (p. 162–167 e 202–213)", "secao": "controle" },
+    { "tipo": "Livro", "titulo": "Hennessy & Patterson, cap. 3 · seções 3.1 e 3.2 · Dependências e loop unrolling (p. 148–162)", "secao": "ilp" },
+    { "tipo": "Livro", "titulo": "Hennessy & Patterson, cap. 3 · seções 3.4 e 3.5 · Escalonamento dinâmico e Tomasulo (p. 167–183)", "secao": "tomasulo" },
+    { "tipo": "Livro", "titulo": "Hennessy & Patterson, cap. 3 · seção 3.6 · Especulação em hardware e ROB (p. 183–192)", "secao": "especulacao" },
+    { "tipo": "Livro", "titulo": "Hennessy & Patterson, cap. 3 · seções 3.7, 3.8 e 3.13 · Emissão múltipla, VLIW, Cortex-A8 e Core i7 (p. 192–202 e 233–241)", "secao": "multipla" },
+    { "tipo": "Livro", "titulo": "Hennessy & Patterson, cap. 3 · seções 3.10 a 3.12, 3.14 e 3.15 · Limites do ILP, multithreading, falácias (p. 213–233 e 241–247)", "secao": "limites" }
+  ],
+  "observacao": "Páginas da 5ª edição (tradução brasileira, Elsevier); em outras edições os números mudam. O pipeline básico de 5 estágios, que o capítulo 3 assume, está no apêndice C do livro. Os exemplos usam as instruções MIPS64 do livro (DADD, LD, L.D, ADD.D…); as subdivisões de página por seção são aproximadas."
+}

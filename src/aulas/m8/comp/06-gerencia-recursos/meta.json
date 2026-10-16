@@ -1,0 +1,38 @@
+{
+  "numero": "06",
+  "titulo": "Gerência de recursos",
+  "tema": "Do silício ao sistema operacional",
+  "resumo": "Como o sistema operacional reparte a CPU (FCFS, SJF, SRTF, prioridade, round-robin, filas e tempo real), a memória (partições, paginação, substituição de páginas, thrashing), o disco (sistema de arquivos, i-nodes) e os dispositivos (polling, interrupção, DMA, escalonamento de disco).",
+  "topicos": [
+    "Critérios de escalonamento",
+    "FCFS, SJF, SRTF, RR",
+    "Prioridade e tempo real",
+    "Partições e fragmentação",
+    "Paginação e page fault",
+    "FIFO, LRU, OPT, relógio",
+    "Thrashing e working set",
+    "Arquivos e i-nodes",
+    "Polling, interrupção, DMA",
+    "Escalonamento de disco"
+  ],
+  "secoes": [
+    ["antes", "Antes de começar"],
+    ["criterios", "Escalonamento: critérios"],
+    ["algoritmos", "Algoritmos de escalonamento"],
+    ["filas", "Filas, multiprocessadores e tempo real"],
+    ["memoria", "Memória principal"],
+    ["paginacao", "Memória virtual: paginação"],
+    ["substituicao", "Substituição de páginas"],
+    ["arquivos", "Sistema de arquivos"],
+    ["es", "Entrada e saída"],
+    ["discos", "Discos e escalonamento de disco"]
+  ],
+  "fontes": [
+    { "tipo": "Livro", "titulo": "Machado & Maia, Arquitetura de sistemas operacionais, cap. 8 · Gerência do processador (p. 125–146)", "secao": "criterios" },
+    { "tipo": "Livro", "titulo": "Machado & Maia, cap. 9 · Gerência de memória (p. 147–160)", "secao": "memoria" },
+    { "tipo": "Livro", "titulo": "Machado & Maia, cap. 10 · Gerência de memória virtual (p. 161–190)", "secao": "paginacao" },
+    { "tipo": "Livro", "titulo": "Machado & Maia, cap. 11 · Sistema de arquivos (p. 191–206)", "secao": "arquivos" },
+    { "tipo": "Livro", "titulo": "Machado & Maia, cap. 12 · Gerência de dispositivos (p. 207–220)", "secao": "es" }
+  ],
+  "observacao": "Parte III do livro, caps. 8 a 12 (p. 125–220). As faixas de página de cada capítulo são aproximadas. Os exemplos numéricos (processos, pedidos de memória, strings de referência, fila do disco) foram montados para esta página; confira a notação com o livro."
+}

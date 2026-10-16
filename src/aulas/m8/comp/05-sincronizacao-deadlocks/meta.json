@@ -1,0 +1,39 @@
+{
+  "numero": "05",
+  "titulo": "Semáforos, sincronização e deadlocks",
+  "tema": "Do silício ao sistema operacional",
+  "resumo": "Condição de corrida, região crítica e exclusão mútua; soluções por hardware e por software; semáforos, monitores e troca de mensagens; produtor/consumidor, leitores e escritores, filósofos; deadlock, condições de Coffman, grafo de alocação, prevenção, algoritmo do banqueiro, detecção e recuperação.",
+  "topicos": [
+    "Condição de corrida",
+    "Exclusão mútua",
+    "Test-and-Set e Peterson",
+    "Semáforos P/V",
+    "Produtor/consumidor",
+    "Monitores",
+    "Deadlock e Coffman",
+    "Banqueiro"
+  ],
+  "secoes": [
+    ["antes", "Antes de começar"],
+    ["corrida", "Condição de corrida"],
+    ["exclusao", "Região crítica e hardware"],
+    ["software", "Soluções por software"],
+    ["semaforos", "Semáforos"],
+    ["classicos", "Problemas clássicos"],
+    ["monitores", "Monitores e mensagens"],
+    ["deadlock", "Deadlock"],
+    ["tratamento", "Tratar deadlock"]
+  ],
+  "fontes": [
+    { "tipo": "Livro", "titulo": "Machado & Maia, Arquitetura de sistemas operacionais, cap. 7 · Aplicações concorrentes e especificação de concorrência (p. 93–96)", "secao": "antes" },
+    { "tipo": "Livro", "titulo": "Machado & Maia, cap. 7 · Problemas de compartilhamento de recursos (p. 96–98)", "secao": "corrida" },
+    { "tipo": "Livro", "titulo": "Machado & Maia, cap. 7 · Exclusão mútua e soluções de hardware (p. 98–101)", "secao": "exclusao" },
+    { "tipo": "Livro", "titulo": "Machado & Maia, cap. 7 · Soluções de software (p. 101–106)", "secao": "software" },
+    { "tipo": "Livro", "titulo": "Machado & Maia, cap. 7 · Semáforos (p. 108–113)", "secao": "semaforos" },
+    { "tipo": "Livro", "titulo": "Machado & Maia, cap. 7 · Sincronização condicional e problemas clássicos (p. 106–113)", "secao": "classicos" },
+    { "tipo": "Livro", "titulo": "Machado & Maia, cap. 7 · Monitores e troca de mensagens (p. 113–120)", "secao": "monitores" },
+    { "tipo": "Livro", "titulo": "Machado & Maia, cap. 7 · Deadlock (p. 120–125)", "secao": "deadlock" },
+    { "tipo": "Livro", "titulo": "Machado & Maia, cap. 7 · Prevenção, detecção e correção de deadlock (p. 120–125)", "secao": "tratamento" }
+  ],
+  "observacao": "Fonte: Machado & Maia, Arquitetura de sistemas operacionais (5ª ed., LTC), Parte II, p. 93–125. As faixas de página por seção são aproximadas. O livro chama P e V de DOWN e UP; aqui as três duplas de nomes aparecem juntas. O passo a passo do algoritmo do banqueiro segue a forma usual dos livros de SO (Tanenbaum, Silberschatz), mais detalhada que a do Machado & Maia."
+}

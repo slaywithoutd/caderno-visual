@@ -12,7 +12,9 @@ export function getStaticPaths() {
 const { aula } = Astro.props;
 const mat = materia(aula.modulo, aula.materia);
 const mod = modulo(aula.modulo);
-const conteudo = comTempo(aula.conteudo, tempoAula(aula));
+/* links entre aulas no conteudo.html são escritos a partir da raiz (href="/m8/comp/02-…"); aqui ganham o base do site */
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const conteudo = comTempo(aula.conteudo, tempoAula(aula)).replaceAll('href="/', `href="${base}/`);
 
 const temRevisao = aula.cartoes.length || aula.cola.length;
 const temNotas = aula.notas.length || aula.anexos.length;

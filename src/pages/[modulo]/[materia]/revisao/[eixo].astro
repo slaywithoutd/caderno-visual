@@ -1,0 +1,19 @@
+---
+/* Revisão para a prova de um eixo da matéria (só existe para matérias com mais de um eixo). */
+import RevisaoPagina from '../../../../components/RevisaoPagina.astro';
+import { modulos, eixosDe, hrefRevisao, hrefRevisaoEixo } from '../../../../lib/catalogo.js';
+
+export function getStaticPaths() {
+  return modulos.flatMap((mod) => mod.materias.flatMap((mat) => {
+    const eixos = eixosDe(mod.slug, mat.slug);
+    if (eixos.length < 2) return [];
+    return eixos.map((eixo) => ({ params: { modulo: mod.slug, materia: mat.slug, eixo: eixo.slug }, props: { mod, mat, eixo, eixos } }));
+  }));
+}
+const { mod, mat, eixo, eixos } = Astro.props;
+const outras = [
+  ...eixos.filter((e) => e.slug !== eixo.slug).map((e) => ({ href: hrefRevisaoEixo(mod.slug, mat.slug, e.slug), rotulo: `${e.titulo} →` })),
+  { href: hrefRevisao(mod.slug, mat.slug), rotulo: `${mat.titulo} inteira →` },
+];
+---
+<RevisaoPagina mod={mod} mat={mat} lista={eixo.aulas} kicker={`${mod.titulo} · ${mat.titulo} · ${eixo.titulo}`} descricao={`Revisão de ${eixo.titulo}`} outras={outras} />

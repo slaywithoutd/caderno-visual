@@ -1,0 +1,795 @@
+<header class="hero prose" id="top">
+  <div class="kicker">Do silício ao sistema operacional · Aula 05</div>
+  <h1>Semáforos, sincronização e deadlocks</h1>
+  <div class="hero-sym"><span>saldo = <b>101</b> ≠ 102</span><span>P(s) <b>·</b> V(s)</span><span>vazio <b>·</b> cheio <b>·</b> mutex</span><span>P1 <b>→</b> R2 <b>→</b> P2 <b>→</b> R1 <b>→</b> P1</span><span>Precisa <b>≤</b> Disponível</span></div>
+</header>
+
+<!-- ============ 1 ============ -->
+<section class="chap" id="antes">
+ <div class="prose">
+  <span class="num">01</span>
+  <h2>Antes de começar: quando threads dividem a memória</h2>
+  <div class="src"><span class="bk">Machado &amp; Maia · cap. 7 · p. 93–96</span><span class="base-tag">Base · fora dos autoestudos</span></div>
+  <p>Na aula 04, as threads de um mesmo processo compartilham o espaço de endereçamento: as variáveis globais e o heap são os mesmos para todas. Isso torna a conversa entre elas barata. Esta aula trata do preço disso: duas threads mexendo no mesmo dado ao mesmo tempo podem estragá-lo.</p>
+
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="bl" x="8" y="10" width="70" height="34" rx="8"/><text x="43" y="27">thread A</text><rect class="am" x="162" y="10" width="70" height="34" rx="8"/><text x="197" y="27">thread B</text><rect class="k" x="62" y="92" width="116" height="48" rx="8"/><text class="tm" x="120" y="104">memória comum</text><text x="120" y="124">saldo = 100</text><line class="s" x1="50" y1="46" x2="96" y2="88" marker-end="url(#mnarrow)"/><line class="s" x1="190" y1="46" x2="144" y2="88" marker-end="url(#mnarrow)"/><text class="tm" x="120" y="62">lê e escreve</text></svg>Duas threads, uma variável. Quem escreve por último vence.</aside>
+  <ul class="b">
+    <li>Uma <b>aplicação concorrente</b> é um programa em que vários processos ou threads trabalham ao mesmo tempo e cooperam. Ex.: um servidor que atende cada cliente numa thread; um app que lê um sensor numa thread e manda dados pela rede em outra.</li>
+    <li>Para cooperar, eles precisam trocar dados. Há dois jeitos: <b>memória compartilhada</b> (todos leem e escrevem as mesmas variáveis) e troca de mensagens (um envia, o outro recebe; seção 7).</li>
+    <li>Um <b>recurso</b> é qualquer coisa que um processo usa e que pode faltar: uma variável, um arquivo, a impressora, o rádio Bluetooth, um trecho de memória, a própria CPU.</li>
+    <li><b>Sincronização</b> é o conjunto de técnicas que coordena quem usa o quê e quando, para que o resultado não dependa da sorte.</li>
+  </ul>
+
+  <h3>Como o programa diz "faça isto em paralelo"</h3>
+  <p>O livro mostra duas notações antigas, anteriores às bibliotecas de threads de hoje. Elas ainda aparecem em prova porque deixam a ideia limpa.</p>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 170"><rect class="k" x="80" y="4" width="80" height="26" rx="6"/><text x="120" y="17">início</text><line class="s" x1="110" y1="30" x2="60" y2="58" marker-end="url(#mnarrow)"/><line class="s" x1="130" y1="30" x2="180" y2="58" marker-end="url(#mnarrow)"/><text class="tm" x="120" y="48">FORK</text><rect class="bl" x="14" y="62" width="92" height="40" rx="6"/><text x="60" y="82">t1 = a × b</text><rect class="am" x="134" y="62" width="92" height="40" rx="6"/><text x="180" y="82">t2 = c × d</text><line class="s" x1="60" y1="104" x2="110" y2="132" marker-end="url(#mnarrow)"/><line class="s" x1="180" y1="104" x2="130" y2="132" marker-end="url(#mnarrow)"/><text class="tm" x="120" y="116">JOIN</text><rect class="gr" x="66" y="136" width="108" height="28" rx="6"/><text x="120" y="150">x = t1 + t2</text></svg>FORK abre dois caminhos; JOIN espera os dois antes de somar.</aside>
+  <ul class="b">
+    <li><b>FORK e JOIN</b>: <code>FORK rotina</code> cria um novo fluxo que roda a rotina em paralelo com quem chamou. <code>JOIN</code> espera esse fluxo terminar antes de seguir. É a ideia do <code>fork()</code> do Unix e do <code>thread.join()</code> do Python.</li>
+    <li><b>PARBEGIN e PAREND</b> (Dijkstra): tudo o que está entre os dois roda em paralelo, e o programa só passa do PAREND quando todos os comandos do bloco acabaram.</li>
+    <li>Exemplo: para calcular <code>x = a×b + c×d</code>, as duas multiplicações não dependem uma da outra. Elas podem rodar em paralelo; a soma espera as duas.</li>
+  </ul>
+<pre><code>PARBEGIN
+    t1 := a * b;      { roda num fluxo }
+    t2 := c * d;      { roda em outro, ao mesmo tempo }
+PAREND;
+x := t1 + t2;         { só executa depois que os dois acabaram }</code></pre>
+
+  <details class="base" open>
+   <summary><span class="base-tag">Base</span> Por que <code>saldo = saldo + 1</code> são três passos</summary>
+   <p>Na aula 02, a CPU só faz contas em registradores. Uma linha simples de alto nível vira várias instruções de máquina:</p>
+<pre><code>saldo = saldo + 1        # uma linha em Python ou C
+
+LOAD  R1, saldo          # 1. copia saldo da memória para o registrador R1
+ADD   R1, R1, 1          # 2. soma 1 dentro do registrador
+STORE saldo, R1          # 3. grava o registrador de volta na memória</code></pre>
+   <ul class="b">
+    <li>Cada thread tem os próprios registradores (o contexto de hardware da aula 04). O R1 da thread A e o R1 da thread B são cópias separadas.</li>
+    <li>A variável <code>saldo</code> na memória é uma só.</li>
+    <li>O escalonador pode tirar a thread da CPU entre quaisquer duas instruções (preempção por interrupção de relógio). Num processador com vários núcleos, as duas threads podem até rodar no mesmo instante.</li>
+    <li>Conclusão: entre o LOAD e o STORE de uma thread, a outra pode ler ou escrever <code>saldo</code>. A seção 2 mostra o estrago.</li>
+   </ul>
+  </details>
+
+  <h3>Leia como</h3>
+ </div>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>Notação</th><th>Leia como</th><th>Exemplo</th></tr></thead>
+      <tbody>
+        <tr><td><code>A</code>, <code>B</code>, <code>T1</code>, <code>P1</code></td><td>uma thread ou um processo</td><td>"T1 entrou na região crítica"</td></tr>
+        <tr><td><code>R1</code>, <code>R2</code></td><td>um recurso (no grafo de deadlock) ou um registrador (no código de máquina)</td><td>"P1 segura R1"</td></tr>
+        <tr><td><code>s</code></td><td>um semáforo, um inteiro especial</td><td><code>s = 1</code></td></tr>
+        <tr><td><code>P(s)</code>, <code>V(s)</code></td><td>as duas operações do semáforo (seção 5)</td><td><code>P(mutex)</code></td></tr>
+        <tr><td><code>x ← x − 1</code></td><td>"x recebe x menos 1" (atribuição)</td><td><code>s ← s − 1</code></td></tr>
+        <tr><td>ms, µs, ns</td><td>milissegundo (10⁻³ s), microssegundo (10⁻⁶ s), nanossegundo (10⁻⁹ s)</td><td>1 ms = 1000 µs</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 2 ============ -->
+<section class="chap" id="corrida">
+ <div class="prose">
+  <span class="num">02</span>
+  <h2>Condição de corrida</h2>
+  <div class="src"><span class="bk">Machado &amp; Maia · cap. 7 · p. 96–98</span></div>
+  <p>Exemplo do livro, adaptado: uma conta tem saldo 100. Duas threads fazem um depósito de 1 cada uma, ao mesmo tempo. O saldo final deveria ser 102. Às vezes sai 101. Veja como, instrução por instrução.</p>
+ </div>
+
+  <figure class="fig" id="fig-corrida">
+    <div class="fig-head"><span class="fig-title">Figura 1 · Duas threads fazendo saldo = saldo + 1</span><div class="fig-tabs"></div></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <svg id="corrida-svg" viewBox="0 0 640 300" role="img" aria-label="Duas threads intercalando LOAD, ADD e STORE sobre a mesma variável"></svg>
+        <div class="stage-cap" id="corrida-cap"></div>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+
+ <div class="prose">
+  <div class="def key">
+    <span class="lab">Definição · Condição de corrida</span>
+    <p class="simples">É quando o resultado de um programa depende de quem chegou primeiro. Duas threads "apostam corrida" até o mesmo dado, e cada ordem de chegada dá um resultado diferente.</p>
+    <p class="formal">Uma <b>condição de corrida</b> (race condition) ocorre quando dois ou mais processos acessam dados compartilhados, pelo menos um deles escreve, e o resultado final depende da ordem relativa em que as instruções deles são executadas.</p>
+  </div>
+  <ul class="b">
+    <li>Cada ordem possível de execução das instruções das duas threads é uma <b>intercalação</b>. Com 3 instruções em cada thread há 20 intercalações; só algumas dão errado.</li>
+    <li>O erro da figura tem nome: <b>atualização perdida</b> (lost update). As duas threads leram 100, as duas gravaram 101, e um dos depósitos sumiu.</li>
+    <li>Ler ao mesmo tempo não estraga nada. O problema aparece quando pelo menos um dos acessos é uma escrita.</li>
+    <li>É o pior tipo de bug: o programa passa em mil testes e falha no milésimo primeiro, quando o escalonador interrompe no ponto errado. Colocar um <code>print</code> para investigar muda o tempo e o bug some.</li>
+  </ul>
+  <p class="prova">Condição de corrida: dois ou mais fluxos acessam um dado compartilhado, pelo menos um escreve, e o resultado depende da ordem de execução. <code>x = x + 1</code> são três instruções (LOAD, ADD, STORE), e a troca no meio perde uma atualização.</p>
+
+  <p>Dá para ver acontecer em Python. Duas threads somam 1 a um contador um milhão de vezes cada:</p>
+<pre><code>import threading
+
+contador = 0
+
+def soma(n):
+    global contador
+    for _ in range(n):
+        contador += 1          # LOAD, ADD, STORE: pode ser interrompido no meio
+
+ts = [threading.Thread(target=soma, args=(1_000_000,)) for _ in range(2)]
+for t in ts: t.start()
+for t in ts: t.join()
+print(contador)                # esperado 2000000; em muitas versões sai menos
+
+trava = threading.Lock()
+def soma_segura(n):
+    global contador
+    for _ in range(n):
+        with trava:            # só uma thread por vez dentro deste bloco
+            contador += 1</code></pre>
+  <ul class="b">
+    <li>Com a trava (<code>Lock</code>), o resultado é sempre 2000000. O custo: as duas threads passam a se revezar nesse trecho, e o programa fica mais lento.</li>
+    <li>A segunda aba da Figura 1 ("com mutex") mostra o que a trava faz por dentro.</li>
+  </ul>
+
+  <div class="def"><span class="lab">Na ponderada · pulseira</span><p>Exemplo diferente do seu: uma estação meteorológica tem uma thread que faz <code>leituras = leituras + 1</code> a cada medição e outra que, a cada segundo, envia <code>leituras</code> e faz <code>leituras = 0</code>. Se a medição acontece entre o envio e o zero, ela some do relatório. Na pulseira, a pergunta que você vai ter de responder é: quais dados a thread do sensor e a thread do BLE tocam ao mesmo tempo, e qual intercalação estraga o log?</p></div>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 3 ============ -->
+<section class="chap" id="exclusao">
+ <div class="prose">
+  <span class="num">03</span>
+  <h2>Região crítica, exclusão mútua e as soluções por hardware</h2>
+  <div class="src"><span class="bk">Machado &amp; Maia · cap. 7 · p. 98–101</span></div>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="k" x="70" y="20" width="100" height="110" rx="8"/><rect class="gr" x="104" y="60" width="32" height="70" rx="3"/><circle cx="130" cy="96" r="3" style="fill:var(--green)"/><rect class="rd" x="92" y="30" width="56" height="20" rx="4"/><text x="120" y="40" style="font-size:10px;fill:var(--red)">OCUPADO</text><circle class="bl" cx="30" cy="96" r="12"/><circle class="am" cx="30" cy="124" r="12"/><text class="tm" x="30" y="146">fila</text><circle class="ac" cx="120" cy="80" r="9"/><text class="tm" x="208" y="80">1 por vez</text></svg>Um provador: uma pessoa dentro, a plaqueta avisa, quem chega espera.</aside>
+  <p>A saída é impedir que duas threads executem ao mesmo tempo o trecho que mexe no dado compartilhado. Como um provador de loja com uma plaqueta "ocupado".</p>
+  <ul class="b">
+    <li><b>Região crítica</b> (ou seção crítica): o trecho de código que acessa o recurso compartilhado. No exemplo, as três instruções de <code>saldo = saldo + 1</code>.</li>
+    <li><b>Exclusão mútua</b>: a garantia de que, no máximo, um processo está dentro da sua região crítica em cada instante. Os outros esperam do lado de fora.</li>
+    <li>Toda solução tem a mesma moldura: um <b>protocolo de entrada</b> antes da região crítica (pede para entrar e espera, se preciso) e um <b>protocolo de saída</b> depois (avisa que saiu).</li>
+  </ul>
+<pre><code>while (1) {
+    entrar_rc();         /* protocolo de entrada */
+    saldo = saldo + 1;   /* região crítica: curta! */
+    sair_rc();           /* protocolo de saída */
+    outras_coisas();     /* fora da região crítica */
+}</code></pre>
+
+  <h3>O que uma boa solução precisa garantir</h3>
+  <p>Dijkstra listou quatro exigências. O livro cobra as quatro:</p>
+  <ul class="b">
+    <li><b>1. Exclusão mútua</b>: dois processos nunca estão juntos dentro da região crítica.</li>
+    <li><b>2. Nada sobre velocidade</b>: a solução não pode depender da velocidade dos processos nem do número de CPUs. "Funciona porque a thread A é mais rápida" não vale.</li>
+    <li><b>3. Quem está fora não atrapalha</b>: um processo que está fora da região crítica não pode impedir outro de entrar.</li>
+    <li><b>4. Espera limitada</b>: nenhum processo espera para sempre para entrar. Se a regra deixa alguém sempre para trás, ele sofre <b>starvation</b> (inanição): está pronto, nunca é atendido.</li>
+  </ul>
+  <p class="prova">Os 4 requisitos da exclusão mútua: (1) nunca dois na região crítica; (2) nada se supõe sobre velocidades ou número de CPUs; (3) quem está fora não bloqueia quem quer entrar; (4) ninguém espera para sempre (espera limitada, sem starvation).</p>
+
+  <h3>Solução 1 de hardware: desabilitar interrupções</h3>
+  <ul class="b">
+    <li>O escalonador só tira uma thread da CPU porque chega uma interrupção (o relógio, o fim de uma E/S). Se a thread <b>desabilitar as interrupções</b> ao entrar e habilitar ao sair, ninguém a interrompe no meio.</li>
+    <li>Problema 1: só funciona com uma CPU. Com dois núcleos, a outra thread roda no outro núcleo sem precisar de interrupção nenhuma.</li>
+    <li>Problema 2: é perigoso. Se o programa esquecer de reabilitar (ou entrar num laço infinito), o sistema inteiro para. Por isso só o núcleo do SO pode usar essa instrução, e só por poucas instruções.</li>
+  </ul>
+
+  <h3>Solução 2 de hardware: instruções atômicas</h3>
+  <div class="def key">
+    <span class="lab">Definição · Operação atômica</span>
+    <p class="simples">Uma operação que acontece "de uma vez só": ou ninguém viu começar, ou já terminou. Nenhuma outra thread consegue enxergar um estado pela metade.</p>
+    <p class="formal">Uma <b>operação atômica</b> é indivisível: o hardware garante que nenhuma outra instrução, de nenhuma CPU, acessa a mesma posição de memória entre o início e o fim dela.</p>
+  </div>
+  <ul class="b">
+    <li><b>Test-and-Set</b> (TSL, "test and set lock"): numa única instrução atômica, lê o valor de uma variável e grava 1 (verdadeiro) nela. Devolve o valor antigo. Se devolveu 0, a trava estava livre e agora é sua; se devolveu 1, alguém já estava dentro.</li>
+    <li><b>Instrução Swap</b> (no x86, <code>XCHG</code>): troca atomicamente o conteúdo de um registrador com uma posição de memória. Serve para o mesmo truque: troque 1 com a trava e veja o que voltou.</li>
+    <li>Com elas se monta um <b>spinlock</b>: a thread repete a instrução atômica até conseguir a trava.</li>
+  </ul>
+<pre><code>#include &lt;stdatomic.h&gt;
+
+atomic_flag trava = ATOMIC_FLAG_INIT;     /* começa livre (0) */
+
+void entrar_rc(void) {
+    while (atomic_flag_test_and_set(&amp;trava))   /* devolve o valor antigo e põe 1 */
+        ;                                       /* estava 1: tenta de novo (gira) */
+}
+void sair_rc(void) {
+    atomic_flag_clear(&amp;trava);                  /* põe 0: libera */
+}</code></pre>
+
+  <h3>O custo de girar</h3>
+<aside class="mn loop" data-loop="espera" data-ms="8000" data-still="0.45" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Em cima, a thread gira testando a trava e gasta CPU. Embaixo, ela dorme na fila e a CPU fica livre.</aside>
+  <ul class="b">
+    <li>Enquanto espera, o spinlock fica num laço testando a trava. Isso é <b>espera ocupada</b> (busy waiting): a thread gasta CPU sem fazer trabalho útil.</li>
+    <li>Num processador de um núcleo, é desperdício puro: a thread gira o quantum inteiro, e quem tem a trava nem está rodando para soltá-la.</li>
+    <li>Com vários núcleos e região crítica bem curta (algumas dezenas de instruções), girar sai mais barato do que dormir e acordar, porque isso exige uma troca de contexto. É por isso que o núcleo do Linux usa spinlocks.</li>
+    <li>A alternativa é bloquear: a thread vai para o estado de espera e o SO só a acorda quando a trava fica livre. É o que os semáforos fazem (seção 5).</li>
+  </ul>
+  <div class="def warn">
+    <span class="lab">Pegadinha</span>
+    <p>Test-and-Set garante exclusão mútua, mas sozinho não garante espera limitada: se várias threads giram, nada impede que a mesma perca sempre. Também não resolve a espera ocupada.</p>
+  </div>
+
+  <div class="def"><span class="lab">Na ponderada · pulseira</span><p>Quem espera a região crítica fica parado o tempo que o outro levar lá dentro. Exemplo com outros números: um controlador tem prazo de 20 ms, gasta 6 ms no próprio trabalho e divide uma trava com uma thread que fica até 15 ms com ela. No pior caso ele espera 15 ms e termina em 15 + 6 = 21 ms: estourou o prazo. Na pulseira, você vai ter de dizer quanto tempo, no pior caso, a thread do sensor pode ficar esperando, e se isso cabe nos 5 ms.</p></div>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 4 ============ -->
+<section class="chap" id="software">
+ <div class="prose">
+  <span class="num">04</span>
+  <h2>Soluções por software: das tentativas a Peterson</h2>
+  <div class="src"><span class="bk">Machado &amp; Maia · cap. 7 · p. 101–106</span></div>
+  <p>E se o hardware não tivesse instrução atômica nenhuma, só LOAD e STORE comuns? O livro mostra uma série de tentativas para dois processos, cada uma consertando a anterior. Ver por que elas falham é a melhor forma de fixar os quatro requisitos.</p>
+ </div>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>Tentativa</th><th>Ideia</th><th>O que dá errado</th><th>Requisito quebrado</th></tr></thead>
+      <tbody>
+        <tr><td>1 · alternância estrita</td><td>uma variável <code>vez</code> diz quem pode entrar; ao sair, passa a vez</td><td>se A quer entrar duas vezes seguidas e B está ocupado com outra coisa, A fica esperando B usar a vez</td><td>3 (quem está fora bloqueia) e 2 (força o mesmo ritmo)</td></tr>
+        <tr><td>2 · testa a bandeira do outro, depois levanta a sua</td><td><code>quer[i]</code> diz "estou dentro"; só entra se a do outro estiver abaixada</td><td>os dois testam ao mesmo tempo, os dois veem a outra abaixada, os dois entram</td><td>1 (exclusão mútua)</td></tr>
+        <tr><td>3 · levanta a bandeira, depois testa</td><td>primeiro avisa que quer, depois espera o outro desistir</td><td>os dois levantam ao mesmo tempo e esperam um pelo outro para sempre</td><td>4 (os dois travam)</td></tr>
+        <tr><td>4 · levanta, testa e recua</td><td>se o outro também quer, abaixa a bandeira, espera um pouco e tenta de novo</td><td>os dois podem recuar e voltar sempre juntos, educados para sempre</td><td>4 (na prática raro, mas possível)</td></tr>
+      </tbody>
+    </table>
+  </div>
+ <div class="prose">
+  <ul class="b">
+    <li>A tentativa 1 se chama <b>alternância estrita</b>: garante exclusão mútua, mas obriga A e B a entrarem em turnos, A, B, A, B, mesmo quando só um quer.</li>
+    <li>O <b>algoritmo de Dekker</b> (1965) foi a primeira solução correta para dois processos só com software. Funciona, mas é comprido e difícil de seguir.</li>
+    <li>O <b>algoritmo de Peterson</b> (1981) faz o mesmo de forma curta. Ele junta as duas ideias: a bandeira de "eu quero" (tentativa 3) e a variável de vez (tentativa 1), usada só para desempatar.</li>
+  </ul>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><line class="s" x1="40" y1="30" x2="40" y2="110"/><path class="bl" d="M40 30 h40 l-8 10 l8 10 h-40 z"/><text class="tm" x="40" y="124">quer[0]</text><line class="s" x1="200" y1="30" x2="200" y2="110"/><path class="am" d="M200 30 h-40 l8 10 l-8 10 h40 z"/><text class="tm" x="200" y="124">quer[1]</text><rect class="k" x="88" y="70" width="64" height="34" rx="6"/><text class="tm" x="120" y="80">vez</text><text x="120" y="94">1</text><text class="tm" x="120" y="142">quem cede a vez espera</text></svg>Duas bandeiras e uma plaquinha de vez. A vez só desempata quando as duas estão levantadas.</aside>
+<pre><code>int quer[2] = {0, 0};   /* quer[i] = 1: o processo i quer entrar */
+int vez;                /* em caso de empate, quem cede */
+
+void entrar_rc(int i) {        /* i é 0 ou 1; o outro é 1 - i */
+    int j = 1 - i;
+    quer[i] = 1;               /* levanta a minha bandeira */
+    vez = j;                   /* cede a vez ao outro (educação) */
+    while (quer[j] &amp;&amp; vez == j)
+        ;                      /* espera só se o outro quer E a vez é dele */
+}
+void sair_rc(int i) {
+    quer[i] = 0;               /* abaixa a bandeira */
+}</code></pre>
+  <ul class="b">
+    <li>Por que garante exclusão mútua: se os dois querem ao mesmo tempo, os dois escrevem em <code>vez</code>. Vale a última escrita. Quem escreveu por último cedeu a vez e espera; o outro entra.</li>
+    <li>Por que ninguém espera para sempre: quando um sai, abaixa a bandeira, e o outro passa. Se o que saiu quiser voltar, ele cede a vez de novo, então o que esperava entra primeiro.</li>
+    <li>Para N processos, o livro cita o <b>algoritmo da padaria</b> (Lamport): cada um pega uma senha numerada, como numa padaria, e entra quem tiver o menor número.</li>
+  </ul>
+  <div class="def warn">
+    <span class="lab">Dois limites dessas soluções</span>
+    <ul class="b">
+      <li>Todas usam espera ocupada: o laço <code>while</code> gira gastando CPU.</li>
+      <li>Em processadores modernos, o compilador e o hardware podem reordenar leituras e escritas na memória para ganhar velocidade (como no pipeline fora de ordem da aula 03). Peterson escrito assim, sem barreiras de memória, pode falhar num multicore de hoje. Na prática se usam instruções atômicas e as primitivas do SO.</li>
+    </ul>
+  </div>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 5 ============ -->
+<section class="chap" id="semaforos">
+ <div class="prose">
+  <span class="num">05</span>
+  <h2>Semáforos</h2>
+  <div class="src"><span class="bk">Machado &amp; Maia · cap. 7 · p. 108–113</span></div>
+<aside class="mn loop" data-loop="estacionamento" data-ms="11000" data-still="0.42" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Placar de vagas: cada carro que entra faz P, cada um que sai faz V. Com 0 vagas, o próximo espera na cancela.</aside>
+  <p>Exemplo antes da regra: um estacionamento com 3 vagas e um placar na entrada. Cada carro que entra diminui o placar; cada um que sai aumenta. Com o placar em 0, o próximo carro espera na cancela, parado, sem dar voltas no quarteirão. Quando alguém sai, a cancela libera um da fila.</p>
+  <div class="def key">
+    <span class="lab">Definição · Semáforo</span>
+    <p class="simples">Um semáforo é esse placar: um número inteiro guardado pelo SO, mais uma fila de quem está esperando. Só dá para mexer nele com duas operações, "pegar" e "devolver".</p>
+    <p class="formal">Um <b>semáforo</b> (Dijkstra, 1965) é uma variável inteira não negativa <code>s</code>, associada a uma fila de processos, manipulada apenas por duas operações atômicas:</p>
+    <ul class="b">
+      <li><code>P(s)</code>: se <code>s &gt; 0</code>, faz <code>s ← s − 1</code> e segue; senão, o processo bloqueia e entra na fila de s.</li>
+      <li><code>V(s)</code>: se há processo na fila, acorda um deles (que segue em frente); senão, faz <code>s ← s + 1</code>.</li>
+    </ul>
+    <p class="nota-formal">P vem do holandês <i>proberen</i> (testar) e V de <i>verhogen</i> (incrementar). O Machado &amp; Maia chama de DOWN e UP; outros livros, de <code>wait</code> e <code>signal</code>. São as mesmas duas operações.</p>
+  </div>
+  <ul class="b">
+    <li>A dupla <b>P e V</b> é atômica: o SO garante que dois P no mesmo semáforo não se intercalam. Para isso ele usa, por pouquíssimas instruções, as soluções da seção 3 (desabilita interrupções ou usa Test-and-Set).</li>
+    <li>A grande diferença para o spinlock: quem não consegue passar no P não gira. Vai para o estado de espera da aula 04 e libera a CPU. Acabou a espera ocupada.</li>
+    <li>Variante comum em livros e provas: deixar s ficar negativo. P faz <code>s ← s − 1</code> e bloqueia se <code>s &lt; 0</code>; V faz <code>s ← s + 1</code> e acorda um se <code>s ≤ 0</code>. Aí <code>|s|</code>, quando s é negativo, é o tamanho da fila. A Figura 2 usa essa versão.</li>
+  </ul>
+
+  <h3>Dois tipos, três usos</h3>
+  <ul class="b">
+    <li><b>Semáforo binário</b>, ou <b>mutex</b> (de <i>mutual exclusion</i>): só vale 0 ou 1. Começa em 1. Serve para exclusão mútua: <code>P(m)</code> antes da região crítica e <code>V(m)</code> depois.</li>
+    <li><b>Semáforo contador</b>: começa com o número de exemplares do recurso (3 vagas, 4 impressoras, N posições num buffer). Deixa até N passarem e segura o resto.</li>
+    <li>Semáforo para <b>ordem</b>: começa em 0. A thread A faz o trabalho X e depois <code>V(s)</code>; a thread B faz <code>P(s)</code> antes de Y. Como s começa em 0, B só passa depois que A sinalizou: Y sempre acontece depois de X.</li>
+  </ul>
+ </div>
+
+  <figure class="fig" id="fig-sem">
+    <div class="fig-head"><span class="fig-title">Figura 2 · Um semáforo com valor e fila</span><div class="fig-tabs"></div></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <svg id="sem-svg" viewBox="0 0 640 290" role="img" aria-label="Quatro threads fazendo P e V num semáforo, com o valor e a fila de espera"></svg>
+        <div class="lbl">operações até agora</div>
+        <div class="trail" id="sem-trail"></div>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+
+ <div class="prose">
+  <p class="prova">Semáforo: inteiro + fila, mexido só por P e V atômicos. P (down, wait) decrementa e bloqueia se não há vaga; V (up, signal) incrementa ou acorda um da fila. Binário (mutex, começa em 1) para exclusão mútua; contador (começa em N) para N exemplares; começando em 0, para impor ordem.</p>
+
+  <h3>Como o SO implementa</h3>
+<pre><code>typedef struct { int valor; Fila fila; } Semaforo;
+
+void P(Semaforo *s) {          /* tudo aqui dentro é atômico (o núcleo garante) */
+    s-&gt;valor = s-&gt;valor - 1;
+    if (s-&gt;valor &lt; 0) {
+        coloca(&amp;s-&gt;fila, thread_atual);
+        bloqueia();            /* estado de espera; o escalonador roda outra */
+    }
+}
+void V(Semaforo *s) {
+    s-&gt;valor = s-&gt;valor + 1;
+    if (s-&gt;valor &lt;= 0) {
+        Thread *t = retira(&amp;s-&gt;fila);
+        acorda(t);             /* vai para o estado de pronto */
+    }
+}</code></pre>
+  <p>No dia a dia você usa a biblioteca. Em C, com POSIX:</p>
+<pre><code>#include &lt;semaphore.h&gt;
+
+sem_t m;
+sem_init(&amp;m, 0, 1);    /* 0 = entre threads do mesmo processo; valor inicial 1 */
+
+sem_wait(&amp;m);          /* P */
+saldo = saldo + 1;     /* região crítica */
+sem_post(&amp;m);          /* V */</code></pre>
+
+  <div class="def warn">
+    <span class="lab">Erros comuns com semáforos</span>
+    <ul class="b">
+      <li>Esquecer o V: a trava nunca é devolvida e todo mundo que vier depois bloqueia para sempre.</li>
+      <li>Trocar a ordem (V antes de P): a exclusão mútua some.</li>
+      <li>Fazer P duas vezes no mesmo mutex na mesma thread: ela bloqueia esperando a si mesma.</li>
+      <li>Pegar dois semáforos em ordens diferentes em threads diferentes: deadlock (seção 8).</li>
+    </ul>
+  </div>
+
+  <h3>Inversão de prioridade</h3>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 160"><text class="tm st" x="4" y="22">alta</text><text class="tm st" x="4" y="62">média</text><text class="tm st" x="4" y="102">baixa</text><line class="s" x1="44" y1="130" x2="236" y2="130" marker-end="url(#mnarrow)"/><text class="tm" x="210" y="146">tempo</text><rect class="bl" x="48" y="92" width="34" height="20" rx="3"/><text class="tm" x="65" y="102">P(m)</text><rect class="rd" x="84" y="12" width="20" height="20" rx="3"/><rect class="k" x="104" y="12" width="122" height="20" rx="3" stroke-dasharray="3 3"/><text class="tm" x="165" y="22">esperando m</text><rect class="am" x="106" y="52" width="94" height="20" rx="3"/><text class="tm" x="153" y="62">roda à vontade</text><rect class="bl" x="200" y="92" width="26" height="20" rx="3"/><text class="tm" x="213" y="102">V</text></svg>A alta espera a baixa, e a média, que nem usa m, passa na frente das duas.</aside>
+  <p>Um caso famoso de semáforo dando errado: a sonda Mars Pathfinder, em 1997, reiniciava sozinha em Marte. Era isto, com três threads de prioridades diferentes (o escalonador sempre roda a de maior prioridade pronta; a aula 06 detalha):</p>
+  <ul class="b">
+    <li>A thread de prioridade baixa pega o mutex m.</li>
+    <li>A de prioridade alta acorda, pede m e bloqueia: precisa esperar a baixa fazer V.</li>
+    <li>Uma de prioridade média, que nem usa m, acorda e toma a CPU da baixa. A baixa não roda, não solta m, e a alta fica esperando a média.</li>
+    <li>Isso é a <b>inversão de prioridade</b>: na prática, a alta passa a ter prioridade menor que a média.</li>
+    <li>Correção usada (e ligada na Pathfinder por um comando enviado da Terra): <b>herança de prioridade</b>. Enquanto segura um mutex que alguém mais importante espera, a thread baixa herda a prioridade dele e termina logo.</li>
+  </ul>
+  <div class="def"><span class="lab">Na ponderada · pulseira</span><p>Exemplo diferente: num drone, a thread de controle (alta) e a de telemetria (baixa) dividem um mutex; a câmera (média) não usa o mutex e processa imagens por 30 ms. Se a câmera acordar enquanto a telemetria segura o mutex, o controle espera até 30 ms a mais. Na pulseira, você vai ter de dizer se a thread do BLE pode segurar algo de que a do sensor precisa, e o que acontece com os 5 ms se outra thread ocupar a CPU nesse meio-tempo.</p></div>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 6 ============ -->
+<section class="chap" id="classicos">
+ <div class="prose">
+  <span class="num">06</span>
+  <h2>Problemas clássicos de sincronização</h2>
+  <div class="src"><span class="bk">Machado &amp; Maia · cap. 7 · p. 106–113</span></div>
+  <p>Exclusão mútua impede duas threads de mexerem juntas. Às vezes é preciso mais: uma thread só pode continuar quando algo aconteceu. O consumidor só pode tirar um item do buffer se houver item. Isso é <b>sincronização condicional</b>.</p>
+
+  <h3>Produtor e consumidor</h3>
+  <ul class="b">
+    <li>O problema do <b>produtor-consumidor</b>: uma thread produz itens (lê um sensor, recebe pacotes) e outra consome (grava, envia). Elas rodam em ritmos diferentes.</li>
+    <li>Entre as duas fica um <b>buffer</b>: uma área de memória que guarda itens até alguém usar. Como a memória é finita, o buffer tem N posições. Por isso o problema também se chama <b>buffer limitado</b>.</li>
+    <li>Duas regras de sincronização condicional: o produtor espera se o buffer está cheio; o consumidor espera se está vazio. E uma de exclusão mútua: os dois não mexem nos índices do buffer ao mesmo tempo.</li>
+    <li>Solução clássica com três semáforos:</li>
+  </ul>
+ </div>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>Semáforo</th><th>Começa em</th><th>Conta o quê</th><th>Quem faz P</th><th>Quem faz V</th></tr></thead>
+      <tbody>
+        <tr><td><code>vazio</code></td><td>N</td><td>posições livres</td><td>produtor (antes de pôr)</td><td>consumidor (depois de tirar)</td></tr>
+        <tr><td><code>cheio</code></td><td>0</td><td>itens prontos</td><td>consumidor (antes de tirar)</td><td>produtor (depois de pôr)</td></tr>
+        <tr><td><code>mutex</code></td><td>1</td><td>quem mexe no buffer</td><td>os dois</td><td>os dois</td></tr>
+      </tbody>
+    </table>
+  </div>
+ <div class="prose">
+<pre><code>#define N 8
+Item buffer[N];
+int entra = 0, sai = 0;               /* índices circulares */
+sem_t vazio, cheio, mutex;            /* sem_init: vazio = N, cheio = 0, mutex = 1 */
+
+void produtor(void) {
+    while (1) {
+        Item x = produz();
+        sem_wait(&amp;vazio);             /* P(vazio): espera haver lugar */
+        sem_wait(&amp;mutex);             /* P(mutex): entra no buffer */
+        buffer[entra] = x;
+        entra = (entra + 1) % N;      /* depois da última posição, volta à 0 */
+        sem_post(&amp;mutex);             /* V(mutex) */
+        sem_post(&amp;cheio);             /* V(cheio): avisa que há item */
+    }
+}
+
+void consumidor(void) {
+    while (1) {
+        sem_wait(&amp;cheio);             /* P(cheio): espera haver item */
+        sem_wait(&amp;mutex);
+        Item x = buffer[sai];
+        sai = (sai + 1) % N;
+        sem_post(&amp;mutex);
+        sem_post(&amp;vazio);             /* V(vazio): avisa que abriu lugar */
+        consome(x);
+    }
+}</code></pre>
+<aside class="mn loop" data-loop="buffer" data-ms="12000" data-still="0.35" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Buffer circular de 8 posições: "entra" e "sai" andam em roda. O produtor nunca passa o consumidor por trás.</aside>
+  <ul class="b">
+    <li>O buffer é circular: <code>entra</code> e <code>sai</code> andam para a frente e, depois da posição N − 1, voltam para a 0 (o <code>% N</code> é o resto da divisão).</li>
+    <li><code>vazio + cheio = N</code> sempre que nenhuma thread está no meio de uma operação.</li>
+    <li>Brinque com a figura: mude N e veja o produtor bloquear no <code>P(vazio)</code> quando o buffer enche, e o consumidor bloquear no <code>P(cheio)</code> quando esvazia.</li>
+  </ul>
+ </div>
+
+  <figure class="fig" id="fig-pc">
+    <div class="fig-head"><span class="fig-title">Figura 3 · Produtor/consumidor com três semáforos</span><div class="fig-tabs"></div></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <div class="ctl-grid"><div class="ctl"><label for="pc-n">posições no buffer (N) <b id="pc-nv"></b></label><input type="range" id="pc-n" min="2" max="6" value="3"></div></div>
+        <svg id="pc-svg" viewBox="0 0 640 270" role="img" aria-label="Buffer circular com produtor, consumidor e os semáforos vazio, cheio e mutex"></svg>
+        <div class="stage-cap" id="pc-cap"></div>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+
+ <div class="prose">
+  <div class="def warn">
+    <span class="lab">A ordem dos P importa</span>
+    <p>Se o produtor fizer <code>P(mutex)</code> antes de <code>P(vazio)</code> e o buffer estiver cheio, ele dorme segurando o mutex. O consumidor faz <code>P(mutex)</code> para tirar um item e também dorme. Nenhum dos dois acorda: deadlock. Regra: primeiro o semáforo da condição (vazio, cheio), depois o mutex.</p>
+  </div>
+  <p class="prova">Produtor/consumidor: <code>vazio = N</code>, <code>cheio = 0</code>, <code>mutex = 1</code>. Produtor: P(vazio), P(mutex), põe, V(mutex), V(cheio). Consumidor: P(cheio), P(mutex), tira, V(mutex), V(vazio). Inverter os P de um lado causa deadlock.</p>
+
+  <h3>Quantas posições o buffer precisa ter?</h3>
+  <p>Se o produtor gera itens a uma taxa r (itens por segundo) e o consumidor só esvazia o buffer de tempos em tempos, a cada T segundos, então entre duas idas do consumidor chegam <code>r × T</code> itens. O buffer precisa de pelo menos isso.</p>
+  <div class="formula">N ≥ r × T</div>
+  <ul class="b">
+    <li>Exemplo com números inventados: um medidor de batimentos gera 40 leituras/s e o envio pela rede acontece a cada 250 ms = 0,25 s.</li>
+    <li><code>N ≥ 40 × 0,25 = 10</code> posições. Com folga para um envio atrasado (digamos, o dobro de T): <code>40 × 0,5 = 20</code>.</li>
+    <li>Cada posição ocupa a memória de um item. Se cada leitura tem 8 bytes, 20 posições custam 160 bytes.</li>
+  </ul>
+  <div class="def"><span class="lab">Na ponderada · pulseira</span><p>A thread do sensor é um produtor e a do BLE, um consumidor. As perguntas que você vai ter de responder: qual o tamanho do buffer para 100 amostras por segundo e o ritmo de envio do BLE que você escolher, e o que o sensor faz quando o buffer enche. Bloquear no <code>P(vazio)</code> espera o BLE; descartar a amostra mais antiga não espera. Cada escolha tem um custo diferente para os 5 ms.</p></div>
+
+  <h3>Leitores e escritores</h3>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 140"><rect class="k" x="84" y="40" width="72" height="60" rx="6"/><text x="120" y="70">dado</text><circle class="bl" cx="30" cy="30" r="12"/><circle class="bl" cx="30" cy="70" r="12"/><circle class="bl" cx="30" cy="110" r="12"/><text class="tm" x="30" y="132">leitores</text><line class="s" x1="44" y1="34" x2="82" y2="56" marker-end="url(#mnarrow)"/><line class="s" x1="44" y1="70" x2="82" y2="70" marker-end="url(#mnarrow)"/><line class="s" x1="44" y1="106" x2="82" y2="84" marker-end="url(#mnarrow)"/><circle class="am" cx="206" cy="70" r="14"/><text class="tm" x="206" y="98">escritor</text><text class="tm" x="206" y="112">espera</text><line class="s" x1="190" y1="70" x2="162" y2="70" stroke-dasharray="3 3"/></svg>Vários leitores juntos podem. O escritor precisa do dado só para ele.</aside>
+  <ul class="b">
+    <li>O problema dos <b>leitores e escritores</b>: um dado (um banco, um arquivo de configuração) é lido por muitos e alterado por poucos.</li>
+    <li>Ler ao mesmo tempo é seguro, então vários leitores podem entrar juntos. Um escritor precisa de exclusão mútua contra todos: outros escritores e leitores.</li>
+    <li>Solução típica: um contador de leitores protegido por um mutex. O primeiro leitor a entrar faz P no semáforo do dado; o último a sair faz V.</li>
+    <li>O risco: se chegam leitores sem parar, o contador nunca zera e o escritor espera para sempre. É starvation. Versões com preferência ao escritor invertem o problema. Bibliotecas oferecem isso pronto como <i>read-write lock</i>.</li>
+  </ul>
+
+  <h3>O jantar dos filósofos</h3>
+<aside class="mn loop" data-loop="filosofos" data-ms="12000" data-still="0.3" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Primeiro todos pegam o garfo da esquerda e ninguém come. Depois, com uma regra de ordem, dois comem por vez.</aside>
+  <ul class="b">
+    <li>O <b>jantar dos filósofos</b> (Dijkstra): cinco filósofos numa mesa redonda alternam entre pensar e comer. Há um garfo entre cada par de vizinhos, cinco no total, e para comer é preciso pegar os dois garfos ao seu lado.</li>
+    <li>Solução ingênua: cada um pega o garfo da esquerda e depois o da direita. Se os cinco pegam o da esquerda no mesmo instante, todos esperam o da direita para sempre. É um deadlock (seção 8).</li>
+    <li>Saídas que o livro discute:
+      <ul class="b">
+        <li>Deixar no máximo quatro sentados ao mesmo tempo (um semáforo contador começando em 4). Com um lugar vazio, pelo menos um consegue os dois garfos.</li>
+        <li>Pegar os dois garfos de uma vez, dentro de uma região crítica: ou pega os dois, ou nenhum.</li>
+        <li>Quebrar a simetria: um dos filósofos pega primeiro o da direita. É a ordem global da seção 9.</li>
+      </ul>
+    </li>
+  </ul>
+  <ul class="b">
+    <li>O livro também traz o <b>barbeiro dorminhoco</b>: um barbeiro, uma cadeira de corte e n cadeiras de espera. Se não há cliente, o barbeiro dorme; o cliente que chega acorda o barbeiro ou senta para esperar, e vai embora se as cadeiras estão todas ocupadas. É um produtor/consumidor com buffer de n lugares que descarta quando enche.</li>
+  </ul>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 7 ============ -->
+<section class="chap" id="monitores">
+ <div class="prose">
+  <span class="num">07</span>
+  <h2>Monitores e troca de mensagens</h2>
+  <div class="src"><span class="bk">Machado &amp; Maia · cap. 7 · p. 113–120</span></div>
+  <p>Semáforos resolvem tudo, mas os P e V ficam espalhados pelo código, e um único esquecido trava o programa. O monitor coloca a sincronização dentro de uma estrutura, e o compilador cuida da exclusão mútua.</p>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 170"><rect class="k" x="70" y="20" width="150" height="130" rx="10"/><text class="tm" x="145" y="34">monitor Buffer</text><rect class="gr" x="66" y="70" width="10" height="34" rx="2"/><circle class="bl" cx="20" cy="76" r="9"/><circle class="bl" cx="42" cy="76" r="9"/><text class="tm" x="30" y="98">fila de entrada</text><circle class="am" cx="110" cy="80" r="11"/><text class="tm" x="110" y="102">dentro: 1</text><rect class="k" x="150" y="54" width="60" height="18" rx="3"/><text class="tm" x="180" y="63">dados</text><rect class="k" x="150" y="78" width="60" height="18" rx="3"/><text class="tm" x="180" y="87">por()</text><rect class="k" x="150" y="102" width="60" height="18" rx="3"/><text class="tm" x="180" y="111">tirar()</text><circle class="bl" cx="110" cy="134" r="8"/><circle class="bl" cx="130" cy="134" r="8"/><text class="tm" x="174" y="134">fila de "cheio"</text></svg>Uma porta, uma pessoa dentro. Quem espera uma condição sai para uma fila lateral e libera a sala.</aside>
+  <div class="def key">
+    <span class="lab">Definição · Monitor</span>
+    <p class="simples">Um monitor é como uma sala com uma porta só, que guarda dados e as funções que mexem neles. Só uma thread entra na sala por vez; as outras esperam na porta. Você não escreve nenhum P ou V para isso.</p>
+    <p class="formal">Um <b>monitor</b> (Hoare, 1974; Brinch Hansen, 1973) é um módulo de linguagem formado por variáveis, procedimentos e código de inicialização. As variáveis só são acessíveis pelos procedimentos do monitor, e a implementação garante que, em cada instante, no máximo um processo executa algum procedimento dele.</p>
+  </div>
+  <ul class="b">
+    <li>A exclusão mútua vem de graça. Para a sincronização condicional (esperar o buffer ter item), o monitor tem <b>variáveis de condição</b>.</li>
+    <li><code>wait(c)</code>: a thread solta o monitor e dorme na fila da condição c. Soltar é o ponto-chave: outra thread pode entrar e mudar o estado.</li>
+    <li><code>signal(c)</code>: acorda uma thread que dorme em c. Se ninguém estiver dormindo, o sinal se perde.</li>
+    <li>Diferença para o semáforo: o semáforo tem memória (um V sem ninguém esperando aumenta o valor, e o próximo P passa direto). A variável de condição não guarda nada. Por isso, antes de <code>wait</code>, sempre se testa a condição.</li>
+  </ul>
+  <p>Python não tem monitor como palavra da linguagem, mas a classe <code>Condition</code> dá o mesmo efeito: uma trava e filas de condição juntas.</p>
+<pre><code>import threading
+
+class BufferLimitado:                 # um monitor feito à mão
+    def __init__(self, n):
+        self.itens, self.n = [], n
+        self.trava = threading.Lock()
+        self.tem_lugar = threading.Condition(self.trava)
+        self.tem_item = threading.Condition(self.trava)
+
+    def por(self, x):
+        with self.trava:                         # entra no monitor
+            while len(self.itens) == self.n:     # testa de novo ao acordar
+                self.tem_lugar.wait()            # solta a trava e dorme
+            self.itens.append(x)
+            self.tem_item.notify()               # signal
+
+    def tirar(self):
+        with self.trava:
+            while not self.itens:
+                self.tem_item.wait()
+            x = self.itens.pop(0)
+            self.tem_lugar.notify()
+            return x</code></pre>
+  <ul class="b">
+    <li>O <code>while</code> (em vez de <code>if</code>) existe porque, entre ser acordada e voltar a rodar, outra thread pode ter entrado e mudado o buffer.</li>
+    <li>Em Java, todo objeto funciona assim: métodos <code>synchronized</code> dão a exclusão mútua, e <code>wait()</code> / <code>notify()</code> fazem o papel da condição.</li>
+  </ul>
+
+  <h3>Troca de mensagens</h3>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 130"><rect class="bl" x="6" y="44" width="56" height="36" rx="8"/><text x="34" y="62">A</text><rect class="am" x="178" y="44" width="56" height="36" rx="8"/><text x="206" y="62">B</text><rect class="k" x="90" y="40" width="60" height="44" rx="4"/><path class="s" d="M90 40 L120 64 L150 40"/><text class="tm" x="120" y="100">mailbox</text><line class="s" x1="62" y1="62" x2="88" y2="62" marker-end="url(#mnarrow)"/><line class="s" x1="152" y1="62" x2="176" y2="62" marker-end="url(#mnarrow)"/><text class="tm" x="74" y="30">send</text><text class="tm" x="166" y="30">receive</text></svg>Endereçamento indireto: A deixa na caixa, B retira. Nenhum dos dois precisa saber o nome do outro.</aside>
+  <ul class="b">
+    <li>Quando os processos não dividem memória (estão em máquinas diferentes, ou o SO os isola), eles se comunicam por <b>troca de mensagens</b>, com duas operações: <code>send(destino, msg)</code> e <code>receive(origem, msg)</code>.</li>
+    <li>A sincronização vem junto: quem faz receive numa fila vazia espera a mensagem chegar.</li>
+    <li><b>Endereçamento direto</b>: o remetente diz o nome do processo destino. <b>Endereçamento indireto</b>: a mensagem vai para uma <b>mailbox</b> (caixa postal, também chamada porta), e qualquer processo autorizado retira de lá.</li>
+    <li><b>Comunicação síncrona</b> (rendezvous, "encontro"): o send espera o receive acontecer e vice-versa. Os dois se encontram e só então seguem. Não precisa de buffer, mas o mais rápido sempre espera o mais lento.</li>
+    <li><b>Comunicação assíncrona</b>: o send deposita a mensagem num buffer e segue. É produtor/consumidor de novo, com o SO cuidando do buffer.</li>
+    <li>Em rede, mensagens podem se perder. Por isso o receptor confirma com uma mensagem de reconhecimento (ACK), e o remetente reenvia se não receber a confirmação dentro de um tempo limite.</li>
+    <li>Exemplos reais: <i>pipes</i> do Unix (<code>ls | grep</code>), sockets, filas de mensagens de sistemas distribuídos.</li>
+  </ul>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 8 ============ -->
+<section class="chap" id="deadlock">
+ <div class="prose">
+  <span class="num">08</span>
+  <h2>Deadlock</h2>
+  <div class="src"><span class="bk">Machado &amp; Maia · cap. 7 · p. 120–122</span></div>
+<aside class="mn loop" data-loop="cruzamento" data-ms="9000" data-still="0.75" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Quatro carros, cada um no quadrante que o próximo precisa. Ninguém volta de ré: travou.</aside>
+  <p>Exemplo antes da regra. Duas threads precisam de dois mutex, mas pegam em ordens diferentes:</p>
+<pre><code>/* thread A */              /* thread B */
+P(arquivo);                 P(rede);
+P(rede);     /* espera B */ P(arquivo);   /* espera A */
+...                         ...</code></pre>
+  <ul class="b">
+    <li>A pega <code>arquivo</code>. O escalonador troca. B pega <code>rede</code>.</li>
+    <li>A pede <code>rede</code>: está com B, então A bloqueia. B pede <code>arquivo</code>: está com A, então B bloqueia.</li>
+    <li>Cada uma só solta o que tem depois de conseguir o que quer. Nenhuma vai conseguir. As duas dormem para sempre, e o SO não faz nada porque, para ele, as duas estão só esperando.</li>
+  </ul>
+  <div class="def key">
+    <span class="lab">Definição · Deadlock</span>
+    <p class="simples">Um grupo de processos em que cada um espera algo que só outro do grupo pode dar. Ninguém dá nada porque todos estão esperando.</p>
+    <p class="formal"><b>Deadlock</b> (impasse) é a situação em que um conjunto de processos está bloqueado, cada um esperando por um evento (em geral, a liberação de um recurso) que apenas outro processo do mesmo conjunto pode causar.</p>
+  </div>
+  <ul class="b">
+    <li>Um <b>recurso preemptível</b> pode ser tirado de quem está usando sem estrago: a CPU (o escalonador faz isso) e, com cuidado, a memória. Um recurso não preemptível não pode: uma impressora no meio da página, um mutex no meio da região crítica. Deadlock envolve recursos não preemptíveis.</li>
+    <li>Um recurso pode ter vários exemplares iguais, chamados <b>instâncias</b>: 2 impressoras do mesmo modelo, 8 posições de buffer. O processo pede "uma impressora", qualquer uma.</li>
+  </ul>
+
+  <h3>As quatro condições de Coffman</h3>
+  <p>Coffman e colegas (1971) mostraram que um deadlock só existe se quatro condições valem ao mesmo tempo. Tire qualquer uma e ele não acontece.</p>
+ </div>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>Condição</th><th>O que diz</th><th>No exemplo de A e B</th></tr></thead>
+      <tbody>
+        <tr><td>1 · Exclusão mútua</td><td>cada recurso é usado por um processo de cada vez</td><td>arquivo e rede são mutex</td></tr>
+        <tr><td>2 · Posse e espera</td><td>quem já segura um recurso pode pedir outro e esperar por ele sem soltar o primeiro</td><td>A segura arquivo e espera rede</td></tr>
+        <tr><td>3 · Não preempção</td><td>ninguém tira à força um recurso de quem o segura; só o dono libera</td><td>o SO não arranca o mutex de A</td></tr>
+        <tr><td>4 · Espera circular</td><td>existe uma corrente fechada P1 → P2 → … → Pn → P1 em que cada um espera um recurso do próximo</td><td>A espera B, B espera A</td></tr>
+      </tbody>
+    </table>
+  </div>
+ <div class="prose">
+  <ul class="b">
+    <li>As <b>condições de Coffman</b> em nome próprio: <b>exclusão mútua</b> (já vista), <b>posse e espera</b> (hold and wait), <b>não preempção</b> e <b>espera circular</b>.</li>
+    <li>As três primeiras dizem que o sistema permite deadlock. A quarta diz que ele aconteceu.</li>
+  </ul>
+  <p class="prova">Deadlock exige as 4 condições de Coffman ao mesmo tempo: exclusão mútua, posse e espera, não preempção e espera circular. Negar qualquer uma impede deadlock.</p>
+
+  <h3>Grafo de alocação de recursos</h3>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><circle class="bl" cx="40" cy="40" r="20"/><text x="40" y="40">P1</text><rect class="am" x="156" y="22" width="44" height="36" rx="4"/><circle cx="178" cy="40" r="4" style="fill:var(--amber)"/><text class="tm" x="178" y="70">R1 (1 instância)</text><line class="s" x1="62" y1="40" x2="152" y2="40" marker-end="url(#mnarrow)" stroke-dasharray="5 4"/><text class="tm" x="106" y="30">pede</text><circle class="bl" cx="40" cy="116" r="20"/><text x="40" y="116">P2</text><rect class="am" x="156" y="98" width="44" height="36" rx="4"/><circle cx="170" cy="116" r="4" style="fill:var(--amber)"/><circle cx="186" cy="116" r="4" style="fill:var(--amber)"/><line class="s" x1="166" y1="116" x2="64" y2="116" marker-end="url(#mnarrow)"/><text class="tm" x="106" y="106">segura</text><text class="tm" x="178" y="146">R2 (2 instâncias)</text></svg>Círculo é processo, quadrado é recurso, ponto é instância. Pedido sai do processo; posse sai do recurso.</aside>
+  <ul class="b">
+    <li>O <b>grafo de alocação de recursos</b> desenha quem segura o quê e quem espera o quê. Um grafo é um conjunto de pontos (vértices) ligados por setas (arestas).</li>
+    <li>Processos são círculos. Recursos são quadrados, com um ponto dentro para cada instância.</li>
+    <li><b>Aresta de pedido</b> P → R: o processo P pediu o recurso R e está esperando.</li>
+    <li><b>Aresta de posse</b> (ou atribuição) R → P: uma instância de R está com P.</li>
+    <li>Seguindo as setas, uma volta que retorna ao ponto de partida é um <b>ciclo no grafo</b>. Ele é a espera circular desenhada.</li>
+    <li>Se cada recurso tem uma instância só: há deadlock <b>se e somente se</b> há ciclo no grafo. Com várias instâncias, o ciclo é necessário, mas não basta: veja a segunda aba da figura.</li>
+  </ul>
+ </div>
+
+  <figure class="fig" id="fig-dl">
+    <div class="fig-head"><span class="fig-title">Figura 4 · Um deadlock se formando no grafo de alocação</span><div class="fig-tabs"></div></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <svg id="dl-svg" viewBox="0 0 640 300" role="img" aria-label="Grafo de alocação de recursos com processos e recursos"></svg>
+        <div class="stage-cap" id="dl-cap"></div>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+
+ <div class="prose">
+  <h3>Deadlock, starvation e livelock</h3>
+ </div>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th></th><th>O que acontece</th><th>Os processos estão…</th><th>Exemplo</th></tr></thead>
+      <tbody>
+        <tr><td>Deadlock</td><td>todos do grupo esperam uns aos outros, para sempre</td><td>bloqueados, sem usar CPU</td><td>A e B com mutex em ordem trocada</td></tr>
+        <tr><td>Starvation</td><td>um processo nunca é atendido, mas os outros andam</td><td>prontos ou esperando, preteridos sempre</td><td>escritor atrás de leitores que não param de chegar</td></tr>
+        <tr><td>Livelock</td><td>todos mudam de estado sem parar, e ninguém avança</td><td>rodando, gastando CPU</td><td>tentativa 4 da seção 4: os dois recuam e voltam juntos</td></tr>
+      </tbody>
+    </table>
+  </div>
+ <div class="prose">
+  <ul class="b">
+    <li><b>Livelock</b> é como duas pessoas num corredor estreito que desviam para o mesmo lado ao mesmo tempo, de novo e de novo.</li>
+  </ul>
+  <div class="def"><span class="lab">Na ponderada · pulseira</span><p>Exemplo diferente: num robô, a thread de navegação pega o mutex do mapa e depois o do motor; a thread de emergência pega o do motor e depois o do mapa. Se as duas começam juntas, travam, e o robô para no meio do corredor. Na pulseira, você vai ter de listar quais recursos cada thread segura ao mesmo tempo (o buffer, o rádio BLE, o motor de vibração) e em que ordem pede cada um, e mostrar se as quatro condições de Coffman podem valer juntas.</p></div>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 9 ============ -->
+<section class="chap" id="tratamento">
+ <div class="prose">
+  <span class="num">09</span>
+  <h2>Tratar deadlock: ignorar, prevenir, evitar, detectar</h2>
+  <div class="src"><span class="bk">Machado &amp; Maia · cap. 7 · p. 122–125</span></div>
+  <p>Há quatro atitudes possíveis, da mais barata à mais trabalhosa. Cada uma age num momento diferente: antes de escrever o sistema, a cada pedido, ou depois que o problema aconteceu.</p>
+ </div>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>Estratégia</th><th>Quando age</th><th>Ideia</th><th>Custo</th></tr></thead>
+      <tbody>
+        <tr><td>Ignorar (avestruz)</td><td>nunca</td><td>deadlock é raro; se acontecer, reinicia</td><td>zero, até o dia em que trava</td></tr>
+        <tr><td>Prevenir</td><td>no projeto</td><td>garante que uma das 4 condições nunca vale</td><td>restringe como os programas pedem recursos</td></tr>
+        <tr><td>Evitar</td><td>a cada pedido</td><td>só concede se o sistema continuar em estado seguro</td><td>precisa saber o máximo de cada processo; conta a cada pedido</td></tr>
+        <tr><td>Detectar e recuperar</td><td>depois</td><td>deixa acontecer, procura ciclos e desfaz</td><td>perde o trabalho de quem for morto ou desfeito</td></tr>
+      </tbody>
+    </table>
+  </div>
+ <div class="prose">
+  <h3>Ignorar</h3>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 120"><line class="s" x1="10" y1="96" x2="230" y2="96"/><ellipse class="k" cx="96" cy="60" rx="34" ry="22"/><path class="s" d="M120 48 Q150 20 160 60 L164 96"/><path class="am" d="M156 92 h18 v6 h-18 z"/><line class="s" x1="84" y1="80" x2="80" y2="96"/><line class="s" x1="104" y1="80" x2="108" y2="96"/><text class="tm" x="190" y="76">cabeça na areia</text></svg>Se o problema é raro e caro de evitar, finge que não existe.</aside>
+  <ul class="b">
+    <li>O <b>algoritmo do avestruz</b>: não fazer nada. Se um deadlock acontecer, o usuário mata o programa ou reinicia a máquina.</li>
+    <li>É o que Unix, Linux e Windows fazem com os deadlocks entre programas comuns. Faz sentido quando o deadlock é raro e qualquer prevenção custaria desempenho o tempo todo.</li>
+  </ul>
+
+  <h3>Prevenir: negar uma das quatro condições</h3>
+ </div>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>Condição negada</th><th>Como</th><th>Problema</th></tr></thead>
+      <tbody>
+        <tr><td>Exclusão mútua</td><td>tornar o recurso compartilhável: dados só de leitura; uma fila gerenciada por um único processo dono (o spool da impressora)</td><td>muitos recursos não dá para compartilhar (um mutex existe justamente para isso)</td></tr>
+        <tr><td>Posse e espera</td><td>pedir todos os recursos de uma vez, no começo; ou soltar tudo antes de pedir mais</td><td>recursos parados reservados à toa; quem precisa de muitos pode esperar para sempre (starvation)</td></tr>
+        <tr><td>Não preempção</td><td>se o pedido for negado, o processo solta o que tem (ou o SO tira dele)</td><td>só serve para recursos cujo estado dá para salvar e restaurar, como CPU e memória</td></tr>
+        <tr><td>Espera circular</td><td>numerar todos os recursos e exigir que cada processo peça em ordem crescente</td><td>o programador precisa respeitar a ordem; às vezes a ordem natural do código é outra</td></tr>
+      </tbody>
+    </table>
+  </div>
+ <div class="prose">
+  <ul class="b">
+    <li>Na prática, a mais usada é a última: <b>ordenação de recursos</b>. Se todo mundo pede R1 antes de R2 antes de R3, nenhuma seta do grafo volta para trás e não há como fechar um ciclo. A terceira aba da Figura 4 mostra isso.</li>
+    <li>No exemplo de A e B da seção 8, basta as duas pegarem <code>arquivo</code> antes de <code>rede</code>.</li>
+  </ul>
+
+  <h3>Evitar: estado seguro</h3>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><ellipse class="gr" cx="120" cy="76" rx="114" ry="68"/><ellipse class="am" cx="160" cy="84" rx="68" ry="44"/><ellipse class="rd" cx="182" cy="92" rx="34" ry="22"/><text class="tm" x="58" y="70">seguro</text><text class="tm" x="132" y="66">inseguro</text><text x="182" y="92" style="font-size:10.5px;fill:var(--red)">deadlock</text></svg>Todo deadlock é estado inseguro. Nem todo inseguro vira deadlock.</aside>
+  <ul class="b">
+    <li>Para <b>evitar deadlock</b>, o SO examina cada pedido antes de conceder. Ele concede só se, depois, o sistema continuar num estado seguro; senão, faz o processo esperar, mesmo que o recurso esteja livre agora.</li>
+    <li>Um <b>estado seguro</b> é um estado em que existe pelo menos uma ordem de execução em que todos os processos conseguem terminar, mesmo que cada um peça tudo o que ainda pode pedir. Essa ordem se chama sequência segura.</li>
+    <li>Estado inseguro não é deadlock ainda: os processos podem, por sorte, pedir menos do que o máximo. Ele só tira a garantia.</li>
+  </ul>
+
+  <h3>O algoritmo do banqueiro</h3>
+  <p>Dijkstra comparou o SO a um banqueiro de cidade pequena: ele tem um caixa limitado e vários clientes com limite de crédito. Ele só empresta se, depois do empréstimo, ainda conseguir atender todos até o fim, em alguma ordem.</p>
+  <div class="def key">
+    <span class="lab">Definição · Algoritmo do banqueiro</span>
+    <p class="simples">Para cada pedido: finja que concedeu. Depois procure um processo cujo restante cabe no que está livre; deixe-o terminar e devolver tudo; repita. Se todos terminarem, o pedido é seguro e é concedido de verdade. Se alguém sobrar, o pedido espera.</p>
+    <p class="formal">O <b>algoritmo do banqueiro</b> mantém, para cada processo i, <code>Máximoᵢ</code> (o que declarou que pode precisar) e <code>Alocadoᵢ</code> (o que tem agora), mais o vetor <code>Disponível</code>. A necessidade restante é <code>Precisaᵢ = Máximoᵢ − Alocadoᵢ</code>. O teste de segurança:</p>
+    <ul class="b">
+      <li>1. <code>Livre ← Disponível</code>; todos começam como "não terminou".</li>
+      <li>2. Ache um i que não terminou com <code>Precisaᵢ ≤ Livre</code>. Se não houver, vá para 4.</li>
+      <li>3. <code>Livre ← Livre + Alocadoᵢ</code> (ele termina e devolve tudo); marque i como terminado; volte a 2.</li>
+      <li>4. Se todos terminaram, o estado é seguro. Senão, inseguro.</li>
+    </ul>
+    <p class="nota-formal">Com vários tipos de recurso, cada um desses nomes é um vetor com um número por tipo, e <code>Precisaᵢ ≤ Livre</code> vale só se valer em cada posição: (1, 0, 2) ≤ (1, 1, 2), mas (2, 0, 0) não é ≤ (1, 5, 5).</p>
+  </div>
+  <p>Exemplo com um tipo de recurso e 10 instâncias (pense em 10 blocos de memória):</p>
+ </div>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>Processo</th><th>Alocado</th><th>Máximo</th><th>Precisa = Máximo − Alocado</th></tr></thead>
+      <tbody>
+        <tr><td>P1</td><td>3</td><td>9</td><td>9 − 3 = 6</td></tr>
+        <tr><td>P2</td><td>2</td><td>4</td><td>4 − 2 = 2</td></tr>
+        <tr><td>P3</td><td>2</td><td>7</td><td>7 − 2 = 5</td></tr>
+        <tr><td colspan="4">Disponível = 10 − (3 + 2 + 2) = 10 − 7 = 3</td></tr>
+      </tbody>
+    </table>
+  </div>
+ <div class="prose">
+  <ul class="b">
+    <li>Livre = 3. P2 precisa de 2 ≤ 3: roda, termina e devolve 2. Livre = 3 + 2 = 5.</li>
+    <li>P3 precisa de 5 ≤ 5: roda e devolve 2. Livre = 5 + 2 = 7.</li>
+    <li>P1 precisa de 6 ≤ 7: roda e devolve 3. Livre = 7 + 3 = 10. Todos terminaram: estado seguro, sequência ⟨P2, P3, P1⟩.</li>
+    <li>Agora P1 pede mais 1. Finja que concedeu: P1 fica com 4 (precisa 5) e Livre = 2. P2 precisa de 2 ≤ 2: termina, Livre = 4. P3 precisa de 5 &gt; 4 e P1 precisa de 5 &gt; 4. Ninguém mais cabe: estado inseguro. O banqueiro nega, e P1 espera.</li>
+  </ul>
+  <p>Teste outros pedidos na figura:</p>
+ </div>
+
+  <figure class="fig" id="fig-bank">
+    <div class="fig-head"><span class="fig-title">Figura 5 · O banqueiro testando um pedido</span><div class="fig-tabs"></div></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <div class="stage-cap" id="bank-cap"></div>
+        <div class="tbl" style="margin:0"><table id="bank-tab"></table></div>
+        <div class="lbl">ordem em que terminam</div>
+        <div class="trail" id="bank-trail"></div>
+        <div class="verdict" id="bank-verdict"></div>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+
+ <div class="prose">
+<pre><code>def seguro(disponivel, alocado, maximo):
+    precisa = [m - a for m, a in zip(maximo, alocado)]
+    livre, terminou, ordem = disponivel, [False] * len(alocado), []
+    mudou = True
+    while mudou:
+        mudou = False
+        for i in range(len(alocado)):
+            if not terminou[i] and precisa[i] &lt;= livre:
+                livre += alocado[i]          # termina e devolve tudo
+                terminou[i], mudou = True, True
+                ordem.append(f'P{i+1}')
+    return all(terminou), ordem
+
+print(seguro(3, [3, 2, 2], [9, 4, 7]))   # (True, ['P2', 'P3', 'P1'])
+print(seguro(2, [4, 2, 2], [9, 4, 7]))   # (False, ['P2'])</code></pre>
+  <ul class="b">
+    <li>Limites do banqueiro: cada processo precisa declarar o máximo antes de começar, o número de processos e de recursos tem de ser fixo, e o teste roda a cada pedido. Por isso ele quase não aparece em SO de uso geral.</li>
+  </ul>
+  <p class="prova">Estado seguro: existe uma ordem em que todos terminam mesmo pedindo o máximo. Inseguro não é deadlock, mas perde a garantia. Banqueiro: Precisa = Máximo − Alocado; concede só se, fingindo a concessão, achar uma sequência segura.</p>
+
+  <h3>Detectar e recuperar</h3>
+  <ul class="b">
+    <li><b>Detecção e recuperação</b>: o SO deixa os pedidos correrem livres e, de tempos em tempos, procura deadlocks.</li>
+    <li>Com uma instância por recurso: procurar ciclo no grafo de alocação (Figura 4). Com várias: um algoritmo parecido com o teste do banqueiro, usando os pedidos atuais no lugar do máximo. Quem não consegue terminar em nenhuma ordem está em deadlock.</li>
+    <li>Quando rodar: a cada pedido (caro), em intervalos fixos, ou quando a utilização da CPU cai muito (sinal de muita gente bloqueada).</li>
+    <li>Recuperar por <b>eliminação</b>: matar todos os processos do ciclo, ou um de cada vez até o ciclo sumir. A vítima é escolhida pelo menor prejuízo: a de menor prioridade, a que rodou menos, a que segura mais recursos.</li>
+    <li>Recuperar por <b>preempção de recurso</b>: tirar o recurso de um processo e dar a outro. Para o processo não ficar num estado inconsistente, ele volta a um <b>checkpoint</b>, um ponto salvo antes: isso é o <b>rollback</b>. Bancos de dados fazem isso com transações.</li>
+    <li>Cuidado com starvation: se a mesma vítima for escolhida sempre, ela nunca termina. Conte quantas vezes cada um foi vítima.</li>
+  </ul>
+  <div class="def"><span class="lab">Na ponderada · pulseira</span><p>Cada estratégia age num momento diferente, e isso pesa quando o prazo é curto. Exemplo diferente: num marca-passo, "detectar e reiniciar" leva o tempo de detectar mais o de reiniciar, e o coração não espera. A ponderada pede que você escolha uma estratégia para a pulseira, com prazo de 5 ms por amostra, e justifique com o custo dela: quando ela age, quanto tempo pode custar, e o que a pessoa sente se falhar.</p></div>
+ </div>
+</section>

@@ -11,7 +11,7 @@ export const cartoes = [
   ['Buracos de 10, 4 e 20 KB (nessa ordem). Onde first, best e worst-fit colocam um pedido de 3 KB?', 'First-fit: no de 10 (o primeiro que cabe). Best-fit: no de 4 (o menor que cabe). Worst-fit: no de 20 (o maior).'],
   ['Páginas de 4 KB. Endereço virtual 9 000: qual página e qual deslocamento? Se a página está na moldura 6, qual o físico?', '9 000 div 4 096 = 2; 9 000 − 8 192 = 808. Endereço (2, 808). Físico = 6 × 4 096 + 808 = 24 576 + 808 = 25 384.'],
   ['Memória de 100 ns, page fault de 10 ms, p = 1/10 000. Qual o tempo efetivo de acesso?', 'TEA = 0,9999 × 100 + 0,0001 × 10 000 000 = 99,99 + 1 000 ≈ 1 100 ns. A memória ficou 11 vezes mais lenta.'],
-  ['O que é a anomalia de Belady e quais algoritmos a sofrem?', 'Mais molduras gerando mais page faults. Só o FIFO (entre os vistos): 1 2 3 4 1 2 5 1 2 3 4 5 dá 9 faltas com 3 molduras e 10 com 4. LRU e ótimo não sofrem.'],
+  ['O que é a anomalia de Belady e quais algoritmos a sofrem?', 'Mais molduras gerando mais page faults. Só o FIFO (entre os vistos): 1 2 3 4 1 2 5 1 2 3 4 5 dá 9 page faults com 3 molduras e 10 com 4. LRU e ótimo não sofrem.'],
   ['O que é thrashing e como o working set ajuda a evitar?', 'O sistema pagina mais do que executa porque os processos têm menos molduras do que usam. O SO só deixa rodar processos cuja soma dos working sets cabe na memória; se não cabe, suspende alguém.'],
   ['Blocos de 4 KB, ponteiros de 4 bytes. Quanto um i-node alcança pelos 12 diretos e pelo indireto simples?', 'Diretos: 12 × 4 KB = 48 KB. Indireto simples: 4 096 / 4 = 1 024 ponteiros × 4 KB = 4 MB.'],
   ['Polling, interrupção ou DMA para copiar blocos grandes de um dispositivo rápido? Por quê?', 'DMA: o controlador copia o bloco inteiro sem a CPU e gera uma interrupção só no fim. Polling prende a CPU; interrupção por palavra gera milhares de interrupções.'],
@@ -20,16 +20,16 @@ export const cartoes = [
 ];
 
 export const cola = [
-  ['Critérios', 'utilização da CPU e vazão ↑; turnaround = fim − chegada; espera = turnaround − surto; resposta = 1ª execução − chegada ↓.'],
+  ['Critérios', 'utilização da CPU e throughput ↑; turnaround = fim − chegada; espera = turnaround − surto; resposta = 1ª execução − chegada ↓.'],
   ['FCFS · SJF · SRTF', 'FCFS: ordem de chegada, efeito comboio. SJF / SRTF: menor surto / menor restante. Menor espera média; precisa estimar o surto; starvation.'],
   ['Prioridade', 'estática ou dinâmica, preemptiva ou não. Starvation → aging.'],
   ['Round-robin · MLFQ', 'quantum q; espera ≤ (n − 1)·q; q grande = FCFS, q pequeno = overhead. MLFQ: gastou o quantum desce, bloqueou fica.'],
   ['Tempo real', 'prazo (deadline), pior caso. Rate monotonic: período menor = prioridade maior, U ≤ n(2^(1/n) − 1). EDF: prazo mais perto, U ≤ 1.'],
   ['Memória', 'MMU: físico = base + lógico se lógico &lt; limite. Fixas → fragmentação interna; variáveis → externa (first/best/worst-fit, compactação). Swapping.'],
-  ['Paginação', 'pág = end div tam, desl = end mod tam; físico = moldura·tam + desl. Bit V = 0 → page fault. TEA = (1 − p)·mem + p·falta.'],
+  ['Paginação', 'pág = end div tam, desl = end mod tam; físico = moldura·tam + desl. Bit V = 0 → page fault. TEA = (1 − p)·mem + p·page fault.'],
   ['Substituição', 'OPT (futuro, mínimo), FIFO (Belady), LRU (perto do ótimo, caro), relógio (bit R, segunda chance), NRU, LFU.'],
   ['Thrashing', 'pagina mais que executa. Working set W(t, Δ); soma dos WS ≤ molduras.'],
   ['Arquivos', 'contígua (rápida, fragmentação externa), encadeada (FAT; acesso direto lento), indexada (i-node: 12 diretos + simples + duplo + triplo). Livre: vetor de bits ou lista.'],
-  ['E/S', 'processo → subsistema de E/S → driver → controlador → dispositivo. Polling (espera ocupada) &lt; interrupção &lt; DMA (1 interrupção por bloco). Buffering, spooling.'],
+  ['E/S', 'processo → subsistema de E/S → driver → controlador → dispositivo. Polling (busy waiting) &lt; interrupção &lt; DMA (1 interrupção por bloco). Buffering, spooling.'],
   ['Disco', 'acesso = seek + latência (meia volta) + transferência. FCFS, SSTF (starvation), SCAN (elevador), C-SCAN (espera uniforme). RAID 0/1/5.'],
 ];

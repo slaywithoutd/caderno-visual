@@ -36,21 +36,21 @@ function linha(p, d, seta, { cor = '--muted', larg = 1.5, tracejado = false } = 
 const mostra = (el, on) => { el.style.opacity = on ? 1 : 0; };
 const num = (x, d = 3) => x.toLocaleString('pt-BR', { maximumFractionDigits: d });
 
-/* ============ Figura 1: chamada de sistema e interrupção ============ */
+/* ============ Figura 1: syscall e interrupção ============ */
 (function () {
   const root = document.getElementById('fig-syscall');
   if (!root) return;
   const svg = document.getElementById('sc-svg'), cap = document.getElementById('sc-cap');
   const seta = marcador(svg);
   const Y = { P: 40, Q: 92, N: 156, D: 222 }, A = 30;
-  const faixas = [['P', 'processo P'], ['Q', 'processo Q'], ['N', 'núcleo'], ['D', 'disco']];
+  const faixas = [['P', 'processo P'], ['Q', 'processo Q'], ['N', 'kernel'], ['D', 'disco']];
   faixas.forEach(([k, nome]) => {
     S('line', { x1: 100, y1: Y[k], x2: 630, y2: Y[k], style: 'stroke:var(--line);stroke-width:1' }, svg);
     txt(svg, 8, Y[k], nome, { tam: 12, cor: '--muted', anc: 'start' });
   });
   S('line', { x1: 4, y1: 124, x2: 636, y2: 124, style: 'stroke:var(--line2);stroke-width:1.2', 'stroke-dasharray': '6 4' }, svg);
   txt(svg, 8, 115, 'modo usuário ↑', { tam: 10, cor: '--muted', anc: 'start' });
-  txt(svg, 8, 134, 'modo núcleo ↓', { tam: 10, cor: '--muted', anc: 'start' });
+  txt(svg, 8, 134, 'modo kernel ↓', { tam: 10, cor: '--muted', anc: 'start' });
   /* [faixa, x0, x1, rótulo, tom, passo em que aparece, tracejado] */
   const SEG = [
     ['P', 100, 176, 'P calcula', 'bl', 0], ['P', 176, 206, 'read', 'am', 1],
@@ -82,23 +82,23 @@ const num = (x, d = 3) => x.toLocaleString('pt-BR', { maximumFractionDigits: d }
   const XC = [176, 206, 262, 276, 470, 530, 572, 630];
   const caps = [
     'CPU em modo usuário · executando P',
-    'P executa a instrução syscall → a CPU vai entrar no núcleo',
-    'CPU em modo núcleo · o núcleo atende o pedido de P',
+    'P executa a instrução syscall → a CPU vai entrar no kernel',
+    'CPU em modo kernel · o kernel atende o pedido de P',
     'P: executando → espera · o disco trabalha sozinho',
     'CPU em modo usuário · executando Q enquanto o disco lê',
-    'interrupção do disco → CPU em modo núcleo · tratador roda',
+    'interrupção do disco → CPU em modo kernel · tratador roda',
     'P: espera → pronto · Q continua de onde parou',
     'P volta à CPU · read() retorna com os dados',
   ];
   const notes = [
-    'O processo <b>P</b> executa em modo usuário, fazendo contas. A faixa do núcleo está vazia: o SO só roda quando alguém o chama.',
+    'O processo <b>P</b> executa em modo usuário, fazendo contas. A faixa do kernel está vazia: o SO só roda quando alguém o chama.',
     'P precisa ler um arquivo e chama <code>read()</code>. A biblioteca põe o número do serviço e os argumentos em registradores e executa a instrução <code>syscall</code>.',
-    'A CPU passa para <b>modo núcleo</b> e salta para o ponto de entrada fixo do núcleo. Ele confere o pedido: o arquivo existe? P tem permissão?',
-    'O núcleo manda o pedido ao controlador do disco e põe P em <b>espera</b>. O disco vai levar milissegundos, e não faz sentido a CPU esperar junto.',
-    'O escalonador escolhe outro processo, <b>Q</b>, e a CPU volta ao modo usuário para executá-lo. Isso é multiprogramação: a CPU não fica parada durante a E/S de P.',
-    'O disco termina e gera uma <b>interrupção</b>. A CPU para Q entre duas instruções, guarda PC e status, passa para modo núcleo e roda o tratador de interrupção.',
+    'A CPU passa para <b>modo kernel</b> e salta para o ponto de entrada fixo do kernel. Ele confere o pedido: o arquivo existe? P tem permissão?',
+    'O kernel manda o pedido ao controlador do disco e põe P em <b>espera</b>. O disco vai levar milissegundos, e não faz sentido a CPU esperar junto.',
+    'O scheduler escolhe outro processo, <b>Q</b>, e a CPU volta ao modo usuário para executá-lo. Isso é multiprogramação: a CPU não fica parada durante a E/S de P.',
+    'O disco termina e gera uma <b>interrupção</b>. A CPU para Q entre duas instruções, guarda PC e status, passa para modo kernel e roda o tratador de interrupção.',
     'O tratador copia os dados lidos, marca P como <b>pronto</b> e devolve a CPU. Q continua de onde parou, sem perceber nada.',
-    'Quando chega a vez de P, o núcleo o retoma: <code>read()</code> retorna com os dados e P segue em modo usuário, como se a leitura tivesse sido instantânea.',
+    'Quando chega a vez de P, o kernel o retoma: <code>read()</code> retorna com os dados e P segue em modo usuário, como se a leitura tivesse sido instantânea.',
   ];
   new StepFig(root, { notes, speed: 2300, render(k) {
     segs.forEach((s) => { mostra(s.g, s.k <= k); s.r.style.strokeWidth = s.k === k ? '2.6' : '1.4'; });
@@ -148,12 +148,12 @@ const num = (x, d = 3) => x.toLocaleString('pt-BR', { maximumFractionDigits: d }
   const notes = [
     'O usuário abre um programa. O SO cria o processo <b>A</b>: monta o PCB e reserva memória. Estado: <b>novo</b>. B está na CPU e C espera na fila.',
     'A é admitido e entra no <b>fim</b> da fila de prontos. Tem tudo para rodar; só falta a CPU.',
-    'A fatia de B acaba e ele volta para a fila; C assume a CPU. A andou na fila, mas continua pronto.',
-    'C pede E/S e vai para espera. O escalonador escolhe A, e o despachante carrega o contexto dele: <b>pronto → executando</b>.',
+    'O quantum de B acaba e ele volta para a fila; C assume a CPU. A andou na fila, mas continua pronto.',
+    'C pede E/S e vai para espera. O scheduler escolhe A, e o dispatcher carrega o contexto dele: <b>pronto → executando</b>.',
     'A chama <code>read()</code> para ler o disco. Ele mesmo pede para sair: <b>executando → espera</b>. B assume a CPU.',
     'O disco termina e manda uma interrupção. O tratador acorda A, que vai para a <b>fila de prontos</b>, e não direto para a CPU: B continua executando.',
-    'B termina a fatia e vai para a fila; C, cuja E/S acabou, também está lá. A volta à CPU e continua na instrução seguinte ao <code>read()</code>.',
-    'O temporizador avisa que a fatia de A acabou. <b>Preempção</b>: A volta para o fim da fila mesmo querendo continuar, e B assume.',
+    'B termina o quantum e vai para a fila; C, cuja E/S acabou, também está lá. A volta à CPU e continua na instrução seguinte ao <code>read()</code>.',
+    'O temporizador avisa que o quantum de A acabou. <b>Preempção</b>: A volta para o fim da fila mesmo querendo continuar, e B assume.',
     'C executou e pediu E/S de novo; B teve a vez dele. A é escolhido mais uma vez.',
     'A chama <code>exit()</code>. O SO fecha os arquivos, libera a memória e, por fim, apaga o PCB. Estado: <b>terminado</b>.',
     'Repare no caminho de A: ele nunca foi de espera direto para executando, nem de pronto para espera. Toda entrada na CPU passa pela fila de prontos.',
@@ -209,7 +209,7 @@ const num = (x, d = 3) => x.toLocaleString('pt-BR', { maximumFractionDigits: d }
   const VB = { PC: '0x2C88', SP: '0x6E40', R1: '12', mapa: 'tab. B' };
   /* por passo: conteúdo de cada bloco e quais linhas destacar */
   function quadro(k) {
-    const cpu = k <= 4 ? { ...VA, estado: '', status: k === 0 ? 'usuário' : 'núcleo' } : { ...VB, estado: '', status: k === 7 ? 'usuário' : 'núcleo', mapa: k >= 6 ? 'tab. B' : 'tab. A' };
+    const cpu = k <= 4 ? { ...VA, estado: '', status: k === 0 ? 'usuário' : 'kernel' } : { ...VB, estado: '', status: k === 7 ? 'usuário' : 'kernel', mapa: k >= 6 ? 'tab. B' : 'tab. A' };
     const a = k < 2 ? { estado: 'executando', PC: '(velho)', SP: '(velho)', R1: '(velho)', status: '(velho)', mapa: 'tab. A' } : { ...VA, estado: k < 3 ? 'executando' : 'pronto', status: 'usuário' };
     const b = { ...VB, estado: k < 5 ? 'pronto' : 'executando', status: 'usuário' };
     const hl = { 2: [['a', 'PC'], ['a', 'SP'], ['a', 'R1'], ['a', 'status']], 3: [['a', 'estado']], 4: [['b', 'estado']], 5: [['c', 'PC'], ['c', 'SP'], ['c', 'R1'], ['b', 'estado']], 6: [['c', 'mapa']], 7: [['c', 'status']], 1: [['c', 'status']] }[k] || [];
@@ -217,20 +217,20 @@ const num = (x, d = 3) => x.toLocaleString('pt-BR', { maximumFractionDigits: d }
   }
   const notes = [
     '<b>A</b> executa em modo usuário. Os registradores da CPU guardam o contexto de hardware de A: <code>PC = 0x4A10</code>, <code>R1 = 731</code>… O PCB de A ainda tem valores velhos, da última vez que ele saiu da CPU.',
-    'O temporizador interrompe: a fatia de A acabou. A CPU passa para <b>modo núcleo</b> e entra no tratador. Daqui em diante nenhum processo avança: começou o overhead.',
-    'O núcleo <b>salva</b> o contexto de hardware de A no PCB de A: PC, SP, registradores e status.',
+    'O temporizador interrompe: o quantum de A acabou. A CPU passa para <b>modo kernel</b> e entra no tratador. Daqui em diante nenhum processo avança: começou o overhead.',
+    'O kernel <b>salva</b> o contexto de hardware de A no PCB de A: PC, SP, registradores e status.',
     'Atualiza o estado de A no PCB, <b>executando → pronto</b>, e põe A no fim da fila de prontos.',
-    'O escalonador escolhe o próximo da fila: <b>B</b>. O PCB de B tem o contexto salvo da última vez que B saiu da CPU.',
-    'O despachante <b>carrega</b> o contexto de B do PCB para os registradores da CPU. Estado de B: executando.',
+    'O scheduler escolhe o próximo da fila: <b>B</b>. O PCB de B tem o contexto salvo da última vez que B saiu da CPU.',
+    'O dispatcher <b>carrega</b> o contexto de B do PCB para os registradores da CPU. Estado de B: executando.',
     'Troca o mapa de memória para o espaço de endereçamento de B (a tabela de páginas). A cache e a TLB ainda estão cheias de dados de A: os primeiros acessos de B vão dar miss.',
     'Volta ao modo usuário e salta para o PC de B, <code>0x2C88</code>. B continua exatamente de onde tinha parado. A faixa vermelha entre A e B é o overhead: alguns µs sem trabalho útil para ninguém.',
   ];
   const caps = [
     'modo usuário · A executando',
-    'modo núcleo · interrupção do temporizador',
+    'modo kernel · interrupção do temporizador',
     'salvar: registradores da CPU → PCB de A',
     'PCB de A: estado = pronto · A vai para a fila',
-    'escalonador escolhe B',
+    'scheduler escolhe B',
     'carregar: PCB de B → registradores da CPU',
     'trocar o mapa de memória: tabela de páginas de B',
     'modo usuário · B executando · troca concluída',
@@ -254,7 +254,7 @@ const num = (x, d = 3) => x.toLocaleString('pt-BR', { maximumFractionDigits: d }
   } });
 })();
 
-/* ============ Figura 4: fatia × custo da troca ============ */
+/* ============ Figura 4: quantum × custo da troca ============ */
 (function () {
   const $ = (id) => document.getElementById(id);
   if (!$('fig-custo')) return;
@@ -397,14 +397,14 @@ const num = (x, d = 3) => x.toLocaleString('pt-BR', { maximumFractionDigits: d }
       label: 'N:1 (ULT)', lib: true, K: { K: 320 },
       map: { T1: 'K', T2: 'K', T3: 'K', T4: 'K' },
       passos: [
-        { th: {}, k: {}, cores: [null, null], cap: 'núcleo vê 1 entidade (K) · 4 threads só na biblioteca',
-          n: 'Modelo <b>N:1</b>: quatro threads de usuário criadas pela biblioteca. O núcleo enxerga uma única entidade, K, e nem sabe que existem quatro threads.' },
+        { th: {}, k: {}, cores: [null, null], cap: 'kernel vê 1 entidade (K) · 4 threads só na biblioteca',
+          n: 'Modelo <b>N:1</b>: quatro threads de usuário criadas pela biblioteca. O kernel enxerga uma única entidade, K, e nem sabe que existem quatro threads.' },
         { th: { T1: 'ex' }, k: { K: 'ex' }, cores: ['T1', null], cap: 'core 1 ocioso: sem paralelismo',
-          n: 'O núcleo põe K para rodar no core 0, e a biblioteca escolhe T1. O core 1 fica <b>ocioso</b>: o núcleo não tem outra entidade desse processo para pôr lá.' },
-        { th: { T2: 'ex' }, k: { K: 'ex' }, cores: ['T2', null], cap: 'troca T1 → T2 feita pela biblioteca, sem chamada de sistema',
-          n: 'A biblioteca troca T1 por T2 sem chamada de sistema: é só uma chamada de função, coisa de nanossegundos.' },
+          n: 'O kernel põe K para rodar no core 0, e a biblioteca escolhe T1. O core 1 fica <b>ocioso</b>: o kernel não tem outra entidade desse processo para pôr lá.' },
+        { th: { T2: 'ex' }, k: { K: 'ex' }, cores: ['T2', null], cap: 'troca T1 → T2 feita pela biblioteca, sem syscall',
+          n: 'A biblioteca troca T1 por T2 sem syscall: é só uma chamada de função, coisa de nanossegundos.' },
         { th: { T1: 'bl', T2: 'bl', T3: 'bl', T4: 'bl' }, k: { K: 'bl' }, cores: [null, null], cap: 'read() bloqueante em T2 → K em espera → processo inteiro parado',
-          n: 'T2 chama <code>read()</code> no disco, uma <b>chamada bloqueante</b>. O núcleo põe K em espera, e com ele o processo inteiro: T1, T3 e T4 estavam prontas e param também.' },
+          n: 'T2 chama <code>read()</code> no disco, uma <b>chamada bloqueante</b>. O kernel põe K em espera, e com ele o processo inteiro: T1, T3 e T4 estavam prontas e param também.' },
         { th: { T3: 'ex' }, k: { K: 'ex' }, cores: ['T3', null], cap: 'só depois da E/S a biblioteca volta a escolher threads',
           n: 'O disco termina, K volta a pronto e depois a executar. Só então a biblioteca pode escolher outra thread. Durante toda a leitura, o processo não avançou nada.' },
       ],
@@ -413,30 +413,30 @@ const num = (x, d = 3) => x.toLocaleString('pt-BR', { maximumFractionDigits: d }
       label: '1:1 (KLT)', lib: false, K: { K1: 140, K2: 260, K3: 380, K4: 500 },
       map: { T1: 'K1', T2: 'K2', T3: 'K3', T4: 'K4' },
       passos: [
-        { th: {}, k: {}, cores: [null, null], cap: 'cada thread é uma thread do núcleo',
-          n: 'Modelo <b>1:1</b>: cada thread que o programa cria é uma thread do núcleo. O núcleo vê e escalona as quatro.' },
+        { th: {}, k: {}, cores: [null, null], cap: 'cada thread é uma thread do kernel',
+          n: 'Modelo <b>1:1</b>: cada thread que o programa cria é uma thread do kernel. O kernel vê e escalona as quatro.' },
         { th: { T1: 'ex', T2: 'ex' }, k: { K1: 'ex', K2: 'ex' }, cores: ['T1', 'T2'], cap: 'dois cores ocupados: paralelismo real',
-          n: 'Com dois cores, o núcleo põe T1 e T2 para rodar ao mesmo tempo: <b>paralelismo</b> real.' },
+          n: 'Com dois cores, o kernel põe T1 e T2 para rodar ao mesmo tempo: <b>paralelismo</b> real.' },
         { th: { T1: 'ex', T2: 'bl', T3: 'ex' }, k: { K1: 'ex', K2: 'bl', K3: 'ex' }, cores: ['T1', 'T3'], cap: 'read() bloqueante em T2 → só K2 em espera',
-          n: 'T2 chama <code>read()</code> bloqueante. Só K2 vai para espera. O núcleo coloca T3 no core 1, e o processo segue.' },
-        { th: { T4: 'ex', T3: 'ex' }, k: { K4: 'ex', K3: 'ex' }, cores: ['T4', 'T3'], cap: 'cada troca entre threads passa pelo núcleo (µs)',
-          n: 'O preço: criar T1 a T4, e cada troca entre elas, passou pelo núcleo. Cada operação custa microssegundos, contra nanossegundos numa biblioteca N:1.' },
+          n: 'T2 chama <code>read()</code> bloqueante. Só K2 vai para espera. O kernel coloca T3 no core 1, e o processo segue.' },
+        { th: { T4: 'ex', T3: 'ex' }, k: { K4: 'ex', K3: 'ex' }, cores: ['T4', 'T3'], cap: 'cada troca entre threads passa pelo kernel (µs)',
+          n: 'O preço: criar T1 a T4, e cada troca entre elas, passou pelo kernel. Cada operação custa microssegundos, contra nanossegundos numa biblioteca N:1.' },
       ],
     },
     mn: {
       label: 'M:N (híbrido)', lib: true, K: { K1: 200, K2: 440, K3: 320 },
       map: { T1: 'K1', T2: 'K1', T3: 'K2', T4: 'K2' },
       passos: [
-        { th: {}, k: {}, cores: [null, null], esconde: ['K3'], cap: '4 threads de usuário sobre 2 threads do núcleo',
-          n: 'Modelo <b>M:N</b> (híbrido): quatro threads de usuário sobre duas threads do núcleo. A biblioteca escolhe qual ULT roda em cada KLT; o núcleo escolhe qual KLT roda em cada core.' },
+        { th: {}, k: {}, cores: [null, null], esconde: ['K3'], cap: '4 threads de usuário sobre 2 threads do kernel',
+          n: 'Modelo <b>M:N</b> (híbrido): quatro threads de usuário sobre duas threads do kernel. A biblioteca escolhe qual ULT roda em cada KLT; o kernel escolhe qual KLT roda em cada core.' },
         { th: { T1: 'ex', T3: 'ex' }, k: { K1: 'ex', K2: 'ex' }, cores: ['T1', 'T3'], esconde: ['K3'], cap: 'K1 e K2 nos dois cores: há paralelismo',
           n: 'Há paralelismo: K1 roda T1 no core 0 e K2 roda T3 no core 1.' },
         { th: { T1: 'bl', T3: 'ex' }, k: { K1: 'bl', K2: 'ex' }, cores: [null, 'T3'], esconde: ['K3'], cap: 'T1 bloqueia → K1 em espera; T2 ficaria sem KLT',
           n: 'T1 faz uma chamada bloqueante, e K1 vai para espera junto com ela. Sem ajuda, T2, que roda sobre K1, ficaria parada.' },
-        { th: { T1: 'bl', T2: 'ex', T3: 'ex' }, k: { K1: 'bl', K2: 'ex', K3: 'ex' }, cores: ['T2', 'T3'], map: { T2: 'K3' }, cap: 'scheduler activations: núcleo avisa, biblioteca usa K3',
-          n: 'Com <b>scheduler activations</b>, o núcleo avisa a biblioteca (upcall) e entrega uma nova KLT, K3. A biblioteca põe T2 nela, e os dois cores continuam ocupados.' },
-        { th: { T2: 'ex', T3: 'ex' }, k: { K3: 'ex', K2: 'ex', K1: 'pr' }, cores: ['T2', 'T3'], map: { T2: 'K3' }, cap: 'flexível, mas com dois escalonadores para coordenar',
-          n: 'O custo é a complexidade: dois escalonadores que precisam se entender. Linux e Windows ficaram com 1:1; o Go faz M:N no seu runtime, sobre threads 1:1 do SO.' },
+        { th: { T1: 'bl', T2: 'ex', T3: 'ex' }, k: { K1: 'bl', K2: 'ex', K3: 'ex' }, cores: ['T2', 'T3'], map: { T2: 'K3' }, cap: 'scheduler activations: kernel avisa, biblioteca usa K3',
+          n: 'Com <b>scheduler activations</b>, o kernel avisa a biblioteca (upcall) e entrega uma nova KLT, K3. A biblioteca põe T2 nela, e os dois cores continuam ocupados.' },
+        { th: { T2: 'ex', T3: 'ex' }, k: { K3: 'ex', K2: 'ex', K1: 'pr' }, cores: ['T2', 'T3'], map: { T2: 'K3' }, cap: 'flexível, mas com dois schedulers para coordenar',
+          n: 'O custo é a complexidade: dois schedulers que precisam se entender. Linux e Windows ficaram com 1:1; o Go faz M:N no seu runtime, sobre threads 1:1 do SO.' },
       ],
     },
   };
@@ -447,7 +447,7 @@ const num = (x, d = 3) => x.toLocaleString('pt-BR', { maximumFractionDigits: d }
     svg.innerHTML = '';
     txt(svg, 8, 12, 'espaço do usuário (um processo)', { tam: 11, cor: '--muted', anc: 'start' });
     S('line', { x1: 4, y1: 152, x2: 636, y2: 152, style: 'stroke:var(--line2);stroke-width:1.2', 'stroke-dasharray': '6 4' }, svg);
-    txt(svg, 8, 164, 'núcleo', { tam: 11, cor: '--muted', anc: 'start' });
+    txt(svg, 8, 164, 'kernel', { tam: 11, cor: '--muted', anc: 'start' });
     txt(svg, 8, 250, 'hardware', { tam: 11, cor: '--muted', anc: 'start' });
     const gL = S('g', null, svg);
     if (M.lib) { caixa(svg, 100, 90, 440, 34, 'cz', 6); txt(svg, 320, 107, 'biblioteca de threads', { tam: 11.5, cor: '--muted' }); }

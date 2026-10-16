@@ -382,7 +382,7 @@
   <p class="prova">Para todo AFN existe um AFD equivalente: os dois reconhecem exatamente as linguagens regulares. Com pilha isso muda (seção 8).</p>
 
   <h3>Simulando em Python</h3>
-  <p>O professor mostrou um simulador de AFD. A tabela δ vira um dicionário de dicionários, e o laço segue uma seta por letra:</p>
+  <p>O professor mostrou um simulador de AFD. A tabela δ vira um dicionário de dicionários, e o loop segue uma seta por letra:</p>
 <pre><code>def afd(delta, q0, F, cadeia):
     estado = q0                      # começa no estado inicial
     for c in cadeia:                 # lê um símbolo por vez
@@ -567,7 +567,7 @@ print(afn(delta, 'q1', ['q4'], '010110'))    # True</code></pre>
   <ul class="b">
     <li>Parênteses em expressões aritméticas: <code>(2 + (3 * 4))</code>.</li>
     <li>Blocos em programação: <code>{ … }</code>, <code>begin … end</code>, <code>if … then … else</code>.</li>
-    <li>Por isso as LLC são a base dos <b>analisadores sintáticos</b> (parsers): a parte do <b>compilador</b> que confere se o programa está escrito na estrutura certa, antes de traduzi-lo.</li>
+    <li>Por isso as LLC são a base dos <b>parsers</b> (analisadores sintáticos): a parte do <b>compilador</b> que confere se o programa está escrito na estrutura certa, antes de traduzi-lo.</li>
   </ul>
   <p>Dois formalismos descrevem as LLC, um de cada lado:</p>
   <ul class="b">

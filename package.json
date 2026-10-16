@@ -8,7 +8,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "checar": "node scripts/checar-termos.mjs"
+    "checar": "node scripts/checar-termos.mjs",
+    "checar-consulta": "node scripts/checar-consulta.mjs"
   },
   "dependencies": {
     "astro": "^5.13.0"

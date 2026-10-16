@@ -1,20 +1,33 @@
 ---
-/* Layout das páginas de leitura (aula e revisão): sidebar flutuante com sumário,
-   barra de progresso, popover do glossário e o miolo da página. */
+/* Layout das páginas de leitura (aula, consulta e revisão): sidebar flutuante com sumário,
+   switch Leitura/Consulta, barra de progresso, popover do glossário e o miolo da página.
+   `modo` (só nas páginas de aula): { atual, leitura, consulta, secaoDe, leituraDe } — ver lib/modo.js.
+   Slot "direita": a barra de Definições do modo Consulta. */
 import Base from './Base.astro';
+import ModoSwitch from '../components/ModoSwitch.astro';
 import { site, url } from '../lib/catalogo.js';
-const { titulo, rotulo, materia, modulo, secoes, descricao = '' } = Astro.props;
+const { titulo, rotulo, materia, modulo, secoes, descricao = '', modo = null } = Astro.props;
+const consulta = modo?.atual === 'consulta';
+const jsonModo = modo ? JSON.stringify(modo).replace(/</g, '\\u003c') : '';
+/* para o redirecionamento antes de desenhar: o outro modo desta aula, se existir */
+const alt = modo ? (consulta ? modo.leitura : modo.consulta) : null;
+let n = 0;
 ---
 <Base title={`${titulo} · ${materia.titulo}`} description={descricao}>
-  <script is:inline>
-    /* aplica o modo leitura salvo antes de desenhar a página (evita piscar) */
+  <script is:inline define:vars={{ atual: modo?.atual || '', alt }}>
+    /* modo salvo (Leitura/Consulta): se a aula existe no outro modo, vai para ele antes de desenhar */
+    try { var m = localStorage.getItem('caderno-modo'); if (atual && alt && m && m !== atual) location.replace(alt); } catch (e) {}
+    /* aplica o modo leitura (óculos) salvo antes de desenhar a página (evita piscar) */
     try { if (localStorage.getItem('caderno-lendo') === '1') { var d = document.documentElement; d.classList.add('lendo'); d.style.setProperty('--z', Math.min(2, Math.max(1.2, (innerWidth - 48) / 900)).toFixed(3)); } } catch (e) {}
+    if (atual === 'consulta') document.documentElement.classList.add('modo-consulta');
   </script>
   <div class="progress" id="progress"></div>
   <div id="pop" role="dialog" aria-live="polite"></div>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><marker id="mnarrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mnarrow"/></marker></defs></svg>
+  <ModoSwitch disponivel={!modo || !!modo.consulta} />
+  {modo && <script type="application/json" id="modo-data" set:html={jsonModo}></script>}
 
-  <div class="layout">
+  <div class={`layout${consulta ? ' layout-consulta' : ''}`}>
     <aside class="side">
       <details class="side-box" id="side-box" open>
         <summary>Nesta página</summary>
@@ -23,8 +36,10 @@ const { titulo, rotulo, materia, modulo, secoes, descricao = '' } = Astro.props;
         <p class="side-aula"><i>{rotulo}</i>{titulo}</p>
         <nav class="toc side-group" aria-label="Nesta página">
           <ol>
-            {secoes.map(([id, nome], i) => (
-              <li><a href={`#${id}`}><i>{String(i + 1).padStart(2, '0')}</i>
+            {secoes.map(([id, nome]) => id.startsWith('@') ? (
+              <li class="toc-grupo">{nome}</li>
+            ) : (
+              <li><a href={`#${id}`}><i>{String(++n).padStart(2, '0')}</i>
                 {id === 'glossario' ? <span>{nome} (<span id="gl-count">0</span> termos)</span> : <span>{nome}</span>}
               </a></li>
             ))}
@@ -35,6 +50,7 @@ const { titulo, rotulo, materia, modulo, secoes, descricao = '' } = Astro.props;
     <main class="content">
       <slot />
     </main>
+    <slot name="direita" />
   </div>
   <button id="oculos" class="oculos-btn" type="button" aria-pressed="false" aria-label="Modo leitura" title="Colocar os óculos (modo leitura)">
     <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
@@ -43,3 +59,8 @@ const { titulo, rotulo, materia, modulo, secoes, descricao = '' } = Astro.props;
     </svg>
   </button>
 </Base>
+
+<script>
+  import { initModo } from '../lib/modo.js';
+  initModo();
+</script>

@@ -123,7 +123,7 @@ montar.bolha = (svg) => {
     });
     const r = c % P;
     leg.textContent = `ciclo ${c + 1}`;
-    leg2.textContent = r === 1 ? 'i3 em ID precisa de i2: espera' : r === 2 ? 'i3 parada em ID · bolha em EX' : '';
+    leg2.textContent = r === 1 ? 'i3 em ID precisa de i2: espera' : r === 2 ? 'i3 parada em ID · bubble em EX' : '';
   };
 };
 

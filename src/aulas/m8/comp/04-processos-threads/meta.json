@@ -2,10 +2,10 @@
   "numero": "04",
   "titulo": "Processos e threads",
   "tema": "Do silício ao sistema operacional",
-  "resumo": "O que o sistema operacional faz, modo usuário e modo núcleo, chamadas de sistema e interrupções; processo, contexto e PCB; estados e troca de contexto; threads e os modelos 1:1, N:1 e M:N.",
+  "resumo": "O que o sistema operacional faz, modo usuário e modo kernel, syscalls e interrupções; processo, contexto e PCB; estados e troca de contexto; threads e os modelos 1:1, N:1 e M:N.",
   "topicos": [
-    "Modo usuário × núcleo",
-    "Chamada de sistema",
+    "Modo usuário × kernel",
+    "Syscall",
     "Programa × processo",
     "PCB",
     "Estados do processo",
@@ -21,7 +21,7 @@
     ["troca", "Troca de contexto"],
     ["tipos", "Criação, término e tipos de processo"],
     ["threads", "Threads"],
-    ["modelos", "Threads de usuário, de núcleo e híbridas"]
+    ["modelos", "Threads de usuário, de kernel e híbridas"]
   ],
   "fontes": [
     {
@@ -35,5 +35,5 @@
       "secao": "threads"
     }
   ],
-  "observacao": "A divisão de páginas entre os capítulos 5 e 6 é aproximada (5ª edição, LTC). A seção 1 é base para quem nunca estudou sistemas operacionais e vai além das páginas indicadas. O livro chama as threads de usuário de TMU (threads em modo usuário) e as de núcleo de TMK (threads em modo kernel); aqui usamos as siglas em inglês, ULT e KLT, que são as mais comuns em outros materiais."
+  "observacao": "A divisão de páginas entre os capítulos 5 e 6 é aproximada (5ª edição, LTC). A seção 1 é base para quem nunca estudou sistemas operacionais e vai além das páginas indicadas. O livro chama as threads de usuário de TMU (threads em modo usuário) e as de kernel de TMK (threads em modo kernel); aqui usamos as siglas em inglês, ULT e KLT, que são as mais comuns em outros materiais."
 }

@@ -12,10 +12,10 @@ montar.espera = (svg) => {
     S('text', { class: 'tm st', x: 4, y: y + 6 }, svg, rot);
     S('line', { class: 's', x1: 4, y1: y + 84, x2: 236, y2: y + 84, 'stroke-dasharray': '2 4' }, svg);
   };
-  faixa(0, 'espera ocupada'); faixa(100, 'bloqueio (semáforo)');
+  faixa(0, 'busy waiting'); faixa(100, 'bloqueio (semáforo)');
   const trava = [30, 130].map((y) => {
     const r = S('rect', { class: 'rd', x: 176, y: y - 18, width: 52, height: 40, rx: 6 }, svg);
-    const t = S('text', { class: 'tm', x: 202, y: y + 2 }, svg, 'trava');
+    const t = S('text', { class: 'tm', x: 202, y: y + 2 }, svg, 'lock');
     return { r, t };
   });
   /* thread que gira */

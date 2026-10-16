@@ -45,7 +45,7 @@ STORE saldo, R1          # 3. grava o registrador de volta na memória</code></p
    <ul class="b">
     <li>Cada thread tem os próprios registradores (o contexto de hardware da aula 04). O R1 da thread A e o R1 da thread B são cópias separadas.</li>
     <li>A variável <code>saldo</code> na memória é uma só.</li>
-    <li>O escalonador pode tirar a thread da CPU entre quaisquer duas instruções (preempção por interrupção de relógio). Num processador com vários núcleos, as duas threads podem até rodar no mesmo instante.</li>
+    <li>O escalonador pode tirar a thread da CPU entre quaisquer duas instruções (preempção por interrupção de relógio). Num processador com vários cores, as duas threads podem até rodar no mesmo instante.</li>
     <li>Conclusão: entre o LOAD e o STORE de uma thread, a outra pode ler ou escrever <code>saldo</code>. A seção 2 mostra o estrago.</li>
    </ul>
   </details>
@@ -73,7 +73,7 @@ STORE saldo, R1          # 3. grava o registrador de volta na memória</code></p
 <section class="chap" id="corrida">
  <div class="prose">
   <span class="num">02</span>
-  <h2>Condição de corrida</h2>
+  <h2>Race condition (condição de corrida)</h2>
   <div class="src"><span class="bk">Machado &amp; Maia · cap. 7 · p. 96–98</span></div>
   <p>Exemplo do livro, adaptado: uma conta tem saldo 100. Duas threads fazem um depósito de 1 cada uma, ao mesmo tempo. O saldo final deveria ser 102. Às vezes sai 101. Veja como, instrução por instrução.</p>
  </div>
@@ -92,9 +92,9 @@ STORE saldo, R1          # 3. grava o registrador de volta na memória</code></p
 
  <div class="prose">
   <div class="def key">
-    <span class="lab">Definição · Condição de corrida</span>
+    <span class="lab">Definição · Race condition</span>
     <p class="simples">É quando o resultado de um programa depende de quem chegou primeiro. Duas threads "apostam corrida" até o mesmo dado, e cada ordem de chegada dá um resultado diferente.</p>
-    <p class="formal">Uma <b>condição de corrida</b> (race condition) ocorre quando dois ou mais processos acessam dados compartilhados, pelo menos um deles escreve, e o resultado final depende da ordem relativa em que as instruções deles são executadas.</p>
+    <p class="formal">Uma <b>race condition</b> ocorre quando dois ou mais processos acessam dados compartilhados, pelo menos um deles escreve, e o resultado final depende da ordem relativa em que as instruções deles são executadas.</p>
   </div>
   <ul class="b">
     <li>Cada ordem possível de execução das instruções das duas threads é uma <b>intercalação</b>. Com 3 instruções em cada thread há 20 intercalações; só algumas dão errado.</li>
@@ -102,7 +102,7 @@ STORE saldo, R1          # 3. grava o registrador de volta na memória</code></p
     <li>Ler ao mesmo tempo não estraga nada. O problema aparece quando pelo menos um dos acessos é uma escrita.</li>
     <li>É o pior tipo de bug: o programa passa em mil testes e falha no milésimo primeiro, quando o escalonador interrompe no ponto errado. Colocar um <code>print</code> para investigar muda o tempo e o bug some.</li>
   </ul>
-  <p class="prova">Condição de corrida: dois ou mais fluxos acessam um dado compartilhado, pelo menos um escreve, e o resultado depende da ordem de execução. <code>x = x + 1</code> são três instruções (LOAD, ADD, STORE), e a troca no meio perde uma atualização.</p>
+  <p class="prova">Race condition: dois ou mais fluxos acessam um dado compartilhado, pelo menos um escreve, e o resultado depende da ordem de execução. <code>x = x + 1</code> são três instruções (LOAD, ADD, STORE), e a troca no meio perde uma atualização.</p>
 
   <p>Dá para ver acontecer em Python. Duas threads somam 1 a um contador um milhão de vezes cada:</p>
 <pre><code>import threading
@@ -126,8 +126,8 @@ def soma_segura(n):
         with trava:            # só uma thread por vez dentro deste bloco
             contador += 1</code></pre>
   <ul class="b">
-    <li>Com a trava (<code>Lock</code>), o resultado é sempre 2000000. O custo: as duas threads passam a se revezar nesse trecho, e o programa fica mais lento.</li>
-    <li>A segunda aba da Figura 1 ("com mutex") mostra o que a trava faz por dentro.</li>
+    <li>Com o lock (<code>Lock</code>), o resultado é sempre 2000000. O custo: as duas threads passam a se revezar nesse trecho, e o programa fica mais lento.</li>
+    <li>A segunda aba da Figura 1 ("com mutex") mostra o que o lock faz por dentro.</li>
   </ul>
 
   <div class="def"><span class="lab">Na ponderada · pulseira</span><p>Exemplo diferente do seu: uma estação meteorológica tem uma thread que faz <code>leituras = leituras + 1</code> a cada medição e outra que, a cada segundo, envia <code>leituras</code> e faz <code>leituras = 0</code>. Se a medição acontece entre o envio e o zero, ela some do relatório. Na pulseira, a pergunta que você vai ter de responder é: quais dados a thread do sensor e a thread do BLE tocam ao mesmo tempo, e qual intercalação estraga o log?</p></div>
@@ -169,8 +169,8 @@ def soma_segura(n):
   <h3>Solução 1 de hardware: desabilitar interrupções</h3>
   <ul class="b">
     <li>O escalonador só tira uma thread da CPU porque chega uma interrupção (o relógio, o fim de uma E/S). Se a thread <b>desabilitar as interrupções</b> ao entrar e habilitar ao sair, ninguém a interrompe no meio.</li>
-    <li>Problema 1: só funciona com uma CPU. Com dois núcleos, a outra thread roda no outro núcleo sem precisar de interrupção nenhuma.</li>
-    <li>Problema 2: é perigoso. Se o programa esquecer de reabilitar (ou entrar num laço infinito), o sistema inteiro para. Por isso só o núcleo do SO pode usar essa instrução, e só por poucas instruções.</li>
+    <li>Problema 1: só funciona com uma CPU. Com dois cores, a outra thread roda no outro core sem precisar de interrupção nenhuma.</li>
+    <li>Problema 2: é perigoso. Se o programa esquecer de reabilitar (ou entrar num laço infinito), o sistema inteiro para. Por isso só o kernel pode usar essa instrução, e só por poucas instruções.</li>
   </ul>
 
   <h3>Solução 2 de hardware: instruções atômicas</h3>
@@ -180,9 +180,9 @@ def soma_segura(n):
     <p class="formal">Uma <b>operação atômica</b> é indivisível: o hardware garante que nenhuma outra instrução, de nenhuma CPU, acessa a mesma posição de memória entre o início e o fim dela.</p>
   </div>
   <ul class="b">
-    <li><b>Test-and-Set</b> (TSL, "test and set lock"): numa única instrução atômica, lê o valor de uma variável e grava 1 (verdadeiro) nela. Devolve o valor antigo. Se devolveu 0, a trava estava livre e agora é sua; se devolveu 1, alguém já estava dentro.</li>
-    <li><b>Instrução Swap</b> (no x86, <code>XCHG</code>): troca atomicamente o conteúdo de um registrador com uma posição de memória. Serve para o mesmo truque: troque 1 com a trava e veja o que voltou.</li>
-    <li>Com elas se monta um <b>spinlock</b>: a thread repete a instrução atômica até conseguir a trava.</li>
+    <li><b>Test-and-Set</b> (TSL, "test and set lock"): numa única instrução atômica, lê o valor de uma variável e grava 1 (verdadeiro) nela. Devolve o valor antigo. Se devolveu 0, o lock estava livre e agora é seu; se devolveu 1, alguém já estava dentro.</li>
+    <li><b>Instrução Swap</b> (no x86, <code>XCHG</code>): troca atomicamente o conteúdo de um registrador com uma posição de memória. Serve para o mesmo truque: troque 1 com o lock e veja o que voltou.</li>
+    <li>Com elas se monta um <b>spinlock</b>: a thread repete a instrução atômica até conseguir o lock.</li>
   </ul>
 <pre><code>#include &lt;stdatomic.h&gt;
 
@@ -197,19 +197,19 @@ void sair_rc(void) {
 }</code></pre>
 
   <h3>O custo de girar</h3>
-<aside class="mn loop" data-loop="espera" data-ms="8000" data-still="0.45" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Em cima, a thread gira testando a trava e gasta CPU. Embaixo, ela dorme na fila e a CPU fica livre.</aside>
+<aside class="mn loop" data-loop="espera" data-ms="8000" data-still="0.45" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Em cima, a thread gira testando o lock e gasta CPU. Embaixo, ela dorme na fila e a CPU fica livre.</aside>
   <ul class="b">
-    <li>Enquanto espera, o spinlock fica num laço testando a trava. Isso é <b>espera ocupada</b> (busy waiting): a thread gasta CPU sem fazer trabalho útil.</li>
-    <li>Num processador de um núcleo, é desperdício puro: a thread gira o quantum inteiro, e quem tem a trava nem está rodando para soltá-la.</li>
-    <li>Com vários núcleos e região crítica bem curta (algumas dezenas de instruções), girar sai mais barato do que dormir e acordar, porque isso exige uma troca de contexto. É por isso que o núcleo do Linux usa spinlocks.</li>
-    <li>A alternativa é bloquear: a thread vai para o estado de espera e o SO só a acorda quando a trava fica livre. É o que os semáforos fazem (seção 5).</li>
+    <li>Enquanto espera, o spinlock fica num laço testando o lock. Isso é <b>busy waiting</b> (espera ocupada): a thread gasta CPU sem fazer trabalho útil.</li>
+    <li>Num processador de um core, é desperdício puro: a thread gira o quantum inteiro, e quem tem o lock nem está rodando para soltá-lo.</li>
+    <li>Com vários cores e região crítica bem curta (algumas dezenas de instruções), girar sai mais barato do que dormir e acordar, porque isso exige uma troca de contexto. É por isso que o kernel do Linux usa spinlocks.</li>
+    <li>A alternativa é bloquear: a thread vai para o estado de espera e o SO só a acorda quando o lock fica livre. É o que os semáforos fazem (seção 5).</li>
   </ul>
   <div class="def warn">
     <span class="lab">Pegadinha</span>
-    <p>Test-and-Set garante exclusão mútua, mas sozinho não garante espera limitada: se várias threads giram, nada impede que a mesma perca sempre. Também não resolve a espera ocupada.</p>
+    <p>Test-and-Set garante exclusão mútua, mas sozinho não garante espera limitada: se várias threads giram, nada impede que a mesma perca sempre. Também não resolve o busy waiting.</p>
   </div>
 
-  <div class="def"><span class="lab">Na ponderada · pulseira</span><p>Quem espera a região crítica fica parado o tempo que o outro levar lá dentro. Exemplo com outros números: um controlador tem prazo de 20 ms, gasta 6 ms no próprio trabalho e divide uma trava com uma thread que fica até 15 ms com ela. No pior caso ele espera 15 ms e termina em 15 + 6 = 21 ms: estourou o prazo. Na pulseira, você vai ter de dizer quanto tempo, no pior caso, a thread do sensor pode ficar esperando, e se isso cabe nos 5 ms.</p></div>
+  <div class="def"><span class="lab">Na ponderada · pulseira</span><p>Quem espera a região crítica fica parado o tempo que o outro levar lá dentro. Exemplo com outros números: um controlador tem prazo de 20 ms, gasta 6 ms no próprio trabalho e divide um lock com uma thread que fica até 15 ms com ele. No pior caso ele espera 15 ms e termina em 15 + 6 = 21 ms: estourou o prazo. Na pulseira, você vai ter de dizer quanto tempo, no pior caso, a thread do sensor pode ficar esperando, e se isso cabe nos 5 ms.</p></div>
  </div>
 </section>
 
@@ -262,7 +262,7 @@ void sair_rc(int i) {
   <div class="def warn">
     <span class="lab">Dois limites dessas soluções</span>
     <ul class="b">
-      <li>Todas usam espera ocupada: o laço <code>while</code> gira gastando CPU.</li>
+      <li>Todas usam busy waiting: o laço <code>while</code> gira gastando CPU.</li>
       <li>Em processadores modernos, o compilador e o hardware podem reordenar leituras e escritas na memória para ganhar velocidade (como no pipeline fora de ordem da aula 03). Peterson escrito assim, sem barreiras de memória, pode falhar num multicore de hoje. Na prática se usam instruções atômicas e as primitivas do SO.</li>
     </ul>
   </div>
@@ -291,13 +291,13 @@ void sair_rc(int i) {
   </div>
   <ul class="b">
     <li>A dupla <b>P e V</b> é atômica: o SO garante que dois P no mesmo semáforo não se intercalam. Para isso ele usa, por pouquíssimas instruções, as soluções da seção 3 (desabilita interrupções ou usa Test-and-Set).</li>
-    <li>A grande diferença para o spinlock: quem não consegue passar no P não gira. Vai para o estado de espera da aula 04 e libera a CPU. Acabou a espera ocupada.</li>
+    <li>A grande diferença para o spinlock: quem não consegue passar no P não gira. Vai para o estado de espera da aula 04 e libera a CPU. Acabou o busy waiting.</li>
     <li>Variante comum em livros e provas: deixar s ficar negativo. P faz <code>s ← s − 1</code> e bloqueia se <code>s &lt; 0</code>; V faz <code>s ← s + 1</code> e acorda um se <code>s ≤ 0</code>. Aí <code>|s|</code>, quando s é negativo, é o tamanho da fila. A Figura 2 usa essa versão.</li>
   </ul>
 
   <h3>Dois tipos, três usos</h3>
   <ul class="b">
-    <li><b>Semáforo binário</b>, ou <b>mutex</b> (de <i>mutual exclusion</i>): só vale 0 ou 1. Começa em 1. Serve para exclusão mútua: <code>P(m)</code> antes da região crítica e <code>V(m)</code> depois.</li>
+    <li><b>Semáforo binário</b>, ou <b>mutex</b> (de mutual exclusion): só vale 0 ou 1. Começa em 1. Serve para exclusão mútua: <code>P(m)</code> antes da região crítica e <code>V(m)</code> depois.</li>
     <li><b>Semáforo contador</b>: começa com o número de exemplares do recurso (3 vagas, 4 impressoras, N posições num buffer). Deixa até N passarem e segura o resto.</li>
     <li>Semáforo para <b>ordem</b>: começa em 0. A thread A faz o trabalho X e depois <code>V(s)</code>; a thread B faz <code>P(s)</code> antes de Y. Como s começa em 0, B só passa depois que A sinalizou: Y sempre acontece depois de X.</li>
   </ul>
@@ -322,7 +322,7 @@ void sair_rc(int i) {
   <h3>Como o SO implementa</h3>
 <pre><code>typedef struct { int valor; Fila fila; } Semaforo;
 
-void P(Semaforo *s) {          /* tudo aqui dentro é atômico (o núcleo garante) */
+void P(Semaforo *s) {          /* tudo aqui dentro é atômico (o kernel garante) */
     s-&gt;valor = s-&gt;valor - 1;
     if (s-&gt;valor &lt; 0) {
         coloca(&amp;s-&gt;fila, thread_atual);
@@ -349,7 +349,7 @@ sem_post(&amp;m);          /* V */</code></pre>
   <div class="def warn">
     <span class="lab">Erros comuns com semáforos</span>
     <ul class="b">
-      <li>Esquecer o V: a trava nunca é devolvida e todo mundo que vier depois bloqueia para sempre.</li>
+      <li>Esquecer o V: o lock nunca é devolvido e todo mundo que vier depois bloqueia para sempre.</li>
       <li>Trocar a ordem (V antes de P): a exclusão mútua some.</li>
       <li>Fazer P duas vezes no mesmo mutex na mesma thread: ela bloqueia esperando a si mesma.</li>
       <li>Pegar dois semáforos em ordens diferentes em threads diferentes: deadlock (seção 8).</li>
@@ -471,7 +471,7 @@ void consumidor(void) {
     <li>O problema dos <b>leitores e escritores</b>: um dado (um banco, um arquivo de configuração) é lido por muitos e alterado por poucos.</li>
     <li>Ler ao mesmo tempo é seguro, então vários leitores podem entrar juntos. Um escritor precisa de exclusão mútua contra todos: outros escritores e leitores.</li>
     <li>Solução típica: um contador de leitores protegido por um mutex. O primeiro leitor a entrar faz P no semáforo do dado; o último a sair faz V.</li>
-    <li>O risco: se chegam leitores sem parar, o contador nunca zera e o escritor espera para sempre. É starvation. Versões com preferência ao escritor invertem o problema. Bibliotecas oferecem isso pronto como <i>read-write lock</i>.</li>
+    <li>O risco: se chegam leitores sem parar, o contador nunca zera e o escritor espera para sempre. É starvation. Versões com preferência ao escritor invertem o problema. Bibliotecas oferecem isso pronto como read-write lock.</li>
   </ul>
 
   <h3>O jantar dos filósofos</h3>
@@ -514,7 +514,7 @@ void consumidor(void) {
     <li><code>signal(c)</code>: acorda uma thread que dorme em c. Se ninguém estiver dormindo, o sinal se perde.</li>
     <li>Diferença para o semáforo: o semáforo tem memória (um V sem ninguém esperando aumenta o valor, e o próximo P passa direto). A variável de condição não guarda nada. Por isso, antes de <code>wait</code>, sempre se testa a condição.</li>
   </ul>
-  <p>Python não tem monitor como palavra da linguagem, mas a classe <code>Condition</code> dá o mesmo efeito: uma trava e filas de condição juntas.</p>
+  <p>Python não tem monitor como palavra da linguagem, mas a classe <code>Condition</code> dá o mesmo efeito: um lock e filas de condição juntos.</p>
 <pre><code>import threading
 
 class BufferLimitado:                 # um monitor feito à mão
@@ -552,7 +552,7 @@ class BufferLimitado:                 # um monitor feito à mão
     <li><b>Comunicação síncrona</b> (rendezvous, "encontro"): o send espera o receive acontecer e vice-versa. Os dois se encontram e só então seguem. Não precisa de buffer, mas o mais rápido sempre espera o mais lento.</li>
     <li><b>Comunicação assíncrona</b>: o send deposita a mensagem num buffer e segue. É produtor/consumidor de novo, com o SO cuidando do buffer.</li>
     <li>Em rede, mensagens podem se perder. Por isso o receptor confirma com uma mensagem de reconhecimento (ACK), e o remetente reenvia se não receber a confirmação dentro de um tempo limite.</li>
-    <li>Exemplos reais: <i>pipes</i> do Unix (<code>ls | grep</code>), sockets, filas de mensagens de sistemas distribuídos.</li>
+    <li>Exemplos reais: pipes do Unix (<code>ls | grep</code>), sockets, filas de mensagens de sistemas distribuídos.</li>
   </ul>
  </div>
 </section>

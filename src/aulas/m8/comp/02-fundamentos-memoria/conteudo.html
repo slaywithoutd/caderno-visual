@@ -14,7 +14,7 @@
 
   <details class="base" open>
    <summary><span class="base-tag">Base</span> Binário, bit, byte e hexadecimal</summary>
-<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 130"><text class="tm" x="120" y="10">pesos</text><text class="tm" x="51" y="28">8</text><text class="tm" x="97" y="28">4</text><text class="tm" x="143" y="28">2</text><text class="tm" x="189" y="28">1</text><rect class="bl" x="32" y="40" width="38" height="38" rx="6"/><text x="51" y="59">1</text><rect class="k" x="78" y="40" width="38" height="38" rx="6"/><text x="97" y="59">0</text><rect class="bl" x="124" y="40" width="38" height="38" rx="6"/><text x="143" y="59">1</text><rect class="bl" x="170" y="40" width="38" height="38" rx="6"/><text x="189" y="59">1</text><text x="120" y="100">8 + 0 + 2 + 1 = 11</text><text class="tm" x="120" y="122">1011₂ = 11 = 0xB</text></svg>Cada casa vale o dobro da casa à direita. Some os pesos das casas com 1.</aside>
+<aside class="mn" id="mn-binario" aria-hidden="true"><svg viewBox="0 0 240 130"><text class="tm" x="120" y="10">pesos</text><text class="tm" x="51" y="28">8</text><text class="tm" x="97" y="28">4</text><text class="tm" x="143" y="28">2</text><text class="tm" x="189" y="28">1</text><rect class="bl" x="32" y="40" width="38" height="38" rx="6"/><text x="51" y="59">1</text><rect class="k" x="78" y="40" width="38" height="38" rx="6"/><text x="97" y="59">0</text><rect class="bl" x="124" y="40" width="38" height="38" rx="6"/><text x="143" y="59">1</text><rect class="bl" x="170" y="40" width="38" height="38" rx="6"/><text x="189" y="59">1</text><text x="120" y="100">8 + 0 + 2 + 1 = 11</text><text class="tm" x="120" y="122">1011₂ = 11 = 0xB</text></svg>Cada casa vale o dobro da casa à direita. Some os pesos das casas com 1.</aside>
    <p>Dentro do chip só existem dois valores: tem tensão elétrica ou não tem. Chamamos esses valores de 0 e 1, e todo número, texto ou instrução vira uma sequência deles.</p>
    <ul class="b">
     <li><b>Sistema binário</b> (base 2): como o decimal, mas cada casa vale o dobro da anterior (1, 2, 4, 8, 16…) em vez de dez vezes. <code>1011₂ = 8 + 0 + 2 + 1 = 11</code>. O ₂ subscrito avisa que o número está em binário.</li>
@@ -27,7 +27,7 @@
   </details>
 
   <h3>Tempo e frequência</h3>
-<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><line class="s" x1="14" y1="40" x2="226" y2="40"/><circle class="bl" cx="30" cy="40" r="5"/><circle class="bl" cx="90" cy="40" r="5"/><circle class="bl" cx="150" cy="40" r="5"/><circle class="bl" cx="210" cy="40" r="5"/><text class="tm" x="30" y="20">1 ns</text><text class="tm" x="90" y="20">1 µs</text><text class="tm" x="150" y="20">1 ms</text><text class="tm" x="210" y="20">1 s</text><text class="tm" x="60" y="56">×1000</text><text class="tm" x="120" y="56">×1000</text><text class="tm" x="180" y="56">×1000</text><text class="tm st" x="14" y="86">cache</text><text class="tm st" x="70" y="100">SSD</text><text class="tm st" x="128" y="86">disco</text><text class="tm st" x="132" y="116">pulseira: 10 ms</text><line class="s" x1="30" y1="46" x2="30" y2="78" stroke-dasharray="2 3"/><line class="s" x1="90" y1="46" x2="90" y2="92" stroke-dasharray="2 3"/><line class="s" x1="150" y1="46" x2="150" y2="78" stroke-dasharray="2 3"/></svg>Cada degrau é mil vezes o anterior. Hardware vive nos nanossegundos.</aside>
+<aside class="mn" id="mn-tempo" aria-hidden="true"><svg viewBox="0 0 240 150"><line class="s" x1="14" y1="40" x2="226" y2="40"/><circle class="bl" cx="30" cy="40" r="5"/><circle class="bl" cx="90" cy="40" r="5"/><circle class="bl" cx="150" cy="40" r="5"/><circle class="bl" cx="210" cy="40" r="5"/><text class="tm" x="30" y="20">1 ns</text><text class="tm" x="90" y="20">1 µs</text><text class="tm" x="150" y="20">1 ms</text><text class="tm" x="210" y="20">1 s</text><text class="tm" x="60" y="56">×1000</text><text class="tm" x="120" y="56">×1000</text><text class="tm" x="180" y="56">×1000</text><text class="tm st" x="14" y="86">cache</text><text class="tm st" x="70" y="100">SSD</text><text class="tm st" x="128" y="86">disco</text><text class="tm st" x="132" y="116">pulseira: 10 ms</text><line class="s" x1="30" y1="46" x2="30" y2="78" stroke-dasharray="2 3"/><line class="s" x1="90" y1="46" x2="90" y2="92" stroke-dasharray="2 3"/><line class="s" x1="150" y1="46" x2="150" y2="78" stroke-dasharray="2 3"/></svg>Cada degrau é mil vezes o anterior. Hardware vive nos nanossegundos.</aside>
   <ul class="b">
     <li><b>Nanossegundo</b> (ns) = 10⁻⁹ s, um bilionésimo de segundo. Um ciclo de clock de um processador de desktop dura menos de 1 ns.</li>
     <li>Microssegundo (µs) = 10⁻⁶ s = 1 000 ns. Milissegundo (ms) = 10⁻³ s = 1 000 µs.</li>
@@ -35,7 +35,7 @@
     <li>Período e frequência são o inverso um do outro: <code>T = 1 / f</code>. Um clock de 2 GHz bate a cada 1 / (2 × 10⁹) = 0,5 ns. Um microcontrolador de 64 MHz bate a cada 1 / (64 × 10⁶) ≈ 15,6 ns.</li>
   </ul>
  </div>
-  <div class="tbl prose">
+  <div class="tbl prose" id="tbl-potencias">
     <table>
       <thead><tr><th>Potência de 2</th><th>Valor</th><th>Nome e uso</th></tr></thead>
       <tbody>
@@ -69,7 +69,7 @@
 
   <details class="base" open>
    <summary><span class="base-tag">Base</span> Do transistor ao programa em cinco minutos</summary>
-<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 200"><rect class="k" x="6" y="6" width="150" height="120" rx="10"/><text class="tm st" x="16" y="20">CPU (chip)</text><rect class="am" x="16" y="32" width="62" height="40" rx="6"/><text x="47" y="52">ULA</text><rect class="bl" x="86" y="32" width="62" height="40" rx="6"/><text class="tm" x="117" y="46">regis-</text><text class="tm" x="117" y="60">tradores</text><rect class="k" x="16" y="80" width="62" height="36" rx="6"/><text class="tm" x="47" y="98">controle</text><rect class="acf" x="86" y="80" width="62" height="36" rx="6"/><text x="117" y="98">cache</text><rect class="gr" x="176" y="70" width="58" height="56" rx="6"/><text x="205" y="98">RAM</text><line class="s" x1="148" y1="98" x2="174" y2="98" marker-end="url(#mnarrow)"/><rect class="k" x="176" y="150" width="58" height="40" rx="6"/><text class="tm" x="205" y="170">SSD/disco</text><line class="s" x1="205" y1="126" x2="205" y2="148" marker-end="url(#mnarrow)"/><text class="tm st" x="6" y="142">perto e rápido → longe e lento</text></svg>A CPU calcula com registradores; a cache guarda cópias da RAM ali do lado.</aside>
+<aside class="mn" id="mn-cpu" aria-hidden="true"><svg viewBox="0 0 240 200"><rect class="k" x="6" y="6" width="150" height="120" rx="10"/><text class="tm st" x="16" y="20">CPU (chip)</text><rect class="am" x="16" y="32" width="62" height="40" rx="6"/><text x="47" y="52">ULA</text><rect class="bl" x="86" y="32" width="62" height="40" rx="6"/><text class="tm" x="117" y="46">regis-</text><text class="tm" x="117" y="60">tradores</text><rect class="k" x="16" y="80" width="62" height="36" rx="6"/><text class="tm" x="47" y="98">controle</text><rect class="acf" x="86" y="80" width="62" height="36" rx="6"/><text x="117" y="98">cache</text><rect class="gr" x="176" y="70" width="58" height="56" rx="6"/><text x="205" y="98">RAM</text><line class="s" x1="148" y1="98" x2="174" y2="98" marker-end="url(#mnarrow)"/><rect class="k" x="176" y="150" width="58" height="40" rx="6"/><text class="tm" x="205" y="170">SSD/disco</text><line class="s" x1="205" y1="126" x2="205" y2="148" marker-end="url(#mnarrow)"/><text class="tm st" x="6" y="142">perto e rápido → longe e lento</text></svg>A CPU calcula com registradores; a cache guarda cópias da RAM ali do lado.</aside>
    <ul class="b">
     <li><b>Transistor</b>: um interruptor minúsculo que liga ou desliga uma corrente elétrica de acordo com a tensão aplicada em um terminal de controle. Um chip moderno tem bilhões deles.</li>
     <li>Combinando transistores se fazem portas lógicas (E, OU, NÃO); combinando portas, se fazem somadores, comparadores e pequenas memórias.</li>
@@ -92,13 +92,13 @@
   <h3>Classes de computadores</h3>
   <p>O livro divide o mercado em cinco classes. Cada uma tem prioridades de projeto diferentes, e isso muda o que conta como "bom".</p>
  </div>
-  <div class="tbl prose">
+  <div class="tbl prose" id="tbl-classes">
     <table>
       <thead><tr><th>Classe</th><th>Exemplos</th><th>O que mais importa no projeto</th></tr></thead>
       <tbody>
         <tr><td>Dispositivo pessoal móvel</td><td>celular, tablet</td><td>custo, energia (bateria), resposta rápida a quem usa</td></tr>
         <tr><td>Desktop</td><td>notebook, computador de mesa</td><td>preço-desempenho, gráficos</td></tr>
-        <tr><td>Servidor</td><td>banco de dados, servidor web</td><td>disponibilidade, escalabilidade, vazão</td></tr>
+        <tr><td>Servidor</td><td>banco de dados, servidor web</td><td>disponibilidade, escalabilidade, throughput</td></tr>
         <tr><td>Cluster / computador em escala de armazém</td><td>data centers do Google, AWS</td><td>preço-desempenho, energia, disponibilidade</td></tr>
         <tr><td>Embarcado</td><td>micro-ondas, carro, pulseira</td><td>preço, energia, cumprir um prazo específico da aplicação</td></tr>
       </tbody>
@@ -122,7 +122,7 @@
   </ul>
 
   <h3>O que o livro chama de arquitetura</h3>
-<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="k" x="10" y="8" width="220" height="32" rx="6"/><text class="tm" x="120" y="24">software: programas, compilador, SO</text><rect class="acf" x="10" y="48" width="220" height="30" rx="6"/><text x="120" y="63">ISA (o contrato)</text><rect class="bl" x="10" y="86" width="220" height="26" rx="6"/><text class="tm" x="120" y="99">microarquitetura: cache, pipeline</text><rect class="am" x="10" y="118" width="220" height="26" rx="6"/><text class="tm" x="120" y="131">hardware: transistores, chip</text></svg>Mesma ISA por cima, implementações diferentes por baixo.</aside>
+<aside class="mn" id="mn-isa" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="k" x="10" y="8" width="220" height="32" rx="6"/><text class="tm" x="120" y="24">software: programas, compilador, SO</text><rect class="acf" x="10" y="48" width="220" height="30" rx="6"/><text x="120" y="63">ISA (o contrato)</text><rect class="bl" x="10" y="86" width="220" height="26" rx="6"/><text class="tm" x="120" y="99">microarquitetura: cache, pipeline</text><rect class="am" x="10" y="118" width="220" height="26" rx="6"/><text class="tm" x="120" y="131">hardware: transistores, chip</text></svg>Mesma ISA por cima, implementações diferentes por baixo.</aside>
   <ul class="b">
     <li><b>ISA</b> (Instruction Set Architecture, <b>conjunto de instruções</b>): a lista de instruções, registradores e regras de acesso à memória que o programador e o compilador enxergam. É o contrato entre software e hardware. Exemplos: x86-64, ARMv8, RISC-V.</li>
     <li><b>Microarquitetura</b> (o livro também diz organização): como um chip implementa a ISA por dentro, com que caches, quantos estágios, quantas unidades de cálculo.</li>
@@ -137,7 +137,7 @@
     <li>Modos de endereçamento: como a instrução diz onde está o dado (registrador, valor fixo na instrução, registrador + deslocamento).</li>
     <li>Tipos e tamanhos de operandos: inteiros de 8 a 64 bits, ponto flutuante de 32 e 64 bits.</li>
     <li>Operações: transferência de dados, aritmética e lógica, controle de fluxo, ponto flutuante.</li>
-    <li>Instruções de controle de fluxo: desvios condicionais, saltos, chamadas e retornos de função.</li>
+    <li>Instruções de controle de fluxo: branches condicionais, saltos, chamadas e retornos de função.</li>
     <li>Codificação: tamanho fixo (32 bits em ARM e RISC-V, fácil de decodificar) ou de tamanho livre (1 a 18 bytes no x86, programas menores).</li>
   </ul>
 
@@ -156,14 +156,14 @@
 <section class="chap" id="desempenho">
  <div class="prose">
   <span class="num">03</span>
-  <h2>Medir desempenho: tempo, vazão e a equação da CPU</h2>
+  <h2>Medir desempenho: tempo, throughput e a equação da CPU</h2>
   <div class="src"><span class="bk">Hennessy &amp; Patterson · cap. 1 · seções 1.8–1.9</span></div>
-<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="bl" x="12" y="20" width="44" height="24" rx="8"/><text class="tm" x="34" y="32">carro</text><line class="s" x1="60" y1="32" x2="200" y2="32" marker-end="url(#mnarrow)"/><text class="tm st" x="70" y="12">1 pessoa em 10 min</text><rect class="am" x="12" y="70" width="80" height="34" rx="6"/><text class="tm" x="52" y="87">ônibus</text><line class="s" x1="96" y1="87" x2="200" y2="87" marker-end="url(#mnarrow)"/><text class="tm st" x="100" y="68">50 pessoas em 20 min</text><text class="tm" x="120" y="122">carro: menor latência</text><text class="tm" x="120" y="138">ônibus: maior vazão</text></svg>Melhorar uma métrica não melhora a outra automaticamente.</aside>
+<aside class="mn" id="mn-latencia" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="bl" x="12" y="20" width="44" height="24" rx="8"/><text class="tm" x="34" y="32">carro</text><line class="s" x1="60" y1="32" x2="200" y2="32" marker-end="url(#mnarrow)"/><text class="tm st" x="70" y="12">1 pessoa em 10 min</text><rect class="am" x="12" y="70" width="80" height="34" rx="6"/><text class="tm" x="52" y="87">ônibus</text><line class="s" x1="96" y1="87" x2="200" y2="87" marker-end="url(#mnarrow)"/><text class="tm st" x="100" y="68">50 pessoas em 20 min</text><text class="tm" x="120" y="122">carro: menor latência</text><text class="tm" x="120" y="138">ônibus: maior throughput</text></svg>Melhorar uma métrica não melhora a outra automaticamente.</aside>
   <p>Um carro leva uma pessoa ao centro em 10 minutos. Um ônibus leva 50 pessoas em 20 minutos. Qual é "mais rápido"? Depende de quem pergunta: o passageiro quer chegar logo; a prefeitura quer transportar muita gente por hora.</p>
   <ul class="b">
     <li><b>Tempo de execução</b> (ou <b>latência</b>): quanto tempo uma tarefa leva do começo ao fim. É o que importa para quem está esperando o resultado.</li>
-    <li><b>Vazão</b> (throughput): quantas tarefas terminam por unidade de tempo. É o que importa para um servidor atendendo milhares de pedidos.</li>
-    <li>Processador mais rápido melhora as duas. Mais processadores em paralelo melhoram a vazão, mas uma tarefa sozinha não termina antes.</li>
+    <li><b>Throughput</b> (vazão): quantas tarefas terminam por unidade de tempo. É o que importa para um servidor atendendo milhares de pedidos.</li>
+    <li>Processador mais rápido melhora as duas. Mais processadores em paralelo melhoram o throughput, mas uma tarefa sozinha não termina antes.</li>
     <li>O tempo que você mede no relógio inclui esperar disco, rede e outros programas. O <b>tempo de CPU</b> conta só o tempo em que o processador trabalhou no seu programa.</li>
   </ul>
 
@@ -173,7 +173,7 @@
     <p class="simples">Divida o tempo da máquina lenta pelo da rápida. Se Y leva 15 s e X leva 10 s, X é 15 / 10 = 1,5 vez mais rápido.</p>
     <p class="formal">Com desempenho = 1 / tempo de execução:</p>
     <div class="formula">n = Tempo_Y / Tempo_X = Desempenho_X / Desempenho_Y</div>
-    <p class="nota-formal">Esse n é a <b>aceleração</b> (speedup) de X em relação a Y. Repare que o tempo de Y fica em cima: tempo menor, desempenho maior.</p>
+    <p class="nota-formal">Esse n é o <b>speedup</b> (aceleração) de X em relação a Y. Repare que o tempo de Y fica em cima: tempo menor, desempenho maior.</p>
   </div>
 
   <h3>Benchmarks</h3>
@@ -200,7 +200,7 @@
     <li>Os três fatores dependem de coisas diferentes, e melhorar um costuma piorar outro. O livro chama isso de equilíbrio do projeto:</li>
   </ul>
  </div>
-  <div class="tbl prose">
+  <div class="tbl prose" id="tbl-fatores">
     <table>
       <thead><tr><th>Fator</th><th>Quem mexe nele</th><th>Exemplo de troca</th></tr></thead>
       <tbody>
@@ -217,7 +217,7 @@
   <div class="formula">CPI = Σ (ICᵢ / IC) × CPIᵢ</div>
   <ul class="b">
     <li>Leia o Σ como "some para cada classe i". ICᵢ / IC é a fração das instruções que são da classe i.</li>
-    <li>Exemplo: 50% aritméticas com CPI 1, 30% de acesso à memória com CPI 2, 20% desvios com CPI 3. CPI = 0,5 × 1 + 0,3 × 2 + 0,2 × 3 = 0,5 + 0,6 + 0,6 = 1,7.</li>
+    <li>Exemplo: 50% aritméticas com CPI 1, 30% de acesso à memória com CPI 2, 20% branches com CPI 3. CPI = 0,5 × 1 + 0,3 × 2 + 0,2 × 3 = 0,5 + 0,6 + 0,6 = 1,7.</li>
   </ul>
  </div>
 
@@ -258,14 +258,14 @@
   <span class="num">04</span>
   <h2>Lei de Amdahl: o limite de melhorar uma parte</h2>
   <div class="src"><span class="bk">Hennessy &amp; Patterson · cap. 1 · seção 1.9</span></div>
-<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 120"><text class="tm st" x="6" y="12">antes (100%)</text><rect class="k" x="6" y="22" width="132" height="26" rx="4"/><text class="tm" x="72" y="35">60% espera E/S</text><rect class="bl" x="138" y="22" width="88" height="26" rx="4"/><text class="tm" x="182" y="35">40% CPU</text><text class="tm st" x="6" y="66">depois: CPU 10× mais rápida</text><rect class="k" x="6" y="76" width="132" height="26" rx="4"/><text class="tm" x="72" y="89">60%</text><rect class="bl" x="138" y="76" width="9" height="26" rx="2"/><text class="tam" x="190" y="89">total 64%</text></svg>A parte que não melhorou passa a dominar.</aside>
-  <p>Exemplo do livro: um servidor web passa 40% do tempo calculando e 60% esperando disco e rede. Troca-se o processador por um 10 vezes mais rápido. O tempo novo é 0,6 + 0,4 / 10 = 0,64 do antigo. A aceleração é 1 / 0,64 = 1,56, longe de 10.</p>
+<aside class="mn" id="mn-amdahl" aria-hidden="true"><svg viewBox="0 0 240 120"><text class="tm st" x="6" y="12">antes (100%)</text><rect class="k" x="6" y="22" width="132" height="26" rx="4"/><text class="tm" x="72" y="35">60% espera E/S</text><rect class="bl" x="138" y="22" width="88" height="26" rx="4"/><text class="tm" x="182" y="35">40% CPU</text><text class="tm st" x="6" y="66">depois: CPU 10× mais rápida</text><rect class="k" x="6" y="76" width="132" height="26" rx="4"/><text class="tm" x="72" y="89">60%</text><rect class="bl" x="138" y="76" width="9" height="26" rx="2"/><text class="tam" x="190" y="89">total 64%</text></svg>A parte que não melhorou passa a dominar.</aside>
+  <p>Exemplo do livro: um servidor web passa 40% do tempo calculando e 60% esperando disco e rede. Troca-se o processador por um 10 vezes mais rápido. O tempo novo é 0,6 + 0,4 / 10 = 0,64 do antigo. O speedup é 1 / 0,64 = 1,56, longe de 10.</p>
   <div class="def key">
     <span class="lab">Definição · Lei de Amdahl</span>
     <p class="simples">O ganho total de uma melhoria é limitado pela parte do tempo em que ela não é usada. Acelerar uma parte pequena dá um ganho pequeno, por mais radical que seja a melhoria.</p>
     <p class="formal">Como o livro escreve:</p>
     <div class="formula">S_global = Tempo_antigo / Tempo_novo = 1 / ((1 − f) + f / s)</div>
-    <p class="nota-formal">f é a fração do tempo de execução original que pode usar a melhoria (entre 0 e 1). s é a aceleração dessa fração (quantas vezes ela fica mais rápida). <code>1 − f</code> é a parte que continua igual e <code>f / s</code> é o que sobra da parte melhorada.</p>
+    <p class="nota-formal">f é a fração do tempo de execução original que pode usar a melhoria (entre 0 e 1). s é o speedup dessa fração (quantas vezes ela fica mais rápida). <code>1 − f</code> é a parte que continua igual e <code>f / s</code> é o que sobra da parte melhorada.</p>
   </div>
   <ul class="b">
     <li>Conta passo a passo com f = 0,4 e s = 10: 1 − f = 0,6; f / s = 0,04; soma = 0,64; S = 1 / 0,64 = 1,56.</li>
@@ -274,7 +274,7 @@
     <li>Daí o princípio "torne rápido o caso comum": melhore o que ocupa mais tempo.</li>
     <li>Em processadores paralelos, f é a parte do programa que dá para dividir e s é o número de processadores. Com f = 0,95 e 8 processadores: 1 / (0,05 + 0,95/8) = 1 / 0,169 = 5,9. Com infinitos processadores, no máximo 1 / 0,05 = 20.</li>
   </ul>
-  <p>Mexa em f e s. O ponto laranja é a aceleração atual; a linha tracejada é o teto 1 / (1 − f):</p>
+  <p>Mexa em f e s. O ponto laranja é o speedup atual; a linha tracejada é o teto 1 / (1 − f):</p>
  </div>
 
   <figure class="fig" id="fig-amdahl">
@@ -283,9 +283,9 @@
       <div class="fig-stage game">
         <div class="ctl-grid">
           <div class="ctl"><label for="am-f">f (fração do tempo que melhora) <b id="am-fv"></b></label><input type="range" id="am-f" min="0" max="99" value="40"></div>
-          <div class="ctl"><label for="am-s">s (aceleração dessa parte) <b id="am-sv"></b></label><input type="range" id="am-s" min="0" max="200" value="100"></div>
+          <div class="ctl"><label for="am-s">s (speedup dessa parte) <b id="am-sv"></b></label><input type="range" id="am-s" min="0" max="200" value="100"></div>
         </div>
-        <svg id="am-svg" viewBox="0 0 640 380" role="img" aria-label="Tempo antes e depois e curva da aceleração global em função de s"></svg>
+        <svg id="am-svg" viewBox="0 0 640 380" role="img" aria-label="Tempo antes e depois e curva do speedup global em função de s"></svg>
         <div class="stage-cap" id="am-cap"></div>
       </div>
       <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
@@ -299,7 +299,7 @@
     <span class="lab">Erros comuns</span>
     <ul class="b">
       <li>Usar f como fração do código ou das instruções. É fração do tempo, medido antes da melhoria.</li>
-      <li>Somar acelerações de duas melhorias. Aplique Amdahl de novo sobre o tempo que sobrou.</li>
+      <li>Somar speedups de duas melhorias. Aplique Amdahl de novo sobre o tempo que sobrou.</li>
       <li>Achar que dobrar o número de processadores dobra o desempenho. Só se f fosse 1.</li>
     </ul>
   </div>
@@ -354,12 +354,12 @@
   </ul>
 
   <h3>Fim da escala de Dennard e a virada para o multicore</h3>
-<aside class="mn loop" data-loop="multicore" data-ms="11000" data-still="0.95" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>O clock subiu até cerca de 2005 e travou perto de 3 a 4 GHz. Daí em diante, o ganho veio de mais núcleos de processamento por chip.</aside>
+<aside class="mn loop" data-loop="multicore" data-ms="11000" data-still="0.95" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>O clock subiu até cerca de 2005 e travou perto de 3 a 4 GHz. Daí em diante, o ganho veio de mais cores por chip.</aside>
   <ul class="b">
     <li><b>Escala de Dennard</b> (1974): ao encolher o transistor, a tensão e a corrente também caem, e a potência por área do chip fica constante. Dava para ter mais transistores e mais clock de graça.</li>
     <li>Por volta de 2004 isso acabou. A tensão parou de cair perto de 1 V, porque abaixo disso a corrente de fuga dispara e o transistor não desliga direito.</li>
     <li>Sem cair a tensão, mais clock e mais transistores por área significam mais potência por área. O chip chegou ao limite do que dá para resfriar com ar: a "parede de potência".</li>
-    <li>A indústria parou de subir o clock e passou a colocar vários processadores no mesmo chip: o processador <b>multicore</b> (multinúcleo), em que cada núcleo de processamento executa seu próprio programa ou thread. O ganho passou a depender de o software ser paralelo (e de Amdahl, seção 4).</li>
+    <li>A indústria parou de subir o clock e passou a colocar vários processadores no mesmo chip: o processador <b>multicore</b> (multinúcleo), em que cada core executa seu próprio programa ou thread. O ganho passou a depender de o software ser paralelo (e de Amdahl, seção 4).</li>
     <li>Hoje nem todos os transistores de um chip podem ficar ligados ao mesmo tempo sem estourar a potência. Partes ficam desligadas a maior parte do tempo, o que se chama de silício escuro.</li>
   </ul>
   <p class="prova">Potência dinâmica ∝ ½ · C · V² · f. Com o fim da escala de Dennard a tensão parou de cair, a densidade de potência travou o clock e a saída foi o multicore. A potência estática (fuga) cresce com transistores menores.</p>
@@ -400,7 +400,7 @@
   </ul>
 
   <h3>Quanto custa um chip</h3>
-<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><circle class="k" cx="62" cy="72" r="56"/><g class="s"><path d="M22 52 H102 M18 72 H106 M22 92 H102 M42 32 V112 M62 18 V126 M82 32 V112" style="stroke:var(--line2)"/></g><circle cx="50" cy="60" r="3.5" style="fill:var(--red)"/><circle cx="90" cy="84" r="3.5" style="fill:var(--red)"/><circle cx="70" cy="100" r="3.5" style="fill:var(--red)"/><circle class="k" cx="182" cy="72" r="56"/><g class="s"><path d="M126 72 H238 M182 18 V126" style="stroke:var(--line2)"/></g><circle cx="170" cy="60" r="3.5" style="fill:var(--red)"/><circle cx="210" cy="84" r="3.5" style="fill:var(--red)"/><circle cx="190" cy="100" r="3.5" style="fill:var(--red)"/><text class="tm" x="62" y="142">dies pequenos</text><text class="tm" x="182" y="142">dies grandes</text></svg>Os mesmos 3 defeitos estragam 3 de 20 dies pequenos, mas 3 de 4 grandes.</aside>
+<aside class="mn" id="mn-wafer" aria-hidden="true"><svg viewBox="0 0 240 150"><circle class="k" cx="62" cy="72" r="56"/><g class="s"><path d="M22 52 H102 M18 72 H106 M22 92 H102 M42 32 V112 M62 18 V126 M82 32 V112" style="stroke:var(--line2)"/></g><circle cx="50" cy="60" r="3.5" style="fill:var(--red)"/><circle cx="90" cy="84" r="3.5" style="fill:var(--red)"/><circle cx="70" cy="100" r="3.5" style="fill:var(--red)"/><circle class="k" cx="182" cy="72" r="56"/><g class="s"><path d="M126 72 H238 M182 18 V126" style="stroke:var(--line2)"/></g><circle cx="170" cy="60" r="3.5" style="fill:var(--red)"/><circle cx="210" cy="84" r="3.5" style="fill:var(--red)"/><circle cx="190" cy="100" r="3.5" style="fill:var(--red)"/><text class="tm" x="62" y="142">dies pequenos</text><text class="tm" x="182" y="142">dies grandes</text></svg>Os mesmos 3 defeitos estragam 3 de 20 dies pequenos, mas 3 de 4 grandes.</aside>
   <ul class="b">
     <li>Chips são fabricados em <b>wafers</b>: discos finos de silício de 300 mm de diâmetro. Cada wafer é cortado em centenas de retângulos, os <b>dies</b> (pastilhas), cada um com um processador.</li>
     <li>O wafer tem defeitos espalhados ao acaso. Um die com defeito vai para o lixo. O <b>yield</b> (rendimento do die) é a fração de dies bons.</li>
@@ -415,7 +415,7 @@
   </ul>
   <p>Conta com wafer de 30 cm, custo do wafer US$ 5 500, yield do wafer 100%:</p>
  </div>
-  <div class="tbl prose">
+  <div class="tbl prose" id="tbl-custo">
     <table>
       <thead><tr><th></th><th>Die de 1,0 cm²</th><th>Die de 2,25 cm² (1,5 × 1,5)</th></tr></thead>
       <tbody>
@@ -429,7 +429,7 @@
   </div>
  <div class="prose">
   <ul class="b">
-    <li>Área 2,25 vezes maior, custo 3,9 vezes maior. É por isso que caches enormes e muitos núcleos de processamento encarecem tanto um chip.</li>
+    <li>Área 2,25 vezes maior, custo 3,9 vezes maior. É por isso que caches enormes e muitos cores encarecem tanto um chip.</li>
     <li>Ao custo do die ainda somam-se teste, encapsulamento e o teste final. E o custo cai com o tempo (curva de aprendizado: o yield melhora) e com o volume produzido.</li>
   </ul>
   <div class="def">
@@ -455,7 +455,7 @@
   </ul>
 <aside class="mn loop" data-loop="piramide" data-ms="10000" data-still="0.3" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Um pedido desce até achar o dado e volta. Quanto mais fundo, mais caro.</aside>
  </div>
-  <div class="tbl prose">
+  <div class="tbl prose" id="tbl-niveis">
     <table>
       <thead><tr><th>Nível</th><th>Tamanho típico</th><th>Latência típica</th><th>Se 1 ns fosse 1 s</th></tr></thead>
       <tbody>
@@ -494,7 +494,7 @@
 
   <h3>As tecnologias de memória</h3>
  </div>
-  <div class="tbl prose">
+  <div class="tbl prose" id="tbl-tecnologias">
     <table>
       <thead><tr><th></th><th>SRAM</th><th>DRAM</th><th>Flash (NAND)</th></tr></thead>
       <tbody>
@@ -537,7 +537,7 @@
   <p>O livro organiza o projeto de uma cache em quatro perguntas.</p>
 
   <h3>1. Onde um bloco pode ficar?</h3>
-<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 170"><text class="tm st" x="4" y="10">bloco 12 numa cache de 8 linhas</text><text class="tm st" x="4" y="32">direto</text><g><rect class="k" x="70" y="22" width="20" height="20"/><rect class="k" x="90" y="22" width="20" height="20"/><rect class="k" x="110" y="22" width="20" height="20"/><rect class="k" x="130" y="22" width="20" height="20"/><rect class="am" x="150" y="22" width="20" height="20"/><rect class="k" x="170" y="22" width="20" height="20"/><rect class="k" x="190" y="22" width="20" height="20"/><rect class="k" x="210" y="22" width="20" height="20"/></g><text class="tm" x="160" y="54">12 mod 8 = 4</text><text class="tm st" x="4" y="82">2 vias</text><g><rect class="am" x="70" y="72" width="20" height="20"/><rect class="am" x="90" y="72" width="20" height="20"/><rect class="k" x="114" y="72" width="20" height="20"/><rect class="k" x="134" y="72" width="20" height="20"/><rect class="k" x="158" y="72" width="20" height="20"/><rect class="k" x="178" y="72" width="20" height="20"/><rect class="k" x="202" y="72" width="20" height="20"/><rect class="k" x="222" y="72" width="16" height="20"/></g><text class="tm" x="90" y="104">conj. 12 mod 4 = 0</text><text class="tm st" x="4" y="132">total</text><g><rect class="am" x="70" y="122" width="20" height="20"/><rect class="am" x="90" y="122" width="20" height="20"/><rect class="am" x="110" y="122" width="20" height="20"/><rect class="am" x="130" y="122" width="20" height="20"/><rect class="am" x="150" y="122" width="20" height="20"/><rect class="am" x="170" y="122" width="20" height="20"/><rect class="am" x="190" y="122" width="20" height="20"/><rect class="am" x="210" y="122" width="20" height="20"/></g><text class="tm" x="150" y="156">qualquer linha</text></svg>Laranja: onde o bloco 12 pode ser guardado em cada organização.</aside>
+<aside class="mn" id="mn-mapeamento" aria-hidden="true"><svg viewBox="0 0 240 170"><text class="tm st" x="4" y="10">bloco 12 numa cache de 8 linhas</text><text class="tm st" x="4" y="32">direto</text><g><rect class="k" x="70" y="22" width="20" height="20"/><rect class="k" x="90" y="22" width="20" height="20"/><rect class="k" x="110" y="22" width="20" height="20"/><rect class="k" x="130" y="22" width="20" height="20"/><rect class="am" x="150" y="22" width="20" height="20"/><rect class="k" x="170" y="22" width="20" height="20"/><rect class="k" x="190" y="22" width="20" height="20"/><rect class="k" x="210" y="22" width="20" height="20"/></g><text class="tm" x="160" y="54">12 mod 8 = 4</text><text class="tm st" x="4" y="82">2 vias</text><g><rect class="am" x="70" y="72" width="20" height="20"/><rect class="am" x="90" y="72" width="20" height="20"/><rect class="k" x="114" y="72" width="20" height="20"/><rect class="k" x="134" y="72" width="20" height="20"/><rect class="k" x="158" y="72" width="20" height="20"/><rect class="k" x="178" y="72" width="20" height="20"/><rect class="k" x="202" y="72" width="20" height="20"/><rect class="k" x="222" y="72" width="16" height="20"/></g><text class="tm" x="90" y="104">conj. 12 mod 4 = 0</text><text class="tm st" x="4" y="132">total</text><g><rect class="am" x="70" y="122" width="20" height="20"/><rect class="am" x="90" y="122" width="20" height="20"/><rect class="am" x="110" y="122" width="20" height="20"/><rect class="am" x="130" y="122" width="20" height="20"/><rect class="am" x="150" y="122" width="20" height="20"/><rect class="am" x="170" y="122" width="20" height="20"/><rect class="am" x="190" y="122" width="20" height="20"/><rect class="am" x="210" y="122" width="20" height="20"/></g><text class="tm" x="150" y="156">qualquer linha</text></svg>Laranja: onde o bloco 12 pode ser guardado em cada organização.</aside>
   <p>Pense num estacionamento. Na versão mais rígida, cada carro tem uma vaga fixa, calculada pela placa. Na mais livre, para em qualquer vaga. No meio do caminho, a placa indica um setor e o carro escolhe qualquer vaga dele.</p>
   <ul class="b">
     <li><b>Mapeamento direto</b>: cada bloco da memória só pode ir para uma linha da cache: a de número (número do bloco) mod (número de linhas). "mod" é o resto da divisão: o bloco 12 numa cache de 8 linhas vai para a linha 12 mod 8 = 4. Simples e rápido; dois blocos que caem na mesma linha ficam se expulsando.</li>
@@ -547,7 +547,7 @@
   </ul>
 
   <h3>2. Como achar um bloco?</h3>
-<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 120"><text class="tm" x="120" y="10">endereço de 32 bits</text><rect class="bl" x="6" y="22" width="118" height="32" rx="4"/><text x="65" y="38">tag</text><rect class="am" x="124" y="22" width="56" height="32" rx="4"/><text x="152" y="38">índice</text><rect class="k" x="180" y="22" width="54" height="32" rx="4"/><text x="207" y="38">offset</text><text class="tb" x="65" y="70">19 bits</text><text class="tam" x="152" y="70">7 bits</text><text class="tm" x="207" y="70">6 bits</text><text class="tm" x="65" y="92">compara</text><text class="tm" x="152" y="92">conjunto</text><text class="tm" x="207" y="92">byte</text><text class="tm" x="120" y="112">32 KiB · blocos de 64 B · 4 vias</text></svg>O mesmo endereço, lido em três pedaços.</aside>
+<aside class="mn" id="mn-endereco" aria-hidden="true"><svg viewBox="0 0 240 120"><text class="tm" x="120" y="10">endereço de 32 bits</text><rect class="bl" x="6" y="22" width="118" height="32" rx="4"/><text x="65" y="38">tag</text><rect class="am" x="124" y="22" width="56" height="32" rx="4"/><text x="152" y="38">índice</text><rect class="k" x="180" y="22" width="54" height="32" rx="4"/><text x="207" y="38">offset</text><text class="tb" x="65" y="70">19 bits</text><text class="tam" x="152" y="70">7 bits</text><text class="tm" x="207" y="70">6 bits</text><text class="tm" x="65" y="92">compara</text><text class="tm" x="152" y="92">conjunto</text><text class="tm" x="207" y="92">byte</text><text class="tm" x="120" y="112">32 KiB · blocos de 64 B · 4 vias</text></svg>O mesmo endereço, lido em três pedaços.</aside>
   <p>A cache corta o endereço pedido em três campos, da direita para a esquerda:</p>
   <ul class="b">
     <li><b>Offset</b> (deslocamento no bloco): qual byte dentro do bloco. Com blocos de 64 bytes, log₂ 64 = 6 bits.</li>
@@ -572,7 +572,7 @@
 <aside class="mn loop" data-loop="writeback" data-ms="10000" data-still="0.55" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Write-back: as escritas ficam só na cache e marcam o bloco como sujo. A memória só é atualizada quando o bloco sai.</aside>
   <ul class="b">
     <li><b>Write-through</b> (escrita direta): toda escrita vai para a cache e para a memória de baixo ao mesmo tempo. A memória fica sempre atualizada, mas cada escrita gera tráfego.</li>
-    <li>Para a CPU não esperar a memória a cada escrita, o write-through usa um <b>buffer de escrita</b> (write buffer): uma pequena fila que guarda as escritas pendentes enquanto a CPU segue em frente.</li>
+    <li>Para a CPU não esperar a memória a cada escrita, o write-through usa um <b>write buffer</b> (buffer de escrita): uma pequena fila que guarda as escritas pendentes enquanto a CPU segue em frente.</li>
     <li><b>Write-back</b> (escrita adiada): a escrita fica só na cache. A memória só recebe o bloco quando ele for expulso. Várias escritas no mesmo bloco viram uma só ida à memória.</li>
     <li>Para saber se precisa gravar ao expulsar, cada linha tem um <b>dirty bit</b> (bit sujo): 1 se o bloco foi modificado desde que chegou. Bloco limpo pode ser descartado; <b>bloco sujo</b> precisa ser gravado antes.</li>
     <li>E se a escrita for um miss? Com <b>write allocate</b>, o bloco é trazido para a cache e então escrito (comum com write-back). Com no-write allocate, a escrita vai direto para a memória sem trazer o bloco (comum com write-through).</li>
@@ -596,33 +596,33 @@
 
  <div class="prose">
   <h3>Desempenho da cache: AMAT</h3>
-  <p>Uma cache acerta 95% das vezes em 1 ns. Nos outros 5%, a CPU espera mais 100 ns pela memória. Em média, cada acesso custa 1 + 0,05 × 100 = 6 ns.</p>
+  <p>Uma cache dá hit em 95% dos acessos, em 1 ns. Nos outros 5%, a CPU espera mais 100 ns pela memória. Em média, cada acesso custa 1 + 0,05 × 100 = 6 ns.</p>
   <div class="def key">
     <span class="lab">Definição · Tempo médio de acesso à memória</span>
     <p class="simples">Todo acesso paga o tempo de olhar a cache. Os que dão miss pagam, além disso, a viagem até a memória de baixo.</p>
     <p class="formal">Como o livro escreve:</p>
-    <div class="formula">AMAT = Tempo de hit + Taxa de miss × Penalidade de miss</div>
-    <p class="nota-formal"><b>AMAT</b>: average memory access time. <b>Tempo de hit</b>: tempo para olhar a cache e entregar o dado quando ele está lá. <b>Taxa de miss</b>: fração dos acessos que dão miss (misses / acessos). <b>Penalidade de miss</b>: tempo extra para trazer o bloco do nível de baixo.</p>
+    <div class="formula">AMAT = Hit time + Miss rate × Miss penalty</div>
+    <p class="nota-formal"><b>AMAT</b>: average memory access time. <b>Hit time</b> (tempo de hit): tempo para olhar a cache e entregar o dado quando ele está lá. <b>Miss rate</b> (taxa de miss): fração dos acessos que dão miss (misses / acessos); 1 − miss rate é a hit rate. <b>Miss penalty</b> (penalidade de miss): tempo extra para trazer o bloco do nível de baixo.</p>
   </div>
   <ul class="b">
-    <li>Misses também entram na equação da CPU. Cada miss trava a CPU por "penalidade" ciclos:</li>
+    <li>Misses também entram na equação da CPU. Cada miss trava a CPU por "miss penalty" ciclos:</li>
   </ul>
-  <div class="formula">CPI efetivo = CPI base + (acessos por instrução) × taxa de miss × penalidade</div>
+  <div class="formula">CPI efetivo = CPI base + (acessos por instrução) × miss rate × miss penalty</div>
   <ul class="b">
-    <li>Exemplo: CPI base 1,0, 1,5 acesso por instrução (uma busca de instrução e meio acesso a dados), taxa de miss 2%, penalidade 100 ciclos. CPI = 1,0 + 1,5 × 0,02 × 100 = 1,0 + 3,0 = 4,0. A memória deixa a máquina 4 vezes mais lenta que a ideal.</li>
+    <li>Exemplo: CPI base 1,0, 1,5 acesso por instrução (uma busca de instrução e meio acesso a dados), miss rate 2%, miss penalty 100 ciclos. CPI = 1,0 + 1,5 × 0,02 × 100 = 1,0 + 3,0 = 4,0. A memória deixa a máquina 4 vezes mais lenta que a ideal.</li>
     <li>Outra forma de contar: misses por mil instruções = 1,5 × 0,02 × 1 000 = 30.</li>
   </ul>
-  <p class="prova">AMAT = tempo de hit + taxa de miss × penalidade de miss. Ex.: 1 + 0,05 × 100 = 6 ns. Misses também aumentam o CPI efetivo.</p>
+  <p class="prova">AMAT = hit time + miss rate × miss penalty. Ex.: 1 + 0,05 × 100 = 6 ns. Misses também aumentam o CPI efetivo.</p>
   <div class="def warn">
     <span class="lab">Cuidado</span>
     <ul class="b">
-      <li>Taxa de miss menor não garante AMAT menor: mais vias costumam aumentar o tempo de hit (mais tags comparadas, mais circuito no caminho).</li>
-      <li>Taxa de miss é por acesso, não por instrução. Para chegar em "por instrução", multiplique pelos acessos por instrução.</li>
+      <li>Miss rate menor não garante AMAT menor: mais vias costumam aumentar o hit time (mais tags comparadas, mais circuito no caminho).</li>
+      <li>A miss rate é por acesso, não por instrução. Para chegar em "por instrução", multiplique pelos acessos por instrução.</li>
     </ul>
   </div>
   <div class="def">
     <span class="lab">Na ponderada · pulseira</span>
-    <p>Prazo de tempo real olha o pior caso, não a média. Exemplo com outros números: uma rotina faz 2 000 acessos; com hit de 1 ciclo e miss de 50 ciclos a 100 MHz, todos acertando custam 20 µs, todos errando custam 2 000 × 51 × 10 ns ≈ 1 ms. A pergunta que você vai responder: <em>no pior caso de acesso à memória, a amostra ainda cabe nos 5 ms?</em></p>
+    <p>Prazo de tempo real olha o pior caso, não a média. Exemplo com outros números: uma rotina faz 2 000 acessos; com hit de 1 ciclo e miss de 50 ciclos a 100 MHz, todos dando hit custam 20 µs, todos dando miss custam 2 000 × 51 × 10 ns ≈ 1 ms. A pergunta que você vai responder: <em>no pior caso de acesso à memória, a amostra ainda cabe nos 5 ms?</em></p>
   </div>
  </div>
 </section>
@@ -635,7 +635,7 @@
   <span class="num">09</span>
   <h2>Otimizações de cache</h2>
   <div class="src"><span class="bk">Hennessy &amp; Patterson · cap. 2 · seção 2.2</span><span class="bk">Apêndice B · seis otimizações básicas</span></div>
-  <p>A fórmula do AMAT tem três termos, então há três frentes de ataque: diminuir a taxa de miss, diminuir a penalidade e diminuir o tempo de hit. Antes, é preciso saber por que os misses acontecem.</p>
+  <p>A fórmula do AMAT tem três termos, então há três frentes de ataque: diminuir a miss rate, diminuir a miss penalty e diminuir o hit time. Antes, é preciso saber por que os misses acontecem.</p>
 
   <h3>Os três Cs: de onde vêm os misses</h3>
   <div class="def key">
@@ -643,8 +643,8 @@
     <p class="simples">Todo miss tem uma de três causas: o bloco nunca tinha sido usado, não cabia tudo, ou cabia mas dois blocos brigaram pela mesma linha.</p>
     <ul class="b">
       <li><b>Compulsório</b> (ou de partida a frio): o primeiro acesso a um bloco. Nenhuma cache evita, por maior que seja.</li>
-      <li><b>Miss de capacidade</b>: o programa usa mais blocos do que a cache comporta. Mesmo uma cache totalmente associativa do mesmo tamanho teria errado.</li>
-      <li><b>Miss de conflito</b>: havia espaço, mas o bloco foi expulso porque outros caíram no mesmo conjunto. Uma cache totalmente associativa do mesmo tamanho teria acertado.</li>
+      <li><b>Miss de capacidade</b>: o programa usa mais blocos do que a cache comporta. Mesmo uma cache totalmente associativa do mesmo tamanho teria dado miss.</li>
+      <li><b>Miss de conflito</b>: havia espaço, mas o bloco foi expulso porque outros caíram no mesmo conjunto. Uma cache totalmente associativa do mesmo tamanho teria dado hit.</li>
     </ul>
   </div>
   <ul class="b">
@@ -654,56 +654,56 @@
 
   <h3>As seis otimizações básicas</h3>
  </div>
-  <div class="tbl prose">
+  <div class="tbl prose" id="tbl-basicas">
     <table>
       <thead><tr><th>Técnica</th><th>Melhora</th><th>Piora</th></tr></thead>
       <tbody>
-        <tr><td>Blocos maiores</td><td>menos compulsórios (aproveita localidade espacial)</td><td>penalidade maior; com cache pequena, mais conflitos</td></tr>
-        <tr><td>Cache maior</td><td>menos misses de capacidade</td><td>tempo de hit, custo e energia</td></tr>
-        <tr><td>Mais associatividade</td><td>menos misses de conflito</td><td>tempo de hit e energia</td></tr>
-        <tr><td>Caches multinível</td><td>penalidade de miss</td><td>mais hardware</td></tr>
-        <tr><td>Atender leituras antes das escritas pendentes</td><td>penalidade de miss (a leitura não espera o buffer de escrita esvaziar)</td><td>precisa conferir se a leitura não pede um dado ainda no buffer</td></tr>
-        <tr><td>Indexar a cache sem esperar a tradução de endereço</td><td>tempo de hit (seção 10)</td><td>complica a proteção entre programas</td></tr>
+        <tr><td>Blocos maiores</td><td>menos compulsórios (aproveita localidade espacial)</td><td>miss penalty maior; com cache pequena, mais conflitos</td></tr>
+        <tr><td>Cache maior</td><td>menos misses de capacidade</td><td>hit time, custo e energia</td></tr>
+        <tr><td>Mais associatividade</td><td>menos misses de conflito</td><td>hit time e energia</td></tr>
+        <tr><td>Caches multinível</td><td>miss penalty</td><td>mais hardware</td></tr>
+        <tr><td>Atender leituras antes das escritas pendentes</td><td>miss penalty (a leitura não espera o write buffer esvaziar)</td><td>precisa conferir se a leitura não pede um dado ainda no buffer</td></tr>
+        <tr><td>Indexar a cache sem esperar a tradução de endereço</td><td>hit time (seção 10)</td><td>complica a proteção entre programas</td></tr>
       </tbody>
     </table>
   </div>
  <div class="prose">
   <h3>Caches multinível</h3>
-<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 140"><rect class="acf" x="10" y="10" width="60" height="30" rx="6"/><text x="40" y="25">L1</text><rect class="bl" x="90" y="10" width="60" height="30" rx="6"/><text x="120" y="25">L2</text><rect class="gr" x="170" y="10" width="60" height="30" rx="6"/><text class="tm" x="200" y="25">DRAM</text><line class="s" x1="70" y1="25" x2="88" y2="25" marker-end="url(#mnarrow)"/><line class="s" x1="150" y1="25" x2="168" y2="25" marker-end="url(#mnarrow)"/><text class="tm" x="40" y="56">1 ciclo</text><text class="tm" x="120" y="56">10 ciclos</text><text class="tm" x="200" y="56">200 ciclos</text><text class="tm" x="78" y="76">4% miss</text><text class="tm" x="158" y="76">50% miss</text><text class="tam" x="120" y="108">1 + 0,04 × (10 + 0,5 × 200)</text><text class="tam" x="120" y="128">= 5,4 ciclos</text></svg>A L2 transforma a penalidade de 200 ciclos numa média de 110.</aside>
+<aside class="mn" id="mn-multinivel" aria-hidden="true"><svg viewBox="0 0 240 140"><rect class="acf" x="10" y="10" width="60" height="30" rx="6"/><text x="40" y="25">L1</text><rect class="bl" x="90" y="10" width="60" height="30" rx="6"/><text x="120" y="25">L2</text><rect class="gr" x="170" y="10" width="60" height="30" rx="6"/><text class="tm" x="200" y="25">DRAM</text><line class="s" x1="70" y1="25" x2="88" y2="25" marker-end="url(#mnarrow)"/><line class="s" x1="150" y1="25" x2="168" y2="25" marker-end="url(#mnarrow)"/><text class="tm" x="40" y="56">1 ciclo</text><text class="tm" x="120" y="56">10 ciclos</text><text class="tm" x="200" y="56">200 ciclos</text><text class="tm" x="78" y="76">4% miss</text><text class="tm" x="158" y="76">50% miss</text><text class="tam" x="120" y="108">1 + 0,04 × (10 + 0,5 × 200)</text><text class="tam" x="120" y="128">= 5,4 ciclos</text></svg>A L2 transforma a miss penalty de 200 ciclos numa média de 110.</aside>
   <ul class="b">
-    <li>Uma L1 pequena e rápida acompanha o clock; uma L2 maior pega o que escapa da L1; uma L3 compartilhada entre os núcleos de processamento pega o resto. Essa é a <b>cache multinível</b>.</li>
-    <li>A penalidade de miss da L1 passa a ser o AMAT da L2:</li>
+    <li>Uma L1 pequena e rápida acompanha o clock; uma L2 maior pega o que escapa da L1; uma L3 compartilhada entre os cores pega o resto. Essa é a <b>cache multinível</b>.</li>
+    <li>A miss penalty da L1 passa a ser o AMAT da L2:</li>
   </ul>
-  <div class="formula">AMAT = Hit_L1 + Miss_L1 × (Hit_L2 + Miss_L2 × Penalidade_L2)</div>
+  <div class="formula">AMAT = Hit_L1 + Miss_L1 × (Hit_L2 + Miss_L2 × Penalty_L2)</div>
   <ul class="b">
     <li>Exemplo: L1 com hit de 1 ciclo e 4% de miss; L2 com hit de 10 ciclos e 50% de miss local; memória a 200 ciclos. AMAT = 1 + 0,04 × (10 + 0,5 × 200) = 1 + 0,04 × 110 = 5,4 ciclos.</li>
-    <li>Sem a L2: 1 + 0,04 × 200 = 9 ciclos. A L2 cortou o AMAT quase pela metade, mesmo errando metade das vezes.</li>
-    <li>Taxa de miss local da L2: misses da L2 / acessos que chegam na L2 (50%). Taxa global: misses da L2 / todos os acessos da CPU = 0,04 × 0,5 = 2%. A global é a que diz quantos acessos vão até a DRAM.</li>
+    <li>Sem a L2: 1 + 0,04 × 200 = 9 ciclos. A L2 cortou o AMAT quase pela metade, mesmo dando miss em metade dos acessos.</li>
+    <li>Miss rate local da L2: misses da L2 / acessos que chegam na L2 (50%). Miss rate global: misses da L2 / todos os acessos da CPU = 0,04 × 0,5 = 2%. A global é a que diz quantos acessos vão até a DRAM.</li>
   </ul>
 
   <h3>As dez otimizações avançadas</h3>
   <p>O capítulo 2 organiza dez técnicas pelo que elas melhoram:</p>
  </div>
-  <div class="tbl prose">
+  <div class="tbl prose" id="tbl-avancadas">
     <table>
       <thead><tr><th>Objetivo</th><th>Técnica</th><th>Ideia</th></tr></thead>
       <tbody>
-        <tr><td rowspan="2">Tempo de hit</td><td>L1 pequena e simples</td><td>pouca associatividade, cabe no ciclo e gasta menos energia</td></tr>
-        <tr><td>Predição de via</td><td>adivinha qual via do conjunto vai acertar e testa essa primeiro</td></tr>
+        <tr><td rowspan="2">Hit time</td><td>L1 pequena e simples</td><td>pouca associatividade, cabe no ciclo e gasta menos energia</td></tr>
+        <tr><td>Predição de via</td><td>adivinha qual via do conjunto vai dar hit e testa essa primeiro</td></tr>
         <tr><td rowspan="3">Banda da cache</td><td>Acesso em pipeline</td><td>um acesso novo começa antes do anterior terminar</td></tr>
         <tr><td>Cache não bloqueante</td><td>continua atendendo hits enquanto um miss está pendente</td></tr>
         <tr><td>Cache em bancos</td><td>divide a cache em bancos independentes, acessados em paralelo</td></tr>
-        <tr><td rowspan="2">Penalidade de miss</td><td>Palavra crítica primeiro</td><td>entrega à CPU o pedaço pedido assim que ele chega, antes do resto do bloco</td></tr>
-        <tr><td>Buffer de escrita com fusão</td><td>junta escritas no mesmo bloco numa só entrada do buffer</td></tr>
-        <tr><td>Taxa de miss</td><td>Otimizações do compilador</td><td>reordena loops e dados para aproveitar localidade</td></tr>
-        <tr><td rowspan="2">Penalidade ou taxa, por paralelismo</td><td>Prefetching por hardware</td><td>traz o próximo bloco antes de ele ser pedido</td></tr>
-        <tr><td>Prefetching pelo compilador</td><td>o compilador insere instruções de pré-busca no código</td></tr>
+        <tr><td rowspan="2">Miss penalty</td><td>Palavra crítica primeiro</td><td>entrega à CPU o pedaço pedido assim que ele chega, antes do resto do bloco</td></tr>
+        <tr><td>Write buffer com fusão</td><td>junta escritas no mesmo bloco numa só entrada do buffer</td></tr>
+        <tr><td>Miss rate</td><td>Otimizações do compilador</td><td>reordena loops e dados para aproveitar localidade</td></tr>
+        <tr><td rowspan="2">Miss penalty ou miss rate, por paralelismo</td><td>Prefetching por hardware</td><td>traz o próximo bloco antes de ele ser pedido</td></tr>
+        <tr><td>Prefetching pelo compilador</td><td>o compilador insere instruções de prefetch no código</td></tr>
       </tbody>
     </table>
   </div>
  <div class="prose">
   <ul class="b">
-    <li><b>Prefetching</b> (pré-busca): trazer dados para a cache antes de serem pedidos. O hardware detecta padrões (pediu o bloco i, provavelmente vai pedir o i+1) e o compilador pode inserir instruções de pré-busca. Se errar o palpite, gasta banda e expulsa blocos úteis.</li>
+    <li><b>Prefetching</b> (pré-busca): trazer dados para a cache antes de serem pedidos. O hardware detecta padrões (pediu o bloco i, provavelmente vai pedir o i+1) e o compilador pode inserir instruções de prefetch. Se errar o palpite, gasta banda e expulsa blocos úteis.</li>
     <li>O compilador também melhora a localidade sem mudar o resultado. Em C, uma matriz é guardada linha por linha. Percorrer coluna por coluna pula 4 × 5 000 bytes a cada acesso e quase todo acesso é miss; trocar a ordem dos loops faz os acessos andarem em sequência:</li>
   </ul>
 <pre><code>/* antes: anda pelas colunas, cada acesso cai num bloco diferente */
@@ -741,7 +741,7 @@ for (i = 0; i &lt; 5000; i++)
     <li>Aqui basta saber que o sistema operacional monta, para cada processo, a tabela de tradução descrita abaixo, e é chamado quando algo dá errado na tradução.</li>
    </ul>
   </details>
-<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 160"><text class="tm" x="44" y="10">processo A</text><text class="tm" x="196" y="10">processo B</text><rect class="bl" x="14" y="20" width="60" height="22" rx="4"/><text class="tm" x="44" y="31">pág. 0</text><rect class="bl" x="14" y="46" width="60" height="22" rx="4"/><text class="tm" x="44" y="57">pág. 1</text><rect class="am" x="166" y="20" width="60" height="22" rx="4"/><text class="tm" x="196" y="31">pág. 0</text><rect class="am" x="166" y="46" width="60" height="22" rx="4"/><text class="tm" x="196" y="57">pág. 1</text><text class="tm" x="120" y="88">RAM</text><rect class="k" x="90" y="96" width="60" height="14"/><rect class="am" x="90" y="110" width="60" height="14"/><rect class="bl" x="90" y="124" width="60" height="14"/><rect class="k" x="90" y="138" width="60" height="14"/><rect class="bl" x="90" y="152" width="60" height="6"/><path class="s" d="M74 31 Q90 120 90 131" marker-end="url(#mnarrow)"/><path class="s" d="M166 31 Q150 110 150 117" marker-end="url(#mnarrow)"/></svg>Cada processo acha que começa no 0. Na RAM, as páginas estão espalhadas.</aside>
+<aside class="mn" id="mn-virtual" aria-hidden="true"><svg viewBox="0 0 240 160"><text class="tm" x="44" y="10">processo A</text><text class="tm" x="196" y="10">processo B</text><rect class="bl" x="14" y="20" width="60" height="22" rx="4"/><text class="tm" x="44" y="31">pág. 0</text><rect class="bl" x="14" y="46" width="60" height="22" rx="4"/><text class="tm" x="44" y="57">pág. 1</text><rect class="am" x="166" y="20" width="60" height="22" rx="4"/><text class="tm" x="196" y="31">pág. 0</text><rect class="am" x="166" y="46" width="60" height="22" rx="4"/><text class="tm" x="196" y="57">pág. 1</text><text class="tm" x="120" y="88">RAM</text><rect class="k" x="90" y="96" width="60" height="14"/><rect class="am" x="90" y="110" width="60" height="14"/><rect class="bl" x="90" y="124" width="60" height="14"/><rect class="k" x="90" y="138" width="60" height="14"/><rect class="bl" x="90" y="152" width="60" height="6"/><path class="s" d="M74 31 Q90 120 90 131" marker-end="url(#mnarrow)"/><path class="s" d="M166 31 Q150 110 150 117" marker-end="url(#mnarrow)"/></svg>Cada processo acha que começa no 0. Na RAM, as páginas estão espalhadas.</aside>
   <div class="def key">
     <span class="lab">Definição · Memória virtual</span>
     <p class="simples">Cada processo usa endereços "de mentira", e o hardware traduz cada um para um endereço de verdade na RAM. A tradução é feita em pedaços de tamanho fixo, as páginas.</p>
@@ -749,7 +749,7 @@ for (i = 0; i &lt; 5000; i++)
     <p class="nota-formal">Endereço virtual = número da página virtual (VPN) + offset dentro da página. A tradução troca só o número da página; o offset passa igual. Com páginas de 4 KiB, o offset tem log₂ 4 096 = 12 bits.</p>
   </div>
   <ul class="b">
-    <li>Cada entrada da tabela tem um bit de validade. Se a página não está na RAM (ficou no SSD ou no disco), o acesso gera uma falta de página e o sistema operacional traz a página. Esse tratamento é assunto da aula 06.</li>
+    <li>Cada entrada da tabela tem um bit de validade. Se a página não está na RAM (ficou no SSD ou no disco), o acesso gera um page fault (falta de página) e o sistema operacional traz a página. Esse tratamento é assunto da aula 06.</li>
     <li>Cada entrada também tem bits de proteção (pode ler, escrever, executar; só o sistema operacional pode acessar). É assim que um processo é impedido de mexer na memória de outro.</li>
     <li>A tradução é feita por um circuito do processador, a unidade de gerência de memória (MMU), que também aparece na aula 06.</li>
     <li>Conta do tamanho da tabela: endereços virtuais de 32 bits e páginas de 4 KiB deixam 32 − 12 = 20 bits de VPN, ou seja, 2²⁰ ≈ 1 milhão de entradas. Com 4 bytes cada, são 4 MiB de tabela por processo. Por isso as tabelas reais são multinível (o x86-64 usa 4 níveis) e só existem os pedaços em uso.</li>
@@ -759,7 +759,7 @@ for (i = 0; i &lt; 5000; i++)
   <ul class="b">
     <li>A tabela de páginas fica na memória. Sem ajuda, cada acesso do programa viraria dois ou mais: um (ou quatro, com 4 níveis) para ler a tabela e outro para o dado.</li>
     <li>A <b>TLB</b> (translation lookaside buffer) é uma cache pequena, só de traduções: guarda pares (VPN → moldura) usados há pouco. Tipicamente de 32 a algumas centenas de entradas, com alta associatividade, respondendo em menos de um ciclo.</li>
-    <li>A localidade de novo: quem acessou uma página tende a acessar a mesma página logo, então a TLB acerta quase sempre.</li>
+    <li>A localidade de novo: quem acessou uma página tende a acessar a mesma página logo, então a TLB dá hit quase sempre.</li>
   </ul>
  </div>
 

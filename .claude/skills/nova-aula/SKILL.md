@@ -42,7 +42,8 @@ lógica do assunto, não pela ordem da lista de autoestudos. Cada seção ganha 
 | `loops.js` | animações em loop (copie o esqueleto de montagem do fim de `m8/comp/01-conceitos/loops.js`) |
 | `index.js` | `import './figuras.js'; import './loops.js';` |
 | `glossario.js` | todo termo em negrito ou que um iniciante não saberia. Não redefina termos que já existem em aulas anteriores (o glossário é global) |
-| `revisao.js` | 8–12 `cartoes` (perguntas de prova) e uma `cola` de 8–12 linhas |
+| `revisao.js` | 8–12 `cartoes` (perguntas de prova) e uma `cola` de 8–12 linhas; cada item com o 3º elemento = id da seção do modo Consulta |
+| `consulta.html` | a mesma aula no modo Consulta (passo 5) |
 | `notas/.gitkeep` | pasta vazia para o material da aula presencial |
 
 Use a aula `m8/comp/01-conceitos` como referência de densidade e formato.
@@ -64,13 +65,29 @@ Use a aula `m8/comp/01-conceitos` como referência de densidade e formato.
 - Matérias não técnicas (negócios, UX, liderança) também ganham visuais: frameworks como
   diagramas, processos como passo a passo, comparações como tabelas e desenhos.
 
-## 5. Conferir
+## 5. Modo Consulta
+
+Depois do `conteudo.html` pronto, escreva o `consulta.html` seguindo "Modo Consulta" do `CLAUDE.md`
+(referência: `m8/comp/02-fundamentos-memoria/consulta.html`):
+
+1. Liste os conceitos da aula (as chaves do `glossario.js` são o ponto de partida) e decida a seção dona
+   de cada um. Ordene por dependência e agrupe (`data-grupo`).
+2. Dê `id` a todo desenho de margem (`mn-…`) e tabela (`tbl-…`) do `conteudo.html` e cite-os pelo id,
+   junto com figuras e loops, na seção do conceito.
+3. Reescreva curto, na estrutura fixa: definição → fórmula → como usar → cai na prova → pegadinhas →
+   ponderada → figuras. Nada da Leitura pode sumir; nada novo entra.
+4. Ponha o 3º item (id da seção) em cada cartão e linha de cola do `revisao.js`; acrescente `f` (fórmula)
+   aos verbetes que têm fórmula.
+5. `npm run checar-consulta -- <modulo>/<materia>/<aula>` terminando em "Tudo certo", e uma releitura
+   procurando conceito explicado em duas seções.
+
+## 6. Conferir
 
 1. Cobertura: percorra a tabela fonte → tópicos e confirme que cada item está na página.
 2. Compreensão: releia como quem só viu as aulas anteriores do caderno. Achou um termo, sigla ou símbolo
    não explicado antes? Explique ou crie verbete. `npm run checar` precisa terminar em "Tudo coberto".
 3. `MSYS_NO_PATHCONV=1 BASE_PATH=/caderno-visual npx astro build` sem erro.
-4. `npm run dev` e abra `/<modulo>/<materia>/<slug>` no navegador: sem erros no console, figuras
+4. `npm run dev` e abra `/<modulo>/<materia>/<slug>` e `/<modulo>/<materia>/<slug>/consulta` no navegador: sem erros no console, figuras
    animam com o mouse em cima, loops rodam, glossário e popover funcionam, nada vaza para os lados
    em largura de celular (400px).
 5. Diga à pessoa o que entrou, de qual fonte, e o que não deu para cobrir (ex.: vídeo sem transcrição).

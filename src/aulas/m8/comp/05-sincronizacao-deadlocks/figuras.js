@@ -65,7 +65,7 @@ const SUAVE = { A: 'var(--blue-soft)', B: 'var(--amber-soft)' };
         'B soma: R1 de B = 101.',
         'A grava 101.',
         'B grava 101 por cima. O depósito de A <b>sumiu</b>: é a <b>atualização perdida</b>.',
-        '<b class="bad">Errado: saldo = 101</b>, esperado 102. É uma <b>condição de corrida</b>: o resultado depende de quando o escalonador trocou de thread.'
+        '<b class="bad">Errado: saldo = 101</b>, esperado 102. É uma <b>race condition</b>: o resultado depende de quando o escalonador trocou de thread.'
       ]
     },
     mutex: {
@@ -77,11 +77,11 @@ const SUAVE = { A: 'var(--blue-soft)', B: 'var(--amber-soft)' };
         'A soma: R1 de A = 101.',
         'Troca! B faz <b>P(mutex)</b>, mas o mutex está com A: <b>B bloqueia</b> e sai da CPU. Ela não chega no LOAD.',
         'A volta e grava 101.',
-        'A faz <b>V(mutex)</b>: solta a trava e acorda B, que estava esperando. B fica com o mutex.',
+        'A faz <b>V(mutex)</b>: solta o lock e acorda B, que estava esperando. B fica com o mutex.',
         'B faz LOAD e lê 101, o valor certo.',
         'B soma: 102.',
         'B grava 102.',
-        'B faz V(mutex) e solta a trava.',
+        'B faz V(mutex) e solta o lock.',
         '<b class="ok">Certo: saldo = 102</b>, qualquer que seja a ordem do escalonador. A troca no meio ainda acontece, mas B não entra na região crítica até A sair.'
       ]
     }

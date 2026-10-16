@@ -43,7 +43,7 @@ const marcadores = (svg) => {
   S('line', { x1: gx, y1: gy, x2: gx, y2: gy + gh, class: 'sv-edge' }, svg);
   for (let kk = 2; kk <= KMAX; kk += 2) S('text', { x: X(kk), y: gy + gh + 14, class: 'sv-muted', 'text-anchor': 'middle' }, svg, kk);
   for (let v = 0; v <= KMAX; v += 4) S('text', { x: gx - 8, y: Y(v) + 4, class: 'sv-muted', 'text-anchor': 'end' }, svg, v + '×');
-  S('text', { x: gx + gw, y: gy + gh + 30, class: 'sv-muted', 'text-anchor': 'end' }, svg, 'número de estágios k');
+  S('text', { x: gx + gw, y: gy + gh + 30, class: 'sv-muted', 'text-anchor': 'end' }, svg, 'número de stages k');
   S('line', { x1: X(1), y1: Y(1), x2: X(KMAX), y2: Y(KMAX), style: 'stroke:var(--muted);stroke-width:1.5;stroke-dasharray:5 4' }, svg);
   S('text', { x: X(KMAX) - 4, y: Y(KMAX) - 8, class: 'sv-muted', 'text-anchor': 'end' }, svg, 'ideal = k');
   const curva = S('path', { style: 'fill:none;stroke:var(--accent);stroke-width:2.5' }, svg);
@@ -69,14 +69,14 @@ const marcadores = (svg) => {
       ['ciclo com pipeline', `1000 / ${K} + ${O} = ${f(ciclo, 1)} ps`],
       ['CPI com pipeline', `1 + ${f(ST)} = ${f(cpi)}`],
       ['tempo médio por instrução', `${f(ciclo, 1)} × ${f(cpi)} = ${f(porInstr, 1)} ps`],
-      ['aceleração', `1000 / ${f(porInstr, 1)} = ${f(A)}×   (ideal: ${K}×)`],
+      ['speedup', `1000 / ${f(porInstr, 1)} = ${f(A)}×   (ideal: ${K}×)`],
       ['latência de uma instrução', `${K} × ${f(ciclo, 1)} = ${f(lat, 0)} ps   (sem pipeline: 1000 ps)`],
     ];
     out.innerHTML = rows.map((r) => `<span>${r[0]}</span><span>${r[1]}</span>`).join('');
     const pct = Math.round((A / K) * 100);
     ver.className = 'verdict ' + (pct >= 75 ? 'ok' : 'bad');
-    ver.innerHTML = `Com ${K} estágios, o pipeline chega a <b>${f(A)}×</b> dos ${K}× possíveis (${pct}% do ideal). ` +
-      (O > 0 && K >= 10 ? 'O overhead já é uma fatia grande do ciclo: mais estágios rendem pouco.' : ST > 0 ? 'Cada stall por instrução divide o ganho por (1 + stalls).' : 'Sem stalls, só o overhead separa o real do ideal.');
+    ver.innerHTML = `Com ${K} stages, o pipeline chega a <b>${f(A)}×</b> dos ${K}× possíveis (${pct}% do ideal). ` +
+      (O > 0 && K >= 10 ? 'O overhead já é uma fatia grande do ciclo: mais stages rendem pouco.' : ST > 0 ? 'Cada stall por instrução divide o ganho por (1 + stalls).' : 'Sem stalls, só o overhead separa o real do ideal.');
   }
   [k, o, s].forEach((e) => e.addEventListener('input', upd));
   upd();
@@ -90,7 +90,7 @@ const marcadores = (svg) => {
   const CORES = { IF: 'bl', ID: 'k', EX: 'am', MEM: 'ac', WB: 'gr' };
   const RAWI = ['DADD R1, R2, R3', 'DSUB R4, R1, R5', 'AND  R6, R1, R7', 'OR   R8, R1, R9', 'XOR  R10, R1, R11'];
   const base5 = ['IF ID EX MEM WB', '- IF ID EX MEM WB', '- - IF ID EX MEM WB', '- - - IF ID EX MEM WB', '- - - - IF ID EX MEM WB'];
-  /* cada linha: '-' = vazio, '*X' = parada no estágio X. Setas: [linha, ciclo] → [linha, ciclo] (ciclos a partir de 1) */
+  /* cada linha: '-' = vazio, '*X' = parada no stage X. Setas: [linha, ciclo] → [linha, ciclo] (ciclos a partir de 1) */
   const CASOS = {
     ideal: {
       label: 'Ideal', instr: ['LD   R1, 0(R2)', 'DADD R3, R4, R5', 'DSUB R6, R7, R8', 'AND  R9, R10, R11', 'OR   R12, R13, R14'], rows: base5, setas: [],
@@ -100,7 +100,7 @@ const marcadores = (svg) => {
         [2, 'Ciclo 2: a 1ª passa para ID e a 2ª entra em IF. Duas em andamento.'],
         [3, 'Ciclo 3: três em andamento. A cada ciclo entra uma nova.'],
         [4, 'Ciclo 4: quatro em andamento.'],
-        [5, 'Ciclo 5: o pipeline está <b>cheio</b>, uma instrução em cada estágio. A 1ª termina (WB).'],
+        [5, 'Ciclo 5: o pipeline está <b>cheio</b>, uma instrução em cada stage. A 1ª termina (WB).'],
         [6, 'Ciclo 6: a 2ª termina. Com o pipeline cheio, sai uma instrução por ciclo: CPI = 1.'],
         [7, 'Ciclo 7: o pipeline começa a esvaziar.'],
         [8, 'Ciclo 8: faltam duas.'],
@@ -132,7 +132,7 @@ const marcadores = (svg) => {
         [1, 'Ciclo 1: DADD em IF.'],
         [2, 'Ciclo 2: DADD em ID, DSUB em IF.'],
         [3, 'Ciclo 3: o DSUB chega em ID e precisa de R1, que o DADD (em EX) ainda não escreveu. O interlock detecta o RAW.'],
-        [4, 'Ciclo 4: <b>stall</b>. O DSUB fica parado em ID e o AND, atrás dele, parado em IF. No EX entra uma bolha: um ciclo sem trabalho útil.'],
+        [4, 'Ciclo 4: <b>stall</b>. O DSUB fica parado em ID e o AND, atrás dele, parado em IF. No EX entra uma bubble: um ciclo sem trabalho útil.'],
         [5, 'Ciclo 5: segundo stall. O DADD escreve R1 na primeira metade do ciclo e o DSUB lê na segunda. Dependência resolvida.'],
         [6, 'Ciclo 6: tudo volta a andar. O AND passa para ID e lê R1 já atualizado; o OR finalmente entra em IF.'],
         [7, 'Ciclo 7.'], [8, 'Ciclo 8.'], [9, 'Ciclo 9.'], [10, 'Ciclo 10.'],
@@ -143,7 +143,7 @@ const marcadores = (svg) => {
       label: 'Forwarding', instr: RAWI, rows: base5,
       setas: [{ de: [0, 3], para: [1, 4], tipo: 'ok', ap: 4, fwd: true }, { de: [0, 4], para: [2, 5], tipo: 'ok', ap: 5, fwd: true }, { de: [0, 5], para: [3, 5], tipo: 'ok', ap: 5 }],
       notas: [
-        [0, 'Mesmo código, com <b>forwarding</b>: fios que levam um resultado da saída de um estágio direto para a ULA de quem precisa.'],
+        [0, 'Mesmo código, com <b>forwarding</b>: fios que levam um resultado da saída de um stage direto para a ULA de quem precisa.'],
         [1, 'Ciclo 1: DADD em IF.'],
         [2, 'Ciclo 2: DADD em ID, DSUB em IF.'],
         [3, 'Ciclo 3: o DADD calcula R1 em EX. O valor já existe: fica no registrador de pipeline EX/MEM. O DSUB lê um R1 velho em ID, mas não vai usá-lo.'],
@@ -159,7 +159,7 @@ const marcadores = (svg) => {
       rows: ['IF ID EX MEM WB', '- IF ID *ID EX MEM WB', '- - IF *IF ID EX MEM WB', '- - - - IF ID EX MEM WB'],
       setas: [{ de: [0, 4], para: [1, 5], tipo: 'ok', ap: 5, fwd: true }, { de: [0, 5], para: [2, 5], tipo: 'ok', ap: 5 }],
       notas: [
-        [0, 'Agora quem produz R1 é um <b>load</b>. O dado só sai da memória no fim do estágio MEM, um estágio depois do EX.'],
+        [0, 'Agora quem produz R1 é um <b>load</b>. O dado só sai da memória no fim do stage MEM, um stage depois do EX.'],
         [1, 'Ciclo 1: LD em IF.'],
         [2, 'Ciclo 2: LD em ID, DSUB em IF.'],
         [3, 'Ciclo 3: o LD calcula o endereço (R2 + 0) em EX. O DSUB, em ID, vê que precisa de R1.'],
@@ -244,9 +244,9 @@ const marcadores = (svg) => {
     prev: (q) => q, prox: (q, o) => o, nome: (q) => q,
   };
   const CASOS = {
-    laco2: { label: 'Laço · 2 bits', M: M2, seq: 'TTTNTTTNTTTN', ini: '3', intro: 'Desvio do fim de um laço que volta 3 vezes e sai (T T T N), executado 3 vezes. O preditor de 2 bits começa em <b>11</b> (forte tomado).' },
-    laco1: { label: 'Laço · 1 bit', M: M1, seq: 'TTTNTTTNTTTN', ini: 'T', intro: 'O mesmo desvio com um preditor de <b>1 bit</b>, que só lembra o último resultado. Começa em T.' },
-    alt2: { label: 'Alternado · 2 bits', M: M2, seq: 'TNTNTNTNTNTN', ini: '2', intro: 'Um desvio que alterna T, N, T, N. O preditor de 2 bits começa em <b>10</b>. Veja o que acontece.' },
+    laco2: { label: 'Laço · 2 bits', M: M2, seq: 'TTTNTTTNTTTN', ini: '3', intro: 'Branch do fim de um laço que volta 3 vezes e sai (T T T N), executado 3 vezes. O preditor de 2 bits começa em <b>11</b> (forte tomado).' },
+    laco1: { label: 'Laço · 1 bit', M: M1, seq: 'TTTNTTTNTTTN', ini: 'T', intro: 'O mesmo branch com um preditor de <b>1 bit</b>, que só lembra o último resultado. Começa em T.' },
+    alt2: { label: 'Alternado · 2 bits', M: M2, seq: 'TNTNTNTNTNTN', ini: '2', intro: 'Um branch que alterna T, N, T, N. O preditor de 2 bits começa em <b>10</b>. Veja o que acontece.' },
   };
   let fig = null;
   function load(key) {
@@ -261,7 +261,7 @@ const marcadores = (svg) => {
     tape.innerHTML = ''; tape.append(...cells);
     const notes = [C.intro];
     passos.forEach((s, i) => {
-      notes.push(`Desvio ${i + 1}: no estado <b>${M.nome(s.q)}</b> a previsão é <b>${s.p}</b>; o desvio foi <b>${s.o}</b>. ` +
+      notes.push(`Branch ${i + 1}: no estado <b>${M.nome(s.q)}</b> a previsão é <b>${s.p}</b>; o branch foi <b>${s.o}</b>. ` +
         (s.ok ? '<b class="ok">Acertou.</b> ' : '<b class="bad">Errou.</b> ') + (s.q === s.nq ? `Fica em ${M.nome(s.nq)}.` : `Vai para ${M.nome(s.nq)}.`) +
         (key === 'laco2' && i === 4 ? ' Depois do erro da saída, ele ainda prevê T, e a nova volta do laço é T: <b>não erra de novo</b>.' : '') +
         (key === 'laco1' && i === 4 ? ' O bit tinha virado N na saída do laço: erra a primeira volta da execução seguinte.' : ''));
@@ -285,7 +285,7 @@ const marcadores = (svg) => {
       cells.forEach((c, i) => { c.className = 'cell' + (i < n - (k <= passos.length && k > 0 ? 1 : 0) ? ' done' : '') + (k > 0 && k <= passos.length && i === k - 1 ? ' head' : ''); });
       trail.innerHTML = passos.slice(0, n).map((s) => `<span class="q" style="border-color:var(--${s.ok ? 'green' : 'red'});color:var(--${s.ok ? 'green' : 'red'})">${s.p} ${s.ok ? '✓' : '✗'}</span>`).join('') || '<span class="muted">nenhuma ainda</span>';
       const errs = passos.slice(0, n).filter((s) => !s.ok).length;
-      cap.textContent = `${n} desvios · ${errs} erros` + (n ? ` · acerto ${Math.round(((n - errs) / n) * 100)}%` : '');
+      cap.textContent = `${n} branches · ${errs} erros` + (n ? ` · acerto ${Math.round(((n - errs) / n) * 100)}%` : '');
     };
     if (!fig) fig = new StepFig(root, { notes, render, speed: 1500 });
     else { fig.stop(); fig.render = render; fig.setSteps(notes); }
@@ -345,9 +345,9 @@ const marcadores = (svg) => {
         ['DADDUI R1, R1, #-32', 'uma vez para 4 elementos', 'Ciclo 11: R1 anda 4 elementos (32 bytes) de uma vez. Antes eram 4 DADDUI.'],
         ['S.D    F12, 16(R1)', '−16 + 32 = 16', 'Ciclo 12: guarda o 3º. Deslocamento corrigido para 16, porque R1 já andou 32.'],
         ['S.D    F16, 8(R1)', '−24 + 32 = 8', 'Ciclo 13: guarda o 4º.'],
-        ['BNE    R1, R2, Loop', 'um desvio para 4 elementos', 'Ciclo 14: um único desvio para os 4 elementos.'],
+        ['BNE    R1, R2, Loop', 'um branch para 4 elementos', 'Ciclo 14: um único branch para os 4 elementos.'],
       ],
-      fim: '<b>14 ciclos para 4 elementos = 3,5 por elemento</b>, sem nenhum stall. Aceleração de 9 / 3,5 ≈ 2,6 em relação ao original, com o mesmo hardware.',
+      fim: '<b>14 ciclos para 4 elementos = 3,5 por elemento</b>, sem nenhum stall. Speedup de 9 / 3,5 ≈ 2,6 em relação ao original, com o mesmo hardware.',
     },
   };
   let fig = null;
@@ -481,16 +481,16 @@ const marcadores = (svg) => {
   const A = 'antigo';
   const P = [
     { e: [], h: 0, v: [A, A, A, A, A], n: 'O ROB começa vazio. Entradas entram pelo fim, na ordem do programa, e saem pela <b>cabeça</b>, na mesma ordem. R7 vale 0: a divisão vai dar problema.' },
-    { e: [['executando', ''], ['emitida', 'espera ROB1'], ['executando', '']], h: 0, v: [A, A, A, A, A], n: 'Emite as instruções 1 a 3, cada uma numa entrada do ROB. O LD teve uma falta na cache e vai demorar. O DADD precisa de R1: espera a etiqueta ROB1.' },
+    { e: [['executando', ''], ['emitida', 'espera ROB1'], ['executando', '']], h: 0, v: [A, A, A, A, A], n: 'Emite as instruções 1 a 3, cada uma numa entrada do ROB. O LD teve um miss na cache e vai demorar. O DADD precisa de R1: espera a etiqueta ROB1.' },
     { e: [['executando', ''], ['emitida', 'espera ROB1'], ['executando', ''], ['executando', ''], ['emitida', 'espera ROB4']], h: 0, v: [A, A, A, A, A], n: 'Emite a 4 e a 5. O SD precisa do R8 calculado pela 4: espera ROB4.' },
     { e: [['executando', ''], ['emitida', 'espera ROB1'], ['executando', ''], ['pronta', 'R9−R10'], ['emitida', 'espera ROB4']], h: 0, v: [A, A, A, A, A], n: 'O DSUB (4) termina primeiro. O valor vai para a <b>entrada 4 do ROB</b>, não para R8: R8 continua com o valor antigo.' },
     { e: [['executando', ''], ['emitida', 'espera ROB1'], ['executando', ''], ['pronta', 'R9−R10'], ['pronta', 'R9−R10 → Mem']], h: 0, v: [A, A, A, A, A], n: 'O SD (5) tem endereço e dado prontos. Mesmo assim, <b>não escreve na memória</b>: store só grava no commit.' },
-    { e: [['executando', ''], ['emitida', 'espera ROB1'], ['exceção', 'divisão por zero'], ['pronta', 'R9−R10'], ['pronta', 'R9−R10 → Mem']], h: 0, v: [A, A, A, A, A], n: 'O DDIV (3) detecta divisão por zero. Nada acontece ainda: a exceção fica <b>anotada</b> na entrada 3. Se houvesse um desvio mal previsto antes dela, ela nem deveria existir.' },
-    { e: [['pronta', 'Mem[R2]'], ['executando', ''], ['exceção', 'divisão por zero'], ['pronta', 'R9−R10'], ['pronta', 'R9−R10 → Mem']], h: 0, v: [A, A, A, A, A], n: 'A falta na cache acabou: o LD (1) termina, e o valor vai pelo CDB para o ROB e para o DADD, que começa a executar.' },
+    { e: [['executando', ''], ['emitida', 'espera ROB1'], ['exceção', 'divisão por zero'], ['pronta', 'R9−R10'], ['pronta', 'R9−R10 → Mem']], h: 0, v: [A, A, A, A, A], n: 'O DDIV (3) detecta divisão por zero. Nada acontece ainda: a exceção fica <b>anotada</b> na entrada 3. Se houvesse um branch mal previsto antes dela, ela nem deveria existir.' },
+    { e: [['pronta', 'Mem[R2]'], ['executando', ''], ['exceção', 'divisão por zero'], ['pronta', 'R9−R10'], ['pronta', 'R9−R10 → Mem']], h: 0, v: [A, A, A, A, A], n: 'O miss na cache acabou: o LD (1) termina, e o valor vai pelo CDB para o ROB e para o DADD, que começa a executar.' },
     { e: [['efetivada', 'Mem[R2]'], ['executando', ''], ['exceção', 'divisão por zero'], ['pronta', 'R9−R10'], ['pronta', 'R9−R10 → Mem']], h: 1, v: ['Mem[R2]', A, A, A, A], n: 'A cabeça (entrada 1) está pronta: <b>commit</b>. R1 recebe o valor no banco de registradores e a cabeça avança para a 2.' },
     { e: [['efetivada', 'Mem[R2]'], ['efetivada', 'R1+R4'], ['exceção', 'divisão por zero'], ['pronta', 'R9−R10'], ['pronta', 'R9−R10 → Mem']], h: 2, v: ['Mem[R2]', 'R1+R4', A, A, A], n: 'O DADD (2) termina e, como está na cabeça, faz commit em seguida: R3 é gravado. A cabeça chega à 3.' },
     { e: [['efetivada', 'Mem[R2]'], ['efetivada', 'R1+R4'], ['descartada', 'exceção!'], ['descartada', ''], ['descartada', '']], h: 2, v: ['Mem[R2]', 'R1+R4', A, A, A], n: 'A cabeça é a 3, que tem exceção. Agora sim ela é tratada: o processador <b>descarta a 3 e tudo depois dela</b> (4 e 5), guarda o endereço da 3 e chama o tratador de exceção do sistema operacional.' },
-    { e: [['efetivada', 'Mem[R2]'], ['efetivada', 'R1+R4'], ['descartada', 'exceção!'], ['descartada', ''], ['descartada', '']], h: 2, v: ['Mem[R2]', 'R1+R4', A, A, A], n: '<b>Exceção precisa</b>: tudo antes da 3 foi gravado (R1, R3); nada da 3 em diante mudou (R5, R8 e a memória estão com os valores antigos), mesmo a 4 e a 5 tendo terminado antes. Um desvio mal previsto é desfeito do mesmo jeito.' },
+    { e: [['efetivada', 'Mem[R2]'], ['efetivada', 'R1+R4'], ['descartada', 'exceção!'], ['descartada', ''], ['descartada', '']], h: 2, v: ['Mem[R2]', 'R1+R4', A, A, A], n: '<b>Exceção precisa</b>: tudo antes da 3 foi gravado (R1, R3); nada da 3 em diante mudou (R5, R8 e a memória estão com os valores antigos), mesmo a 4 e a 5 tendo terminado antes. Um branch mal previsto é desfeito do mesmo jeito.' },
   ];
   const COR_EST = { emitida: 'var(--muted)', executando: 'var(--amber)', pronta: 'var(--green)', 'exceção': 'var(--red)', efetivada: 'var(--accent)', descartada: 'var(--muted)' };
   const tdc = (v, extra = '') => `<td style="font-family:var(--f-mono);font-size:.8rem;padding:5px 8px;${extra}">${esc(v)}</td>`;

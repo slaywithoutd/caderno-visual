@@ -1,9 +1,11 @@
 ---
 import Base from '../layouts/Base.astro';
+import ModoSwitch from '../components/ModoSwitch.astro';
 import { site, modulos, aulasDe, eixosDe, hrefRevisao, hrefRevisaoEixo, hrefGlossario, glossarioGlobal, tempoAula, formatarTempo } from '../lib/catalogo.js';
 const nTermos = Object.keys(glossarioGlobal).length;
 ---
 <Base title={site.titulo} description={site.subtitulo}>
+  <ModoSwitch />
   <main class="home">
     <header class="home-head">
       <h1>{site.titulo}</h1>
@@ -42,7 +44,7 @@ const nTermos = Object.keys(glossarioGlobal).length;
                   <ol class="aula-list">
                     {eixo.aulas.map((a) => (
                       <li>
-                        <a class="aula-row" href={a.href}>
+                        <a class="aula-row" href={a.href} data-consulta={a.hrefConsulta || undefined}>
                           <span class="aula-num">{a.numero}</span>
                           <span class="aula-body">
                             <span class="aula-title">{a.titulo}</span>
@@ -64,6 +66,11 @@ const nTermos = Object.keys(glossarioGlobal).length;
     ))}
   </main>
 </Base>
+
+<script>
+  import { initModo } from '../lib/modo.js';
+  initModo();
+</script>
 
 <style>
   .home{max-width:880px;margin:0 auto;padding:clamp(48px,10vh,104px) 24px 96px}

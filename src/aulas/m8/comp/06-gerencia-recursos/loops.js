@@ -76,7 +76,7 @@ montar.mlfq = (svg) => {
     for (const [a, b, f] of fases) {
       if (t < a || t >= b) continue;
       const u = (t - a) / (b - a);
-      if (typeof f === 'number') { ay = Y[f]; p = u; txt = f < 2 ? 'azul gasta o quantum inteiro…' : 'lá embaixo: fatias maiores'; }
+      if (typeof f === 'number') { ay = Y[f]; p = u; txt = f < 2 ? 'azul gasta o quantum inteiro…' : 'lá embaixo: quantum maior'; }
       else if (f === 'd01') { ay = lerp(Y[0], Y[1], ease(u)); txt = '…e desce uma fila'; }
       else if (f === 'd12') { ay = lerp(Y[1], Y[2], ease(u)); txt = '…e desce de novo'; }
       else { ay = lerp(Y[2], Y[0], ease(u)); txt = 'aging: esperou demais, sobe'; }

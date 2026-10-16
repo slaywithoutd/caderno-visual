@@ -260,7 +260,7 @@ export function alocar(estrategia) {
   const tlbLin = [];
   const TLB0 = [['2', '7'], ['0', '4'], ['6', '1']];
   for (let i = 0; i < 4; i++) tlbLin.push(S('text', { x: 75, y: 148 + i * 18, class: 'sv-text', 'text-anchor': 'middle', 'font-size': 12 }, svg, ''));
-  const so = caixa(10, 240, 130, 50, 'núcleo do SO');
+  const so = caixa(10, 240, 130, 50, 'kernel do SO');
   const soTxt = S('text', { x: 75, y: 278, class: 'sv-muted', 'text-anchor': 'middle', 'font-size': 11 }, svg, '');
   const pt = caixa(190, 10, 170, 280, 'tabela de páginas');
   S('text', { x: 210, y: 42, class: 'sv-muted', 'font-size': 10 }, svg, 'pág');
@@ -358,27 +358,27 @@ export function substituir(alg, refs, nf) {
     const ptrAntes = ptr;
     if (!falta) {
       uso[j] = i; R[j] = 1;
-      nota = `<b>${pg}</b> já está na moldura ${j}: acerto.`;
+      nota = `<b>${pg}</b> já está na moldura ${j}: hit.`;
       if (alg === 'lru') nota += ' Vira a usada mais recentemente.';
       if (alg === 'clock') nota += ' Bit de referência = 1.';
     } else {
       faltas++;
       const vazia = fr.indexOf(null);
-      if (vazia >= 0 && alg !== 'clock') { j = vazia; nota = `<b>${pg}</b>: falta. Moldura ${j} está livre.`; }
+      if (vazia >= 0 && alg !== 'clock') { j = vazia; nota = `<b>${pg}</b>: page fault. Moldura ${j} está livre.`; }
       else if (alg === 'clock') {
         const pulos = [];
         while (fr[ptr] !== null && R[ptr] === 1) { pulos.push(fr[ptr]); R[ptr] = 0; ptr = (ptr + 1) % nf; }
         j = ptr; vit = fr[j];
-        nota = `<b>${pg}</b>: falta. ` + (vit === null ? `Ponteiro na moldura ${j}, livre.` : `${pulos.length ? `Ponteiro dá segunda chance a ${pulos.join(', ')} (R vira 0). ` : ''}Moldura ${j} tem a ${vit} com R = 0: vítima.`);
+        nota = `<b>${pg}</b>: page fault. ` + (vit === null ? `Ponteiro na moldura ${j}, livre.` : `${pulos.length ? `Ponteiro dá segunda chance a ${pulos.join(', ')} (R vira 0). ` : ''}Moldura ${j} tem a ${vit} com R = 0: vítima.`);
         ptr = (ptr + 1) % nf;
       } else {
         let cand = 0;
-        if (alg === 'fifo') { cand = carga.indexOf(Math.min(...carga)); nota = `<b>${pg}</b>: falta. FIFO tira a ${fr[cand]}, a que entrou primeiro (na ref. ${carga[cand] + 1}).`; }
-        if (alg === 'lru') { cand = uso.indexOf(Math.min(...uso)); nota = `<b>${pg}</b>: falta. LRU tira a ${fr[cand]}, usada há mais tempo (ref. ${uso[cand] + 1}).`; }
+        if (alg === 'fifo') { cand = carga.indexOf(Math.min(...carga)); nota = `<b>${pg}</b>: page fault. FIFO tira a ${fr[cand]}, a que entrou primeiro (na ref. ${carga[cand] + 1}).`; }
+        if (alg === 'lru') { cand = uso.indexOf(Math.min(...uso)); nota = `<b>${pg}</b>: page fault. LRU tira a ${fr[cand]}, usada há mais tempo (ref. ${uso[cand] + 1}).`; }
         if (alg === 'opt') {
           const prox = fr.map((p) => { const k = refs.indexOf(p, i + 1); return k < 0 ? Infinity : k; });
           cand = prox.indexOf(Math.max(...prox));
-          nota = `<b>${pg}</b>: falta. Ótimo olha o futuro e tira a ${fr[cand]}, ${prox[cand] === Infinity ? 'que nunca mais será usada' : `que só volta na ref. ${prox[cand] + 1}`}.`;
+          nota = `<b>${pg}</b>: page fault. Ótimo olha o futuro e tira a ${fr[cand]}, ${prox[cand] === Infinity ? 'que nunca mais será usada' : `que só volta na ref. ${prox[cand] + 1}`}.`;
         }
         j = cand; vit = fr[j];
       }
@@ -405,8 +405,8 @@ export function substituir(alg, refs, nf) {
     const { passos, faltas } = substituir(alg, refs, nf);
     const todos = Object.keys(NOME).map((a) => `${NOME[a]} ${substituir(a, refs, nf).faltas}`).join(' · ');
     const notes = [`String de referências: <code>${refs.join(' ')}</code>, ${nf} moldura${nf > 1 ? 's' : ''}, começando vazias. ${alg === 'clock' ? 'O ponteiro do relógio começa na moldura 0. ' : ''}Cada coluna é uma referência; F marca page fault.`, ...passos.map((p) => p.nota)];
-    let fim = `<b>Total: ${faltas} faltas</b> em ${refs.length} referências (taxa ${num(faltas / refs.length * 100)}%). Com ${nf} molduras: ${todos}.`;
-    if (+sel.value === 0 && alg === 'fifo') fim += nf === 3 ? ' Agora mude para 4 molduras: o FIFO vai dar <b>mais</b> faltas (anomalia de Belady).' : nf === 4 ? ' Com 3 molduras eram 9: mais memória, mais faltas. Anomalia de Belady.' : '';
+    let fim = `<b>Total: ${faltas} page faults</b> em ${refs.length} referências (taxa ${num(faltas / refs.length * 100)}%). Com ${nf} molduras: ${todos}.`;
+    if (+sel.value === 0 && alg === 'fifo') fim += nf === 3 ? ' Agora mude para 4 molduras: o FIFO vai dar <b>mais</b> page faults (anomalia de Belady).' : nf === 4 ? ' Com 3 molduras eram 9: mais memória, mais page faults. Anomalia de Belady.' : '';
     if (+sel.value === 2 && alg === 'lru' && nf < 4) fim += ' Laço maior que a memória: LRU sempre tira justamente a próxima a ser usada.';
     notes.push(fim);
     const n = refs.length, x0 = 50, cw = Math.min(46, (630 - x0) / n), y0 = 54, rh = 30;
@@ -433,9 +433,9 @@ export function substituir(alg, refs, nf) {
         if (alg === 'clock' && atual) S('text', { x: x + 4, y: y0 + p.ptr * rh + 11, style: 'fill:var(--accent);font-weight:700', 'font-size': 10 }, svg, '▸');
         if (p.falta) S('text', { x: x + cw / 2, y: y0 + nf * rh + 16, 'text-anchor': 'middle', 'font-size': 13, style: 'fill:var(--red);font-weight:700;font-family:var(--f-mono)' }, svg, 'F');
       });
-      S('text', { x: 4, y: y0 + nf * rh + 16, class: 'sv-muted', 'font-size': 10 }, svg, 'falta');
+      S('text', { x: 4, y: y0 + nf * rh + 16, class: 'sv-muted', 'font-size': 10 }, svg, 'fault');
       const fz = ate ? passos[ate - 1].faltas : 0;
-      cap.innerHTML = k > n ? `${NOME[alg]}, ${nf} molduras: ${faltas} faltas · ${esc(todos)}` : `${NOME[alg]} · ${nf} molduras · faltas até agora: ${fz}`;
+      cap.innerHTML = k > n ? `${NOME[alg]}, ${nf} molduras: ${faltas} page faults · ${esc(todos)}` : `${NOME[alg]} · ${nf} molduras · page faults até agora: ${fz}`;
     };
     svg.setAttribute('viewBox', `0 0 640 ${y0 + nf * rh + 34}`);
     if (!fig) fig = new StepFig(root, { notes, render, speed: 1500 });

@@ -25,7 +25,8 @@ passo a passo, animações em loop e glossário. Serve para estudar no lugar dos
 src/data/estrutura.js            módulos, matérias (m8: comp, mat, negocios, ux, lideranca) e eixos de cada matéria
 src/aulas/<modulo>/<materia>/<aula>/
   meta.json                      título, resumo, tópicos, seções do sumário, fontes   (obrigatório)
-  conteudo.html                  texto da aula, só as seções de conteúdo               (obrigatório)
+  conteudo.html                  texto da aula, modo Leitura (só as seções de conteúdo)  (obrigatório)
+  consulta.html                  a mesma aula por conceito, modo Consulta                 (obrigatório em aula nova)
   index.js                       importa figuras.js e loops.js (roda no navegador)
   figuras.js                     figuras passo a passo (StepFig) e widgets
   loops.js                       animações em loop
@@ -163,6 +164,63 @@ Em `figuras.js`: `new StepFig(document.getElementById('fig-afd'), { notes: ['htm
 Autômatos: `drawMachine(svg, { states:[{id,x,y,start,accept}], edges:[{from,to,labels:[{text,k}],bend}] })`.
 Veja os exemplos da aula `m8/comp/01-conceitos`.
 
+## Modo Consulta (consulta.html)
+
+Toda aula tem dois modos, trocados por um switch global no topo (a escolha fica no navegador e vale para
+todas as aulas; ao trocar, a página cai no mesmo assunto do outro modo):
+
+- **Leitura** (`conteudo.html`): a aula na ordem das fontes, para aprender da primeira vez.
+- **Consulta** (`consulta.html`, página `/<modulo>/<materia>/<aula>/consulta`): o **mesmo** conteúdo, mais
+  curto e reorganizado por conceito, para revisar e procurar. Nada some (informação, fórmula, conta, figura,
+  "cai na prova", ponderada) e nada é inventado.
+
+Regras do modo Consulta:
+
+1. **Cada conceito mora em UMA seção.** Tudo o que a aula diz sobre ele fica junto ali. Nos outros lugares
+   o termo é só um link para lá (o glossário faz isso sozinho). Conceito explicado em duas seções é bug.
+2. Seções em ordem de dependência (o que é preciso saber antes vem antes), do geral para o específico,
+   agrupadas por `data-grupo` (o grupo vira rótulo no sumário).
+3. Conceito de outra aula não se repete: link para a aula de origem (`<a href="/m8/comp/04-…">aula 04</a>`).
+4. Estrutura fixa e curta de cada seção, nesta ordem (os rótulos vêm do CSS):
+
+```html
+<section class="cs" id="amat" data-grupo="Memória" data-termos="amat,tempo-hit,taxa-miss" data-leitura="cache">
+  <h2>AMAT e CPI efetivo</h2>
+  <p class="cs-def">Definição em uma ou duas frases.</p>
+  <ul class="b">…detalhes que fazem parte da definição (opcional)…</ul>
+  <div class="cs-formula"><div class="formula">AMAT = Hit time + Miss rate × Miss penalty</div></div>
+  <div class="cs-uso">…conta passo a passo com números…</div>
+  <p class="prova">…copiado igual ao do conteudo.html…</p>
+  <div class="cs-pegadinhas"><ul class="b">…</ul></div>
+  <div class="cs-ponderada"><p>…</p></div>
+  <div data-ref="fig-cache"></div>
+</section>
+```
+
+   - `data-termos`: as chaves do `glossario.js` da aula que **moram** nesta seção. Toda chave da aula mora
+     em exatamente uma seção (a barra de Definições usa isso para o "ver seção").
+   - `data-leitura`: ids das seções do `conteudo.html` de onde o conteúdo veio (para o switch).
+   - Blocos vazios são omitidos; a ordem não muda.
+   - A leitura dos símbolos de uma fórmula ("f é…, s é…") fica dentro do `.cs-formula`, logo abaixo dela.
+   - Tabelas (`data-ref-tbl`) e `h3` podem entrar onde o conteúdo pede (uma seção longa como "Otimizações"
+     usa h3); o resto da ordem vale.
+   - Pegadinha é armadilha (erro comum, confusão de prova). Fato ou troca ("write-through gera tráfego") é bullet.
+5. Frases curtas, bullets enxutos, sem parágrafo introdutório e sem analogia longa (uma linha, se ajudar).
+   Voz da seção "Voz" abaixo, versão enxuta.
+6. Figuras, loops, desenhos de margem e tabelas **não são copiados**: o consulta.html cita pelo id e o build
+   traz do conteudo.html. `<div data-ref="fig-x"></div>` (figura), `<div data-ref-loop="nome"></div>` (loop),
+   `<div data-ref-mn="mn-x"></div>` (desenho de margem: dê `id="mn-…"` ao `<aside class="mn">` no
+   conteudo.html), `<div data-ref-tbl="tbl-x"></div>` (tabela: `id="tbl-…"` no `<div class="tbl">`).
+   Cada um aparece uma vez, na seção do conceito a que pertence.
+7. `<p class="prova">` do modo Leitura entram iguais (mesmo texto), na seção do conceito.
+8. `revisao.js`: cada cartão e linha de cola ganha um 3º item, o id da seção do modo Consulta
+   (`['pergunta', 'resposta', 'amat']`). O fim da página Consulta agrupa cartões e cola por seção.
+9. `glossario.js`: campo opcional `f` com a fórmula do termo, que aparece na barra de Definições.
+
+`npm run checar-consulta` confere as regras que dá para conferir (cada termo em uma seção só, toda figura,
+loop, desenho, tabela e "cai na prova" presentes, ordem dos blocos, cartões agrupados). Ele não vê se um
+conceito foi **explicado** em duas seções: releia procurando isso.
+
 ## glossario.js
 
 ```js
@@ -217,6 +275,42 @@ Não pergunte à dona "o que você já sabe?". Coloque a base na página, recolh
   ao terminar, confira item por item contra as transcrições/capítulos.
 - Notação matemática com caracteres Unicode (Σ, ε, ⇒, ⊊, aⁿbⁿ), não LaTeX.
 
+## Voz (inspirada na série Grokking)
+
+Referência de tom: *Grokking Algorithms* e os outros livros da série Grokking. Vale para o modo Consulta
+e para toda aula nova (as aulas já escritas no modo Leitura mantêm a voz que têm).
+
+- Fale com a leitora: "você". Como uma colega mais experiente sentada do lado, sem cerimônia e sem gíria.
+- Exemplo concreto primeiro, com números pequenos; a regra geral depois, e só quando o exemplo já a mostrou.
+- Passos pequenos. Cada passo depende só do anterior. Se precisou de "obviamente", faltou um passo.
+- O desenho carrega a explicação; o texto aponta para o desenho ("repare que a linha 2 fica vazia").
+- Humor leve é bem-vindo, raro e curto. Nunca às custas da clareza.
+- Fecho de seção com um resumo de 1 a 3 bullets ("Recapitulando").
+- Do guia de escrita da dona (skill `revisao-de-texto`) valem: a lista de marcas de IA (travessão no meio
+  da frase, "não é X, é Y", grupos de três forçados, frase de efeito no fim do parágrafo, palavras infladas
+  como crucial/fundamental/robusto/vale ressaltar, negrito abrindo todo item, conectivo em todo parágrafo,
+  emoji); o mesmo termo e o mesmo número do começo ao fim; nada repetido; nada de bastidor (o texto fala do
+  assunto, nunca de como foi feito). O registro formal e impessoal daquela skill **não** vale aqui.
+
+## Termos técnicos: inglês × português
+
+A dona é fluente em inglês e conhece muitos termos de computação em inglês. Regra: **use o termo como ele
+é falado na área**. Se no dia a dia de quem trabalha com isso o termo é em inglês, ele fica em inglês, sem
+tradução no texto; a tradução vai no glossário (no `t`, entre parênteses, e como forma extra em `m`, para
+virar link nos dois idiomas). Se o português é tão natural quanto, use o português.
+
+| Fica em inglês | Fica em português |
+|---|---|
+| cache, hit, miss, hit rate, miss rate, miss penalty, write-through, write-back, dirty bit, prefetching, buffer, write buffer, TLB, page fault, swap | processo, memória, memória virtual, desempenho, energia, potência, registrador, instrução, endereço, página, tabela de páginas |
+| pipeline, stage, stall, bubble, forwarding, hazard, branch, branch prediction, speedup, throughput, benchmark, clock, core, multicore, die, wafer, yield | escalonamento, escalonador, semáforo, exclusão mútua, região crítica, condição de corrida, troca de contexto, fila de prontos, estado |
+| thread, kernel, syscall, scheduler (pode alternar com escalonador ao citar código), deadlock, starvation, mutex, lock, spinlock, busy waiting, race condition (na 1ª menção, junto de "condição de corrida") | sistema operacional, arquivo, diretório, disco, dispositivo, interrupção, alocação, fragmentação |
+| round-robin, quantum, aging, first-fit/best-fit/worst-fit, working set, thrashing, i-node, DMA, polling, spooling, seek, LRU, FIFO | linguagem, alfabeto, palavra, gramática, autômato, pilha (estrutura de dados), pilha de execução |
+
+Na dúvida, prefira o inglês para nome de mecanismo/técnica e o português para conceito geral. Siglas
+ficam como são (CPU, GPU, ISA, CPI, AMAT, PCB, MMU). Não traduza nome de algoritmo ou de problema clássico
+que é conhecido pelo nome em inglês (Tomasulo, Peterson, banker's algorithm pode ficar "algoritmo do
+banqueiro" porque o livro brasileiro usa assim).
+
 ## Decisões de design (não desfazer sem a dona pedir)
 
 - Visual limpo de post técnico (Medium/ByteByteGo): fundo claro, IBM Plex Sans/Mono, cor só nos diagramas.
@@ -224,6 +318,8 @@ Não pergunte à dona "o que você já sabe?". Coloque a base na página, recolh
 - Texto na coluna de 3/4; a margem de 1/4 recebe desenhos, loops e os passos das figuras.
 - Figuras sem caixa. Barra de controles (play, ‹, ›, reiniciar, progresso) **acima** da figura.
 - Figura passo a passo anima só com o mouse em cima e avança na hora em que ele entra.
+- Dois modos por aula, Leitura e Consulta, com switch global no topo (`src/lib/modo.js`). No Consulta, a
+  barra de Definições fica à direita, sempre visível (no celular, botão), com busca que filtra enquanto digita.
 - Nenhuma animação roda (nem com o mouse em cima, nem loop) sem que **pelo menos 80%** dela esteja na
   tela (`fracaoVisivel` em `src/lib/dom.js`). Loops começam do início quando aparecem e congelam ao sair.
 - Toda página de leitura (aula, revisão, glossário) mostra o **tempo de leitura** logo abaixo do título,
@@ -244,6 +340,7 @@ Não pergunte à dona "o que você já sabe?". Coloque a base na página, recolh
 ```bash
 npm run dev                                         # http://localhost:4321
 npm run checar                                      # termos em negrito sem verbete no glossário
+npm run checar-consulta                             # regras do modo Consulta
 MSYS_NO_PATHCONV=1 BASE_PATH=/caderno-visual npx astro build   # igual ao CI (no Git Bash do Windows)
 ```
 

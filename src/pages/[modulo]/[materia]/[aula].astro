@@ -4,7 +4,7 @@
 import Aula from '../../../layouts/Aula.astro';
 import Glossario from '../../../components/Glossario.astro';
 import Cartoes from '../../../components/Cartoes.astro';
-import { aulas, materia, modulo, hrefRevisao, glossarioGlobal, hrefGlossario, tempoAula, comTempo } from '../../../lib/catalogo.js';
+import { aulas, materia, modulo, hrefRevisao, glossarioGlobal, glossarioDaAula, hrefGlossario, tempoAula, comTempo, montarConsulta } from '../../../lib/catalogo.js';
 
 export function getStaticPaths() {
   return aulas.map((a) => ({ params: { modulo: a.modulo, materia: a.materia, aula: a.slug }, props: { aula: a } }));
@@ -15,6 +15,10 @@ const mod = modulo(aula.modulo);
 /* links entre aulas no conteudo.html são escritos a partir da raiz (href="/m8/comp/02-…"); aqui ganham o base do site */
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const conteudo = comTempo(aula.conteudo, tempoAula(aula)).replaceAll('href="/', `href="${base}/`);
+
+/* switch Leitura/Consulta: o mapa de seções serve para cair no mesmo assunto ao trocar de modo */
+const C = aula.consulta ? montarConsulta(aula) : null;
+const modo = { atual: 'leitura', leitura: aula.href, consulta: aula.hrefConsulta, secaoDe: C ? C.secaoDe : {}, leituraDe: C ? C.leituraDe : {}, chaves: C ? C.chaves : {} };
 
 const temRevisao = aula.cartoes.length || aula.cola.length;
 const temNotas = aula.notas.length || aula.anexos.length;
@@ -37,7 +41,7 @@ const temFotos = !!fotos.length;
 const notas = aula.notas.map((n) => ({ Corpo: n.Content, nome: nomeNota(n), data: n.frontmatter.data }));
 function nomeNota(n) { return n.frontmatter.titulo || n.arquivo.replace(/\.md$/, '').replace(/[-_]/g, ' '); }
 ---
-<Aula titulo={aula.titulo} rotulo={`Aula ${aula.numero}`} materia={mat} modulo={mod} secoes={secoes} descricao={aula.resumo}>
+<Aula titulo={aula.titulo} rotulo={`Aula ${aula.numero}`} materia={mat} modulo={mod} secoes={secoes} descricao={aula.resumo} modo={modo}>
   <div data-aula={aula.id} id="aula-root">
     <Fragment set:html={conteudo} />
   </div>
@@ -86,7 +90,7 @@ function nomeNota(n) { return n.frontmatter.titulo || n.arquivo.replace(/\.md$/,
     </Fragment>
   )}
 
-  <Glossario termos={glossarioGlobal} listar={Object.keys(aula.glossario)} global={hrefGlossario} num={num('glossario')} intro={`Os termos desta aula. Termos de aulas anteriores também viram link no texto e abrem no <a href="${hrefGlossario}">glossário coletivo</a>. Os blocos <b>"pra ir além"</b> não são necessários para a prova.`} />
+  <Glossario termos={glossarioDaAula(aula)} listar={Object.keys(aula.glossario)} global={hrefGlossario} num={num('glossario')} intro={`Os termos desta aula. Termos de aulas anteriores também viram link no texto e abrem no <a href="${hrefGlossario}">glossário coletivo</a>. Os blocos <b>"pra ir além"</b> não são necessários para a prova.`} />
 
   {temFontes && (
     <section class="fontes" id="fontes">

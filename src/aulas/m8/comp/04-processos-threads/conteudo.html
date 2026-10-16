@@ -1,7 +1,7 @@
 <header class="hero prose" id="top">
   <div class="kicker">Do silício ao sistema operacional · Aula 04</div>
   <h1>Processos e threads: como um computador parece fazer tudo ao mesmo tempo</h1>
-  <div class="hero-sym"><span>modo <b>usuário</b> → <b>núcleo</b></span><span>PCB = <b>contexto</b> + estado</span><span>pronto <b>⇄</b> executando</span><span>q / (q + s)</span><span><b>1:1</b> · N:1 · M:N</span></div>
+  <div class="hero-sym"><span>modo <b>usuário</b> → <b>kernel</b></span><span>PCB = <b>contexto</b> + estado</span><span>pronto <b>⇄</b> executando</span><span>q / (q + s)</span><span><b>1:1</b> · N:1 · M:N</span></div>
 </header>
 
 <!-- ============ 1 ============ -->
@@ -19,8 +19,8 @@
       <thead><tr><th>Unidade</th><th>Quanto é</th><th>O que acontece nesse tempo</th></tr></thead>
       <tbody>
         <tr><td><code>ns</code> (nanossegundo)</td><td>10⁻⁹ s, um bilionésimo de segundo</td><td>um ciclo de clock de uma CPU de 1 GHz; um acesso à cache L1 (~1 ns)</td></tr>
-        <tr><td><code>µs</code> (microssegundo)</td><td>10⁻⁶ s = 1 000 ns</td><td>uma chamada de sistema simples (~0,1 a 1 µs); uma troca de contexto (~1 a 10 µs)</td></tr>
-        <tr><td><code>ms</code> (milissegundo)</td><td>10⁻³ s = 1 000 µs</td><td>uma fatia de tempo de CPU (~1 a 100 ms); uma leitura de HD (~5 a 10 ms); de SSD (~0,1 ms)</td></tr>
+        <tr><td><code>µs</code> (microssegundo)</td><td>10⁻⁶ s = 1 000 ns</td><td>uma syscall simples (~0,1 a 1 µs); uma troca de contexto (~1 a 10 µs)</td></tr>
+        <tr><td><code>ms</code> (milissegundo)</td><td>10⁻³ s = 1 000 µs</td><td>um quantum de CPU (~1 a 100 ms); uma leitura de HD (~5 a 10 ms); de SSD (~0,1 ms)</td></tr>
         <tr><td><code>s</code> (segundo)</td><td>1 000 ms</td><td>o que uma pessoa percebe como "demorou"; acima de ~100 ms já dá para notar atraso</td></tr>
       </tbody>
     </table>
@@ -29,56 +29,56 @@
   <p>Guarde a ordem de grandeza: enquanto um HD faz uma leitura (5 ms), uma CPU de 2 GHz passa por 10 milhões de ciclos. Quase tudo nesta aula existe para não desperdiçar esses ciclos.</p>
 
   <h3>O sistema operacional</h3>
-<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 170"><rect class="k" x="10" y="6" width="66" height="30" rx="6"/><text class="tm" x="43" y="21">navegador</text><rect class="k" x="87" y="6" width="66" height="30" rx="6"/><text class="tm" x="120" y="21">editor</text><rect class="k" x="164" y="6" width="66" height="30" rx="6"/><text class="tm" x="197" y="21">jogo</text><text class="tm st" x="10" y="50">modo usuário</text><line class="s" x1="10" y1="60" x2="230" y2="60" stroke-dasharray="4 3"/><rect class="acf" x="10" y="68" width="220" height="40" rx="8"/><text class="ta" x="120" y="88">núcleo do SO</text><rect class="am" x="10" y="122" width="66" height="34" rx="6"/><text class="tm" x="43" y="139">CPU</text><rect class="am" x="87" y="122" width="66" height="34" rx="6"/><text class="tm" x="120" y="139">memória</text><rect class="am" x="164" y="122" width="66" height="34" rx="6"/><text class="tm" x="197" y="139">disco, rede</text></svg>Os programas não falam com o hardware: pedem ao núcleo, que fala por eles.</aside>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 170"><rect class="k" x="10" y="6" width="66" height="30" rx="6"/><text class="tm" x="43" y="21">navegador</text><rect class="k" x="87" y="6" width="66" height="30" rx="6"/><text class="tm" x="120" y="21">editor</text><rect class="k" x="164" y="6" width="66" height="30" rx="6"/><text class="tm" x="197" y="21">jogo</text><text class="tm st" x="10" y="50">modo usuário</text><line class="s" x1="10" y1="60" x2="230" y2="60" stroke-dasharray="4 3"/><rect class="acf" x="10" y="68" width="220" height="40" rx="8"/><text class="ta" x="120" y="88">kernel do SO</text><rect class="am" x="10" y="122" width="66" height="34" rx="6"/><text class="tm" x="43" y="139">CPU</text><rect class="am" x="87" y="122" width="66" height="34" rx="6"/><text class="tm" x="120" y="139">memória</text><rect class="am" x="164" y="122" width="66" height="34" rx="6"/><text class="tm" x="197" y="139">disco, rede</text></svg>Os programas não falam com o hardware: pedem ao kernel, que fala por eles.</aside>
   <ul class="b">
     <li><b>Sistema operacional</b> (SO): o programa que fica entre os seus programas e o hardware. Windows, Linux, macOS, Android e iOS são sistemas operacionais.</li>
     <li>Primeiro papel, <b>máquina estendida</b>: esconder os detalhes do hardware atrás de serviços simples. Seu código diz "abra o arquivo notas.txt", e o SO cuida de achar os blocos certos no disco.</li>
     <li>Segundo papel, <b>gerente de recursos</b>: dividir CPU, memória e dispositivos entre vários programas que disputam ao mesmo tempo, sem que um atrapalhe ou espione o outro.</li>
-    <li><b>Núcleo</b> (kernel): a parte do SO que fica sempre carregada na memória e tem acesso total ao hardware. Ele gerencia processos, memória, arquivos e dispositivos. O resto do SO (janelas, utilitários, o interpretador de comandos) são programas comuns.</li>
+    <li><b>Kernel</b> (núcleo): a parte do SO que fica sempre carregada na memória e tem acesso total ao hardware. Ele gerencia processos, memória, arquivos e dispositivos. O resto do SO (janelas, utilitários, o interpretador de comandos) são programas comuns.</li>
   </ul>
 
-  <h3>Modo usuário e modo núcleo</h3>
-<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><ellipse class="k" cx="120" cy="75" rx="112" ry="68"/><text class="tm" x="120" y="20">modo usuário</text><text class="tm" x="120" y="132">seu código: só instruções comuns</text><ellipse class="acf" cx="120" cy="76" rx="58" ry="34"/><text class="ta" x="120" y="70">modo núcleo</text><text class="tm" x="120" y="88">tudo liberado</text></svg>O núcleo roda no anel de dentro. Para entrar nele, só pela porta oficial: chamada de sistema ou interrupção.</aside>
+  <h3>Modo usuário e modo kernel</h3>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><ellipse class="k" cx="120" cy="75" rx="112" ry="68"/><text class="tm" x="120" y="20">modo usuário</text><text class="tm" x="120" y="132">seu código: só instruções comuns</text><ellipse class="acf" cx="120" cy="76" rx="58" ry="34"/><text class="ta" x="120" y="70">modo kernel</text><text class="tm" x="120" y="88">tudo liberado</text></svg>O kernel roda no anel de dentro. Para entrar nele, só pela porta oficial: syscall ou interrupção.</aside>
   <p>Se qualquer programa pudesse mandar comandos direto ao disco ou mexer na memória dos outros, um bug num jogo derrubaria a máquina inteira. Por isso a CPU tem pelo menos dois modos de operação, marcados por um bit num registrador especial.</p>
   <ul class="b">
-    <li><b>Modo núcleo</b> (também chamado modo kernel, supervisor ou privilegiado): a CPU executa qualquer instrução e acessa qualquer endereço. Só o código do núcleo roda assim.</li>
+    <li><b>Modo kernel</b> (também chamado modo núcleo, supervisor ou privilegiado): a CPU executa qualquer instrução e acessa qualquer endereço. Só o código do kernel roda assim.</li>
     <li><b>Modo usuário</b>: a CPU recusa um grupo de instruções. Todo programa seu roda neste modo.</li>
-    <li><b>Instrução privilegiada</b>: instrução que só pode rodar em modo núcleo. Exemplos: conversar com um dispositivo de E/S, mudar a tabela de páginas da memória virtual (aula 02), desligar interrupções, mudar o bit de modo.</li>
-    <li>Se um programa em modo usuário tenta uma instrução privilegiada, a CPU não executa: ela desvia para o núcleo, que em geral encerra o programa.</li>
+    <li><b>Instrução privilegiada</b>: instrução que só pode rodar em modo kernel. Exemplos: conversar com um dispositivo de E/S, mudar a tabela de páginas da memória virtual (aula 02), desligar interrupções, mudar o bit de modo.</li>
+    <li>Se um programa em modo usuário tenta uma instrução privilegiada, a CPU não executa: ela desvia para o kernel, que em geral encerra o programa.</li>
   </ul>
   <div class="def warn">
-    <span class="lab">Duas palavras "núcleo"</span>
-    <p>Em português, "núcleo" serve para duas coisas: o núcleo do SO (kernel) e cada processador dentro do chip (core). Neste caderno, <i>núcleo</i> sozinho é sempre o kernel. Para o hardware, escrevemos <i>core</i>: "uma CPU com 4 cores".</p>
+    <span class="lab">"Núcleo": kernel ou core?</span>
+    <p>Em português, "núcleo" serve para duas coisas: o kernel do SO e cada processador dentro do chip (core). Por isso este caderno não usa "núcleo": kernel é sempre o do SO, e core é o do hardware, como em "uma CPU com 4 cores".</p>
   </div>
 
-  <h3>Chamada de sistema: pedir ao núcleo</h3>
-  <p>Se o seu programa não pode falar com o disco, como ele lê um arquivo? Ele pede ao núcleo.</p>
+  <h3>Syscall: pedir ao kernel</h3>
+  <p>Se o seu programa não pode falar com o disco, como ele lê um arquivo? Ele pede ao kernel.</p>
   <ul class="b">
-    <li><b>Chamada de sistema</b> (system call, syscall): o pedido formal de um programa ao núcleo. Exemplos do Linux: <code>read</code> (ler), <code>write</code> (escrever), <code>open</code> (abrir arquivo), <code>fork</code> (criar processo), <code>exit</code> (terminar).</li>
-    <li>Em geral você não chama direto: <code>print</code> do Python e <code>printf</code> do C são funções de biblioteca que, por baixo, fazem a chamada <code>write</code>.</li>
-    <li>O mecanismo: o programa põe o número do serviço e os argumentos em registradores e executa uma instrução especial de desvio (<code>syscall</code> no x86-64, <code>svc</code> no ARM). A CPU muda para modo núcleo e salta para um endereço fixo, escolhido pelo núcleo. O programa não consegue pular para outro lugar do núcleo.</li>
-    <li>O núcleo confere o pedido (o arquivo existe? você tem permissão?), faz o serviço, devolve o resultado num registrador e volta para o modo usuário, na instrução seguinte.</li>
+    <li><b>Syscall</b> (system call, chamada de sistema): o pedido formal de um programa ao kernel. Exemplos do Linux: <code>read</code> (ler), <code>write</code> (escrever), <code>open</code> (abrir arquivo), <code>fork</code> (criar processo), <code>exit</code> (terminar).</li>
+    <li>Em geral você não chama direto: <code>print</code> do Python e <code>printf</code> do C são funções de biblioteca que, por baixo, fazem a syscall <code>write</code>.</li>
+    <li>O mecanismo: o programa põe o número do serviço e os argumentos em registradores e executa uma instrução especial de trap (<code>syscall</code> no x86-64, <code>svc</code> no ARM). A CPU muda para modo kernel e salta para um endereço fixo, escolhido pelo kernel. O programa não consegue pular para outro lugar do kernel.</li>
+    <li>O kernel confere o pedido (o arquivo existe? você tem permissão?), faz o serviço, devolve o resultado num registrador e volta para o modo usuário, na instrução seguinte.</li>
     <li>Custa caro em relação a uma função comum: trocar de modo e conferir tudo leva de centenas de ns a alguns µs.</li>
   </ul>
 
-  <h3>Interrupção: o hardware chama o núcleo</h3>
+  <h3>Interrupção: o hardware chama o kernel</h3>
   <ul class="b">
     <li><b>E/S</b> (entrada e saída, ou I/O em inglês): toda troca de dados entre a CPU e o mundo de fora da memória: disco, teclado, tela, rede, sensores.</li>
     <li>Dispositivos de E/S são lentíssimos perto da CPU. Ficar perguntando "já acabou?" em loop desperdiçaria milhões de ciclos.</li>
-    <li><b>Interrupção</b>: um aviso elétrico que um dispositivo manda para a CPU avisando "aconteceu algo". A CPU termina a instrução atual, guarda o mínimo para poder voltar (o PC e o registrador de status), muda para modo núcleo e executa o <b>tratador de interrupção</b>, a rotina do núcleo para aquele tipo de evento. No fim, volta ao ponto exato onde estava.</li>
+    <li><b>Interrupção</b>: um aviso elétrico que um dispositivo manda para a CPU avisando "aconteceu algo". A CPU termina a instrução atual, guarda o mínimo para poder voltar (o PC e o registrador de status), muda para modo kernel e executa o <b>tratador de interrupção</b>, a rotina do kernel para aquele tipo de evento. No fim, volta ao ponto exato onde estava.</li>
     <li>Exemplos: o disco terminou uma leitura, uma tecla foi pressionada, chegou um pacote de rede.</li>
-    <li><b>Temporizador</b> (timer, relógio): um circuito que interrompe a CPU em intervalos fixos, por exemplo a cada 1 ms. É o que garante ao SO retomar o controle mesmo de um programa que nunca faz chamada de sistema.</li>
+    <li><b>Temporizador</b> (timer, relógio): um circuito que interrompe a CPU em intervalos fixos, por exemplo a cada 1 ms. É o que garante ao SO retomar o controle mesmo de um programa que nunca faz syscall.</li>
     <li><b>Exceção</b>: a mesma ideia, mas causada pela instrução que está executando: divisão por zero, acesso a endereço proibido, instrução privilegiada em modo usuário.</li>
-    <li>Interrupção é <i>assíncrona</i>: chega a qualquer momento, sem relação com a instrução atual. Exceção é <i>síncrona</i>: acontece sempre no mesmo ponto se você rodar o programa de novo. A chamada de sistema às vezes é chamada de "interrupção de software", porque entra no núcleo pelo mesmo tipo de caminho.</li>
+    <li>Interrupção é <i>assíncrona</i>: chega a qualquer momento, sem relação com a instrução atual. Exceção é <i>síncrona</i>: acontece sempre no mesmo ponto se você rodar o programa de novo. A syscall às vezes é chamada de "interrupção de software", porque entra no kernel pelo mesmo tipo de caminho.</li>
   </ul>
   <p>Veja as duas coisas juntas: um programa pede uma leitura de disco, espera, e o disco avisa por interrupção.</p>
  </div>
 
   <figure class="fig" id="fig-syscall">
-    <div class="fig-head"><span class="fig-title">Figura 1 · Uma chamada de sistema e uma interrupção, na linha do tempo</span></div>
+    <div class="fig-head"><span class="fig-title">Figura 1 · Uma syscall e uma interrupção, na linha do tempo</span></div>
     <div class="fig-body">
       <div class="fig-stage">
-        <svg id="sc-svg" viewBox="0 0 640 270" role="img" aria-label="Linha do tempo com faixas para o processo P, o processo Q, o núcleo e o disco"></svg>
+        <svg id="sc-svg" viewBox="0 0 640 270" role="img" aria-label="Linha do tempo com faixas para o processo P, o processo Q, o kernel e o disco"></svg>
         <div class="stage-cap" id="sc-cap"></div>
       </div>
       <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
@@ -94,7 +94,7 @@
     <li><b>Multiprogramação</b>: manter vários programas na memória ao mesmo tempo. Quando um para para esperar E/S, o SO entrega a CPU a outro.</li>
     <li>Conta de exemplo: um programa usa 10 ms de CPU e depois espera 40 ms pelo disco, em ciclo. Sozinho, ocupa a CPU 10 ms a cada 50 ms: 10 / 50 = 20 %.</li>
     <li>Com 4 programas iguais, enquanto um espera os outros usam a CPU: no melhor caso, 4 × 20 % = 80 % de uso. No pior caso as esperas coincidem e o ganho é menor.</li>
-    <li><b>Tempo compartilhado</b> (time-sharing): multiprogramação mais o temporizador. Cada programa recebe uma fatia curta de CPU (o quantum, assunto da aula 06), por exemplo 10 ms, e é interrompido no fim dela mesmo sem pedir E/S. Para quem está usando, tudo parece rodar ao mesmo tempo.</li>
+    <li><b>Tempo compartilhado</b> (time-sharing): multiprogramação mais o temporizador. Cada programa recebe um quantum (uma fatia curta de CPU, assunto da aula 06), por exemplo 10 ms, e é interrompido no fim dele mesmo sem pedir E/S. Para quem está usando, tudo parece rodar ao mesmo tempo.</li>
   </ul>
   <p>Para isso funcionar, o SO precisa parar um programa no meio e depois continuar exatamente de onde ele parou, como se nada tivesse acontecido. O que o SO guarda para conseguir isso é o que transforma um programa em processo.</p>
  </div>
@@ -124,7 +124,7 @@
   <p class="prova">Programa é código parado no disco (passivo). Processo é o programa em execução, com contexto de hardware, contexto de software e espaço de endereçamento (ativo). Um programa pode dar origem a vários processos.</p>
 
   <h3>O que precisa ser guardado para parar e continuar</h3>
-  <p>Imagine o processo A no meio de uma repetição, com o contador <code>i</code> valendo 731, quando o temporizador interrompe e o SO passa a CPU para B. Para A continuar depois sem perceber nada, o SO precisa ter guardado:</p>
+  <p>Imagine o processo A no meio de um loop, com o contador <code>i</code> valendo 731, quando o temporizador interrompe e o SO passa a CPU para B. Para A continuar depois sem perceber nada, o SO precisa ter guardado:</p>
   <ul class="b">
     <li>em que instrução A parou (o contador de programa);</li>
     <li>os valores que estavam nos registradores da CPU, inclusive o <code>i = 731</code>, se o compilador deixou <code>i</code> num registrador;</li>
@@ -152,8 +152,8 @@
     <li>Registradores gerais: guardam os valores intermediários das contas.</li>
     <li><b>Contador de programa</b> (PC, program counter): o endereço da próxima instrução a executar.</li>
     <li><b>Apontador de pilha</b> (SP, stack pointer): o endereço do topo da pilha de execução, explicada logo abaixo.</li>
-    <li><b>Registrador de status</b> (PSW, program status word): bits sobre a situação da CPU. A última comparação deu zero? Deu negativo? Houve estouro? A CPU está em modo usuário ou núcleo? Interrupções estão ligadas?</li>
-    <li>Enquanto o processo executa, esses valores moram nos registradores físicos. Quando ele sai da CPU, o SO copia todos para a memória do núcleo. Essa cópia é a troca de contexto da seção 5.</li>
+    <li><b>Registrador de status</b> (PSW, program status word): bits sobre a situação da CPU. A última comparação deu zero? Deu negativo? Houve estouro? A CPU está em modo usuário ou kernel? Interrupções estão ligadas?</li>
+    <li>Enquanto o processo executa, esses valores moram nos registradores físicos. Quando ele sai da CPU, o SO copia todos para a memória do kernel. Essa cópia é a troca de contexto da seção 5.</li>
   </ul>
 
   <h3>Contexto de software</h3>
@@ -174,7 +174,7 @@
     <li><b>Dados globais</b>: as variáveis globais e estáticas, que existem do começo ao fim da execução.</li>
     <li><b>Heap</b>: memória pedida durante a execução, quando o tamanho só é conhecido na hora: <code>malloc</code> em C, <code>new</code> em Java, todo objeto em Python. Cresce para cima.</li>
     <li><b>Pilha de execução</b> (stack): guarda um bloco para cada chamada de função em andamento, com as <b>variáveis locais</b>, os parâmetros e o endereço para onde voltar. Cada chamada empilha um bloco; cada <code>return</code> tira o bloco do topo. Cresce para baixo, a partir do topo do espaço.</li>
-    <li>Entre o heap e a pilha de execução sobra um espaço livre. Uma recursão sem fim gasta esse espaço até o fim e causa o famoso <i>stack overflow</i>: o SO encerra o processo.</li>
+    <li>Entre o heap e a pilha de execução sobra um espaço livre. Uma recursão sem fim gasta esse espaço até o fim e causa o famoso stack overflow: o SO encerra o processo.</li>
   </ul>
   <p>Onde mora cada coisa num programa em C:</p>
 <pre><code>int total = 0;                       // dados globais
@@ -190,12 +190,12 @@ int soma(int n) {                    // as instruções de soma ficam no código
     <p>A pilha de execução segue a mesma regra da pilha da aula 01: o último bloco que entra é o primeiro que sai. Se <code>main</code> chama <code>soma</code>, que chama <code>malloc</code>, a primeira a terminar é <code>malloc</code>, e o bloco dela é o que está no topo.</p>
   </div>
 
-  <h3>PCB: a ficha do processo no núcleo</h3>
-<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 176"><rect class="acf" x="40" y="6" width="160" height="164" rx="8"/><text class="ta" x="120" y="22">PCB</text><line class="s" x1="40" y1="34" x2="200" y2="34"/><text class="tm st" x="50" y="48">PID     4182</text><text class="tm st" x="50" y="66">estado  pronto</text><text class="tm st" x="50" y="84">PC      0x4A10</text><text class="tm st" x="50" y="102">SP      0x7FF0</text><text class="tm st" x="50" y="120">prior.  20</text><text class="tm st" x="50" y="138">dono    maria</text><text class="tm st" x="50" y="156">arqs    0, 1, 3</text></svg>Uma ficha por processo, guardada na memória do núcleo.</aside>
+  <h3>PCB: a ficha do processo no kernel</h3>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 176"><rect class="acf" x="40" y="6" width="160" height="164" rx="8"/><text class="ta" x="120" y="22">PCB</text><line class="s" x1="40" y1="34" x2="200" y2="34"/><text class="tm st" x="50" y="48">PID     4182</text><text class="tm st" x="50" y="66">estado  pronto</text><text class="tm st" x="50" y="84">PC      0x4A10</text><text class="tm st" x="50" y="102">SP      0x7FF0</text><text class="tm st" x="50" y="120">prior.  20</text><text class="tm st" x="50" y="138">dono    maria</text><text class="tm st" x="50" y="156">arqs    0, 1, 3</text></svg>Uma ficha por processo, guardada na memória do kernel.</aside>
   <div class="def key">
     <span class="lab">Definição · PCB</span>
-    <p class="simples">É a ficha que o núcleo mantém para cada processo, como um prontuário médico: quem é o processo, em que situação está e tudo o que é preciso para retomá-lo de onde parou.</p>
-    <p class="formal">O <b>bloco de controle do processo</b> (PCB, process control block) é a estrutura de dados do núcleo que guarda o contexto de hardware, o contexto de software, as informações sobre o espaço de endereçamento e o estado do processo.</p>
+    <p class="simples">É a ficha que o kernel mantém para cada processo, como um prontuário médico: quem é o processo, em que situação está e tudo o que é preciso para retomá-lo de onde parou.</p>
+    <p class="formal">O <b>bloco de controle do processo</b> (PCB, process control block) é a estrutura de dados do kernel que guarda o contexto de hardware, o contexto de software, as informações sobre o espaço de endereçamento e o estado do processo.</p>
   </div>
  </div>
   <div class="tbl prose">
@@ -214,7 +214,7 @@ int soma(int n) {                    // as instruções de soma ficam no código
   </div>
  <div class="prose">
   <ul class="b">
-    <li>O PCB fica na memória do núcleo, fora do alcance do processo. Assim ele não consegue, por exemplo, aumentar a sua prioridade.</li>
+    <li>O PCB fica na memória do kernel, fora do alcance do processo. Assim ele não consegue, por exemplo, aumentar a sua prioridade.</li>
     <li><b>Tabela de processos</b>: a coleção de todos os PCBs do sistema. No Linux, cada PCB é uma <code>struct task_struct</code>. Os comandos <code>ps</code> e <code>top</code> e o Gerenciador de Tarefas do Windows mostram o que está nela.</li>
     <li>No Linux dá para espiar parte do PCB de um processo em <code>/proc/&lt;PID&gt;/status</code>.</li>
   </ul>
@@ -251,19 +251,19 @@ int soma(int n) {                    // as instruções de soma ficam no código
       <thead><tr><th>Transição</th><th>Quando acontece</th><th>Quem provoca</th></tr></thead>
       <tbody>
         <tr><td>novo → pronto</td><td>o SO terminou de criar o processo e o admitiu</td><td>SO</td></tr>
-        <tr><td>pronto → executando</td><td>o escalonador escolheu este processo</td><td>escalonador</td></tr>
-        <tr><td>executando → espera</td><td>o processo pediu E/S ou vai esperar um evento</td><td>o próprio processo, por chamada de sistema</td></tr>
+        <tr><td>pronto → executando</td><td>o scheduler escolheu este processo</td><td>scheduler</td></tr>
+        <tr><td>executando → espera</td><td>o processo pediu E/S ou vai esperar um evento</td><td>o próprio processo, por syscall</td></tr>
         <tr><td>espera → pronto</td><td>o evento aconteceu (o disco terminou)</td><td>SO, ao tratar a interrupção</td></tr>
-        <tr><td>executando → pronto</td><td>a fatia de tempo acabou, ou chegou um processo mais prioritário</td><td>SO, pelo temporizador (preempção)</td></tr>
+        <tr><td>executando → pronto</td><td>o quantum acabou, ou chegou um processo mais prioritário</td><td>SO, pelo temporizador (preempção)</td></tr>
         <tr><td>executando → terminado</td><td>fim normal, erro fatal ou morto por outro processo</td><td>o processo ou o SO</td></tr>
       </tbody>
     </table>
   </div>
  <div class="prose">
   <ul class="b">
-    <li><b>Escalonador</b> (scheduler): a rotina do núcleo que escolhe qual processo pronto vai para a CPU. Os critérios de escolha (ordem de chegada, prioridade, revezamento) são o assunto da aula 06.</li>
-    <li><b>Despachante</b> (dispatcher): a parte que executa a escolha: carrega o contexto do processo escolhido e salta para o PC dele.</li>
-    <li><b>Preempção</b>: tirar a CPU de um processo que ainda queria continuar. Um SO preemptivo usa o temporizador para isso. Sem preempção, um programa preso numa repetição eterna trava a máquina inteira, como acontecia no Windows 3.1, que dependia de cada programa ceder a CPU por conta dele.</li>
+    <li><b>Scheduler</b> (escalonador): a rotina do kernel que escolhe qual processo pronto vai para a CPU. Os critérios de escolha (ordem de chegada, prioridade, revezamento) são o assunto da aula 06.</li>
+    <li><b>Dispatcher</b> (despachante): a parte que executa a escolha: carrega o contexto do processo escolhido e salta para o PC dele.</li>
+    <li><b>Preempção</b>: tirar a CPU de um processo que ainda queria continuar. Um SO preemptivo usa o temporizador para isso. Sem preempção, um programa preso num loop infinito trava a máquina inteira, como acontecia no Windows 3.1, que dependia de cada programa ceder a CPU por conta dele.</li>
   </ul>
   <p>Agora acompanhe um processo A do começo ao fim, junto com dois vizinhos, B e C:</p>
  </div>
@@ -289,7 +289,7 @@ int soma(int n) {                    // as instruções de soma ficam no código
     <span class="lab">Pegadinhas de prova</span>
     <ul class="b">
       <li>Espera → executando não existe. Quem sai da espera vai para a fila de prontos e disputa a CPU de novo.</li>
-      <li>Pronto → espera não existe. Só quem está executando consegue pedir E/S, porque pedir é executar uma chamada de sistema.</li>
+      <li>Pronto → espera não existe. Só quem está executando consegue pedir E/S, porque pedir é executar uma syscall.</li>
       <li>Executando → pronto é involuntário (preempção). Executando → espera é voluntário (o processo pediu algo).</li>
     </ul>
   </div>
@@ -339,26 +339,26 @@ int soma(int n) {                    // as instruções de soma ficam no código
  <div class="prose">
   <h3>Quanto custa</h3>
   <ul class="b">
-    <li><b>Overhead</b>: o tempo e os recursos gastos com gerenciamento, que não são trabalho útil de nenhum processo. Durante a troca de contexto, a CPU só executa código do núcleo: nenhum processo avança.</li>
-    <li>Custo direto: salvar e carregar registradores, rodar o escalonador, trocar o mapa de memória. Em máquinas atuais fica na faixa de 1 a 10 µs.</li>
+    <li><b>Overhead</b>: o tempo e os recursos gastos com gerenciamento, que não são trabalho útil de nenhum processo. Durante a troca de contexto, a CPU só executa código do kernel: nenhum processo avança.</li>
+    <li>Custo direto: salvar e carregar registradores, rodar o scheduler, trocar o mapa de memória. Em máquinas atuais fica na faixa de 1 a 10 µs.</li>
     <li>Custo indireto: a cache e a TLB (aula 02) estão cheias de dados do processo antigo. Os primeiros acessos do novo processo dão miss, e isso pode custar mais do que a troca em si.</li>
   </ul>
-  <p>Seja q a fatia de tempo que cada processo usa antes de ser trocado e s o tempo de uma troca. A cada ciclo, a CPU trabalha q e perde s:</p>
+  <p>Seja q o quantum, o tempo que cada processo usa antes de ser trocado e s o tempo de uma troca. A cada ciclo, a CPU trabalha q e perde s:</p>
   <div class="formula">fração útil = q / (q + s)          overhead = s / (q + s)</div>
   <ul class="b">
     <li>Exemplo: q = 4 ms e s = 20 µs = 0,02 ms. Fração útil = 4 / (4 + 0,02) = 4 / 4,02 ≈ 0,995. A CPU trabalha 99,5 % do tempo; o overhead é 0,5 %.</li>
     <li>Mesma troca com q = 0,1 ms: 0,1 / (0,1 + 0,02) = 0,1 / 0,12 ≈ 0,833. Agora 16,7 % do tempo vai embora em trocas.</li>
     <li>O outro lado: com n processos revezando, cada um espera os outros n − 1 terminarem a vez deles. O tempo até voltar a executar é, no pior caso, (n − 1) × (q + s). Com 5 processos, q = 4 ms e s = 0,02 ms: 4 × 4,02 = 16,08 ms.</li>
-    <li>Fatia curta: resposta rápida, overhead alto. Fatia longa: overhead baixo, resposta lenta. Mexa nos números:</li>
+    <li>Quantum curto: resposta rápida, overhead alto. Quantum longo: overhead baixo, resposta lenta. Mexa nos números:</li>
   </ul>
  </div>
 
   <figure class="fig" id="fig-custo">
-    <div class="fig-head"><span class="fig-title">Figura 4 · Fatia de tempo × custo da troca</span></div>
+    <div class="fig-head"><span class="fig-title">Figura 4 · Quantum × custo da troca</span></div>
     <div class="fig-body">
       <div class="fig-stage game">
         <div class="ctl-grid">
-          <div class="ctl"><label for="cu-q">fatia q (ms) <b id="cu-qv"></b></label><input type="range" id="cu-q" min="0" max="12" value="6"></div>
+          <div class="ctl"><label for="cu-q">quantum q (ms) <b id="cu-qv"></b></label><input type="range" id="cu-q" min="0" max="12" value="6"></div>
           <div class="ctl"><label for="cu-s">troca s (µs) <b id="cu-sv"></b></label><input type="range" id="cu-s" min="0" max="8" value="3"></div>
           <div class="ctl"><label for="cu-n">processos n <b id="cu-nv"></b></label><input type="range" id="cu-n" min="2" max="8" value="4"></div>
         </div>
@@ -372,14 +372,14 @@ int soma(int n) {                    // as instruções de soma ficam no código
           <li class="past">Diminua q até 0,5 ms com s alto: a faixa fica cheia de vermelho.</li>
           <li class="past">Aumente q: o vermelho some, mas o tempo até a vez voltar cresce.</li>
           <li class="past">Mais processos não mudam a fração útil, só a espera de cada um.</li>
-          <li class="cur">Não existe fatia perfeita: o escalonador escolhe q pensando no tipo de uso (aula 06).</li>
+          <li class="cur">Não existe quantum perfeito: o scheduler escolhe q pensando no tipo de uso (aula 06).</li>
         </ol>
       </div>
     </div>
   </figure>
 
  <div class="prose">
-  <p class="prova">A troca de contexto é overhead: enquanto ela acontece, nenhum processo avança. Fração útil = q / (q + s). Fatia menor dá resposta mais rápida e mais overhead.</p>
+  <p class="prova">A troca de contexto é overhead: enquanto ela acontece, nenhum processo avança. Fração útil = q / (q + s). Quantum menor dá resposta mais rápida e mais overhead.</p>
   <div class="def">
     <span class="lab">Na ponderada · pulseira</span>
     <p>Exemplo fora do cenário: um monitor cardíaco precisa tratar cada batida em até 20 ms e divide a CPU com outras 3 tarefas, com q = 4 ms e s = 15 µs. No pior caso, a tarefa dele espera (n − 1) × (q + s) = 3 × 4,015 = 12,045 ms antes de começar, e sobram menos de 8 ms para o cálculo. Você vai ter de montar essa conta com os números da pulseira e dizer se o prazo de 5 ms por amostra aguenta.</p>
@@ -402,7 +402,7 @@ int soma(int n) {                    // as instruções de soma ficam no código
   <ul class="b">
     <li>Logon interativo: ao entrar no sistema com usuário e senha, o SO cria um processo para atender aquele usuário.</li>
     <li>Pelo <b>shell</b>, o interpretador de comandos: cada comando digitado (<code>ls</code>, <code>python app.py</code>) vira um processo novo.</li>
-    <li>Por outro processo, com uma chamada de sistema: <code>fork</code> no Unix e no Linux, <code>CreateProcess</code> no Windows.</li>
+    <li>Por outro processo, com uma syscall: <code>fork</code> no Unix e no Linux, <code>CreateProcess</code> no Windows.</li>
   </ul>
   <ul class="b">
     <li><b>Subprocesso</b> (processo filho): processo criado por outro, o processo pai. Pais e filhos formam uma <b>árvore de processos</b> (veja com <code>pstree</code> no Linux). O filho herda parte do contexto do pai, como o dono e os arquivos abertos.</li>
@@ -433,7 +433,7 @@ else:
   <h3>Sinais</h3>
   <ul class="b">
     <li><b>Sinal</b>: um aviso que o SO entrega a um processo de forma assíncrona, como uma interrupção, só que para processos. Cada sinal tem um número e um nome.</li>
-    <li>Exemplos: <code>Ctrl+C</code> envia SIGINT; <code>kill -9</code> envia SIGKILL, que não pode ser ignorado; acessar memória proibida gera SIGSEGV (o <i>segmentation fault</i>).</li>
+    <li>Exemplos: <code>Ctrl+C</code> envia SIGINT; <code>kill -9</code> envia SIGKILL, que não pode ser ignorado; acessar memória proibida gera SIGSEGV (o segmentation fault).</li>
     <li>O processo pode registrar uma função do próprio programa para tratar a maioria dos sinais. Se não registrar, vale a ação padrão, em geral terminar.</li>
   </ul>
 
@@ -447,7 +447,7 @@ else:
   <ul class="b">
     <li><b>CPU-bound</b> (limitado pela CPU): passa a maior parte do tempo calculando. Exemplos: compactar um vídeo, treinar um modelo de aprendizado de máquina, simulação numérica. Ficaria mais rápido com uma CPU mais rápida.</li>
     <li><b>I/O-bound</b> (limitado por E/S): passa a maior parte do tempo em espera por E/S. Exemplos: editor de texto esperando teclas, servidor web esperando a rede, banco de dados esperando o disco. Ficaria mais rápido com E/S mais rápida.</li>
-    <li>O mesmo processo pode mudar de perfil ao longo da execução. Escalonadores costumam favorecer os I/O-bound: eles usam a CPU por pouco tempo, pedem E/S e liberam a CPU logo (aula 06).</li>
+    <li>O mesmo processo pode mudar de perfil ao longo da execução. Schedulers costumam favorecer os I/O-bound: eles usam a CPU por pouco tempo, pedem E/S e liberam a CPU logo (aula 06).</li>
   </ul>
   <div class="def">
     <span class="lab">Na ponderada · pulseira</span>
@@ -479,7 +479,7 @@ else:
   </div>
   <ul class="b">
     <li>Com threads, o processo vira a unidade de alocação de recursos, e a thread vira a unidade de escalonamento.</li>
-    <li>O núcleo guarda a parte individual de cada thread num <b>TCB</b> (thread control block), um bloco menor que o PCB, ligado a ele.</li>
+    <li>O kernel guarda a parte individual de cada thread num <b>TCB</b> (thread control block), um bloco menor que o PCB, ligado a ele.</li>
   </ul>
  </div>
 
@@ -561,36 +561,36 @@ for t in ts: t.join()                # a thread principal espera as três</code>
 <section class="chap" id="modelos">
  <div class="prose">
   <span class="num">08</span>
-  <h2>Threads de usuário, de núcleo e híbridas</h2>
+  <h2>Threads de usuário, de kernel e híbridas</h2>
   <div class="src"><span class="bk">Machado &amp; Maia · cap. 6 · p. 79–92</span></div>
-  <p>Quem cria as threads e decide qual delas roda? Há duas respostas: uma biblioteca dentro do próprio processo, ou o núcleo. O livro chama a primeira de TMU (thread em modo usuário) e a segunda de TMK (thread em modo kernel), e ainda descreve uma mistura das duas.</p>
+  <p>Quem cria as threads e decide qual delas roda? Há duas respostas: uma biblioteca dentro do próprio processo, ou o kernel. O livro chama a primeira de TMU (thread em modo usuário) e a segunda de TMK (thread em modo kernel), e ainda descreve uma mistura das duas.</p>
 
   <h3>Threads de usuário (ULT)</h3>
   <ul class="b">
-    <li><b>ULT</b> (user-level thread, a TMU do livro): thread criada e escalonada por uma <b>biblioteca de threads</b> que roda dentro do processo, em modo usuário. O núcleo nem sabe que ela existe: para ele, o processo é monothread.</li>
-    <li>Vantagem: criar e trocar de thread é só uma chamada de função na biblioteca, sem chamada de sistema e sem mudar de modo. Leva nanossegundos.</li>
+    <li><b>ULT</b> (user-level thread, a TMU do livro): thread criada e escalonada por uma <b>biblioteca de threads</b> que roda dentro do processo, em modo usuário. O kernel nem sabe que ela existe: para ele, o processo é monothread.</li>
+    <li>Vantagem: criar e trocar de thread é só uma chamada de função na biblioteca, sem syscall e sem mudar de modo. Leva nanossegundos.</li>
     <li>Vantagem: funciona até num SO que não conhece threads, e a aplicação pode escalonar as threads do jeito que preferir.</li>
-    <li>Problema: uma <b>chamada bloqueante</b>, aquela que deixa quem chamou em espera até o serviço terminar (como <code>read</code> do disco), bloqueia o processo inteiro. O núcleo põe "o processo" em espera, e todas as threads param junto.</li>
-    <li>Problema: não há paralelismo. O núcleo só vê uma entidade para escalonar, então ela usa um core por vez.</li>
+    <li>Problema: uma <b>chamada bloqueante</b>, aquela que deixa quem chamou em espera até o serviço terminar (como <code>read</code> do disco), bloqueia o processo inteiro. O kernel põe "o processo" em espera, e todas as threads param junto.</li>
+    <li>Problema: não há paralelismo. O kernel só vê uma entidade para escalonar, então ela usa um core por vez.</li>
     <li>Problema: o temporizador interrompe o processo, não a thread. Se uma thread não cede a vez, a biblioteca não consegue tirá-la. Bibliotecas tentam contornar trocando chamadas bloqueantes por versões não bloqueantes.</li>
   </ul>
 
-  <h3>Threads de núcleo (KLT)</h3>
+  <h3>Threads de kernel (KLT)</h3>
   <ul class="b">
-    <li><b>KLT</b> (kernel-level thread, a TMK do livro): o núcleo cria, conhece e escalona cada thread, por chamadas de sistema. Cada uma tem estado no núcleo.</li>
-    <li>Vantagem: uma thread bloqueada em E/S não trava as outras; o núcleo escalona outra thread do mesmo processo.</li>
+    <li><b>KLT</b> (kernel-level thread, a TMK do livro): o kernel cria, conhece e escalona cada thread, por syscalls. Cada uma tem estado no kernel.</li>
+    <li>Vantagem: uma thread bloqueada em E/S não trava as outras; o kernel escalona outra thread do mesmo processo.</li>
     <li>Vantagem: paralelismo real. Num processador com 4 cores, 4 threads do mesmo processo rodam ao mesmo tempo.</li>
-    <li>Problema: criar, trocar e sincronizar exigem entrar no núcleo, o que é bem mais lento que uma chamada de função. E o núcleo guarda uma estrutura para cada thread, o que limita quantas cabem.</li>
+    <li>Problema: criar, trocar e sincronizar exigem entrar no kernel, o que é bem mais lento que uma chamada de função. E o kernel guarda uma estrutura para cada thread, o que limita quantas cabem.</li>
   </ul>
 
   <h3>Os três mapeamentos</h3>
-<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><text class="tm" x="40" y="10">N:1</text><text class="tm" x="120" y="10">1:1</text><text class="tm" x="200" y="10">M:N</text><circle class="bl" cx="22" cy="34" r="8"/><circle class="bl" cx="40" cy="34" r="8"/><circle class="bl" cx="58" cy="34" r="8"/><rect class="am" x="30" y="96" width="20" height="20" rx="3"/><path class="s" d="M22 42 L38 94 M40 42 L40 94 M58 42 L42 94"/><circle class="bl" cx="102" cy="34" r="8"/><circle class="bl" cx="120" cy="34" r="8"/><circle class="bl" cx="138" cy="34" r="8"/><rect class="am" x="92" y="96" width="20" height="20" rx="3"/><rect class="am" x="110" y="96" width="20" height="20" rx="3"/><rect class="am" x="128" y="96" width="20" height="20" rx="3"/><path class="s" d="M102 42 V94 M120 42 V94 M138 42 V94"/><circle class="bl" cx="176" cy="34" r="8"/><circle class="bl" cx="194" cy="34" r="8"/><circle class="bl" cx="212" cy="34" r="8"/><circle class="bl" cx="230" cy="34" r="8"/><rect class="am" x="180" y="96" width="20" height="20" rx="3"/><rect class="am" x="206" y="96" width="20" height="20" rx="3"/><path class="s" d="M176 42 L188 94 M194 42 L190 94 M212 42 L216 94 M230 42 L218 94"/><line class="s" x1="4" y1="68" x2="236" y2="68" stroke-dasharray="4 3"/><text class="tm" x="120" y="140">● thread de usuário   ■ thread do núcleo</text></svg>Quantas threads de usuário ficam sobre cada thread do núcleo.</aside>
-  <p>Os <b>modelos de mapeamento</b> dizem quantas threads de usuário ficam penduradas em cada thread do núcleo:</p>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><text class="tm" x="40" y="10">N:1</text><text class="tm" x="120" y="10">1:1</text><text class="tm" x="200" y="10">M:N</text><circle class="bl" cx="22" cy="34" r="8"/><circle class="bl" cx="40" cy="34" r="8"/><circle class="bl" cx="58" cy="34" r="8"/><rect class="am" x="30" y="96" width="20" height="20" rx="3"/><path class="s" d="M22 42 L38 94 M40 42 L40 94 M58 42 L42 94"/><circle class="bl" cx="102" cy="34" r="8"/><circle class="bl" cx="120" cy="34" r="8"/><circle class="bl" cx="138" cy="34" r="8"/><rect class="am" x="92" y="96" width="20" height="20" rx="3"/><rect class="am" x="110" y="96" width="20" height="20" rx="3"/><rect class="am" x="128" y="96" width="20" height="20" rx="3"/><path class="s" d="M102 42 V94 M120 42 V94 M138 42 V94"/><circle class="bl" cx="176" cy="34" r="8"/><circle class="bl" cx="194" cy="34" r="8"/><circle class="bl" cx="212" cy="34" r="8"/><circle class="bl" cx="230" cy="34" r="8"/><rect class="am" x="180" y="96" width="20" height="20" rx="3"/><rect class="am" x="206" y="96" width="20" height="20" rx="3"/><path class="s" d="M176 42 L188 94 M194 42 L190 94 M212 42 L216 94 M230 42 L218 94"/><line class="s" x1="4" y1="68" x2="236" y2="68" stroke-dasharray="4 3"/><text class="tm" x="120" y="140">● thread de usuário   ■ thread do kernel</text></svg>Quantas threads de usuário ficam sobre cada thread do kernel.</aside>
+  <p>Os <b>modelos de mapeamento</b> dizem quantas threads de usuário ficam penduradas em cada thread do kernel:</p>
   <ul class="b">
-    <li><b>N:1</b> (muitos para um): várias ULT sobre uma única entidade do núcleo. É o modelo de ULT puro. Exemplos: as <i>green threads</i> das primeiras versões do Java, a biblioteca GNU Portable Threads.</li>
+    <li><b>N:1</b> (muitos para um): várias ULT sobre uma única entidade do kernel. É o modelo de ULT puro. Exemplos: as green threads das primeiras versões do Java, a biblioteca GNU Portable Threads.</li>
     <li><b>1:1</b> (um para um): cada thread que o programa cria é uma KLT. É o modelo do Linux (pthreads, com a biblioteca NPTL), do Windows e do Java atual.</li>
-    <li><b>M:N</b> (muitos para muitos, o modo híbrido do livro): M threads de usuário distribuídas sobre N threads do núcleo, com N ≤ M. Junta troca rápida, paralelismo e tolerância a bloqueio. O preço é a complexidade: dois escalonadores, um na biblioteca e outro no núcleo, que precisam se entender. Exemplos: o Solaris antigo, as goroutines do Go, as threads virtuais do Java 21.</li>
-    <li><b>Scheduler activations</b>: o mecanismo que o livro descreve para fazer o híbrido funcionar. Quando uma thread vai bloquear, o núcleo avisa a biblioteca (uma chamada "de baixo para cima", chamada upcall), e a biblioteca coloca outra thread de usuário para rodar.</li>
+    <li><b>M:N</b> (muitos para muitos, o modo híbrido do livro): M threads de usuário distribuídas sobre N threads do kernel, com N ≤ M. Junta troca rápida, paralelismo e tolerância a bloqueio. O preço é a complexidade: dois schedulers, um na biblioteca e outro no kernel, que precisam se entender. Exemplos: o Solaris antigo, as goroutines do Go, as threads virtuais do Java 21.</li>
+    <li><b>Scheduler activations</b>: o mecanismo que o livro descreve para fazer o híbrido funcionar. Quando uma thread vai bloquear, o kernel avisa a biblioteca (uma chamada "de baixo para cima", chamada upcall), e a biblioteca coloca outra thread de usuário para rodar.</li>
   </ul>
   <p>Agora veja os três modelos com o mesmo programa: quatro threads, dois cores e uma chamada bloqueante.</p>
  </div>
@@ -599,7 +599,7 @@ for t in ts: t.join()                # a thread principal espera as três</code>
     <div class="fig-head"><span class="fig-title">Figura 6 · ULT × KLT com uma chamada bloqueante</span><div class="fig-tabs"></div></div>
     <div class="fig-body">
       <div class="fig-stage">
-        <svg id="mo-svg" viewBox="0 0 640 330" role="img" aria-label="Threads de usuário, threads do núcleo e dois cores"></svg>
+        <svg id="mo-svg" viewBox="0 0 640 330" role="img" aria-label="Threads de usuário, threads do kernel e dois cores"></svg>
         <div class="stage-cap" id="mo-cap"></div>
       </div>
       <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
@@ -611,8 +611,8 @@ for t in ts: t.join()                # a thread principal espera as três</code>
     <table>
       <thead><tr><th></th><th>ULT (N:1)</th><th>KLT (1:1)</th><th>Híbrido (M:N)</th></tr></thead>
       <tbody>
-        <tr><td>Quem escalona</td><td>a biblioteca</td><td>o núcleo</td><td>os dois</td></tr>
-        <tr><td>Criar e trocar</td><td>muito rápido (ns)</td><td>mais lento (chamada de sistema, µs)</td><td>rápido na maioria das trocas</td></tr>
+        <tr><td>Quem escalona</td><td>a biblioteca</td><td>o kernel</td><td>os dois</td></tr>
+        <tr><td>Criar e trocar</td><td>muito rápido (ns)</td><td>mais lento (syscall, µs)</td><td>rápido na maioria das trocas</td></tr>
         <tr><td>Chamada bloqueante</td><td>bloqueia o processo todo</td><td>bloqueia só a thread</td><td>bloqueia uma KLT; as outras seguem</td></tr>
         <tr><td>Paralelismo em vários cores</td><td>não</td><td>sim</td><td>sim, até N ao mesmo tempo</td></tr>
         <tr><td>Exemplos</td><td>green threads, GNU Pth</td><td>Linux, Windows</td><td>Go, Solaris antigo</td></tr>
@@ -621,7 +621,7 @@ for t in ts: t.join()                # a thread principal espera as três</code>
   </div>
 
  <div class="prose">
-  <p class="prova">ULT: troca rápida, mas uma chamada bloqueante bloqueia o processo todo e não há paralelismo. KLT: o núcleo escalona cada thread, há paralelismo real e uma thread bloqueada não trava as outras, ao custo de mais overhead.</p>
+  <p class="prova">ULT: troca rápida, mas uma chamada bloqueante bloqueia o processo todo e não há paralelismo. KLT: o kernel escalona cada thread, há paralelismo real e uma thread bloqueada não trava as outras, ao custo de mais overhead.</p>
   <div class="def">
     <span class="lab">Na ponderada · pulseira</span>
     <p>Exemplo fora do cenário: num drone com biblioteca N:1, se a thread de telemetria faz um envio de rádio bloqueante de 30 ms, a thread que controla os motores para junto por 30 ms. Você vai ter de dizer o que acontece com a leitura do sensor quando o envio por BLE bloqueia, conforme o modelo de threads escolhido.</p>

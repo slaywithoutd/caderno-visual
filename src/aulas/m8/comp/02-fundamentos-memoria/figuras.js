@@ -97,19 +97,19 @@ function abas(root, cenarios, speed) {
       linha(24, 'A · 2 GHz', A, show, { ...hl, res: k >= 4 ? 'ok' : hl.res }, 0.85);
       linha(150, 'B · 3 GHz', B, show, hl, 0.85);
       cap.textContent = ['T = IC × CPI × Tc  ·  Tc = 1 / f', 'A: Tc = 0,5 ns   ·   B: Tc ≈ 0,333 ns', 'A: 1,5 × 10⁹ ciclos   ·   B: 2,5 × 10⁹ ciclos',
-        'A: 0,75 s   ·   B: 0,833 s', 'aceleração de A sobre B = 0,833 / 0,75 ≈ 1,11'][k];
+        'A: 0,75 s   ·   B: 0,833 s', 'speedup de A sobre B = 0,833 / 0,75 ≈ 1,11'][k];
     },
   };
 
-  const MIX = [{ n: 'aritméticas', fr: 0.5, cpi: 1 }, { n: 'memória', fr: 0.3, cpi: 2 }, { n: 'desvios', fr: 0.2, cpi: 3 }];
+  const MIX = [{ n: 'aritméticas', fr: 0.5, cpi: 1 }, { n: 'memória', fr: 0.3, cpi: 2 }, { n: 'branches', fr: 0.2, cpi: 3 }];
   const mix = {
     label: 'CPI por tipo de instrução',
     notes: [
       'Um programa com três classes de instrução. A <b>largura</b> de cada faixa é a fração das instruções; a <b>altura</b> é o CPI da classe. A área de cada faixa é a contribuição dela para o CPI médio.',
       'Aritméticas: 50% das instruções × CPI 1 = <b>0,5</b>.',
       'Acessos à memória: 30% × CPI 2 = <b>0,6</b>.',
-      'Desvios: 20% × CPI 3 = <b>0,6</b>. Somando: CPI = 0,5 + 0,6 + 0,6 = <b>1,7</b>, a altura média da figura (linha tracejada).',
-      'Uma cache melhor baixa o CPI dos acessos à memória de 2 para 1,5: contribuição 0,3 × 1,5 = 0,45 e CPI = <b>1,55</b>. Mesmo IC e mesmo clock, então a aceleração é 1,7 / 1,55 ≈ <b>1,10</b>.',
+      'Branches: 20% × CPI 3 = <b>0,6</b>. Somando: CPI = 0,5 + 0,6 + 0,6 = <b>1,7</b>, a altura média da figura (linha tracejada).',
+      'Uma cache melhor baixa o CPI dos acessos à memória de 2 para 1,5: contribuição 0,3 × 1,5 = 0,45 e CPI = <b>1,55</b>. Mesmo IC e mesmo clock, então o speedup é 1,7 / 1,55 ≈ <b>1,10</b>.',
     ],
     render(k) {
       svg.innerHTML = '';
@@ -136,7 +136,7 @@ function abas(root, cenarios, speed) {
         else { S('line', { x1: x0, x2: x0 + W, y1: base - 1.7 * U, y2: base - 1.7 * U, style: 'stroke:var(--line2);stroke-dasharray:3 4' }, svg); media(1.55); tx(svg, x0 + 6, base - 1.7 * U - 11, 'CPI médio: 1,7 → 1,55', { a: 'start', fill: 'var(--accent)', w: 600 }); }
       }
       cap.textContent = ['CPI = Σ (ICᵢ / IC) × CPIᵢ', 'CPI = 0,5 × 1 + …', 'CPI = 0,5 + 0,3 × 2 + …', 'CPI = 0,5 + 0,6 + 0,6 = 1,7',
-        'CPI = 0,5 + 0,45 + 0,6 = 1,55  ·  aceleração = 1,7 / 1,55 ≈ 1,10'][k];
+        'CPI = 0,5 + 0,45 + 0,6 = 1,55  ·  speedup = 1,7 / 1,55 ≈ 1,10'][k];
     },
   };
 
@@ -146,13 +146,13 @@ function abas(root, cenarios, speed) {
       'Um compilador novo gera <b>20% menos instruções</b>, mas troca algumas simples por outras mais lentas: o CPI sobe de 1,7 para 1,9. O clock continua 2 GHz (Tc = 0,5 ns). Vale a pena?',
       'Antes: 1 × 10⁹ × 1,7 × 0,5 ns = <b>0,85 s</b>.',
       'Depois: 0,8 × 10⁹ × 1,9 × 0,5 ns = <b>0,76 s</b>.',
-      'Aceleração 0,85 / 0,76 ≈ <b>1,12</b>. O CPI piorou e o programa ficou mais rápido: só o produto dos três fatores decide.',
+      'Speedup 0,85 / 0,76 ≈ <b>1,12</b>. O CPI piorou e o programa ficou mais rápido: só o produto dos três fatores decide.',
     ],
     render(k) {
       svg.innerHTML = '';
       linha(24, 'antes', ANT, { tc: true, res: k >= 1 }, { ic: k === 0 || k === 1, cpi: k === 0 || k === 1, res: k === 1 ? 'hl' : null }, 0.9);
       linha(150, 'depois', DEP, { tc: true, res: k >= 2 }, { ic: k === 0 || k === 2, cpi: k === 0 || k === 2, res: k === 2 ? 'hl' : k === 3 ? 'ok' : null }, 0.9);
-      cap.textContent = ['IC cai 20%, CPI sobe de 1,7 para 1,9', 'T_antes = 10⁹ × 1,7 × 0,5 ns = 0,85 s', 'T_depois = 0,8 × 10⁹ × 1,9 × 0,5 ns = 0,76 s', 'aceleração = 0,85 / 0,76 ≈ 1,12'][k];
+      cap.textContent = ['IC cai 20%, CPI sobe de 1,7 para 1,9', 'T_antes = 10⁹ × 1,7 × 0,5 ns = 0,85 s', 'T_depois = 0,8 × 10⁹ × 1,9 × 0,5 ns = 0,76 s', 'speedup = 0,85 / 0,76 ≈ 1,12'][k];
     },
   };
 
@@ -197,7 +197,7 @@ function abas(root, cenarios, speed) {
       tx(svg, gx0 - 8, Y(v), nf(v, 1), { a: 'end', m: 1 });
     }
     [1, 2, 5, 10, 20, 50, 100].forEach((v) => { S('line', { x1: X(v), x2: X(v), y1: gy1, y2: gy1 + 5, style: 'stroke:var(--line2)' }, svg); tx(svg, X(v), gy1 + 16, String(v), { m: 1 }); });
-    tx(svg, gx1, gy1 + 32, 's (aceleração da parte melhorada, escala log)', { a: 'end', m: 1 });
+    tx(svg, gx1, gy1 + 32, 's (speedup da parte melhorada, escala log)', { a: 'end', m: 1 });
     tx(svg, 14, gy0 - 14, 'S global', { a: 'start', m: 1 });
     /* ideal S = s */
     const sIdeal = Math.min(100, ymax);
@@ -278,7 +278,7 @@ function abas(root, cenarios, speed) {
       fecho: 'Com 2 vias, os blocos 0 e 4 cabem juntos no conjunto 0 e os conflitos do mapeamento direto viram hits. Ainda sobra um conflito no fim, porque 0, 2, 4 e 6 (todos pares) disputam o mesmo conjunto de 2 lugares.' },
     total: { label: 'Totalmente associativa', sets: 1, ways: 4, ib: 0,
       intro: '<b>Totalmente associativa</b>: um conjunto só, com 4 vias. Não há índice; a tag é o número inteiro do bloco (4 bits) e é comparada com as 4 linhas ao mesmo tempo. Substituição LRU.',
-      fecho: 'Sobraram só misses compulsórios e um de capacidade. Em troca, cada acesso compara 4 tags ao mesmo tempo: na prática o tempo de hit seria maior.' },
+      fecho: 'Sobraram só misses compulsórios e um de capacidade. Em troca, cada acesso compara 4 tags ao mesmo tempo: na prática o hit time seria maior.' },
   };
 
   function cenario(c) {
@@ -299,7 +299,7 @@ function abas(root, cenarios, speed) {
       notes.push(t);
     });
     const hits = P.filter((p) => p.hit).length, m = (10 - hits) / 10;
-    notes.push(`Resultado: <b>${hits} hits</b> em 10 pedidos, taxa de miss ${10 - hits}/10 = ${nf(m)}. Com tempo de hit de ${HIT} ciclo e penalidade de ${PEN}: AMAT = 1 + ${nf(m)} × ${PEN} = <b>${nf(HIT + m * PEN)} ciclos</b>. ${c.fecho}`);
+    notes.push(`Resultado: <b>${hits} hits</b> em 10 pedidos, miss rate ${10 - hits}/10 = ${nf(m)}. Com hit time de ${HIT} ciclo e miss penalty de ${PEN}: AMAT = 1 + ${nf(m)} × ${PEN} = <b>${nf(HIT + m * PEN)} ciclos</b>. ${c.fecho}`);
 
     function render(k) {
       svg.innerHTML = '';
@@ -355,8 +355,8 @@ function abas(root, cenarios, speed) {
         tx(svg, cC, y + 22, l.v ? 'bloco ' + l.b : 'vazia', { m: !l.v, w: l.v ? 600 : 400 });
       }
       const m2 = (feitos - hitsAte) / Math.max(1, feitos);
-      cap.innerHTML = k === 0 ? 'sequência: 6, 4, 0, 1, 0, 4, 0, 2, 6, 4  ·  hit = 1 ciclo, penalidade = 20 ciclos'
-        : k <= 10 ? `até aqui: ${feitos} pedidos, taxa de miss ${feitos - hitsAte}/${feitos} = ${nf(m2)}`
+      cap.innerHTML = k === 0 ? 'sequência: 6, 4, 0, 1, 0, 4, 0, 2, 6, 4  ·  hit time = 1 ciclo, miss penalty = 20 ciclos'
+        : k <= 10 ? `até aqui: ${feitos} pedidos, miss rate ${feitos - hitsAte}/${feitos} = ${nf(m2)}`
           : `AMAT = 1 + ${nf(m)} × 20 = ${nf(1 + m * 20)} ciclos`;
     }
     return { label: c.label, notes, render };
@@ -392,12 +392,12 @@ function abas(root, cenarios, speed) {
     'Guarda 2 → 3 na TLB (sai a entrada mais antiga, a da VPN 6). Endereço físico = moldura 3 + offset A3C = <code>0x3A3C</code>. O offset passou sem mudar.',
     'Agora <code>0x2F00</code>: VPN 2 de novo. Está na TLB: <b class="ok">TLB hit</b>, sem ler a tabela. Endereço físico <code>0x3F00</code>. Localidade: mesma página, outro byte.',
     'Agora <code>0x4010</code>: VPN 4, offset 010. A TLB guarda 2 e 0: <b class="bad">TLB miss</b>.',
-    'Linha 4 da tabela: <b>V = 0</b>. A página não está na RAM, está no SSD: <b class="bad">falta de página</b>. O processador interrompe o programa e chama o sistema operacional.',
-    'O sistema operacional traz a página do SSD para a moldura livre 6, atualiza a tabela e a TLB e repete o acesso: <code>0x4010</code> vira o endereço físico <code>0x6010</code>. Custos típicos: TLB hit, menos de 1 ciclo; TLB miss, dezenas de ciclos; falta de página, milhões de ciclos.',
+    'Linha 4 da tabela: <b>V = 0</b>. A página não está na RAM, está no SSD: <b class="bad">page fault</b>. O processador interrompe o programa e chama o sistema operacional.',
+    'O sistema operacional traz a página do SSD para a moldura livre 6, atualiza a tabela e a TLB e repete o acesso: <code>0x4010</code> vira o endereço físico <code>0x6010</code>. Custos típicos: TLB hit, menos de 1 ciclo; TLB miss, dezenas de ciclos; page fault, milhões de ciclos.',
   ];
   const caps = ['endereço virtual = VPN (4 bits) | offset (12 bits)', '0x2A3C → VPN 2 | offset A3C', 'TLB: 6 ≠ 2, 0 ≠ 2 → miss',
     'tabela[2] = (V = 1, moldura 3)', 'físico = 3 | A3C = 0x3A3C', '0x2F00 → TLB[2] = 3 → 0x3F00', '0x4010 → VPN 4 | offset 010 → TLB miss',
-    'tabela[4]: V = 0 → falta de página', 'tabela[4] = (V = 1, moldura 6) → 0x6010'];
+    'tabela[4]: V = 0 → page fault', 'tabela[4] = (V = 1, moldura 6) → 0x6010'];
 
   new StepFig(root, { notes, speed: 2600, render(k) {
     const e = E[k];

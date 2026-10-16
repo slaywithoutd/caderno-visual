@@ -1,11 +1,11 @@
 /* Revisão da aula: cartões (pergunta, resposta) e cola de uma página (tópico, resumo). */
 export const cartoes = [
-  ['O que é condição de corrida?', 'Dois ou mais fluxos acessam um dado compartilhado, pelo menos um escreve, e o resultado depende da ordem de execução das instruções.'],
+  ['O que é race condition (condição de corrida)?', 'Dois ou mais fluxos acessam um dado compartilhado, pelo menos um escreve, e o resultado depende da ordem de execução das instruções.'],
   ['Por que <code>saldo = saldo + 1</code> não é seguro com duas threads?', 'Vira três instruções (LOAD, ADD, STORE). Se a outra thread lê entre o LOAD e o STORE, as duas gravam o mesmo valor e um incremento se perde.'],
   ['Saldo 100, duas threads somam 1, ordem A.LOAD, B.LOAD, A.ADD, B.ADD, A.STORE, B.STORE. Resultado?', '101. As duas leram 100, as duas gravaram 101. Esperado 102: atualização perdida.'],
   ['Quais os 4 requisitos de uma solução de exclusão mútua?', '(1) Nunca dois na região crítica. (2) Nada se supõe sobre velocidades ou número de CPUs. (3) Quem está fora não bloqueia os outros. (4) Espera limitada: ninguém espera para sempre.'],
-  ['Por que desabilitar interrupções não serve num multicore?', 'Só impede a troca na CPU atual. Uma thread em outro núcleo roda ao mesmo tempo sem precisar de interrupção.'],
-  ['O que faz Test-and-Set?', 'Numa instrução atômica, lê a variável, grava 1 nela e devolve o valor antigo. Se devolveu 0, a trava era livre e agora é sua.'],
+  ['Por que desabilitar interrupções não serve num multicore?', 'Só impede a troca na CPU atual. Uma thread em outro core roda ao mesmo tempo sem precisar de interrupção.'],
+  ['O que faz Test-and-Set?', 'Numa instrução atômica, lê a variável, grava 1 nela e devolve o valor antigo. Se devolveu 0, o lock estava livre e agora é seu.'],
   ['Qual o defeito da alternância estrita?', 'Força turnos A, B, A, B. Se um não quer entrar, o outro fica esperando a vez: quem está fora bloqueia quem quer entrar.'],
   ['Semáforo com s = 2 (pode ficar negativo). Quatro threads fazem P. Qual o valor e quantas na fila?', 's = 2 − 4 = −2. Duas passaram e |−2| = 2 estão na fila.'],
   ['Valores iniciais dos semáforos no produtor/consumidor com N posições?', 'vazio = N, cheio = 0, mutex = 1.'],
@@ -19,11 +19,11 @@ export const cartoes = [
 ];
 
 export const cola = [
-  ['Condição de corrida', 'resultado depende da ordem; x = x + 1 é LOAD, ADD, STORE.'],
+  ['Race condition', 'resultado depende da ordem; x = x + 1 é LOAD, ADD, STORE.'],
   ['Exclusão mútua', '4 requisitos: só um dentro; nada de velocidade; quem está fora não bloqueia; espera limitada.'],
-  ['Hardware', 'desabilitar interrupções (só 1 CPU, só núcleo); Test-and-Set e Swap atômicos → spinlock (espera ocupada).'],
-  ['Software', 'alternância estrita falha (req. 3); Dekker, Peterson (2 processos), padaria (N). Todos com espera ocupada.'],
-  ['Semáforo', 'P (down, wait): s − 1, bloqueia se não há vaga. V (up, signal): s + 1 ou acorda um. Sem espera ocupada.'],
+  ['Hardware', 'desabilitar interrupções (só 1 CPU, só no kernel); Test-and-Set e Swap atômicos → spinlock (busy waiting).'],
+  ['Software', 'alternância estrita falha (req. 3); Dekker, Peterson (2 processos), padaria (N). Todos com busy waiting.'],
+  ['Semáforo', 'P (down, wait): s − 1, bloqueia se não há vaga. V (up, signal): s + 1 ou acorda um. Sem busy waiting.'],
   ['Tipos', 'binário/mutex começa em 1; contador começa em N; começa em 0 para impor ordem.'],
   ['Produtor/consumidor', 'vazio = N, cheio = 0, mutex = 1. P da condição antes do P(mutex). N ≥ r × T.'],
   ['Clássicos', 'leitores/escritores (starvation de escritor); filósofos (deadlock se todos pegam a esquerda); barbeiro.'],

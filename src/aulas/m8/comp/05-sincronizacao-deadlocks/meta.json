@@ -2,9 +2,9 @@
   "numero": "05",
   "titulo": "Semáforos, sincronização e deadlocks",
   "tema": "Do silício ao sistema operacional",
-  "resumo": "Condição de corrida, região crítica e exclusão mútua; soluções por hardware e por software; semáforos, monitores e troca de mensagens; produtor/consumidor, leitores e escritores, filósofos; deadlock, condições de Coffman, grafo de alocação, prevenção, algoritmo do banqueiro, detecção e recuperação.",
+  "resumo": "Race condition (condição de corrida), região crítica e exclusão mútua; soluções por hardware e por software; semáforos, monitores e troca de mensagens; produtor/consumidor, leitores e escritores, filósofos; deadlock, condições de Coffman, grafo de alocação, prevenção, algoritmo do banqueiro, detecção e recuperação.",
   "topicos": [
-    "Condição de corrida",
+    "Race condition",
     "Exclusão mútua",
     "Test-and-Set e Peterson",
     "Semáforos P/V",
@@ -15,7 +15,7 @@
   ],
   "secoes": [
     ["antes", "Antes de começar"],
-    ["corrida", "Condição de corrida"],
+    ["corrida", "Race condition"],
     ["exclusao", "Região crítica e hardware"],
     ["software", "Soluções por software"],
     ["semaforos", "Semáforos"],

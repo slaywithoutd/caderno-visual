@@ -4,8 +4,9 @@ import { H, esc } from './dom.js';
    G       todos os termos conhecidos (glossário global: um termo aprendido numa aula vale nas próximas)
    listar  chaves que aparecem como cartão nesta página (padrão: todas)
    global  link da página do glossário coletivo, usado quando o termo não está listado aqui
+   secaoDe (modo Consulta) chave → id da seção dona do termo nesta página: o termo vira link para lá
    Cada termo pode ter `origem: { rotulo, href }` (de qual aula veio), preenchido pelo catálogo. */
-export function initGlossary(G, { listar = Object.keys(G), global = null } = {}) {
+export function initGlossary(G, { listar = Object.keys(G), global = null, secaoDe = null } = {}) {
   const keys = Object.keys(G);
   const aqui = new Set(listar.filter((k) => G[k]));
   const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -51,16 +52,20 @@ export function initGlossary(G, { listar = Object.keys(G), global = null } = {})
   if (forms.length) {
     const re = new RegExp('(?<![\\p{L}\\p{N}*⁺-])(' + forms.join('|') + ')(?![\\p{L}\\p{N}-])', 'giu');
     const SKIP = 'code,h1,h2,h3,figure,.src,.formula,button,a,.gterm,.num,.lab,.widget,.tbl,.cards,.cheat,#glossario,section.fontes,.mn,.kicker,footer,summary';
-    document.querySelectorAll('section.chap').forEach((sec) => {
-      if (sec.id === 'glossario' || sec.id === 'revisao') return;
+    document.querySelectorAll('section.chap, section.cs').forEach((sec) => {
+      if (sec.id === 'glossario' || sec.id === 'revisao' || sec.id === 'cola') return;
       const seen = new Set(); const tw = document.createTreeWalker(sec, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement.closest(SKIP) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
       const nodes = []; while (tw.nextNode()) nodes.push(tw.currentNode);
       nodes.forEach((node) => {
         const txt = node.nodeValue; re.lastIndex = 0; let m, last = 0; const frag = document.createDocumentFragment(); let changed = false;
         while ((m = re.exec(txt))) {
-          const k = form2key.get(m[1].toLowerCase()); if (!k || seen.has(k)) continue; seen.add(k); changed = true;
+          const k = form2key.get(m[1].toLowerCase()); if (!k || seen.has(k)) continue; seen.add(k);
+          const dono = secaoDe && secaoDe[k];
+          if (dono === sec.id) continue; /* na seção dona do conceito, o termo não é link para ela mesma */
+          changed = true;
           frag.appendChild(document.createTextNode(txt.slice(last, m.index)));
-          const b = H('button', { class: 'gterm', type: 'button' }, esc(m[1])); b.dataset.g = k; frag.appendChild(b); last = m.index + m[1].length;
+          const b = dono ? H('a', { class: 'gterm glink', href: `#${dono}` }, esc(m[1])) : H('button', { class: 'gterm', type: 'button' }, esc(m[1]));
+          b.dataset.g = k; frag.appendChild(b); last = m.index + m[1].length;
         }
         if (changed) { frag.appendChild(document.createTextNode(txt.slice(last))); node.parentNode.replaceChild(frag, node); }
       });
@@ -79,7 +84,8 @@ export function initGlossary(G, { listar = Object.keys(G), global = null } = {})
   }
   function closePop() { pop.classList.remove('on'); document.querySelectorAll('.gterm.act').forEach((t) => t.classList.remove('act')); anchor = null; }
   document.addEventListener('click', (e) => {
-    const t = e.target.closest('.gterm'); if (t) { e.stopPropagation(); if (anchor === t && pop.classList.contains('on')) closePop(); else openPop(t.dataset.g, t); return; }
+    const t = e.target.closest('.gterm'); if (t && t.tagName === 'A') { closePop(); return; }
+    if (t) { e.stopPropagation(); if (anchor === t && pop.classList.contains('on')) closePop(); else openPop(t.dataset.g, t); return; }
     const s = e.target.closest('[data-see]'); if (s) { openPop(s.dataset.see, anchor || s); return; }
     if (e.target.closest('.p-go,.gl-origem')) { closePop(); return; }
     if (!e.target.closest('#pop')) closePop();
@@ -95,5 +101,5 @@ export function initGlossarioDaPagina() {
   const el = document.getElementById('gl-data');
   if (!el) return;
   const d = JSON.parse(el.textContent);
-  initGlossary(d.termos, { listar: d.listar, global: d.global });
+  initGlossary(d.termos, { listar: d.listar, global: d.global, secaoDe: d.secaoDe || null });
 }

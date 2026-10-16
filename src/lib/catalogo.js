@@ -1,7 +1,8 @@
 /* Catálogo montado a partir das pastas (roda no build, não no navegador).
    src/aulas/<modulo>/<materia>/<slug>/
      meta.json        título, resumo, seções, fontes   (obrigatório)
-     conteudo.html    texto da aula                    (obrigatório)
+     conteudo.html    texto da aula, modo Leitura      (obrigatório)
+     consulta.html    a mesma aula por conceito, modo Consulta (opcional; ver CLAUDE.md)
      index.js         figuras/loops/glossário no navegador
      glossario.js     termos                            revisao.js  cartões e cola
      notas/           anotações (.md), slides (.pdf) e fotos da aula */
@@ -9,6 +10,7 @@ import { site, modulos } from '../data/estrutura.js';
 
 const metas = import.meta.glob('/src/aulas/*/*/*/meta.json', { eager: true, import: 'default' });
 const conteudos = import.meta.glob('/src/aulas/*/*/*/conteudo.html', { eager: true, query: '?raw', import: 'default' });
+const consultas = import.meta.glob('/src/aulas/*/*/*/consulta.html', { eager: true, query: '?raw', import: 'default' });
 const revisoes = import.meta.glob('/src/aulas/*/*/*/revisao.js', { eager: true });
 const glossarios = import.meta.glob('/src/aulas/*/*/*/glossario.js', { eager: true, import: 'default' });
 const notasMd = import.meta.glob('/src/aulas/*/*/*/notas/*.md', { eager: true });
@@ -33,6 +35,8 @@ export const aulas = Object.entries(metas)
       id: `${modulo}/${materia}/${slug}`,
       href: url(`/${modulo}/${materia}/${slug}`),
       conteudo: conteudos[`${dir}/conteudo.html`] || '',
+      consulta: consultas[`${dir}/consulta.html`] || '',
+      hrefConsulta: consultas[`${dir}/consulta.html`] ? url(`/${modulo}/${materia}/${slug}/consulta`) : null,
       cartoes: rev.cartoes || [],
       cola: rev.cola || [],
       glossario: glossarios[`${dir}/glossario.js`] || {},
@@ -74,11 +78,19 @@ export const glossarioGlobal = (() => {
   for (const a of aulas) {
     const mat = materia(a.modulo, a.materia);
     for (const [k, v] of Object.entries(a.glossario)) {
-      if (!G[k]) G[k] = { ...v, origem: { rotulo: `Aula ${a.numero} · ${mat ? mat.titulo : a.materia}`, href: `${a.href}#gl-${k}` } };
+      if (!G[k]) G[k] = { ...v, origem: { rotulo: `Aula ${a.numero} · ${mat ? mat.titulo : a.materia}`, href: `${a.href}#gl-${k}`, aula: a.id, tema: a.tema || '' } };
     }
   }
   return G;
 })();
+
+/* Termos que viram link numa aula: os do glossário global que vêm de aulas do mesmo eixo (tema).
+   Termos de outro eixo davam falso positivo ("conjunto" de linguagens formais dentro de "associativa em
+   conjunto" de cache); eles continuam no glossário coletivo, só não viram link aqui. */
+export function glossarioDaAula(aula) {
+  const tema = (aula.tema || '').toLowerCase();
+  return Object.fromEntries(Object.entries(glossarioGlobal).filter(([k, e]) => aula.glossario[k] || (e.origem.tema || '').toLowerCase() === tema));
+}
 
 /* Destaques "cai na prova": <p class="prova"> no conteúdo e "> [!prova]" nas notas */
 const inline = (t) => t
@@ -141,3 +153,46 @@ export function htmlTempo(t, rotulo = 'Leitura') {
 
 /* coloca a linha de tempo logo depois do título (dentro do primeiro <header> do conteúdo) */
 export const comTempo = (html, t, rotulo) => html.replace('</header>', `${htmlTempo(t, rotulo)}\n</header>`);
+
+/* ---------------- Modo Consulta ----------------
+   consulta.html tem uma <section class="cs" id="…" data-termos="chave,chave" data-leitura="id-leitura,…"
+   data-grupo="Nome do grupo"> por conceito. Figuras e loops não são copiados: o consulta.html põe
+   <div data-ref="fig-x"></div>, <div data-ref-loop="nome"></div>, <div data-ref-mn="mn-x"></div> (desenho de
+   margem) ou <div data-ref-tbl="tbl-x"></div> (tabela), e aqui eles são trazidos do conteudo.html. */
+const attr = (tag, nome) => (tag.match(new RegExp(`${nome}="([^"]*)"`)) || [])[1] || '';
+/* recorta do conteudo.html o elemento <tag> que tem o atributo marca (ex.: id="fig-cache") */
+function recortar(conteudo, tag, marca) {
+  const i = conteudo.indexOf(marca);
+  if (i < 0) return '';
+  const ini = conteudo.lastIndexOf(`<${tag}`, i);
+  const fim = conteudo.indexOf(`</${tag}>`, i);
+  return ini < 0 || fim < 0 ? '' : conteudo.slice(ini, fim + tag.length + 3);
+}
+export const trechoFigura = (conteudo, id) => recortar(conteudo, 'figure', `id="${id}"`);
+export const trechoLoop = (conteudo, nome) => recortar(conteudo, 'aside', `data-loop="${nome}"`);
+/* desenho de margem estático (<aside class="mn" id="mn-…">) e tabela (<div class="tbl" id="tbl-…">) */
+export const trechoMargem = (conteudo, id) => recortar(conteudo, 'aside', `id="${id}"`);
+export const trechoTabela = (conteudo, id) => recortar(conteudo, 'div', `id="${id}"`);
+/* figuras e tabelas trazidas do modo Leitura citam "(seção 5)": no modo Consulta essa numeração não existe */
+const semNumeroDeSecao = (html) => html.replace(/\s*\(seção \d+\)/g, '');
+export function montarConsulta(aula) {
+  const faltando = [];
+  const html = semNumeroDeSecao(aula.consulta
+    .replace(/<div data-ref="([^"]+)"><\/div>/g, (_, id) => trechoFigura(aula.conteudo, id) || (faltando.push(id), ''))
+    .replace(/<div data-ref-loop="([^"]+)"><\/div>/g, (_, n) => trechoLoop(aula.conteudo, n) || (faltando.push('loop:' + n), ''))
+    .replace(/<div data-ref-mn="([^"]+)"><\/div>/g, (_, id) => trechoMargem(aula.conteudo, id) || (faltando.push(id), ''))
+    .replace(/<div data-ref-tbl="([^"]+)"><\/div>/g, (_, id) => trechoTabela(aula.conteudo, id).replace(/\bid="[^"]*"/, '') || (faltando.push(id), '')));
+  if (faltando.length) throw new Error(`${aula.id}/consulta.html cita o que não existe no conteudo.html: ${faltando.join(', ')}`);
+
+  const secoes = [], secaoDe = {}, leituraDe = {};
+  for (const m of aula.consulta.matchAll(/<section\b[^>]*class="cs\b[^"]*"[^>]*>\s*<h2>([\s\S]*?)<\/h2>/g)) {
+    const tag = m[0].slice(0, m[0].indexOf('>') + 1);
+    const id = attr(tag, 'id');
+    secoes.push({ id, titulo: m[1].replace(/<[^>]+>/g, '').trim(), grupo: attr(tag, 'data-grupo') });
+    attr(tag, 'data-termos').split(',').map((t) => t.trim()).filter(Boolean).forEach((k) => { secaoDe[k] = id; });
+    leituraDe[id] = attr(tag, 'data-leitura').split(',').map((t) => t.trim()).filter(Boolean);
+  }
+  /* palavras de cada seção (título + nomes e formas dos termos que moram nela), para o switch achar a seção */
+  const chaves = Object.fromEntries(secoes.map((s) => [s.id, [s.titulo, ...Object.entries(secaoDe).filter(([, id]) => id === s.id).flatMap(([k]) => (aula.glossario[k] ? [aula.glossario[k].t, ...aula.glossario[k].m] : []))].join(' ')]));
+  return { html, secoes, secaoDe, leituraDe, chaves };
+}

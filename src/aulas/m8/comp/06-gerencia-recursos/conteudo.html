@@ -26,7 +26,7 @@
       <thead><tr><th>Unidade</th><th>Vale</th><th>Exemplo de grandeza</th></tr></thead>
       <tbody>
         <tr><td><code>s</code> (segundo)</td><td>1 s</td><td>copiar um processo de 100 MB inteiro para o disco (swapping)</td></tr>
-        <tr><td><code>ms</code> (milissegundo)</td><td>10⁻³ s, um milésimo</td><td>quantum de escalonamento (10–100 ms), busca no disco (5–10 ms)</td></tr>
+        <tr><td><code>ms</code> (milissegundo)</td><td>10⁻³ s, um milésimo</td><td>quantum de escalonamento (10–100 ms), seek no disco (5–10 ms)</td></tr>
         <tr><td><code>µs</code> (microssegundo)</td><td>10⁻⁶ s, um milionésimo</td><td>tratar uma interrupção, fazer uma troca de contexto (alguns µs)</td></tr>
         <tr><td><code>ns</code> (nanossegundo)</td><td>10⁻⁹ s, um bilionésimo</td><td>acesso à memória principal (≈ 100 ns)</td></tr>
       </tbody>
@@ -72,7 +72,7 @@
   <p>Com multiprogramação, vários processos ficam prontos ao mesmo tempo e só um usa cada CPU. O <b>escalonamento</b> é a política que decide qual deles roda agora. O escalonador (aula 04) aplica a política; quem efetivamente entrega a CPU é outra peça.</p>
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="k" x="6" y="12" width="96" height="40" rx="6"/><text class="tm" x="54" y="24">fila de prontos</text><circle class="bl" cx="26" cy="38" r="8"/><circle class="am" cx="48" cy="38" r="8"/><circle class="gr" cx="70" cy="38" r="8"/><rect class="acf" x="138" y="12" width="96" height="40" rx="6"/><text class="ta" x="186" y="32">CPU</text><path class="s" d="M102 32 H134" marker-end="url(#mnarrow)"/><text class="tm" x="120" y="66">escalonador escolhe</text><text class="tm" x="120" y="80">dispatcher troca</text><rect class="k" x="40" y="100" width="160" height="40" rx="6"/><text class="tm" x="120" y="120">salva contexto · carrega outro</text></svg>Escolher é política; trocar é mecanismo.</aside>
   <ul class="b">
-    <li>Dispatcher (despachante): a rotina do núcleo que faz a troca de contexto e entrega a CPU ao processo escolhido. O tempo que ele gasta é a latência de despacho, puro overhead.</li>
+    <li>Dispatcher (despachante): a rotina do kernel que faz a troca de contexto e entrega a CPU ao processo escolhido. O tempo que ele gasta é a latência de despacho, puro overhead.</li>
     <li>Todo processo alterna fases: usa a CPU por um tempo, pede E/S e espera, usa a CPU de novo. Cada fase de uso contínuo da CPU é um <b>surto de CPU</b> (CPU burst). Processos cpu-bound têm surtos longos; io-bound, surtos curtos.</li>
   </ul>
 
@@ -94,7 +94,7 @@
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><line class="s" x1="10" y1="60" x2="232" y2="60"/><rect class="k" x="30" y="44" width="60" height="16"/><text class="tm" x="60" y="52">espera</text><rect class="acf" x="90" y="44" width="70" height="16"/><text class="tm" x="125" y="52">roda</text><rect class="k" x="160" y="44" width="30" height="16"/><rect class="acf" x="190" y="44" width="30" height="16"/><line class="s" x1="30" y1="36" x2="30" y2="68"/><text class="tm" x="30" y="78">chega</text><line class="s" x1="90" y1="36" x2="90" y2="68"/><text class="tm" x="90" y="78">1ª vez</text><line class="s" x1="220" y1="36" x2="220" y2="68"/><text class="tm" x="220" y="78">fim</text><path class="am" style="fill:none;stroke-width:2.5" d="M30 96 H90"/><text class="tam" x="60" y="108">resposta</text><path class="bl" style="fill:none;stroke-width:2.5" d="M30 126 H220"/><text class="tb" x="125" y="140">turnaround</text></svg>Turnaround é da chegada ao fim. Espera é a soma dos trechos parados na fila.</aside>
   <ul class="b">
     <li><b>Utilização da CPU</b>: fração do tempo em que a CPU faz trabalho útil. Queremos alta (40% numa máquina folgada, 90% numa carregada).</li>
-    <li>Vazão (throughput, aula 02): processos concluídos por unidade de tempo. Queremos alta.</li>
+    <li>Throughput (vazão, aula 02): processos concluídos por unidade de tempo. Queremos alta.</li>
     <li><b>Tempo de processador</b> (tempo de CPU): quanto de CPU o processo realmente usa. Isso o escalonador não muda: é a soma dos surtos.</li>
     <li><b>Tempo de espera</b>: tempo total que o processo passa na fila de prontos, esperando a CPU. É o que o escalonador controla diretamente. Queremos baixo.</li>
     <li><b>Turnaround</b> (tempo de retorno): do momento em que o processo chega até ele terminar. Inclui espera, execução e E/S. Queremos baixo.</li>
@@ -110,12 +110,12 @@
     <p class="nota-formal">"Médio" é a média aritmética entre os processos: some e divida pela quantidade. Num algoritmo não preemptivo, cada processo roda uma vez só, então espera e resposta coincidem.</p>
   </div>
   <ul class="b">
-    <li>Os critérios brigam entre si. Trocar de processo o tempo todo melhora a resposta e piora a vazão (mais tempo gasto trocando). Um sistema em lote prioriza vazão e turnaround; um interativo, resposta.</li>
+    <li>Os critérios brigam entre si. Trocar de processo o tempo todo melhora a resposta e piora o throughput (mais tempo gasto trocando). Um sistema em lote prioriza throughput e turnaround; um interativo, resposta.</li>
     <li>Para enxergar uma escala de execução, usa-se um <b>diagrama de Gantt</b>: uma barra do tempo em que cada trecho mostra quem estava na CPU.</li>
   </ul>
   <div class="def">
     <span class="lab">Na ponderada · pulseira</span>
-    <p>A ferramenta desta seção é escolher o critério certo antes do algoritmo. Exemplo diferente: um termostato industrial lê a temperatura a cada 50 ms e precisa reagir em até 20 ms. Se a leitura chega e espera atrás de um processo de 30 ms num escalonador não preemptivo, a resposta passa de 30 ms e o prazo estoura, mesmo com a vazão excelente. A pergunta que você vai ter de responder: para a amostra do sensor, o que importa é a média ou o pior caso do tempo de resposta? E isso pede escalonamento preemptivo ou não?</p>
+    <p>A ferramenta desta seção é escolher o critério certo antes do algoritmo. Exemplo diferente: um termostato industrial lê a temperatura a cada 50 ms e precisa reagir em até 20 ms. Se a leitura chega e espera atrás de um processo de 30 ms num escalonador não preemptivo, a resposta passa de 30 ms e o prazo estoura, mesmo com o throughput excelente. A pergunta que você vai ter de responder: para a amostra do sensor, o que importa é a média ou o pior caso do tempo de resposta? E isso pede escalonamento preemptivo ou não?</p>
   </div>
  </div>
 </section>
@@ -243,7 +243,7 @@
   <span class="num">04</span>
   <h2>Múltiplas filas, multiprocessadores e tempo real</h2>
   <div class="src"><span class="bk">Machado &amp; Maia · cap. 8 · p. 141–146</span></div>
-  <p>Num sistema real convivem processos com necessidades diferentes: o editor de texto quer resposta rápida, a compilação quer vazão, o controle do motor quer prazo. Um algoritmo só não serve para todos.</p>
+  <p>Num sistema real convivem processos com necessidades diferentes: o editor de texto quer resposta rápida, a compilação quer throughput, o controle do motor quer prazo. Um algoritmo só não serve para todos.</p>
 
   <h3>Múltiplas filas</h3>
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="rd" x="6" y="8" width="150" height="30" rx="6"/><text class="tm" x="81" y="23">sistema · prioridade fixa</text><rect class="am" x="6" y="58" width="150" height="30" rx="6"/><text class="tm" x="81" y="73">interativos · RR</text><rect class="bl" x="6" y="108" width="150" height="30" rx="6"/><text class="tm" x="81" y="123">lote · FCFS</text><rect class="acf" x="182" y="58" width="52" height="30" rx="6"/><text class="ta" x="208" y="73">CPU</text><path class="s" d="M156 23 Q172 23 186 56" marker-end="url(#mnarrow)"/><path class="s" d="M156 73 H178" marker-end="url(#mnarrow)"/><path class="s" d="M156 123 Q172 123 186 90" marker-end="url(#mnarrow)"/></svg>Cada classe tem sua fila e seu algoritmo. A fila de cima sempre ganha.</aside>
@@ -260,7 +260,7 @@
     <li>Todo processo novo entra na fila de cima, de maior prioridade e quantum pequeno (8 ms, por exemplo).</li>
     <li>Gastou o quantum inteiro sem bloquear? Comportamento de cpu-bound: desce uma fila. As filas de baixo têm prioridade menor e quantum maior (16 ms, 32 ms…); a última costuma ser FCFS.</li>
     <li>Bloqueou para E/S antes do fim do quantum? Comportamento de io-bound: fica na fila em que está (ou sobe).</li>
-    <li>Resultado: io-bound e interativos ficam em cima, com resposta rápida; cpu-bound descem e rodam em fatias maiores, com menos troca de contexto. Para evitar starvation lá embaixo, usa-se aging: quem espera demais sobe.</li>
+    <li>Resultado: io-bound e interativos ficam em cima, com resposta rápida; cpu-bound descem e rodam com quantum maior, com menos troca de contexto. Para evitar starvation lá embaixo, usa-se aging: quem espera demais sobe.</li>
   </ul>
 
   <h3>Mais de um processador</h3>
@@ -279,7 +279,7 @@
   </div>
   <ul class="b">
     <li><b>Tempo real crítico</b> (hard): perder um prazo é falha do sistema (freio ABS, marca-passo). <b>Não crítico</b> (soft): perder às vezes degrada a qualidade (um quadro de vídeo que pula).</li>
-    <li>O livro destaca que o escalonamento de tempo real usa prioridade fixa e preempção, sem fatia de tempo e sem aging: a tarefa mais importante sempre ganha, na hora.</li>
+    <li>O livro destaca que o escalonamento de tempo real usa prioridade fixa e preempção, sem quantum e sem aging: a tarefa mais importante sempre ganha, na hora.</li>
     <li>A variação no momento em que uma tarefa periódica realmente roda se chama <b>jitter</b>. Um sensor lido "a cada 10 ms" que às vezes é lido aos 9 e às vezes aos 14 tem jitter de 5 ms.</li>
   </ul>
   <p>Duas regras clássicas para tarefas periódicas (cada tarefa i repete a cada período Tᵢ e precisa de Cᵢ de CPU por vez):</p>
@@ -417,7 +417,7 @@
   <div class="def key">
     <span class="lab">Definição · Page fault</span>
     <p class="simples">O processo tentou acessar uma página que não está na memória. A instrução não pode continuar; o SO precisa buscar a página no disco primeiro.</p>
-    <p class="formal">Um <b>page fault</b> (falta de página) é a interrupção gerada pela MMU quando a entrada da tabela de páginas tem bit de validade 0. O SO trata a falta, carrega a página numa moldura, atualiza a tabela e manda reexecutar a instrução que falhou.</p>
+    <p class="formal">Um <b>page fault</b> (falta de página) é a interrupção gerada pela MMU quando a entrada da tabela de páginas tem bit de validade 0. O SO trata o page fault, carrega a página numa moldura, atualiza a tabela e manda reexecutar a instrução que falhou.</p>
   </div>
   <p>Acompanhe a tradução do endereço 20 500, com o page fault no meio:</p>
  </div>
@@ -438,27 +438,27 @@
   <h3>Políticas de busca</h3>
   <ul class="b">
     <li><b>Paginação por demanda</b>: uma página só é trazida quando alguém a acessa (quando dá page fault). O processo começa com zero páginas na memória e vai carregando o que usa.</li>
-    <li>Paginação antecipada (prepaging): traz também as páginas vizinhas, apostando na localidade espacial. Acerta, economiza faltas; erra, gasta disco e memória à toa.</li>
+    <li>Paginação antecipada (prepaging): traz também as páginas vizinhas, apostando na localidade espacial. Acerta, economiza page faults; erra, gasta disco e memória à toa.</li>
   </ul>
 
   <h3>O preço de um page fault</h3>
   <div class="def">
     <span class="lab">Conta · tempo efetivo de acesso</span>
-    <p>Acesso à memória: 100 ns. Tratar um page fault (ir ao disco e voltar): 8 ms = 8 000 000 ns. Se a probabilidade de falta por acesso for p, o <b>tempo efetivo de acesso</b> é a média ponderada:</p>
+    <p>Acesso à memória: 100 ns. Tratar um page fault (ir ao disco e voltar): 8 ms = 8 000 000 ns. Se a probabilidade de page fault por acesso for p, o <b>tempo efetivo de acesso</b> é a média ponderada:</p>
     <div class="formula">TEA = (1 − p) × 100 ns + p × 8 000 000 ns</div>
     <ul class="b">
-      <li>Com p = 0,001 (uma falta a cada mil acessos): 0,999 × 100 + 0,001 × 8 000 000 = 99,9 + 8 000 = 8 099,9 ns ≈ 8,1 µs. A memória ficou 81 vezes mais lenta.</li>
-      <li>Para ficar no máximo 10% mais lenta (TEA ≤ 110 ns): 100 + p × 7 999 900 ≤ 110, então p ≤ 10 / 7 999 900 ≈ 0,00000125. Uma falta a cada 800 mil acessos.</li>
+      <li>Com p = 0,001 (um page fault a cada mil acessos): 0,999 × 100 + 0,001 × 8 000 000 = 99,9 + 8 000 = 8 099,9 ns ≈ 8,1 µs. A memória ficou 81 vezes mais lenta.</li>
+      <li>Para ficar no máximo 10% mais lenta (TEA ≤ 110 ns): 100 + p × 7 999 900 ≤ 110, então p ≤ 10 / 7 999 900 ≈ 0,00000125. Um page fault a cada 800 mil acessos.</li>
       <li>Por isso a localidade (aula 02) é o que faz a memória virtual funcionar: quase todo acesso cai numa página que já está na memória.</li>
     </ul>
   </div>
 
   <h3>Tamanho da página e tabelas em níveis</h3>
   <ul class="b">
-    <li>Página grande: tabela menor e menos faltas, mas mais fragmentação interna e mais lixo trazido junto. Página pequena: o contrário. 4 KB é o tamanho mais comum hoje.</li>
+    <li>Página grande: tabela menor e menos page faults, mas mais fragmentação interna e mais lixo trazido junto. Página pequena: o contrário. 4 KB é o tamanho mais comum hoje.</li>
     <li>A tabela pode ficar enorme. Endereço de 32 bits com páginas de 4 KB: 32 − 12 = 20 bits de página, ou seja 2²⁰ ≈ 1 milhão de entradas. Com 4 bytes cada: 4 MB de tabela por processo, quase toda vazia.</li>
     <li>Solução: a <b>tabela de páginas em níveis</b>. Os 20 bits viram 10 + 10: os primeiros escolhem uma entrada num diretório de 1 024 posições, que aponta para uma tabela de segundo nível de 1 024 entradas. Tabelas de segundo nível de regiões não usadas nem existem.</li>
-    <li>O preço são mais acessos à memória por tradução (um por nível). A TLB (aula 02) esconde isso: com taxa de acerto alta, quase nenhuma tradução precisa percorrer os níveis.</li>
+    <li>O preço são mais acessos à memória por tradução (um por nível). A TLB (aula 02) esconde isso: com hit rate alto, quase nenhuma tradução precisa percorrer os níveis.</li>
   </ul>
 
   <h3>Segmentação</h3>
@@ -472,7 +472,7 @@
   </ul>
   <div class="def">
     <span class="lab">Na ponderada · pulseira</span>
-    <p>A ferramenta é o TEA: um page fault custa milissegundos e acontece em momentos que o código não controla. Exemplo com outros números: um controlador de drone tem prazo de 2 ms por ciclo; se uma página do laço de controle estiver no disco, uma única falta de 6 ms estoura três ciclos seguidos. Por isso sistemas de tempo real travam as páginas críticas na memória (no Linux, <code>mlock</code>) ou nem usam memória virtual (muitos microcontroladores não têm MMU). A pergunta que você vai ter de responder: o laço que processa a amostra pode sofrer uma falta de página ou outra espera imprevisível de memória?</p>
+    <p>A ferramenta é o TEA: um page fault custa milissegundos e acontece em momentos que o código não controla. Exemplo com outros números: um controlador de drone tem prazo de 2 ms por ciclo; se uma página do laço de controle estiver no disco, um único page fault de 6 ms estoura três ciclos seguidos. Por isso sistemas de tempo real travam as páginas críticas na memória (no Linux, <code>mlock</code>) ou nem usam memória virtual (muitos microcontroladores não têm MMU). A pergunta que você vai ter de responder: o laço que processa a amostra pode sofrer um page fault ou outra espera imprevisível de memória?</p>
   </div>
  </div>
 </section>
@@ -489,16 +489,16 @@
   <ul class="b">
     <li>A página escolhida é a vítima. Se o bit de modificação dela estiver ligado, ela é gravada no disco antes; se não, basta descartar (o disco já tem uma cópia igual). Trocar uma página suja custa duas operações de disco.</li>
     <li>Alocação fixa: cada processo tem um número fixo de molduras. Alocação variável: o número muda conforme a necessidade.</li>
-    <li><b>Substituição local</b>: a vítima sai das molduras do próprio processo que faltou. <b>Substituição global</b>: pode sair de qualquer processo. A global aproveita melhor a memória; a local isola um processo guloso dos outros.</li>
+    <li><b>Substituição local</b>: a vítima sai das molduras do próprio processo que deu page fault. <b>Substituição global</b>: pode sair de qualquer processo. A global aproveita melhor a memória; a local isola um processo guloso dos outros.</li>
     <li>Para comparar algoritmos, usa-se uma <b>string de referências</b>: a lista das páginas acessadas, em ordem. Conta-se quantos page faults cada algoritmo gera com um certo número de molduras.</li>
   </ul>
 
   <h3>Os algoritmos</h3>
   <ul class="b">
-    <li><b>Algoritmo ótimo</b> (OPT ou MIN): tira a página que vai demorar mais para ser usada de novo. Gera o menor número possível de faltas, mas exige conhecer o futuro. Serve de régua para medir os outros.</li>
+    <li><b>Algoritmo ótimo</b> (OPT ou MIN): tira a página que vai demorar mais para ser usada de novo. Gera o menor número possível de page faults, mas exige conhecer o futuro. Serve de régua para medir os outros.</li>
     <li><b>FIFO</b>: tira a página que está há mais tempo na memória, numa fila. Fácil, mas ignora o uso: a página mais antiga pode ser a mais usada (uma variável global, o laço principal).</li>
     <li><b>LRU</b> (least recently used): tira a página usada há mais tempo. Aposta que o passado recente prevê o futuro próximo (localidade temporal). Chega perto do ótimo, mas registrar a hora de cada acesso é caro; o hardware precisaria de um contador ou de uma lista reordenada a cada acesso.</li>
-    <li><b>Algoritmo do relógio</b> (segunda chance): aproximação barata do LRU. As molduras formam um círculo com um ponteiro. Na falta, olha o bit de referência da página apontada: se for 1, zera e dá uma segunda chance (avança); se for 0, essa é a vítima.</li>
+    <li><b>Algoritmo do relógio</b> (segunda chance): aproximação barata do LRU. As molduras formam um círculo com um ponteiro. No page fault, olha o bit de referência da página apontada: se for 1, zera e dá uma segunda chance (avança); se for 0, essa é a vítima.</li>
     <li><b>NRU</b> (not recently used): separa as páginas em quatro classes pelos bits de referência e de modificação (não usada e limpa, não usada e suja, usada e limpa, usada e suja) e tira uma da classe mais baixa.</li>
     <li><b>LFU</b> (least frequently used): tira a menos acessada no total. Tem um defeito: uma página muito usada no começo e nunca mais fica com contagem alta e não sai.</li>
     <li>Aleatório: escolhe qualquer uma. Não gasta nada para decidir, e é a referência de "pior razoável". O livro ainda cita o FIFO com buffer de páginas: as vítimas vão para uma lista e, se forem acessadas de novo logo, voltam sem ir ao disco.</li>
@@ -524,17 +524,17 @@
  <div class="prose">
   <h3>A anomalia de Belady</h3>
   <ul class="b">
-    <li>Intuição: mais molduras, menos faltas. Quase sempre é verdade, mas não para o FIFO.</li>
-    <li>Na string 1 2 3 4 1 2 5 1 2 3 4 5, o FIFO dá 9 faltas com 3 molduras e 10 faltas com 4. Mude o controle de molduras na figura de 3 para 4 e confira.</li>
+    <li>Intuição: mais molduras, menos page faults. Quase sempre é verdade, mas não para o FIFO.</li>
+    <li>Na string 1 2 3 4 1 2 5 1 2 3 4 5, o FIFO dá 9 page faults com 3 molduras e 10 com 4. Mude o controle de molduras na figura de 3 para 4 e confira.</li>
     <li>Isso é a <b>anomalia de Belady</b>. Acontece porque o FIFO com 4 molduras guarda páginas diferentes das que guardaria com 3; o conjunto de 3 não está contido no de 4.</li>
-    <li>LRU e ótimo nunca sofrem a anomalia. Eles são algoritmos de pilha: o que fica na memória com n molduras está sempre contido no que ficaria com n + 1. Na mesma string, LRU dá 10 e 8 faltas; ótimo, 7 e 6.</li>
+    <li>LRU e ótimo nunca sofrem a anomalia. Eles são algoritmos de pilha: o que fica na memória com n molduras está sempre contido no que ficaria com n + 1. Na mesma string, LRU dá 10 e 8 page faults; ótimo, 7 e 6.</li>
   </ul>
-  <p class="prova">Anomalia de Belady: no FIFO, aumentar o número de molduras pode aumentar o número de page faults (string 1 2 3 4 1 2 5 1 2 3 4 5: 9 faltas com 3 molduras, 10 com 4). LRU e ótimo não sofrem. O ótimo é irrealizável (precisa do futuro) e serve de referência.</p>
+  <p class="prova">Anomalia de Belady: no FIFO, aumentar o número de molduras pode aumentar o número de page faults (string 1 2 3 4 1 2 5 1 2 3 4 5: 9 page faults com 3 molduras, 10 com 4). LRU e ótimo não sofrem. O ótimo é irrealizável (precisa do futuro) e serve de referência.</p>
 
   <h3>Thrashing</h3>
 <aside class="mn loop" data-loop="thrashing" data-ms="10000" data-still="0.8" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Mais processos aumentam a utilização da CPU até um ponto. Depois, cada um tem molduras de menos e a CPU passa a esperar o disco.</aside>
   <ul class="b">
-    <li>Se um processo tem menos molduras do que as páginas que usa o tempo todo, ele dá page fault, tira uma página que vai precisar já, dá outra falta, e assim por diante.</li>
+    <li>Se um processo tem menos molduras do que as páginas que usa o tempo todo, ele dá page fault, tira uma página que vai precisar já, dá outro page fault, e assim por diante.</li>
     <li>Com muitos processos assim, o sistema entra em <b>thrashing</b>: passa mais tempo trocando páginas com o disco do que executando. A CPU fica ociosa esperando o disco.</li>
     <li>A armadilha: o SO vê a CPU ociosa e pensa "cabe mais um processo". Coloca mais um, que rouba molduras dos outros, e piora tudo.</li>
     <li>Solução: reduzir a multiprogramação, suspendendo processos inteiros (swapping) até sobrar memória para os que ficam.</li>
@@ -543,14 +543,14 @@
   <h3>Working set</h3>
   <div class="def key">
     <span class="lab">Definição · Working set</span>
-    <p class="simples">O working set é o conjunto de páginas que o processo está usando "agora". Se todas cabem na memória, ele roda quase sem faltas. Se não cabem, entra em thrashing.</p>
+    <p class="simples">O working set é o conjunto de páginas que o processo está usando "agora". Se todas cabem na memória, ele roda quase sem page faults. Se não cabem, entra em thrashing.</p>
     <p class="formal">O <b>working set</b> W(t, Δ) é o conjunto de páginas distintas referenciadas nas últimas Δ referências antes do instante t. Δ é a janela do working set. Proposto por Peter Denning a partir da localidade.</p>
   </div>
   <ul class="b">
     <li>Exemplo com Δ = 6. As referências mais recentes foram 2 6 1 5 7 7 7 7 5 1 (a última é o 1). As 6 últimas são 7 7 7 7 5 1, então W = {1, 5, 7}: o processo precisa de 3 molduras agora. Bem antes, com 2 6 1 5 7 7, o working set era {1, 2, 5, 6, 7}, 5 páginas.</li>
     <li>Num trecho de laço apertado o working set é pequeno; quando o programa muda de fase (sai de uma função e entra noutra), ele cresce e depois encolhe de novo.</li>
     <li>Regra do SO: só deixe rodar processos cuja soma dos working sets cabe nas molduras disponíveis. Se não cabe, suspenda alguém. Isso evita thrashing e mantém a multiprogramação tão alta quanto possível.</li>
-    <li>Medir o working set exato é caro. Na prática, o SO acompanha a taxa de faltas de cada processo: muitas faltas, dá mais molduras; poucas faltas, tira.</li>
+    <li>Medir o working set exato é caro. Na prática, o SO acompanha a taxa de page faults de cada processo: muitos page faults, dá mais molduras; poucos, tira.</li>
   </ul>
   <p class="prova">Thrashing: o sistema gasta mais tempo paginando do que executando, porque os processos têm menos molduras que o working set. Aumentar a multiprogramação piora; a saída é suspender processos até a soma dos working sets caber na memória.</p>
  </div>
@@ -570,7 +570,7 @@
   <ul class="b">
     <li>Um <b>arquivo</b> é um conjunto de dados relacionados, guardado em memória secundária e identificado por um nome. Muitas vezes o nome tem uma extensão (<code>.txt</code>, <code>.c</code>) que indica o tipo.</li>
     <li>Atributos que o SO guarda junto: tamanho, dono, proteção, datas de criação e de último acesso e modificação, localização no disco.</li>
-    <li>Operações, todas por chamadas de sistema: criar, abrir, ler, gravar, posicionar, fechar, apagar, renomear. "Abrir" busca os atributos uma vez e guarda numa tabela de arquivos abertos, para as próximas leituras não precisarem procurar de novo.</li>
+    <li>Operações, todas por syscalls: criar, abrir, ler, gravar, posicionar, fechar, apagar, renomear. "Abrir" busca os atributos uma vez e guarda numa tabela de arquivos abertos, para as próximas leituras não precisarem procurar de novo.</li>
   </ul>
   <p>Organização (como os dados ficam arrumados dentro do arquivo) e método de acesso (como o programa chega a eles):</p>
   <ul class="b">
@@ -646,8 +646,8 @@
   <h3>As camadas</h3>
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 190"><rect class="k" x="30" y="4" width="180" height="26" rx="5"/><text class="tm" x="120" y="17">processo · read()</text><rect class="acf" x="30" y="40" width="180" height="26" rx="5"/><text class="tm" x="120" y="53">subsistema de E/S</text><rect class="bl" x="30" y="76" width="180" height="26" rx="5"/><text class="tm" x="120" y="89">driver</text><rect class="am" x="30" y="112" width="180" height="26" rx="5"/><text class="tm" x="120" y="125">controlador (hardware)</text><rect class="gr" x="30" y="148" width="180" height="26" rx="5"/><text class="tm" x="120" y="161">dispositivo</text><line class="s" x1="10" y1="106" x2="230" y2="106" stroke-dasharray="4 3"/><text class="tm st" x="2" y="184">software ↑ · hardware ↓</text></svg>De cima para baixo, cada camada sabe mais sobre o dispositivo específico.</aside>
   <ul class="b">
-    <li><b>Subsistema de E/S</b>: a parte do núcleo independente de dispositivo. Dá nomes uniformes, controla quem pode usar o quê, mantém buffers e cache, trata erros comuns.</li>
-    <li><b>Driver</b> (device driver): o código que sabe falar com um modelo específico de dispositivo. Traduz "ler bloco 512" nos comandos e registradores daquele controlador. Roda no núcleo, por isso um driver com defeito derruba o sistema todo.</li>
+    <li><b>Subsistema de E/S</b>: a parte do kernel independente de dispositivo. Dá nomes uniformes, controla quem pode usar o quê, mantém buffers e cache, trata erros comuns.</li>
+    <li><b>Driver</b> (device driver): o código que sabe falar com um modelo específico de dispositivo. Traduz "ler bloco 512" nos comandos e registradores daquele controlador. Roda no kernel, por isso um driver com defeito derruba o sistema todo.</li>
     <li><b>Controlador</b>: o hardware que fica entre o barramento e o dispositivo (a placa controladora de disco, o chip do Bluetooth). Tem registradores de comando, de status e de dados, e às vezes um buffer próprio.</li>
     <li>Dispositivo: o aparelho em si (o disco, o teclado, o sensor).</li>
   </ul>
@@ -659,7 +659,7 @@
   <h3>Três jeitos de a CPU conversar com o dispositivo</h3>
 <aside class="mn loop" data-loop="dma" data-ms="12000" data-still="0.7" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Polling: a CPU pergunta sem parar e não faz mais nada. DMA: o controlador copia o bloco sozinho e só interrompe no fim.</aside>
   <ul class="b">
-    <li><b>E/S programada</b> com <b>polling</b> (espera ocupada, aula 05): a CPU manda o comando e fica lendo o registrador de status do controlador em laço ("já terminou? já terminou?"). Simples, mas a CPU fica presa enquanto o dispositivo trabalha.</li>
+    <li><b>E/S programada</b> com <b>polling</b> (busy waiting, aula 05): a CPU manda o comando e fica lendo o registrador de status do controlador em laço ("já terminou? já terminou?"). Simples, mas a CPU fica presa enquanto o dispositivo trabalha.</li>
     <li><b>E/S dirigida por interrupção</b>: a CPU manda o comando e vai rodar outro processo. Quando o dispositivo termina, o controlador gera uma interrupção (aula 04) e o SO trata. A CPU só trabalha no começo e no fim. Mas se o dispositivo transfere muitos dados, cada palavra ainda gera uma interrupção e passa pela CPU.</li>
     <li><b>DMA</b> (direct memory access, acesso direto à memória): um controlador de DMA copia o bloco inteiro entre o dispositivo e a memória sozinho, sem a CPU. A CPU só diz "copie 4 KB do dispositivo para o endereço X" e recebe uma única interrupção no fim. Enquanto isso, CPU e DMA disputam o barramento de memória de vez em quando (o DMA "rouba ciclos"), mas a CPU segue trabalhando.</li>
   </ul>

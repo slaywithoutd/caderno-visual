@@ -135,7 +135,35 @@ function derivFig(rootId,keys){
 derivFig('fig-der1',['anbn','num']);
 derivFig('fig-der2',['expr','amb1','amb2']);
 
-/* ============ Fig 3: bombeamento no AFD ============ */
+/* ============ AFN: conjunto de estados ativos ============ */
+(function(){
+  const svg=document.getElementById('afn-svg');
+  const D=drawMachine(svg,{states:[{id:'q1',x:80,y:140,start:true},{id:'q2',x:240,y:140},{id:'q3',x:400,y:140},{id:'q4',x:560,y:140,accept:true}],
+    edges:[{from:'q1',to:'q1',labels:[{text:'0, 1',k:0}]},{from:'q1',to:'q2',labels:[{text:'1',k:0}]},{from:'q2',to:'q3',labels:[{text:'0, ε',k:0}]},{from:'q3',to:'q4',labels:[{text:'1',k:0}]},{from:'q4',to:'q4',labels:[{text:'0, 1',k:0}]}]});
+  const w='010110';
+  const sets=[['q1'],['q1'],['q1','q2','q3'],['q1','q3'],['q1','q2','q3','q4'],['q1','q2','q3','q4'],['q1','q3','q4']];
+  const notes=[
+    'Este AFN aceita as palavras com <code>11</code> ou <code>101</code>. Ele começa só no estado inicial. Ativos: <b>{q1}</b>.',
+    'Lê <b>0</b>: q1 tem um laço com 0 e fica em q1. Ativos: <b>{q1}</b>.',
+    'Lê <b>1</b>: q1 tem duas setas com 1, então a computação se divide. Um ramo fica em q1 e outro vai para q2. De q2 sai uma ε-transição para q3, seguida sem ler nada. Ativos: <b>{q1, q2, q3}</b>.',
+    'Lê <b>0</b>: q1 fica em q1, q2 vai para q3, e q3 não tem seta com 0: esse ramo <b>morre</b>. Ativos: <b>{q1, q3}</b>.',
+    'Lê <b>1</b>: q1 se divide de novo (q1, q2 e, pelo ε, q3) e q3 vai para q4. q4 é final: o ramo que chegou lá achou <code>101</code>. Ativos: <b>{q1, q2, q3, q4}</b>.',
+    'Lê <b>1</b>: q2 não tem seta com 1 e morre; q3 vai para q4; q4 fica em q4. Ativos: <b>{q1, q2, q3, q4}</b>.',
+    'Lê <b>0</b>: q3 morre; os outros seguem. Ativos: <b>{q1, q3, q4}</b>.',
+    '<b class="ok">Aceita.</b> A entrada acabou e um dos estados ativos, q4, é final. Basta <b>um</b> ramo aceitar, mesmo que vários tenham morrido no caminho.'
+  ];
+  const tape=document.getElementById('afn-tape'),trail=document.getElementById('afn-trail');
+  const cells=[...w].map(c=>H('span',{class:'cell'},c));tape.append(...cells);
+  const fmt=s=>`{${s.join(', ')}}`;
+  new StepFig(document.getElementById('fig-afn'),{notes,speed:2200,render(k){
+    const fin=k>=7,pos=Math.min(k,6),act=sets[pos];
+    Object.entries(D.states).forEach(([id,g])=>{g.classList.remove('on','acc');if(act.includes(id))g.classList.add(fin&&id==='q4'?'acc':'on');});
+    cells.forEach((c,i)=>{c.className='cell'+(i<pos?' done':'')+(i===pos&&!fin?' head':'');});
+    trail.innerHTML=sets.slice(0,pos+1).map((s,i)=>`<span class="q${i===pos?' rep':''}">${fmt(s)}</span>`).join('<span class="ar">→</span>');
+  }});
+})();
+
+/* ============ Fig 4: bombeamento no AFD ============ */
 (function(){
   const svg=document.getElementById('pump-svg');
   const M={states:[{id:'q0',x:70,y:120,start:true},{id:'q1',x:230,y:120},{id:'q2',x:410,y:120},{id:'q3',x:230,y:245,accept:true},{id:'qe',x:520,y:245,faded:true,note:'erro (setas omitidas)'}],
@@ -234,6 +262,15 @@ const PDAS={
       {from:'q5',to:'q6',read:'',pop:'',push:'',hint:'passa para os c'},
       {from:'q6',to:'q6',read:'c',pop:'A',push:'',hint:'cada c cancela um A'},
       {from:'q6',to:'q7',read:'',pop:'$',push:'',hint:'bateu: i = k'}]},
+  zeros:{name:'0ⁿ1²ⁿ (exercício da aula)',alpha:'01',start:'q1',accept:['q5'],presets:['011','001111','0011','00111111'],vb:'0 0 640 200',
+    states:[{id:'q1',x:50,y:130},{id:'q2',x:180,y:130},{id:'q3',x:330,y:130},{id:'q4',x:470,y:130},{id:'q5',x:600,y:130}],
+    bends:{'q3>q4':-34,'q4>q3':-34},
+    trans:[{from:'q1',to:'q2',read:'',pop:'',push:'$',hint:'marca o fundo da pilha'},
+      {from:'q2',to:'q2',read:'0',pop:'',push:'X',hint:'cada 0 vira um X na pilha'},
+      {from:'q2',to:'q3',read:'1',pop:'',push:'',hint:'primeiro 1 do par: só lê'},
+      {from:'q3',to:'q4',read:'1',pop:'X',push:'',hint:'segundo 1 do par: cancela um X'},
+      {from:'q4',to:'q3',read:'1',pop:'',push:'',hint:'começa o próximo par: só lê'},
+      {from:'q4',to:'q5',read:'',pop:'$',push:'',hint:'achou o $: cada 0 teve seus dois 1'}]},
 };
 function simulate(M,w){
   const n=w.length,cap=n+3,key=c=>c.s+'|'+c.pos+'|'+c.st.join('');
@@ -297,7 +334,7 @@ function pdaFig(rootId,keys){
   setMachine(key);
 }
 pdaFig('fig-pda1',['anbn']);
-pdaFig('fig-pda2',['wwr','abc']);
+pdaFig('fig-pda2',['wwr','abc','zeros']);
 
 /* ============ Chomsky ============ */
 (function(){
@@ -315,11 +352,14 @@ pdaFig('fig-pda2',['wwr','abc']);
   const EX=[
     {t:'a*b*',r:0,x:cx-45,y:cy+5,why:'Regular: a expressão regular a*b* descreve, e um AFD de 2 estados (mais o de erro) reconhece.'},
     {t:'(ab)*',r:0,x:cx+45,y:cy+5,why:'Regular: AFD com um laço de 2 estados.'},
-    {t:'aⁿbⁿ',r:1,x:cx-150,y:cy+10,why:'Livre do contexto (S → aSb | ε, AP da Figura 6), mas não regular (lema do bombeamento, Figura 4).'},
-    {t:'wwᴿ',r:1,x:cx+150,y:cy+10,why:'Livre do contexto: AP que chuta o meio (Figura 7). Não regular.'},
+    {t:'aⁿbⁿ',r:1,x:cx-150,y:cy+10,why:'Livre do contexto (S → aSb | ε, AP da Figura 7), mas não regular (lema do bombeamento, Figura 5).'},
+    {t:'wwᴿ',r:1,x:cx+150,y:cy+10,why:'Livre do contexto: AP que chuta o meio (Figura 8). Não regular.'},
     {t:'expressões',r:1,x:cx,y:cy+78,why:'Livre do contexto: E → E+E | E*E | (E) | x. Parênteses balanceados impedem que seja regular.'},
     {t:'aⁿbⁿcⁿ',r:2,x:cx-225,y:cy+30,why:'Sensível ao contexto, não livre do contexto: uma pilha só consegue comparar duas contagens, não três.'},
     {t:'ww',r:2,x:cx+225,y:cy+30,why:'Sensível ao contexto: a cópia não sai espelhada, então a pilha (que inverte) não serve.'},
+    {t:'termina em 0',r:0,x:cx,y:cy+40,why:'Regular: um AFD de 2 estados lembra só o último símbolo lido. Exemplo da aula.'},
+    {t:'aⁿbᵐcⁿ⁺ᵐ',r:1,x:cx-100,y:cy-54,why:'Livre do contexto: empilha os a e os b, e cada c desempilha um. Exemplo da aula.'},
+    {t:'aⁿbᵐcⁿᵐ',r:2,x:cx+140,y:cy-87,why:'Sensível ao contexto: k = n·m exige recontar os b para cada a, e a pilha perde o que desempilha. Exemplo da aula.'},
     {t:'parada (aceita)',r:3,x:cx,y:cy+160,why:'Recursivamente enumerável: uma MT simula M em w e aceita se M parar. Se M não parar, a MT roda para sempre.'},
     {t:'complemento da parada',r:4,x:cx+270,y:cy-185,why:'Fora de todas as classes: nenhuma máquina de Turing reconhece. Existem linguagens que nem o Tipo 0 alcança.'},
   ];

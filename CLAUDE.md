@@ -90,6 +90,7 @@ Cada seção:
 - Caixas: `<div class="def key"><span class="lab">Definição · X</span>…</div>`; `.def.warn` para erros comuns/pegadinhas; `.def` neutro para dicas.
 - Fórmula em destaque: `<div class="formula">L(G) = { w ∈ T* | S ⇒⁺ w }</div>`.
 - Tabela: `<div class="tbl prose"><table>…</table></div>`.
+- Código (ex.: simulador em Python): `<pre><code>…</code></pre>` dentro de um `.prose`; escape `&`, `<` e `>`.
 - **Cai na prova**: `<p class="prova">frase curta e direta</p>`. Vai também para a revisão da matéria. Use 3 a 6 por aula, só no que realmente cai.
 - Variáveis de gramática: `<span class="v">S</span>`; terminais: `<span class="t">a</span>`.
 - Termos do glossário viram link sozinhos (primeira ocorrência por seção), usando o **glossário global**:

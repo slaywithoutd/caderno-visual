@@ -220,9 +220,210 @@
       <li>Um <b>formalismo</b> é um jeito preciso, com regras fixas, de descrever uma linguagem.</li>
       <li>A gramática é um formalismo <b>gerador</b>: ela fabrica as palavras.</li>
       <li>Um <b>autômato</b> (uma máquina abstrata, que aparece na próxima seção) é um formalismo <b>reconhecedor</b>: recebe uma palavra e responde "sim, pertence" ou "não pertence".</li>
-      <li>A matéria toda gira em torno de qual gramática corresponde a qual máquina. O mapa completo é a Hierarquia de Chomsky, na seção 8.</li>
+      <li>A matéria toda gira em torno de qual gramática corresponde a qual máquina. O mapa completo é a Hierarquia de Chomsky, na seção 9.</li>
     </ul>
   </div>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ AF ============ -->
+<section class="chap" id="af">
+ <div class="prose">
+  <span class="num">04</span>
+  <h2>Autômatos finitos: AFD e AFN</h2>
+  <div class="src"><span class="bk">Aula presencial · slides do prof. Resina</span><span class="bk">Revisão do Módulo 6 · Introdução a AFD e AFND</span></div>
+  <p>Os vídeos das próximas seções assumem que você já conhece autômatos finitos. A aula presencial revisou o assunto com os slides do Módulo 6, e esta seção junta tudo o que ela cobriu.</p>
+
+  <h3>Uma máquina de estados</h3>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="k" x="8" y="58" width="84" height="34" rx="17"/><text x="50" y="75">Fechado</text><rect class="am" x="148" y="58" width="84" height="34" rx="17"/><text x="190" y="75">Aberto</text><path class="s" d="M84 58 Q120 26 156 58" marker-end="url(#mnarrow)"/><text class="tm" x="120" y="22">frente, atrás, ambos</text><path class="s" d="M156 92 Q120 124 84 92" marker-end="url(#mnarrow)"/><text class="tm" x="120" y="132">nenhum</text></svg>Porta automática: dois estados, quatro entradas. Os laços (ficar onde está) foram omitidos.</aside>
+  <ul class="b">
+    <li>Um <b>autômato finito</b> é um modelo de computador bem simplificado. A única memória dele é saber em qual <b>estado</b> está, e o número de estados é fixo.</li>
+    <li>Exemplo da aula: o controlador de uma porta automática. Estados: Aberto e Fechado. Entradas: ninguém nos tapetes, alguém na frente, alguém atrás, alguém nos dois.</li>
+    <li>Para cada par (estado, entrada) há uma regra: fechada e alguém chega, ela abre; aberta e ninguém nos tapetes, ela fecha; nos outros casos, continua aberta.</li>
+    <li>Essa tabela de regras é a <b>função de transição</b>, escrita com a letra grega δ (delta): <code>δ(Fechado, Frente) = Aberto</code>.</li>
+    <li>Elevadores e máquinas de refrigerante funcionam assim. Na computação, autômatos finitos estão nas <b>expressões regulares</b> e na <b>análise léxica</b>, a primeira etapa de um compilador.</li>
+  </ul>
+
+  <h3>Como o AFD lê uma palavra</h3>
+<aside class="mn loop" data-loop="afd" data-ms="7000" data-still="0.9" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Este AFD aceita as palavras que terminam em a. Ele lê "baba" letra por letra e termina em q1, um estado final.</aside>
+  <ul class="b">
+    <li>A entrada vem escrita numa <b>fita</b> dividida em células, um símbolo por célula. A máquina lê da esquerda para a direita, uma célula por vez, sem voltar.</li>
+    <li>No desenho, cada estado é um círculo. O <b>estado inicial</b> (só existe um) tem uma seta solta apontando para ele. Os <b>estados finais</b>, ou de aceitação, têm círculo duplo e podem ser vários. Os outros são chamados de intermediários.</li>
+    <li>Cada <b>transição</b> é uma seta com uma letra: "estando em q, se ler x, vá para r".</li>
+    <li>A palavra é <b>aceita</b> quando duas coisas valem ao mesmo tempo: todos os símbolos foram lidos e a máquina parou num estado final. Caso contrário, é rejeitada.</li>
+  </ul>
+  <div class="def key">
+    <span class="lab">Definição · AFD</span>
+    <p class="simples">Um <b>AFD</b> (autômato finito determinístico) é descrito por cinco coisas: os estados, as letras que ele lê, a tabela de regras, onde ele começa e onde ele aceita. "Determinístico" quer dizer que nunca há dúvida: em cada estado, para cada letra, existe exatamente uma seta.</p>
+    <p class="formal">Um AFD é uma 5-upla <code>M = (Q, Σ, δ, q₀, F)</code>: Q é o conjunto finito de estados; Σ é o alfabeto; <code>δ: Q × Σ → Q</code> é a função de transição; <code>q₀ ∈ Q</code> é o estado inicial; <code>F ⊆ Q</code> é o conjunto de estados finais.</p>
+    <p class="nota-formal"><code>δ: Q × Σ → Q</code> se lê "δ recebe um estado e um símbolo e devolve um estado". O <code>×</code> é o <b>produto cartesiano</b>: Q × Σ é o conjunto de todos os pares (estado, símbolo). Exemplo: <code>δ(q0, a) = q1</code>.</p>
+  </div>
+  <p class="prova">AFD: <code>M = (Q, Σ, δ, q₀, F)</code> com <code>δ: Q × Σ → Q</code>. Exatamente uma seta por estado e por símbolo. Aceita se leu tudo e parou num estado final.</p>
+
+  <h3>Estado de erro (trap state)</h3>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 178"><line class="s" x1="0" y1="60" x2="12" y2="60" marker-end="url(#mnarrow)"/><circle class="k" cx="30" cy="60" r="16"/><text x="30" y="60">q0</text><circle class="k" cx="110" cy="60" r="16"/><text x="110" y="60">q1</text><circle class="gr" cx="196" cy="60" r="16"/><circle class="gr" cx="196" cy="60" r="12"/><text x="196" y="60">q2</text><circle class="rd" cx="110" cy="140" r="16"/><text x="110" y="140">q3</text><line class="s" x1="46" y1="60" x2="92" y2="60" marker-end="url(#mnarrow)"/><text class="tm" x="69" y="51">a</text><line class="s" x1="126" y1="60" x2="178" y2="60" marker-end="url(#mnarrow)"/><text class="tm" x="152" y="51">b</text><path class="s" d="M103 45 C93 18 127 18 117 45" marker-end="url(#mnarrow)"/><text class="tm" x="110" y="14">a</text><path class="s" d="M189 45 C179 18 213 18 203 45" marker-end="url(#mnarrow)"/><text class="tm" x="196" y="14">b</text><line class="s" x1="41" y1="72" x2="96" y2="128" marker-end="url(#mnarrow)"/><text class="tm" x="58" y="106">b</text><line class="s" x1="184" y1="72" x2="125" y2="128" marker-end="url(#mnarrow)"/><text class="tm" x="162" y="106">a</text><path class="s" d="M103 155 C93 180 127 180 117 155" marker-end="url(#mnarrow)"/><text class="tam" x="152" y="168">a, b</text></svg>AFD de aⁿbᵐ (n, m ≥ 1). q3 é o estado de erro: quem entra não sai.</aside>
+  <p>Se no AFD toda seta precisa existir, o que acontece quando a palavra já não tem salvação, como um <code>a</code> depois dos <code>b</code> em aⁿbᵐ? A máquina vai para um <b>estado de erro</b> (trap state, ou estado armadilha). Ele não é final e todas as setas que saem dele voltam para ele mesmo. Quem entra não sai, e a palavra é rejeitada.</p>
+  <ul class="b">
+    <li>No desenho, é comum omitir o estado de erro e as setas que levam a ele, para não poluir. Fica combinado: seta que falta vai para o erro.</li>
+    <li>O AFN, que aparece logo abaixo, não precisa dele: ali uma seta pode faltar de verdade.</li>
+  </ul>
+  <p>O mesmo exemplo em forma de tabela, para <code>L = { aⁿbᵐ | n ≥ 1 e m ≥ 1 }</code>. Linha é o estado atual, coluna é o que foi lido, a casa é para onde vai:</p>
+ </div>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>AFD</th><th>a</th><th>b</th><th></th><th>AFN</th><th>a</th><th>b</th><th>ε</th></tr></thead>
+      <tbody>
+        <tr><td>→ q0</td><td>q1</td><td>q3</td><td></td><td>→ q0</td><td>{q1}</td><td>∅</td><td>∅</td></tr>
+        <tr><td>q1</td><td>q1</td><td>q2</td><td></td><td>q1</td><td>{q1}</td><td>{q2}</td><td>∅</td></tr>
+        <tr><td>* q2</td><td>q3</td><td>q2</td><td></td><td>* q2</td><td>∅</td><td>{q2}</td><td>∅</td></tr>
+        <tr><td>q3</td><td>q3</td><td>q3</td><td></td><td></td><td></td><td></td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+ <div class="prose">
+  <ul class="b">
+    <li>Convenção da tabela: <code>→</code> marca o estado inicial e <code>*</code> marca os finais.</li>
+    <li>No AFD, cada casa tem exatamente um estado, e q3 (o erro) recebe tudo o que "deu errado".</li>
+    <li>No AFN, cada casa tem um conjunto de estados. ∅ quer dizer "não há seta": o caminho morre ali, sem precisar de q3.</li>
+  </ul>
+  <p class="prova">Estado de erro (trap state): não é final e todas as setas dele voltam para ele. O AFD precisa dele para completar a tabela; o AFN não precisa.</p>
+
+  <h3>Linguagens regulares</h3>
+  <div class="def key">
+    <span class="lab">Definição · Linguagem regular</span>
+    <p class="simples">Uma linguagem é <b>regular</b> quando dá para construir um AFD que aceita exatamente as palavras dela.</p>
+    <p class="formal">L é regular ⇔ existe um AFD M com <code>L(M) = L</code>. <code>L(M)</code> se lê "a linguagem de M": o conjunto das palavras que M aceita.</p>
+  </div>
+  <ul class="b">
+    <li>Toda linguagem finita é regular. Com um número finito de palavras, dá para montar um caminho de estados para cada uma. Exemplo da aula: <code>{aa, ab, ba, bb}</code>.</li>
+    <li>Toda linguagem regular pode ser escrita de dois jeitos: com um AFD, que reconhece, ou com uma <b>expressão regular</b> (regex), que descreve. <code>a*b*</code> quer dizer "zero ou mais a, depois zero ou mais b"; o <code>*</code> é "repita quantas vezes quiser, inclusive nenhuma".</li>
+    <li>Com linguagens infinitas, algumas são regulares e outras não, porque a memória do AFD é limitada. Esse é o assunto da seção 5.</li>
+  </ul>
+  <div class="def warn">
+    <span class="lab">Cuidado com a frase</span>
+    <p>É "toda linguagem <b>regular</b> pode ser expressa por um AFD ou por uma regex", e não "toda linguagem formal". <code>aⁿbⁿ</code> é uma linguagem formal e não tem AFD nem regex.</p>
+  </div>
+  <p class="prova">Regular ⇔ existe AFD ⇔ existe AFN ⇔ existe expressão regular. Toda linguagem finita é regular.</p>
+
+  <h3>Conjunto das partes</h3>
+<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><text x="120" y="16">A = {1, 2, 3}</text><path class="s" d="M120 26 V40" marker-end="url(#mnarrow)"/><rect class="k" x="6" y="50" width="52" height="28" rx="6"/><text class="tm" x="32" y="64">∅</text><rect class="bl" x="64" y="50" width="52" height="28" rx="6"/><text class="tm" x="90" y="64">{1}</text><rect class="bl" x="122" y="50" width="52" height="28" rx="6"/><text class="tm" x="148" y="64">{2}</text><rect class="bl" x="180" y="50" width="52" height="28" rx="6"/><text class="tm" x="206" y="64">{3}</text><rect class="am" x="6" y="86" width="52" height="28" rx="6"/><text class="tm" x="32" y="100">{1,2}</text><rect class="am" x="64" y="86" width="52" height="28" rx="6"/><text class="tm" x="90" y="100">{1,3}</text><rect class="am" x="122" y="86" width="52" height="28" rx="6"/><text class="tm" x="148" y="100">{2,3}</text><rect class="gr" x="180" y="86" width="52" height="28" rx="6"/><text class="tm" x="206" y="100">{1,2,3}</text><text class="tam" x="120" y="138">8 = 2³ subconjuntos</text></svg>Cada elemento entra ou não entra: 2 × 2 × 2 escolhas.</aside>
+  <p>Antes do AFN, uma ferramenta de conjuntos que aparece na definição dele.</p>
+  <div class="def key">
+    <span class="lab">Definição · Conjunto das partes 𝒫(A)</span>
+    <p class="simples">Liste todos os jeitos de escolher elementos de um conjunto, incluindo não escolher nenhum e escolher todos. Cada escolha é um subconjunto. A coleção de todas as escolhas é o <b>conjunto das partes</b> (ou conjunto potência).</p>
+    <p class="formal"><code>𝒫(A) = { B | B ⊆ A }</code>. Para <code>A = {1, 2, 3}</code>: <code>𝒫(A) = {∅, {1}, {2}, {3}, {1,2}, {1,3}, {2,3}, {1,2,3}}</code>.</p>
+    <p class="nota-formal">Os elementos de 𝒫(A) são conjuntos. <code>|A|</code>, com as barras, é a <b>cardinalidade</b> de A: quantos elementos ele tem. Sempre vale <code>|𝒫(A)| = 2^|A|</code>, porque cada elemento tem duas opções (entra ou não entra). Com 3 elementos, 2³ = 8.</p>
+  </div>
+  <p>Por que isso importa: uma função que devolve um elemento de 𝒫(Q) devolve um conjunto de estados. É assim que a matemática escreve "pode ir para vários lugares ao mesmo tempo" (ou para nenhum, com ∅).</p>
+
+  <h3>AFN: quando a máquina tem escolha</h3>
+  <ul class="b">
+    <li>Num <b>AFN</b> (autômato finito não determinístico, também chamado de AFND), a partir de um estado e de uma letra a máquina pode ir para mais de um estado, ou para nenhum.</li>
+    <li>Ele também pode ter <b>ε-transições</b>: setas que mudam de estado sem ler nada da fita.</li>
+    <li>São essas duas coisas que separam o determinístico do <b>não determinístico</b>.</li>
+    <li>Como uma seta pode faltar (destino ∅), o AFN dispensa o estado de erro: sem seta, aquele caminho só acaba.</li>
+  </ul>
+  <div class="def key">
+    <span class="lab">Definição · AFN</span>
+    <p class="simples">São as mesmas cinco peças do AFD. Só a tabela de regras muda: cada casa guarda um conjunto de destinos (que pode ser vazio), e aparece uma coluna extra para ε.</p>
+    <p class="formal"><code>M = (Q, Σ, δ, q₀, F)</code> com <code>δ: Q × Σ_ε → 𝒫(Q)</code>, onde <code>Σ_ε = Σ ∪ {ε}</code>.</p>
+    <p class="nota-formal">Compare com o AFD, <code>δ: Q × Σ → Q</code>. Trocar Σ por <code>Σ_ε</code> libera as ε-transições ("ler" ε é não ler nada). Trocar Q por <code>𝒫(Q)</code> faz a resposta ser um conjunto: <code>{q1, q2}</code> para duas opções, <code>∅</code> para nenhuma.</p>
+  </div>
+  <p class="prova">AFD × AFN: no AFN, <code>δ: Q × Σ_ε → 𝒫(Q)</code>. Vários destinos (ou nenhum) para o mesmo símbolo, e ε-transições. O AFN não precisa de estado de erro.</p>
+
+  <h3>Computação não determinística</h3>
+  <ul class="b">
+    <li>A execução de um AFN é uma árvore de possibilidades. A raiz é o início; cada ponto onde há escolha abre <b>ramos</b>.</li>
+    <li>A palavra é aceita se pelo menos um ramo lê tudo e para num estado final. Ramos sem seta para seguir morrem.</li>
+    <li>Um jeito prático de acompanhar sem desenhar a árvore: anote, a cada letra, o conjunto de estados em que algum ramo está. É o que a figura faz.</li>
+  </ul>
+  <p>O AFN abaixo é o exemplo 2 da aula. Ele reconhece as palavras sobre {0, 1} que têm <code>11</code> ou <code>101</code> como <b>subpalavra</b> (subcadeia), e vai ler <code>010110</code>:</p>
+ </div>
+
+  <figure class="fig" id="fig-afn">
+    <div class="fig-head"><span class="fig-title">Figura 3 · Um AFN lendo 010110</span></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <svg id="afn-svg" viewBox="0 0 640 210" role="img" aria-label="AFN que reconhece palavras com 11 ou 101"></svg>
+        <div class="lbl">palavra w</div>
+        <div class="tape" id="afn-tape"></div>
+        <div class="lbl" style="margin-top:8px">estados ativos depois de cada letra</div>
+        <div class="trail" id="afn-trail"></div>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>δ</th><th>0</th><th>1</th><th>ε</th></tr></thead>
+      <tbody>
+        <tr><td>→ q1</td><td>{q1}</td><td>{q1, q2}</td><td>∅</td></tr>
+        <tr><td>q2</td><td>{q3}</td><td>∅</td><td>{q3}</td></tr>
+        <tr><td>q3</td><td>∅</td><td>{q4}</td><td>∅</td></tr>
+        <tr><td>* q4</td><td>{q4}</td><td>{q4}</td><td>∅</td></tr>
+      </tbody>
+    </table>
+  </div>
+ <div class="prose">
+  <ul class="b">
+    <li>Leitura da tabela: <code>δ(q1, 1) = {q1, q2}</code> é a escolha (ficar ou apostar que o padrão começou). <code>δ(q2, ε) = {q3}</code> é a ε-transição, que pula o 0 do meio de <code>101</code> e transforma o padrão em <code>11</code>.</li>
+  </ul>
+
+  <h3>AFN e AFD têm o mesmo poder</h3>
+  <ul class="b">
+    <li>O AFN parece mais forte, mas não é. Para todo AFN existe um AFD que reconhece a mesma linguagem. E todo AFD já é um AFN (um que nunca tem escolha).</li>
+    <li>Os dois reconhecem exatamente as linguagens regulares. A vantagem do AFN é ser menor e mais fácil de desenhar.</li>
+    <li>A conversão de AFN para AFD usa como estados do AFD os conjuntos de estados ativos, como os da figura. Por isso o AFD pode precisar de até <code>2^|Q|</code> estados: um para cada elemento de 𝒫(Q).</li>
+  </ul>
+  <p class="prova">Para todo AFN existe um AFD equivalente: os dois reconhecem exatamente as linguagens regulares. Com pilha isso muda (seção 8).</p>
+
+  <h3>Simulando em Python</h3>
+  <p>O professor mostrou um simulador de AFD. A tabela δ vira um dicionário de dicionários, e o laço segue uma seta por letra:</p>
+<pre><code>def afd(delta, q0, F, cadeia):
+    estado = q0                      # começa no estado inicial
+    for c in cadeia:                 # lê um símbolo por vez
+        estado = delta[estado][c]    # segue a única seta possível
+    return estado in F               # aceita se parou num estado final
+
+delta = {                            # aⁿbᵐ, n, m ≥ 1 (q3 é o erro)
+    'q0': {'a': 'q1', 'b': 'q3'},
+    'q1': {'a': 'q1', 'b': 'q2'},
+    'q2': {'a': 'q3', 'b': 'q2'},
+    'q3': {'a': 'q3', 'b': 'q3'}}
+print(afd(delta, 'q0', ['q2'], 'aaabbbb'))   # True</code></pre>
+  <ul class="b">
+    <li>Para o AFN, a aula listou três ideias. Rodar uma cópia do autômato por ramo, em paralelo (threads), o que exige sincronizar os processos. Percorrer a árvore em <b>largura</b>: todos os ramos avançam uma letra por vez, como na figura. Ou em <b>profundidade</b>, com <b>backtracking</b>: segue um ramo até o fim e, se falhar, volta ao último ponto de escolha e tenta outro.</li>
+    <li>A versão em largura cabe em poucas linhas: guarde o conjunto de estados ativos.</li>
+  </ul>
+<pre><code>def fecho(delta, estados):           # acrescenta quem se alcança por ε
+    pilha, vistos = list(estados), set(estados)
+    while pilha:
+        q = pilha.pop()
+        for r in delta.get(q, {}).get('ε', set()):
+            if r not in vistos:
+                vistos.add(r)
+                pilha.append(r)
+    return vistos
+
+def afn(delta, q0, F, cadeia):
+    ativos = fecho(delta, {q0})
+    for c in cadeia:
+        proximos = set()
+        for q in ativos:
+            proximos |= delta.get(q, {}).get(c, set())   # sem seta: ramo morre
+        ativos = fecho(delta, proximos)
+    return any(q in F for q in ativos)   # algum ramo parou num estado final?
+
+delta = {                            # contém 11 ou 101
+    'q1': {'0': {'q1'}, '1': {'q1', 'q2'}},
+    'q2': {'0': {'q3'}, 'ε': {'q3'}},
+    'q3': {'1': {'q4'}},
+    'q4': {'0': {'q4'}, '1': {'q4'}}}
+print(afn(delta, 'q1', ['q4'], '010110'))    # True</code></pre>
  </div>
 </section>
 
@@ -231,28 +432,10 @@
 <!-- ============ 3 ============ -->
 <section class="chap" id="naoregulares">
  <div class="prose">
-  <span class="num">04</span>
+  <span class="num">05</span>
   <h2>O limite das linguagens regulares</h2>
   <div class="src"><a class="vd" href="https://www.youtube.com/watch?v=xlw0dFJ9CPY" target="_blank" rel="noopener">Vídeo · LFA Aula 11 · Linguagens não-regulares ↗</a></div>
-  <p>O vídeo é a aula 11 de outro curso e começa assumindo que você já viu autômatos finitos e linguagens regulares. A caixa abaixo resume o que ele pressupõe.</p>
-
-  <details class="base" open>
-   <summary><span class="base-tag">Base</span> Autômato finito e linguagem regular em 3 minutos</summary>
-<aside class="mn loop" data-loop="afd" data-ms="7000" data-still="0.9" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Este AFD aceita as palavras que terminam em a. Ele lê "baba" letra por letra e termina em q1, um estado final.</aside>
-   <ul class="b">
-    <li>Um <b>autômato finito</b> (AF) é uma máquina bem simples que lê uma palavra da esquerda para a direita, uma letra por vez, e no fim diz <b>aceito</b> ou <b>rejeito</b>.</li>
-    <li>Ela tem um número finito de <b>estados</b> (desenhados como círculos: q0, q1…). Estar num estado é a única coisa que ela "lembra".</li>
-    <li>As <b>transições</b> (setas) dizem: "estando no estado q, se ler a letra x, vá para o estado r".</li>
-    <li>Um estado é o <b>estado inicial</b> (seta solta apontando para ele). Alguns são <b>estados finais</b> (círculo duplo).</li>
-    <li>A palavra é <b>aceita</b> se, depois de ler tudo, a máquina está num estado final.</li>
-    <li><b>AFD</b> (determinístico): para cada estado e letra existe exatamente uma seta. <b>AFN</b> (não determinístico): pode haver várias opções, ou nenhuma; a palavra é aceita se <b>alguma</b> escolha de caminho termina num estado final. Os dois reconhecem exatamente as mesmas linguagens.</li>
-   </ul>
-   <div class="def key">
-    <span class="lab">Definição · Linguagem regular</span>
-    <p class="simples">Uma linguagem é <b>regular</b> quando dá para construir um autômato finito que aceita exatamente as palavras dela.</p>
-    <p class="formal">L é regular ⇔ existe um AF M com <code>L(M) = L</code>. Equivalente: existe uma <b>expressão regular</b> que descreve L, como <code>a*b*</code> ("zero ou mais a, depois zero ou mais b"; o * quer dizer "repita quantas vezes quiser, inclusive nenhuma").</p>
-   </div>
-  </details>
+  <p>O vídeo é a aula 11 de outro curso e assume o que está na seção 4: autômatos finitos e linguagens regulares.</p>
 
 <aside class="mn loop" data-loop="memoria" data-ms="9000" data-still="0.55" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>O AFD leu vários a, mas só sabe em qual estado está. Contar até n exigiria n estados.</aside>
   <p>O ponto fraco do autômato finito é a memória: ele só sabe em qual estado está, e o número de estados é fixo. Isso cria um limite do que ele consegue reconhecer.</p>
@@ -278,7 +461,7 @@
  </div>
 
   <figure class="fig" id="fig-pump">
-    <div class="fig-head"><span class="fig-title">Figura 3 · Por que existe um pedaço "bombeável"</span></div>
+    <div class="fig-head"><span class="fig-title">Figura 4 · Por que existe um pedaço "bombeável"</span></div>
     <div class="fig-body">
       <div class="fig-stage">
         <svg id="pump-svg" viewBox="0 0 640 300" role="img" aria-label="AFD para a(bc)*d"></svg>
@@ -327,7 +510,7 @@
  </div>
 
   <figure class="fig" id="fig-game">
-    <div class="fig-head"><span class="fig-title">Figura 4 · O jogo do bombeamento para L = { aⁿbⁿ }</span></div>
+    <div class="fig-head"><span class="fig-title">Figura 5 · O jogo do bombeamento para L = { aⁿbⁿ }</span></div>
     <div class="fig-body">
       <div class="fig-stage game">
         <div class="ctl-grid">
@@ -376,7 +559,7 @@
 <!-- ============ 4 ============ -->
 <section class="chap" id="llc">
  <div class="prose">
-  <span class="num">05</span>
+  <span class="num">06</span>
   <h2>Linguagens livres do contexto</h2>
   <div class="src"><span class="bk">Menezes · cap. 6 · p. 153–156</span></div>
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 112"><text x="120" y="70" style="font-size:22px;letter-spacing:4px">( ( ) ( ( ) ) )</text><path class="ac" d="M28 54 Q120 -10 212 54"/><path class="s" d="M52 56 Q66 34 82 56"/><path class="s" d="M106 56 Q142 18 186 56"/><path class="am" style="fill:none" d="M130 58 Q146 40 162 58"/><text class="tm" x="120" y="104">cada ( casa com um )</text></svg>Duplo balanceamento: o último que abriu é o primeiro a fechar.</aside>
@@ -389,7 +572,7 @@
   <p>Dois formalismos descrevem as LLC, um de cada lado:</p>
   <ul class="b">
     <li><b>Gramática livre do contexto (GLC)</b>: gera as palavras.</li>
-    <li><b>Autômato com pilha (AP)</b>: reconhece. É um autômato finito com uma pilha como memória extra (seção 6).</li>
+    <li><b>Autômato com pilha (AP)</b>: reconhece. É um autômato finito com uma pilha como memória extra (seção 7).</li>
   </ul>
 
   <div class="def key">
@@ -437,7 +620,7 @@
  </div>
 
   <figure class="fig" id="fig-der2">
-    <div class="fig-head"><span class="fig-title">Figura 5 · Derivações em GLC</span><div class="fig-tabs"></div></div>
+    <div class="fig-head"><span class="fig-title">Figura 6 · Derivações em GLC</span><div class="fig-tabs"></div></div>
     <div class="fig-body">
       <div class="fig-stage">
         <div class="rules"></div>
@@ -457,9 +640,9 @@
 <!-- ============ 5 ============ -->
 <section class="chap" id="ap">
  <div class="prose">
-  <span class="num">06</span>
+  <span class="num">07</span>
   <h2>Autômatos com pilha</h2>
-  <div class="src"><a class="vd" href="https://www.youtube.com/watch?v=-rfslM7ouzY" target="_blank" rel="noopener">Vídeo · Autômatos com pilha ↗</a></div>
+  <div class="src"><a class="vd" href="https://www.youtube.com/watch?v=-rfslM7ouzY" target="_blank" rel="noopener">Vídeo · Autômatos com pilha ↗</a><span class="bk">Aula presencial · slides do prof. Resina</span></div>
 <aside class="mn loop" data-loop="pilha" data-ms="8000" data-still="0.4" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Cada a empilha um A; cada b tira um. Sobrou só o $: mesma quantidade.</aside>
   <p>O autômato finito falhou com aⁿbⁿ por falta de memória. A solução é dar a ele uma memória extra, mas de um tipo bem específico: uma <b>pilha</b>.</p>
   <ul class="b">
@@ -467,7 +650,7 @@
     <li><b>Empilhar</b> (push): coloca um símbolo no topo. <b>Desempilhar</b> (pop): tira o símbolo do topo.</li>
     <li>O último a entrar é o primeiro a sair. Isso combina com balanceamento: o último <code>(</code> aberto é o primeiro a ser fechado.</li>
   </ul>
-  <p>Um <b>autômato com pilha</b> (AP, ou PDA em inglês) é um autômato finito <b>não determinístico</b> com uma pilha. Lembrando da caixa da seção 4: não determinístico quer dizer que, em algum momento, a máquina pode ter mais de uma opção, e a palavra é aceita se <b>alguma</b> sequência de escolhas der certo.</p>
+  <p>Um <b>autômato com pilha</b> (AP, ou PDA em inglês) é um autômato finito <b>não determinístico</b> com uma pilha. Lembrando da seção 4: não determinístico quer dizer que, em algum momento, a máquina pode ter mais de uma opção, e a palavra é aceita se <b>alguma</b> sequência de escolhas der certo. Do jeito que o professor resumiu: um AP é um AFN com memória infinita, mas só o topo dessa memória é acessível.</p>
 
   <div class="def key">
     <span class="lab">Definição formal (notação do vídeo)</span>
@@ -490,22 +673,34 @@
     <table>
       <thead><tr><th>Rótulo</th><th>O que faz</th><th>Uso típico</th></tr></thead>
       <tbody>
-        <tr><td><code>a, ε → A</code></td><td>lê a, não tira nada, empilha A</td><td>contar / guardar</td></tr>
-        <tr><td><code>b, A → ε</code></td><td>lê b, desempilha A, não empilha</td><td>casar / cancelar</td></tr>
-        <tr><td><code>ε, ε → $</code></td><td>não lê nada, empilha $</td><td>marcar o fundo da pilha</td></tr>
-        <tr><td><code>ε, $ → ε</code></td><td>não lê, desempilha $</td><td>testar "pilha vazia" antes de aceitar</td></tr>
-        <tr><td><code>a, ε → ε</code></td><td>só lê a</td><td>ignorar símbolos</td></tr>
+        <tr><td><code>a, b → c</code></td><td>lê a, desempilha b, empilha c</td><td>trocar o topo</td></tr>
+        <tr><td><code>a, ε → c</code></td><td>lê a, não desempilha, empilha c</td><td>contar / guardar</td></tr>
+        <tr><td><code>ε, ε → c</code></td><td>não lê, não desempilha, empilha c</td><td>marcar o fundo com <code>$</code></td></tr>
+        <tr><td><code>a, b → ε</code></td><td>lê a, desempilha b, não empilha</td><td>casar / cancelar</td></tr>
+        <tr><td><code>ε, b → ε</code></td><td>não lê, desempilha b</td><td>com b = <code>$</code>: testar "pilha vazia" antes de aceitar</td></tr>
+        <tr><td><code>a, ε → ε</code></td><td>só lê a</td><td>idêntica a uma transição de AFN</td></tr>
+        <tr><td><code>ε, ε → ε</code></td><td>não faz nada, só muda de estado</td><td>idêntica à ε-transição do AFN</td></tr>
       </tbody>
     </table>
   </div>
  <div class="prose">
   <ul class="b">
-    <li>Se o topo da pilha não for o símbolo pedido, aquela seta <b>não pode</b> ser usada naquele momento.</li>
+    <li>Os três valores vêm sempre nesta ordem: lido da fita, desempilhado, empilhado. Para a seta ser usada, duas condições valem ao mesmo tempo: o próximo símbolo da fita é o pedido e o topo da pilha é o pedido. Se o topo não bate, aquela seta <b>não pode</b> ser usada naquele momento.</li>
     <li>Uma transição que não lê nada (com ε na entrada) é uma <b>ε-transição</b>: a máquina muda de estado "de graça".</li>
     <li>O AP não tem um teste "a pilha está vazia?". O truque é empilhar um <code>$</code> logo no começo: quando o <code>$</code> aparece no topo, a pilha está vazia.</li>
   </ul>
 
   <p class="prova">Transição <code>a, b → c</code>: lê a, desempilha b, empilha c (cada um pode ser ε). Use <code>$</code> para saber quando a pilha está vazia.</p>
+
+  <div class="def">
+    <span class="lab">JFLAP · ferramenta da aula</span>
+    <ul class="b">
+      <li>O <b>JFLAP</b> constrói e simula autômatos finitos, autômatos com pilha e máquinas de Turing. A aula usa a versão 7.1 (um arquivo .jar).</li>
+      <li>Em Preferences → Set the Empty String Character, troque para Epsilon, para o ε aparecer como nos slides. A preferência fica num .xml que precisa estar na mesma pasta do .jar.</li>
+      <li>Ao criar um Pushdown Automaton, escolha Single Character Input.</li>
+      <li>O JFLAP tem um marcador de fundo próprio, o Z. Na aula ignoramos e usamos <code>$</code>, como na literatura.</li>
+    </ul>
+  </div>
 
   <h3>Computação: configurações</h3>
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 110"><text x="120" y="30" style="font-size:20px">( q , w , γ )</text><line class="s" x1="80" y1="44" x2="44" y2="76"/><line class="s" x1="120" y1="44" x2="120" y2="76"/><line class="s" x1="160" y1="44" x2="196" y2="76"/><rect class="am" x="14" y="78" width="60" height="26" rx="13"/><text class="tm" x="44" y="91">estado</text><rect class="k" x="84" y="78" width="72" height="26" rx="13"/><text class="tm" x="120" y="91">falta ler</text><rect class="bl" x="166" y="78" width="60" height="26" rx="13"/><text class="tm" x="196" y="91">pilha</text></svg>Uma fotografia completa da máquina num instante.</aside>
@@ -527,7 +722,7 @@
  </div>
 
   <figure class="fig" id="fig-pda1">
-    <div class="fig-head"><span class="fig-title">Figura 6 · AP para { aⁿbⁿ | n ≥ 0 }</span><div class="fig-tabs pda-in"></div></div>
+    <div class="fig-head"><span class="fig-title">Figura 7 · AP para { aⁿbⁿ | n ≥ 0 }</span><div class="fig-tabs pda-in"></div></div>
     <div class="fig-body">
       <div class="fig-stage">
         <svg class="diag"></svg>
@@ -560,9 +755,9 @@
 <!-- ============ 6 ============ -->
 <section class="chap" id="apex">
  <div class="prose">
-  <span class="num">07</span>
+  <span class="num">08</span>
   <h2>Mais exemplos: projetando APs</h2>
-  <div class="src"><a class="vd" href="https://www.youtube.com/watch?v=wXtbxHn81mQ" target="_blank" rel="noopener">Vídeo · APs: mais exemplos ↗</a></div>
+  <div class="src"><a class="vd" href="https://www.youtube.com/watch?v=wXtbxHn81mQ" target="_blank" rel="noopener">Vídeo · APs: mais exemplos ↗</a><span class="bk">Aula presencial · slides do prof. Resina</span></div>
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 130"><rect class="bl" x="14" y="40" width="32" height="32" rx="6"/><text x="30" y="56">a</text><rect class="bl" x="50" y="40" width="32" height="32" rx="6"/><text x="66" y="56">b</text><rect class="bl" x="86" y="40" width="32" height="32" rx="6"/><text x="102" y="56">b</text><rect class="am" x="122" y="40" width="32" height="32" rx="6"/><text x="138" y="56">b</text><rect class="am" x="158" y="40" width="32" height="32" rx="6"/><text x="174" y="56">b</text><rect class="am" x="194" y="40" width="32" height="32" rx="6"/><text x="210" y="56">a</text><line class="ac" x1="120" y1="28" x2="120" y2="84" stroke-dasharray="3 3"/><text class="ta" x="120" y="18">meio?</text><path class="s" d="M102 76 Q120 96 138 76"/><path class="s" d="M66 76 Q120 116 174 76"/><path class="s" d="M30 76 Q120 136 210 76"/></svg>Empilha a 1ª metade; a 2ª sai na ordem inversa e confere.</aside>
   <p>Projetar um AP é responder duas perguntas: <b>o que eu preciso lembrar, e em que ordem vou conferir?</b> A pilha devolve as coisas na ordem inversa, então ela é perfeita para conferir algo "espelhado".</p>
   <h3>Palíndromos pares: { wwᴿ }</h3>
@@ -582,11 +777,17 @@
     <li>Chuta qual igualdade vai testar: o ramo de cima confere a com b (e ignora os c); o de baixo ignora os b e confere a com c.</li>
     <li>"Ou" na definição da linguagem costuma virar <b>dois ramos não determinísticos</b>.</li>
   </ul>
-  <p>Escolha a máquina. Na contagem final aparece quantas configurações o simulador explorou: são os ramos do não determinismo.</p>
+  <h3>{ 0ⁿ1²ⁿ | n ≥ 1 }: dois 1 para cada 0</h3>
+  <ul class="b">
+    <li>Exercício da aula. Exemplos: <code>011</code>, <code>001111</code>, <code>000111111</code>.</li>
+    <li>Cada 0 empilha um X. Depois os 1 vêm em pares: o primeiro do par só é lido, o segundo desempilha um X.</li>
+    <li>Outra saída: empilhar dois X por 0 e desempilhar um por 1. Como cada transição empilha um símbolo só, isso pede um estado intermediário.</li>
+  </ul>
+  <p>Escolha a máquina (são os três exercícios possíveis da aula). Na contagem final aparece quantas configurações o simulador explorou: são os ramos do não determinismo.</p>
  </div>
 
   <figure class="fig" id="fig-pda2">
-    <div class="fig-head"><span class="fig-title">Figura 7 · APs não determinísticos</span><div class="fig-tabs pda-in"></div></div>
+    <div class="fig-head"><span class="fig-title">Figura 8 · APs não determinísticos</span><div class="fig-tabs pda-in"></div></div>
     <div class="fig-body">
       <div class="fig-stage">
         <svg class="diag"></svg>
@@ -611,7 +812,7 @@
     <ul class="b">
       <li>Comece empilhando <code>$</code>. Termine com <code>ε, $ → ε</code> indo para o estado final.</li>
       <li>Use um estado por "fase" da palavra (lendo a, lendo b, lendo c).</li>
-      <li>Precisa contar duas coisas ao mesmo tempo contra uma terceira (aⁿbⁿcⁿ: mesmo número de a, b e c)? Uma pilha não basta. Esse é o sinal de que a linguagem não é livre do contexto.</li>
+      <li>Precisa contar duas coisas ao mesmo tempo contra uma terceira (aⁿbⁿcⁿ: mesmo número de a, b e c)? Uma pilha não basta. Esse é o sinal de que a linguagem não é livre do contexto. É a pegadinha da lista da aula: aⁿbⁿcⁿ não tem AP.</li>
     </ul>
   </div>
   <div class="def key">
@@ -626,9 +827,9 @@
 <!-- ============ 7 ============ -->
 <section class="chap" id="chomsky">
  <div class="prose">
-  <span class="num">08</span>
+  <span class="num">09</span>
   <h2>Hierarquia de Chomsky</h2>
-  <div class="src"><a class="vd" href="https://www.youtube.com/watch?v=VGCkKElmOm8" target="_blank" rel="noopener">Vídeo · LFA Aula 19 · Hierarquia de Chomsky ↗</a></div>
+  <div class="src"><a class="vd" href="https://www.youtube.com/watch?v=VGCkKElmOm8" target="_blank" rel="noopener">Vídeo · LFA Aula 19 · Hierarquia de Chomsky ↗</a><span class="bk">Aula presencial · slides do prof. Resina</span></div>
 <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="gr" x="10" y="116" width="46" height="14" rx="4"/><text class="tm" x="33" y="142">AF</text><text class="tm" x="33" y="108">nada</text><rect class="bl" x="68" y="86" width="46" height="44" rx="4"/><text class="tm" x="91" y="142">AP</text><text class="tm" x="91" y="78">pilha</text><rect class="am" x="126" y="56" width="46" height="74" rx="4"/><text class="tm" x="149" y="142">ALL</text><text class="tm" x="149" y="48">fita=n</text><rect class="rd" x="184" y="26" width="46" height="104" rx="4"/><text class="tm" x="207" y="142">MT</text><text class="tm" x="207" y="18">fita ∞</text></svg>Subir de tipo = dar mais memória à máquina.</aside>
   <p>Noam Chomsky (linguista) classificou as gramáticas pelo <b>formato das regras</b>. Quanto mais restrita a regra, menor a classe de linguagens que ela gera. Cada classe tem uma máquina que a reconhece. É o mapa que amarra toda a matéria.</p>
 
@@ -644,7 +845,7 @@
  </div>
 
   <figure class="fig" id="fig-chomsky">
-    <div class="fig-head"><span class="fig-title">Figura 8 · As quatro classes, de dentro para fora</span></div>
+    <div class="fig-head"><span class="fig-title">Figura 9 · As quatro classes, de dentro para fora</span></div>
     <div class="fig-body">
       <div class="fig-stage">
         <svg id="ch-svg" viewBox="0 0 700 400" role="img" aria-label="Elipses aninhadas da hierarquia de Chomsky"></svg>
@@ -674,11 +875,13 @@
   <ul class="b">
     <li>As inclusões são <b>próprias</b> (⊊): todo Tipo 3 é Tipo 2, todo Tipo 2 é Tipo 1, e assim por diante, mas sempre existe uma linguagem no anel de fora que não está no de dentro.</li>
     <li><b>Recursivamente enumerável</b> é o nome técnico de "existe uma máquina de Turing que aceita as palavras dela". É a classe mais ampla que uma máquina consegue alcançar.</li>
-    <li>Para separar Tipo 3 de Tipo 2 usamos o lema do bombeamento da seção 4 (aⁿbⁿ). Para separar Tipo 2 de Tipo 1 existe um lema do bombeamento para LLC (aⁿbⁿcⁿ).</li>
+    <li>Para separar Tipo 3 de Tipo 2 usamos o lema do bombeamento da seção 5 (aⁿbⁿ). Para separar Tipo 2 de Tipo 1 existe um lema do bombeamento para LLC (aⁿbⁿcⁿ).</li>
     <li>Ao subir de tipo, a máquina ganha memória: nenhuma (AF) → pilha (AP) → fita do tamanho da entrada (ALL) → fita infinita (MT).</li>
     <li>Dentro do Tipo 2 há uma subclasse importante: as <b>LLC determinísticas</b>, reconhecidas por AP determinístico. São elas que os parsers de compiladores usam (gramáticas LL(k) e LR(k)). wwᴿ é LLC, mas não é determinística.</li>
     <li>No Tipo 3, gramática regular, expressão regular, AFD, AFN e AFN-ε (AFN com ε-transições) têm todos o mesmo poder.</li>
     <li>Fora do Tipo 0 ainda existem linguagens que <b>nenhuma</b> máquina de Turing reconhece.</li>
+    <li>Na aula, cada nível foi ligado a uma etapa do compilador: as regulares são a base da <b>análise léxica</b> (reconhecer as palavras do código), as livres do contexto, da <b>análise sintática</b> (conferir a ordem delas), e as sensíveis ao contexto estão por trás da <b>análise semântica</b> (dá para fazê-la sem se aprofundar nelas).</li>
+    <li>Por que <code>ww</code> não é livre do contexto: a pilha devolve a primeira metade invertida, e comparar na mesma ordem pediria uma segunda pilha. Em compiladores, é o mesmo tipo de problema que conferir se uma variável foi declarada antes de ser usada.</li>
   </ul>
  </div>
 </section>

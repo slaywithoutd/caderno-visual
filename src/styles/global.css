@@ -417,8 +417,8 @@ p.prova::before{content:'Cai na prova'}
 .nota-corpo ul,.nota-corpo ol{padding-left:1.25em;color:var(--fg2)}
 .nota-corpo li{margin:.3em 0}
 .nota-corpo img{border-radius:8px;border:1px solid var(--line)}
-.nota-corpo pre{background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:10px 14px;overflow-x:auto;font-size:.85rem}
-.nota-corpo pre code{border:0;background:none;padding:0;white-space:pre}
+.prose pre,.nota-corpo pre{margin:0 0 1.1rem;line-height:1.5;background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:10px 14px;overflow-x:auto;font-size:.85rem}
+.prose pre code,.nota-corpo pre code{border:0;background:none;padding:0;white-space:pre}
 .nota-corpo table{margin:1rem 0}
 .anexo-pdf{width:var(--mw);margin:1.4rem 0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .anexo-pdf summary{padding:10px 14px;cursor:pointer;font-size:.88rem;font-weight:500;display:flex;gap:12px;align-items:center}

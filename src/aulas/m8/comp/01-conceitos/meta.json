@@ -2,10 +2,11 @@
   "numero": "01",
   "titulo": "Conceitos de linguagens formais",
   "tema": "Linguagens Formais e Autômatos",
-  "resumo": "Alfabeto, palavra e gramática; o limite das linguagens regulares; linguagens livres do contexto, autômatos com pilha e a Hierarquia de Chomsky.",
+  "resumo": "Alfabeto, palavra e gramática; AFD, AFN e estado de erro; o limite das linguagens regulares; linguagens livres do contexto, autômatos com pilha e a Hierarquia de Chomsky.",
   "topicos": [
     "Σ* e linguagens",
     "Gramáticas",
+    "AFD e AFN",
     "Lema do bombeamento",
     "GLC",
     "Autômato com pilha",
@@ -23,6 +24,10 @@
     [
       "gramaticas",
       "Gramáticas e derivação"
+    ],
+    [
+      "af",
+      "AFD e AFN"
     ],
     [
       "naoregulares",
@@ -50,6 +55,16 @@
       "tipo": "Livro",
       "titulo": "Menezes, Linguagens Formais e Autômatos, cap. 2 · Linguagens e gramáticas (p. 54–63)",
       "secao": "palavras"
+    },
+    {
+      "tipo": "Slides",
+      "titulo": "Prof. Resina · Conceitos de Linguagens Formais (M8, semana 1)",
+      "secao": "af"
+    },
+    {
+      "tipo": "Slides",
+      "titulo": "Prof. Resina · Introdução aos AFDs e aos AFNDs (M6, semana 9, revisão)",
+      "secao": "af"
     },
     {
       "tipo": "Vídeo",

@@ -71,7 +71,9 @@ for (const mod of readdirSync(RAIZ)) for (const mat of readdirSync(join(RAIZ, mo
     const refMn = [...cons.matchAll(/data-ref-mn="([^"]+)"/g)].map((m) => m[1]);
     mns.filter(Boolean).forEach((x) => { const n = refMn.filter((r) => r === x).length; if (n !== 1) erro(`desenho ${x} aparece ${n} vez(es) no modo Consulta (deve ser 1)`); });
     refMn.filter((r) => !mns.includes(r)).forEach((r) => erro(`data-ref-mn="${r}" não existe no conteudo.html`));
-    const tbls = [...leit.matchAll(/<div class="tbl[^"]*"([^>]*)>/g)].map((m) => attr(m[1], 'id'));
+    /* tabelas fora de figuras (as de dentro de <figure> chegam junto com a figura) */
+    const semFiguras = leit.replace(/<figure\b[\s\S]*?<\/figure>/g, '');
+    const tbls = [...semFiguras.matchAll(/<div\b[^>]*class="tbl\b[^"]*"[^>]*>/g)].map((m) => attr(m[0], 'id'));
     if (tbls.some((x) => !x)) erro(`${tbls.filter((x) => !x).length} tabela(s) sem id no conteudo.html (dê id="tbl-…" ou reescreva a tabela no consulta.html)`);
     const refTbl = [...cons.matchAll(/data-ref-tbl="([^"]+)"/g)].map((m) => m[1]);
     tbls.filter(Boolean).forEach((x) => { const n = refTbl.filter((r) => r === x).length; if (n !== 1) erro(`tabela ${x} aparece ${n} vez(es) no modo Consulta (deve ser 1)`); });

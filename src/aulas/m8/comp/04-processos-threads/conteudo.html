@@ -14,7 +14,7 @@
 
   <h3>Escalas de tempo que vão aparecer</h3>
  </div>
-  <div class="tbl prose">
+  <div class="tbl prose" id="tbl-escalas">
     <table>
       <thead><tr><th>Unidade</th><th>Quanto é</th><th>O que acontece nesse tempo</th></tr></thead>
       <tbody>
@@ -29,7 +29,7 @@
   <p>Guarde a ordem de grandeza: enquanto um HD faz uma leitura (5 ms), uma CPU de 2 GHz passa por 10 milhões de ciclos. Quase tudo nesta aula existe para não desperdiçar esses ciclos.</p>
 
   <h3>O sistema operacional</h3>
-<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 170"><rect class="k" x="10" y="6" width="66" height="30" rx="6"/><text class="tm" x="43" y="21">navegador</text><rect class="k" x="87" y="6" width="66" height="30" rx="6"/><text class="tm" x="120" y="21">editor</text><rect class="k" x="164" y="6" width="66" height="30" rx="6"/><text class="tm" x="197" y="21">jogo</text><text class="tm st" x="10" y="50">modo usuário</text><line class="s" x1="10" y1="60" x2="230" y2="60" stroke-dasharray="4 3"/><rect class="acf" x="10" y="68" width="220" height="40" rx="8"/><text class="ta" x="120" y="88">kernel do SO</text><rect class="am" x="10" y="122" width="66" height="34" rx="6"/><text class="tm" x="43" y="139">CPU</text><rect class="am" x="87" y="122" width="66" height="34" rx="6"/><text class="tm" x="120" y="139">memória</text><rect class="am" x="164" y="122" width="66" height="34" rx="6"/><text class="tm" x="197" y="139">disco, rede</text></svg>Os programas não falam com o hardware: pedem ao kernel, que fala por eles.</aside>
+<aside class="mn" id="mn-so" aria-hidden="true"><svg viewBox="0 0 240 170"><rect class="k" x="10" y="6" width="66" height="30" rx="6"/><text class="tm" x="43" y="21">navegador</text><rect class="k" x="87" y="6" width="66" height="30" rx="6"/><text class="tm" x="120" y="21">editor</text><rect class="k" x="164" y="6" width="66" height="30" rx="6"/><text class="tm" x="197" y="21">jogo</text><text class="tm st" x="10" y="50">modo usuário</text><line class="s" x1="10" y1="60" x2="230" y2="60" stroke-dasharray="4 3"/><rect class="acf" x="10" y="68" width="220" height="40" rx="8"/><text class="ta" x="120" y="88">kernel do SO</text><rect class="am" x="10" y="122" width="66" height="34" rx="6"/><text class="tm" x="43" y="139">CPU</text><rect class="am" x="87" y="122" width="66" height="34" rx="6"/><text class="tm" x="120" y="139">memória</text><rect class="am" x="164" y="122" width="66" height="34" rx="6"/><text class="tm" x="197" y="139">disco, rede</text></svg>Os programas não falam com o hardware: pedem ao kernel, que fala por eles.</aside>
   <ul class="b">
     <li><b>Sistema operacional</b> (SO): o programa que fica entre os seus programas e o hardware. Windows, Linux, macOS, Android e iOS são sistemas operacionais.</li>
     <li>Primeiro papel, <b>máquina estendida</b>: esconder os detalhes do hardware atrás de serviços simples. Seu código diz "abra o arquivo notas.txt", e o SO cuida de achar os blocos certos no disco.</li>
@@ -38,7 +38,7 @@
   </ul>
 
   <h3>Modo usuário e modo kernel</h3>
-<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><ellipse class="k" cx="120" cy="75" rx="112" ry="68"/><text class="tm" x="120" y="20">modo usuário</text><text class="tm" x="120" y="132">seu código: só instruções comuns</text><ellipse class="acf" cx="120" cy="76" rx="58" ry="34"/><text class="ta" x="120" y="70">modo kernel</text><text class="tm" x="120" y="88">tudo liberado</text></svg>O kernel roda no anel de dentro. Para entrar nele, só pela porta oficial: syscall ou interrupção.</aside>
+<aside class="mn" id="mn-modos" aria-hidden="true"><svg viewBox="0 0 240 150"><ellipse class="k" cx="120" cy="75" rx="112" ry="68"/><text class="tm" x="120" y="20">modo usuário</text><text class="tm" x="120" y="132">seu código: só instruções comuns</text><ellipse class="acf" cx="120" cy="76" rx="58" ry="34"/><text class="ta" x="120" y="70">modo kernel</text><text class="tm" x="120" y="88">tudo liberado</text></svg>O kernel roda no anel de dentro. Para entrar nele, só pela porta oficial: syscall ou interrupção.</aside>
   <p>Se qualquer programa pudesse mandar comandos direto ao disco ou mexer na memória dos outros, um bug num jogo derrubaria a máquina inteira. Por isso a CPU tem pelo menos dois modos de operação, marcados por um bit num registrador especial.</p>
   <ul class="b">
     <li><b>Modo kernel</b> (também chamado modo núcleo, supervisor ou privilegiado): a CPU executa qualquer instrução e acessa qualquer endereço. Só o código do kernel roda assim.</li>
@@ -108,7 +108,7 @@
   <span class="num">02</span>
   <h2>Programa × processo</h2>
   <div class="src"><span class="bk">Machado &amp; Maia · cap. 5 · p. 59–78</span></div>
-<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="k" x="8" y="14" width="96" height="112" rx="6"/><text class="tm st" x="18" y="32">RECEITA</text><line class="s" x1="18" y1="48" x2="94" y2="48"/><line class="s" x1="18" y1="62" x2="94" y2="62"/><line class="s" x1="18" y1="76" x2="80" y2="76"/><line class="s" x1="18" y1="90" x2="94" y2="90"/><line class="s" x1="18" y1="104" x2="70" y2="104"/><text class="tm" x="56" y="140">programa</text><rect class="am" x="132" y="14" width="100" height="112" rx="6"/><path class="ac" d="M140 76 H180" marker-end="url(#mnarrow)"/><text class="tam st" x="140" y="32">cozinhando</text><text class="tm st" x="140" y="56">passo 4 de 9</text><text class="tm st" x="186" y="76">aqui</text><circle class="k" cx="156" cy="104" r="10"/><circle class="k" cx="184" cy="104" r="10"/><circle class="k" cx="212" cy="104" r="10"/><text class="tm" x="182" y="140">processo</text></svg>A receita parada no livro é o programa. Você cozinhando, com a página marcada e as panelas no fogo, é o processo.</aside>
+<aside class="mn" id="mn-receita" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="k" x="8" y="14" width="96" height="112" rx="6"/><text class="tm st" x="18" y="32">RECEITA</text><line class="s" x1="18" y1="48" x2="94" y2="48"/><line class="s" x1="18" y1="62" x2="94" y2="62"/><line class="s" x1="18" y1="76" x2="80" y2="76"/><line class="s" x1="18" y1="90" x2="94" y2="90"/><line class="s" x1="18" y1="104" x2="70" y2="104"/><text class="tm" x="56" y="140">programa</text><rect class="am" x="132" y="14" width="100" height="112" rx="6"/><path class="ac" d="M140 76 H180" marker-end="url(#mnarrow)"/><text class="tam st" x="140" y="32">cozinhando</text><text class="tm st" x="140" y="56">passo 4 de 9</text><text class="tm st" x="186" y="76">aqui</text><circle class="k" cx="156" cy="104" r="10"/><circle class="k" cx="184" cy="104" r="10"/><circle class="k" cx="212" cy="104" r="10"/><text class="tm" x="182" y="140">processo</text></svg>A receita parada no livro é o programa. Você cozinhando, com a página marcada e as panelas no fogo, é o processo.</aside>
   <p>Um <b>programa</b> é um arquivo: instruções e dados parados no disco, esperando. Um <b>processo</b> é esse programa rodando, com tudo o que muda enquanto ele roda.</p>
   <div class="def key">
     <span class="lab">Definição · Processo</span>
@@ -143,7 +143,7 @@
   <span class="num">03</span>
   <h2>Contexto, espaço de endereçamento e PCB</h2>
   <div class="src"><span class="bk">Machado &amp; Maia · cap. 5 · p. 59–78</span></div>
-<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="k" x="6" y="6" width="228" height="138" rx="10"/><text class="tm st" x="16" y="22">PROCESSO</text><rect class="am" x="16" y="34" width="100" height="48" rx="6"/><text class="tam" x="66" y="50">hardware</text><text class="tm" x="66" y="68">PC, SP, regs</text><rect class="bl" x="124" y="34" width="100" height="48" rx="6"/><text class="tb" x="174" y="50">software</text><text class="tm" x="174" y="68">PID, dono, limites</text><rect class="gr" x="16" y="90" width="208" height="44" rx="6"/><text x="120" y="104" style="fill:var(--green);font-weight:600">espaço de endereçamento</text><text class="tm" x="120" y="122">código · dados · heap · pilha de exec.</text></svg>As três partes de um processo no livro de Machado &amp; Maia.</aside>
+<aside class="mn" id="mn-partes" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="k" x="6" y="6" width="228" height="138" rx="10"/><text class="tm st" x="16" y="22">PROCESSO</text><rect class="am" x="16" y="34" width="100" height="48" rx="6"/><text class="tam" x="66" y="50">hardware</text><text class="tm" x="66" y="68">PC, SP, regs</text><rect class="bl" x="124" y="34" width="100" height="48" rx="6"/><text class="tb" x="174" y="50">software</text><text class="tm" x="174" y="68">PID, dono, limites</text><rect class="gr" x="16" y="90" width="208" height="44" rx="6"/><text x="120" y="104" style="fill:var(--green);font-weight:600">espaço de endereçamento</text><text class="tm" x="120" y="122">código · dados · heap · pilha de exec.</text></svg>As três partes de um processo no livro de Machado &amp; Maia.</aside>
   <p>O livro divide o processo em três partes. As duas primeiras são o <b>contexto</b> do processo; a terceira é a memória dele.</p>
 
   <h3>Contexto de hardware</h3>
@@ -191,19 +191,19 @@ int soma(int n) {                    // as instruções de soma ficam no código
   </div>
 
   <h3>PCB: a ficha do processo no kernel</h3>
-<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 176"><rect class="acf" x="40" y="6" width="160" height="164" rx="8"/><text class="ta" x="120" y="22">PCB</text><line class="s" x1="40" y1="34" x2="200" y2="34"/><text class="tm st" x="50" y="48">PID     4182</text><text class="tm st" x="50" y="66">estado  pronto</text><text class="tm st" x="50" y="84">PC      0x4A10</text><text class="tm st" x="50" y="102">SP      0x7FF0</text><text class="tm st" x="50" y="120">prior.  20</text><text class="tm st" x="50" y="138">dono    maria</text><text class="tm st" x="50" y="156">arqs    0, 1, 3</text></svg>Uma ficha por processo, guardada na memória do kernel.</aside>
+<aside class="mn" id="mn-pcb" aria-hidden="true"><svg viewBox="0 0 240 176"><rect class="acf" x="40" y="6" width="160" height="164" rx="8"/><text class="ta" x="120" y="22">PCB</text><line class="s" x1="40" y1="34" x2="200" y2="34"/><text class="tm st" x="50" y="48">PID     4182</text><text class="tm st" x="50" y="66">estado  pronto</text><text class="tm st" x="50" y="84">PC      0x4A10</text><text class="tm st" x="50" y="102">SP      0x7FF0</text><text class="tm st" x="50" y="120">prior.  20</text><text class="tm st" x="50" y="138">dono    maria</text><text class="tm st" x="50" y="156">arqs    0, 1, 3</text></svg>Uma ficha por processo, guardada na memória do kernel.</aside>
   <div class="def key">
     <span class="lab">Definição · PCB</span>
     <p class="simples">É a ficha que o kernel mantém para cada processo, como um prontuário médico: quem é o processo, em que situação está e tudo o que é preciso para retomá-lo de onde parou.</p>
     <p class="formal">O <b>bloco de controle do processo</b> (PCB, process control block) é a estrutura de dados do kernel que guarda o contexto de hardware, o contexto de software, as informações sobre o espaço de endereçamento e o estado do processo.</p>
   </div>
  </div>
-  <div class="tbl prose">
+  <div class="tbl prose" id="tbl-pcb">
     <table>
       <thead><tr><th>Campo do PCB</th><th>Exemplo</th><th>Parte</th></tr></thead>
       <tbody>
         <tr><td>PID, PID do pai, dono</td><td>4182, 1975, maria</td><td>contexto de software</td></tr>
-        <tr><td>Estado</td><td>pronto</td><td>seção 4</td></tr>
+        <tr><td>Estado</td><td>pronto</td><td>estado do processo</td></tr>
         <tr><td>PC, SP, registradores, status</td><td>0x4A10, 0x7FF0, R1 = 731, modo usuário</td><td>contexto de hardware</td></tr>
         <tr><td>Prioridade, quotas, privilégios</td><td>20; até 1024 arquivos; sem root</td><td>contexto de software</td></tr>
         <tr><td>Mapa da memória</td><td>onde está a tabela de páginas do processo</td><td>espaço de endereçamento</td></tr>
@@ -246,7 +246,7 @@ int soma(int n) {                    // as instruções de soma ficam no código
 
   <h3>Mudanças de estado</h3>
  </div>
-  <div class="tbl prose">
+  <div class="tbl prose" id="tbl-transicoes">
     <table>
       <thead><tr><th>Transição</th><th>Quando acontece</th><th>Quem provoca</th></tr></thead>
       <tbody>
@@ -315,7 +315,7 @@ int soma(int n) {                    // as instruções de soma ficam no código
   <span class="num">05</span>
   <h2>Troca de contexto</h2>
   <div class="src"><span class="bk">Machado &amp; Maia · cap. 5 · p. 59–78</span></div>
-<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="bl" x="10" y="14" width="64" height="80" rx="6"/><text class="tb" x="42" y="30">caderno A</text><text class="tm" x="42" y="56">parou na</text><text class="tm" x="42" y="72">questão 7</text><rect class="am" x="166" y="14" width="64" height="80" rx="6"/><text class="tam" x="198" y="30">caderno B</text><text class="tm" x="198" y="56">parou na</text><text class="tm" x="198" y="72">questão 2</text><circle class="k" cx="120" cy="56" r="20"/><text class="tm" x="120" y="56">prof.</text><path class="s" d="M98 50 H80" marker-end="url(#mnarrow)"/><path class="s" d="M142 62 H160" marker-end="url(#mnarrow)"/><text class="tm" x="120" y="124">anota em A, lê B, continua</text></svg>Um professor particular com dois alunos: antes de trocar, anota onde parou com um e lê onde tinha parado com o outro.</aside>
+<aside class="mn" id="mn-troca" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="bl" x="10" y="14" width="64" height="80" rx="6"/><text class="tb" x="42" y="30">caderno A</text><text class="tm" x="42" y="56">parou na</text><text class="tm" x="42" y="72">questão 7</text><rect class="am" x="166" y="14" width="64" height="80" rx="6"/><text class="tam" x="198" y="30">caderno B</text><text class="tm" x="198" y="56">parou na</text><text class="tm" x="198" y="72">questão 2</text><circle class="k" cx="120" cy="56" r="20"/><text class="tm" x="120" y="56">prof.</text><path class="s" d="M98 50 H80" marker-end="url(#mnarrow)"/><path class="s" d="M142 62 H160" marker-end="url(#mnarrow)"/><text class="tm" x="120" y="124">anota em A, lê B, continua</text></svg>Um professor particular com dois alunos: antes de trocar, anota onde parou com um e lê onde tinha parado com o outro.</aside>
   <div class="def key">
     <span class="lab">Definição · Troca de contexto</span>
     <p class="simples">Um professor atende dois alunos alternadamente. Antes de passar de um para o outro, anota no caderno do primeiro em que questão parou; depois lê no caderno do segundo onde tinha parado com ele, e continua dali. O tempo gasto anotando e lendo não ensina nada a ninguém.</p>
@@ -397,7 +397,7 @@ int soma(int n) {                    // as instruções de soma ficam no código
   <div class="src"><span class="bk">Machado &amp; Maia · cap. 5 · p. 59–78</span></div>
 
   <h3>Como um processo nasce</h3>
-<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 160"><rect class="acf" x="88" y="6" width="64" height="26" rx="6"/><text class="ta" x="120" y="19">init · 1</text><rect class="k" x="20" y="62" width="70" height="26" rx="6"/><text class="tm" x="55" y="75">login · 812</text><rect class="k" x="150" y="62" width="70" height="26" rx="6"/><text class="tm" x="185" y="75">cron · 640</text><rect class="bl" x="20" y="120" width="70" height="26" rx="6"/><text class="tm" x="55" y="133">bash · 901</text><rect class="am" x="110" y="120" width="70" height="26" rx="6"/><text class="tm" x="145" y="133">python · 977</text><path class="s" d="M110 32 L62 60" marker-end="url(#mnarrow)"/><path class="s" d="M130 32 L178 60" marker-end="url(#mnarrow)"/><path class="s" d="M55 88 V118" marker-end="url(#mnarrow)"/><path class="s" d="M90 133 H108" marker-end="url(#mnarrow)"/></svg>Árvore de processos: cada um tem um pai. No Linux, todos descendem do processo 1.</aside>
+<aside class="mn" id="mn-arvore" aria-hidden="true"><svg viewBox="0 0 240 160"><rect class="acf" x="88" y="6" width="64" height="26" rx="6"/><text class="ta" x="120" y="19">init · 1</text><rect class="k" x="20" y="62" width="70" height="26" rx="6"/><text class="tm" x="55" y="75">login · 812</text><rect class="k" x="150" y="62" width="70" height="26" rx="6"/><text class="tm" x="185" y="75">cron · 640</text><rect class="bl" x="20" y="120" width="70" height="26" rx="6"/><text class="tm" x="55" y="133">bash · 901</text><rect class="am" x="110" y="120" width="70" height="26" rx="6"/><text class="tm" x="145" y="133">python · 977</text><path class="s" d="M110 32 L62 60" marker-end="url(#mnarrow)"/><path class="s" d="M130 32 L178 60" marker-end="url(#mnarrow)"/><path class="s" d="M55 88 V118" marker-end="url(#mnarrow)"/><path class="s" d="M90 133 H108" marker-end="url(#mnarrow)"/></svg>Árvore de processos: cada um tem um pai. No Linux, todos descendem do processo 1.</aside>
   <p>Machado &amp; Maia citam três jeitos de criar um processo:</p>
   <ul class="b">
     <li>Logon interativo: ao entrar no sistema com usuário e senha, o SO cria um processo para atender aquele usuário.</li>
@@ -467,7 +467,7 @@ else:
   <p>Um servidor web atende mil clientes ao mesmo tempo. Com um subprocesso por cliente, são mil PCBs, mil espaços de endereçamento e, para compartilhar a mesma cache de páginas, mil processos conversando por mecanismos lentos do SO. Threads resolvem isso.</p>
 
   <h3>Monothread e multithread</h3>
-<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="k" x="6" y="10" width="100" height="110" rx="8"/><path class="ac" d="M56 26 C36 50 76 70 56 94 C46 106 56 112 56 112"/><text class="tm" x="56" y="136">monothread</text><rect class="k" x="134" y="10" width="100" height="110" rx="8"/><path class="ac" d="M156 26 C140 50 172 70 156 112"/><path d="M184 26 C200 50 168 76 184 112" style="fill:none;stroke:var(--amber);stroke-width:1.8"/><path d="M212 26 C196 56 226 80 212 112" style="fill:none;stroke:var(--green);stroke-width:1.8"/><text class="tm" x="184" y="136">multithread</text></svg>Cada fio é um fluxo de execução, com o seu PC. Todos os fios da direita moram no mesmo processo.</aside>
+<aside class="mn" id="mn-threads" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="k" x="6" y="10" width="100" height="110" rx="8"/><path class="ac" d="M56 26 C36 50 76 70 56 94 C46 106 56 112 56 112"/><text class="tm" x="56" y="136">monothread</text><rect class="k" x="134" y="10" width="100" height="110" rx="8"/><path class="ac" d="M156 26 C140 50 172 70 156 112"/><path d="M184 26 C200 50 168 76 184 112" style="fill:none;stroke:var(--amber);stroke-width:1.8"/><path d="M212 26 C196 56 226 80 212 112" style="fill:none;stroke:var(--green);stroke-width:1.8"/><text class="tm" x="184" y="136">multithread</text></svg>Cada fio é um fluxo de execução, com o seu PC. Todos os fios da direita moram no mesmo processo.</aside>
   <ul class="b">
     <li>Ambiente <b>monothread</b>: cada processo tem um único fluxo de execução, ou seja, um só PC. Para fazer duas coisas ao mesmo tempo, a aplicação precisa de dois processos. Era assim no MS-DOS e nos primeiros Unix.</li>
     <li>Ambiente <b>multithread</b>: um processo pode ter vários fluxos de execução, todos dentro do mesmo espaço de endereçamento.</li>
@@ -495,7 +495,7 @@ else:
     <div class="fig-ctrl"></div>
   </figure>
 
-  <div class="tbl prose">
+  <div class="tbl prose" id="tbl-threads">
     <table>
       <thead><tr><th>Compartilhado por todas as threads do processo</th><th>De cada thread</th></tr></thead>
       <tbody>
@@ -534,7 +534,7 @@ for t in ts: t.start()               # três fluxos rodando no mesmo processo
 for t in ts: t.join()                # a thread principal espera as três</code></pre>
 
   <h3>Concorrência e paralelismo</h3>
-<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 140"><text class="tm st" x="6" y="12">1 core: concorrência</text><rect class="bl" x="6" y="22" width="36" height="22" rx="3"/><rect class="am" x="44" y="22" width="36" height="22" rx="3"/><rect class="bl" x="82" y="22" width="36" height="22" rx="3"/><rect class="am" x="120" y="22" width="36" height="22" rx="3"/><rect class="bl" x="158" y="22" width="36" height="22" rx="3"/><rect class="am" x="196" y="22" width="36" height="22" rx="3"/><text class="tm st" x="6" y="70">2 cores: paralelismo</text><rect class="bl" x="6" y="80" width="226" height="22" rx="3"/><rect class="am" x="6" y="108" width="226" height="22" rx="3"/></svg>Em cima, A e B se revezam num core. Embaixo, cada um tem o seu core e os dois avançam juntos.</aside>
+<aside class="mn" id="mn-concorrencia" aria-hidden="true"><svg viewBox="0 0 240 140"><text class="tm st" x="6" y="12">1 core: concorrência</text><rect class="bl" x="6" y="22" width="36" height="22" rx="3"/><rect class="am" x="44" y="22" width="36" height="22" rx="3"/><rect class="bl" x="82" y="22" width="36" height="22" rx="3"/><rect class="am" x="120" y="22" width="36" height="22" rx="3"/><rect class="bl" x="158" y="22" width="36" height="22" rx="3"/><rect class="am" x="196" y="22" width="36" height="22" rx="3"/><text class="tm st" x="6" y="70">2 cores: paralelismo</text><rect class="bl" x="6" y="80" width="226" height="22" rx="3"/><rect class="am" x="6" y="108" width="226" height="22" rx="3"/></svg>Em cima, A e B se revezam num core. Embaixo, cada um tem o seu core e os dois avançam juntos.</aside>
   <ul class="b">
     <li><b>Concorrência</b>: várias tarefas em andamento no mesmo intervalo de tempo, revezando a CPU. Num instante qualquer, só uma executa; a alternância rápida dá a impressão de simultaneidade.</li>
     <li><b>Paralelismo</b>: várias tarefas executando no mesmo instante, em cores diferentes. Exige mais de um core.</li>
@@ -584,7 +584,7 @@ for t in ts: t.join()                # a thread principal espera as três</code>
   </ul>
 
   <h3>Os três mapeamentos</h3>
-<aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><text class="tm" x="40" y="10">N:1</text><text class="tm" x="120" y="10">1:1</text><text class="tm" x="200" y="10">M:N</text><circle class="bl" cx="22" cy="34" r="8"/><circle class="bl" cx="40" cy="34" r="8"/><circle class="bl" cx="58" cy="34" r="8"/><rect class="am" x="30" y="96" width="20" height="20" rx="3"/><path class="s" d="M22 42 L38 94 M40 42 L40 94 M58 42 L42 94"/><circle class="bl" cx="102" cy="34" r="8"/><circle class="bl" cx="120" cy="34" r="8"/><circle class="bl" cx="138" cy="34" r="8"/><rect class="am" x="92" y="96" width="20" height="20" rx="3"/><rect class="am" x="110" y="96" width="20" height="20" rx="3"/><rect class="am" x="128" y="96" width="20" height="20" rx="3"/><path class="s" d="M102 42 V94 M120 42 V94 M138 42 V94"/><circle class="bl" cx="176" cy="34" r="8"/><circle class="bl" cx="194" cy="34" r="8"/><circle class="bl" cx="212" cy="34" r="8"/><circle class="bl" cx="230" cy="34" r="8"/><rect class="am" x="180" y="96" width="20" height="20" rx="3"/><rect class="am" x="206" y="96" width="20" height="20" rx="3"/><path class="s" d="M176 42 L188 94 M194 42 L190 94 M212 42 L216 94 M230 42 L218 94"/><line class="s" x1="4" y1="68" x2="236" y2="68" stroke-dasharray="4 3"/><text class="tm" x="120" y="140">● thread de usuário   ■ thread do kernel</text></svg>Quantas threads de usuário ficam sobre cada thread do kernel.</aside>
+<aside class="mn" id="mn-mapeamentos" aria-hidden="true"><svg viewBox="0 0 240 150"><text class="tm" x="40" y="10">N:1</text><text class="tm" x="120" y="10">1:1</text><text class="tm" x="200" y="10">M:N</text><circle class="bl" cx="22" cy="34" r="8"/><circle class="bl" cx="40" cy="34" r="8"/><circle class="bl" cx="58" cy="34" r="8"/><rect class="am" x="30" y="96" width="20" height="20" rx="3"/><path class="s" d="M22 42 L38 94 M40 42 L40 94 M58 42 L42 94"/><circle class="bl" cx="102" cy="34" r="8"/><circle class="bl" cx="120" cy="34" r="8"/><circle class="bl" cx="138" cy="34" r="8"/><rect class="am" x="92" y="96" width="20" height="20" rx="3"/><rect class="am" x="110" y="96" width="20" height="20" rx="3"/><rect class="am" x="128" y="96" width="20" height="20" rx="3"/><path class="s" d="M102 42 V94 M120 42 V94 M138 42 V94"/><circle class="bl" cx="176" cy="34" r="8"/><circle class="bl" cx="194" cy="34" r="8"/><circle class="bl" cx="212" cy="34" r="8"/><circle class="bl" cx="230" cy="34" r="8"/><rect class="am" x="180" y="96" width="20" height="20" rx="3"/><rect class="am" x="206" y="96" width="20" height="20" rx="3"/><path class="s" d="M176 42 L188 94 M194 42 L190 94 M212 42 L216 94 M230 42 L218 94"/><line class="s" x1="4" y1="68" x2="236" y2="68" stroke-dasharray="4 3"/><text class="tm" x="120" y="140">● thread de usuário   ■ thread do kernel</text></svg>Quantas threads de usuário ficam sobre cada thread do kernel.</aside>
   <p>Os <b>modelos de mapeamento</b> dizem quantas threads de usuário ficam penduradas em cada thread do kernel:</p>
   <ul class="b">
     <li><b>N:1</b> (muitos para um): várias ULT sobre uma única entidade do kernel. É o modelo de ULT puro. Exemplos: as green threads das primeiras versões do Java, a biblioteca GNU Portable Threads.</li>
@@ -607,7 +607,7 @@ for t in ts: t.join()                # a thread principal espera as três</code>
     <div class="fig-ctrl"></div>
   </figure>
 
-  <div class="tbl prose">
+  <div class="tbl prose" id="tbl-modelos">
     <table>
       <thead><tr><th></th><th>ULT (N:1)</th><th>KLT (1:1)</th><th>Híbrido (M:N)</th></tr></thead>
       <tbody>

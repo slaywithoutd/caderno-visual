@@ -1,0 +1,807 @@
+<!-- Modo Consulta da aula 06. Um conceito por seção, na ordem das dependências, agrupadas por capítulo do livro.
+     Estrutura fixa de cada seção: h2 → p.cs-def → .cs-formula → .cs-uso → .cs-pegadinhas → .cs-ponderada → figuras.
+     Figuras, loops, desenhos de margem e tabelas vêm do conteudo.html (data-ref, data-ref-loop, data-ref-mn, data-ref-tbl). -->
+
+<!-- ================= Base ================= -->
+<section class="cs" id="gerente" data-grupo="Base" data-termos="" data-leitura="antes">
+  <h2>O SO como gerente de recursos</h2>
+  <p class="cs-def">Há poucos recursos e muitos processos querendo: uma CPU (ou poucas), uma memória principal finita, um disco, alguns dispositivos. A gerência de recursos é a parte do SO que decide quem fica com o quê, e por quanto tempo.</p>
+  <ul class="b">
+    <li>Na <a href="/m8/comp/04-processos-threads">aula 04</a> o SO criou processos e threads; na <a href="/m8/comp/05-sincronizacao-deadlocks">aula 05</a>, fez eles conviverem sem estragar dados compartilhados.</li>
+    <li>O livro divide a gerência em quatro: processador (cap. 8), memória (caps. 9 e 10), arquivos (cap. 11) e dispositivos (cap. 12).</li>
+    <li>O dilema de todos os capítulos: uma regra simples e justa costuma desperdiçar recurso; uma regra eficiente costuma ser injusta com alguém ou cara de calcular.</li>
+  </ul>
+  <div data-ref-mn="mn-recursos"></div>
+</section>
+
+<section class="cs" id="unidades" data-grupo="Base" data-termos="" data-leitura="antes">
+  <h2>Unidades de tempo, potências de 2 e div e mod</h2>
+  <p class="cs-def">Os tempos vão de ns (um acesso à memória, ≈ 100 ns) a ms (um braço de disco se mexendo). 1 ms = 1 000 µs = 1 000 000 ns.</p>
+  <div data-ref-tbl="tbl-unidades"></div>
+  <ul class="b">
+    <li>Um page fault de 8 ms custa o mesmo que 80 000 acessos à memória de 100 ns. Ir ao disco é tão caro que vale gastar muita conta para evitar: isso explica quase todas as decisões de <a href="#tea">memória virtual</a>.</li>
+    <li>Memória se mede em potências de 2: 1 KB = 2¹⁰ = 1 024 bytes, 1 MB = 2²⁰, 1 GB = 2³⁰. Uma página de 4 KB tem 4 × 1 024 = 4 096 = 2¹² bytes.</li>
+    <li>Com n bits você escreve 2ⁿ números diferentes. Um endereço de 32 bits alcança 2³² bytes = 4 GB.</li>
+    <li><code>a div b</code> é o quociente inteiro da divisão; <code>a mod b</code> é o resto.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b">
+      <li><code>20 500 div 4 096 = 5</code> e <code>20 500 mod 4 096 = 20</code>, porque 5 × 4 096 = 20 480 e sobram 20.</li>
+      <li>Quando b é potência de 2, div e mod são só cortar os bits: os 12 bits de baixo de um número são o resto da divisão por 2¹². O hardware faz isso de graça.</li>
+    </ul>
+  </div>
+  <div data-ref-tbl="tbl-simbolos"></div>
+</section>
+
+<!-- ================= Processador ================= -->
+<section class="cs" id="escalonamento" data-grupo="Processador" data-termos="escalonamento,surto-cpu" data-leitura="criterios">
+  <h2>Escalonamento do processador e surto de CPU</h2>
+  <p class="cs-def">Com multiprogramação, vários processos ficam prontos ao mesmo tempo e só um usa cada CPU. Escalonamento é a política que decide qual deles roda agora.</p>
+  <ul class="b">
+    <li>O escalonador (<a href="/m8/comp/04-processos-threads">aula 04</a>) aplica a política; o dispatcher (<a href="/m8/comp/04-processos-threads">aula 04</a>) faz a troca de contexto e entrega a CPU ao escolhido.</li>
+    <li>O tempo que o dispatcher gasta é a latência de despacho, puro overhead.</li>
+    <li>Todo processo alterna fases: usa a CPU, pede E/S e espera, usa a CPU de novo. Cada fase de uso contínuo da CPU é um surto de CPU (CPU burst).</li>
+    <li>Processos cpu-bound têm surtos longos; io-bound, surtos curtos.</li>
+  </ul>
+  <div data-ref-mn="mn-escalonador"></div>
+</section>
+
+<section class="cs" id="preemptivo" data-grupo="Processador" data-termos="nao-preemptivo,escalonamento-cooperativo" data-leitura="criterios">
+  <h2>Quando o escalonador entra: preemptivo, não preemptivo e cooperativo</h2>
+  <p class="cs-def">Não preemptivo: o processo só larga a CPU quando termina ou bloqueia. Preemptivo: o SO pode tirar a CPU no meio do surto (preempção, <a href="/m8/comp/04-processos-threads">aula 04</a>), por tempo ou porque chegou alguém mais importante.</p>
+  <ul class="b">
+    <li>O escalonador entra em ação em quatro casos: (1) o processo que roda termina; (2) ele pede E/S ou espera um evento e vai para o estado de espera; (3) um processo novo fica pronto, ou um que esperava E/S volta para a fila de prontos; (4) o relógio interrompe porque o tempo do processo atual acabou.</li>
+    <li>Nos casos 1 e 2 a troca é obrigatória: a CPU ficou livre. Nos casos 3 e 4 ela é opcional, e é aí que os algoritmos se separam.</li>
+    <li>Não preemptivo: simples e com pouca troca de contexto, mas um processo longo segura todo mundo.</li>
+    <li>Preemptivo: melhor tempo de resposta, mais trocas de contexto.</li>
+    <li>Escalonamento cooperativo: variação antiga em que o próprio processo devolve a CPU de tempos em tempos (Windows 3.x, MacOS clássico). Um programa com defeito que nunca devolve trava a máquina.</li>
+  </ul>
+</section>
+
+<section class="cs" id="criterios" data-grupo="Processador" data-termos="utilizacao-cpu,tempo-processador,tempo-espera,turnaround,tempo-resposta" data-leitura="criterios">
+  <h2>Critérios: utilização, throughput, espera, turnaround e resposta</h2>
+  <p class="cs-def">Turnaround vai da chegada ao fim; espera é o tempo parado na fila de prontos; resposta vai da chegada até a primeira reação. Utilização e throughput você quer altos; espera, turnaround e resposta, baixos.</p>
+  <ul class="b">
+    <li>Utilização da CPU: fração do tempo em que a CPU faz trabalho útil (40% numa máquina folgada, 90% numa carregada).</li>
+    <li>Throughput (<a href="/m8/comp/02-fundamentos-memoria">aula 02</a>): processos concluídos por unidade de tempo.</li>
+    <li>Tempo de processador (tempo de CPU): quanto de CPU o processo realmente usa, a soma dos surtos. O escalonador não muda esse número.</li>
+    <li>Tempo de espera: total na fila de prontos, esperando a CPU. É o que o escalonador controla diretamente.</li>
+    <li>Turnaround: inclui espera, execução e E/S.</li>
+    <li>Tempo de resposta: da chegada (ou de um pedido do usuário) até a primeira reação. Em sistemas interativos, é o critério que o usuário sente.</li>
+    <li>Os critérios brigam: trocar de processo o tempo todo melhora a resposta e piora o throughput (mais tempo gasto trocando). Um sistema em lote prioriza throughput e turnaround; um interativo, resposta.</li>
+  </ul>
+  <div class="cs-formula">
+    <div class="formula">turnaround = término − chegada</div>
+    <div class="formula">espera = turnaround − surto de CPU</div>
+    <div class="formula">resposta = primeira execução − chegada</div>
+    <ul class="b">
+      <li>Valem para um processo que só usa CPU, sem E/S no meio.</li>
+      <li>"Médio" é a média aritmética entre os processos: some e divida pela quantidade.</li>
+      <li>Num algoritmo não preemptivo, cada processo roda uma vez só, então espera e resposta coincidem.</li>
+    </ul>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Um processo chega em t = 2, só pega a CPU em t = 5, roda até t = 8, espera de novo, volta em t = 11 e termina em t = 14. Ele precisava de 6 unidades de CPU (3 + 3).</li>
+      <li>Turnaround = 14 − 2 = 12. Desses, 6 rodando e 6 parado na fila: espera = 6. Resposta = 5 − 2 = 3.</li>
+    </ul>
+  </div>
+  <div class="cs-ponderada">
+    <p>A ferramenta é escolher o critério certo antes do algoritmo. Exemplo diferente: um termostato industrial lê a temperatura a cada 50 ms e precisa reagir em até 20 ms. Se a leitura chega e espera atrás de um processo de 30 ms num escalonador não preemptivo, a resposta passa de 30 ms e o prazo estoura, mesmo com o throughput excelente. Pergunta: <em>para a amostra do sensor, o que importa é a média ou o pior caso do tempo de resposta? E isso pede escalonamento preemptivo ou não?</em></p>
+  </div>
+  <div data-ref-mn="mn-criterios"></div>
+</section>
+
+<section class="cs" id="gantt" data-grupo="Processador" data-termos="gantt" data-leitura="criterios,algoritmos">
+  <h2>Diagrama de Gantt e o conjunto de exemplo</h2>
+  <p class="cs-def">O diagrama de Gantt é uma barra do tempo em que cada trecho mostra quem estava na CPU. É com ele que você enxerga uma escala de execução.</p>
+  <ul class="b">
+    <li>Todos os algoritmos a seguir rodam o mesmo conjunto de quatro processos, para dar para comparar as médias:</li>
+  </ul>
+  <div data-ref-tbl="tbl-processos"></div>
+  <div class="cs-pegadinhas">
+    <ul class="b"><li>Prioridade: aqui número menor = mais importante. Os livros e os sistemas variam nessa convenção; confira sempre.</li></ul>
+  </div>
+</section>
+
+<section class="cs" id="fcfs" data-grupo="Processador" data-termos="fila,fcfs,efeito-comboio" data-leitura="algoritmos">
+  <h2>FCFS e efeito comboio</h2>
+  <p class="cs-def">FCFS (first-come, first-served; o livro chama de escalonamento FIFO): a fila de prontos é uma fila comum, e quem chegou antes roda antes, até terminar ou bloquear. Não preemptivo.</p>
+  <ul class="b">
+    <li>Simples e sem starvation: todo mundo chega à frente um dia.</li>
+    <li>Efeito comboio: um processo longo na frente faz todos os curtos esperarem.</li>
+    <li>Pior ainda com E/S: os io-bound ficam presos atrás de um cpu-bound, e os dispositivos ficam parados enquanto isso.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Escala: A roda de 0 a 6, B de 6 a 9, C de 9 a 17, D de 17 a 19.</li>
+      <li>Espera (início − chegada): A = 0, B = 6 − 1 = 5, C = 9 − 2 = 7, D = 17 − 3 = 14. Média = (0 + 5 + 7 + 14) / 4 = 26 / 4 = 6,5.</li>
+      <li>Turnaround médio = (6 + 8 + 15 + 16) / 4 = 45 / 4 = 11,25.</li>
+      <li>D precisava de só 2 unidades e esperou 14: é o comboio.</li>
+    </ul>
+  </div>
+  <div data-ref-loop="comboio"></div>
+</section>
+
+<section class="cs" id="sjf" data-grupo="Processador" data-termos="sjf,media-exponencial" data-leitura="algoritmos">
+  <h2>SJF: o menor surto primeiro, e a média exponencial</h2>
+  <p class="cs-def">SJF (shortest job first): quando a CPU fica livre, roda o processo pronto com o menor surto. Na versão do livro, não preemptivo.</p>
+  <ul class="b">
+    <li>Com todos os processos disponíveis juntos, SJF dá o menor tempo médio de espera possível: passar um curto na frente de um longo diminui a espera do curto mais do que aumenta a do longo.</li>
+    <li>O SO estima o próximo surto com uma média que dá mais peso ao passado recente, a média exponencial.</li>
+    <li>Ninguém sabe o surto antes de ele acontecer: SJF depende de estimativa.</li>
+    <li>Starvation: um processo longo pode esperar para sempre se sempre chegarem curtos.</li>
+  </ul>
+  <div class="cs-formula">
+    <div class="formula">τₙ₊₁ = α·tₙ + (1 − α)·τₙ</div>
+    <ul class="b"><li>tₙ: o surto que acabou de acontecer. τₙ: a estimativa anterior. α (entre 0 e 1): quanto confiar no último valor.</li></ul>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Em t = 0 só A existe: A roda de 0 a 6. Em t = 6 estão prontos B (3), C (8) e D (2): roda D (6–8), depois B (8–11), depois C (11–19).</li>
+      <li>Espera: A = 0, D = 6 − 3 = 3, B = 8 − 1 = 7, C = 11 − 2 = 9. Média = 19 / 4 = 4,75. Caiu de 6,5 (FCFS) para 4,75.</li>
+      <li>Média exponencial com α = 0,5, estimativa de 10 ms e surto real de 6 ms. 1ª iteração: 0,5 × 6 + 0,5 × 10 = 3 + 5 = 8 ms.</li>
+      <li>2ª iteração (surto de 6 de novo): 0,5 × 6 + 0,5 × 8 = 7 ms; a estimativa se aproxima do real.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="srtf" data-grupo="Processador" data-termos="srtf" data-leitura="algoritmos">
+  <h2>SRTF: SJF com preempção</h2>
+  <p class="cs-def">SRTF (shortest remaining time first): a cada chegada, compara o surto do recém-chegado com o que ainda falta para o processo atual. Se o novo for menor, preempta.</p>
+  <ul class="b">
+    <li>O starvation do SJF fica pior: um processo longo pode ser interrompido sem parar.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>A começa em 0. Em t = 1 chega B (3), e faltam 5 para A: B toma a CPU (1–4).</li>
+      <li>D chega em 3 com 2, mas B só tem 1 restante e continua. Em 4: D (4–6), A (6–11), C (11–19).</li>
+      <li>Espera: A = 11 − 0 − 6 = 5, B = 0, C = 9, D = 1. Média = 15 / 4 = 3,75, a menor do exemplo.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="prioridade" data-grupo="Processador" data-termos="prioridade,aging,circular-prioridades" data-leitura="algoritmos">
+  <h2>Escalonamento por prioridade e aging</h2>
+  <p class="cs-def">Cada processo tem um número de importância, e roda o mais importante entre os prontos. Pode ser preemptivo (chegou alguém mais importante, troca na hora) ou não.</p>
+  <ul class="b">
+    <li>SJF é um caso particular: a prioridade é o tamanho do surto.</li>
+    <li>Prioridade estática: fixada na criação e não muda. Prioridade dinâmica: o SO ajusta durante a execução, por exemplo subindo a de quem acabou de voltar de E/S.</li>
+    <li>O risco é o starvation de quem tem prioridade baixa. A solução clássica é o aging: a prioridade de quem espera melhora com o tempo.</li>
+    <li>Circular com prioridades (descrito no livro): <a href="#round-robin">round-robin</a> dentro de cada nível de prioridade, com prioridade dinâmica que favorece os io-bound.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Versão preemptiva com o exemplo: A roda em 0, B (prioridade 2) toma a CPU em 1, C (prioridade 1) toma em 2 e roda até 10. Depois B (10–12), A (12–17), D (17–19). D, o menos importante, espera 14.</li>
+      <li>Aging: a cada 5 unidades na fila, o número cai 1. Um processo de prioridade 4 vira 3 depois de 5 unidades, 2 depois de 10, e uma hora roda.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="round-robin" data-grupo="Processador" data-termos="round-robin,quantum" data-leitura="algoritmos">
+  <h2>Round-robin e quantum</h2>
+  <p class="cs-def">Round-robin (escalonamento circular): fila FCFS, mas cada processo só usa a CPU por um quantum (fatia de tempo). Acabou o quantum e o processo não terminou: o relógio interrompe, ele vai para o fim da fila e o próximo entra.</p>
+  <ul class="b">
+    <li>Pensado para sistemas de tempo compartilhado.</li>
+    <li>Quantum grande demais: quase ninguém é interrompido e o round-robin vira FCFS (no exemplo, q = 8 dá exatamente a escala do FCFS).</li>
+    <li>Quantum pequeno demais: a CPU passa boa parte do tempo trocando de contexto.</li>
+  </ul>
+  <div class="cs-formula">
+    <div class="formula">espera para voltar à CPU ≤ (n − 1) × q     ·     overhead = troca / (q + troca)</div>
+    <ul class="b"><li>n: número de processos. q: quantum. troca: tempo de uma troca de contexto.</li></ul>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>5 processos e q = 20 ms: ninguém espera mais de 4 × 20 = 80 ms.</li>
+      <li>Troca de contexto de 1 ms. q = 4 ms → de cada 5 ms só 4 são úteis: overhead = 1 / (4 + 1) = 20%.</li>
+      <li>q = 20 ms → 1 / 21 ≈ 4,8%.</li>
+      <li>q = 100 ms → 1 / 101 ≈ 1%, mas resposta de até 9 × 100 = 900 ms com 10 processos.</li>
+      <li>Regra prática: um quantum em que uns 80% dos surtos cabem inteiros.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="comparacao" data-grupo="Processador" data-termos="" data-leitura="algoritmos">
+  <h2>Comparando os algoritmos de escalonamento</h2>
+  <p class="cs-def">Não existe um vencedor em todos os critérios. SRTF ganha em espera e turnaround; round-robin ganha em resposta, que é o que o usuário interativo percebe.</p>
+  <div data-ref-tbl="tbl-comparacao"></div>
+  <ul class="b">
+    <li>Prioridade é a pior média aqui porque o critério dela é outro: a ordem de importância, que nada tem a ver com o tamanho dos surtos.</li>
+    <li>Na figura, escolha a aba para rodar cada algoritmo sobre o mesmo conjunto; no round-robin, mude o quantum e veja as médias mudarem.</li>
+  </ul>
+  <p class="prova">SJF (não preemptivo) e SRTF (preemptivo) minimizam o tempo médio de espera, mas exigem estimar o surto e causam starvation de processos longos. FCFS sofre efeito comboio. No round-robin, quantum grande vira FCFS e quantum pequeno vira overhead de troca de contexto.</p>
+  <div data-ref="fig-gantt"></div>
+</section>
+
+<section class="cs" id="filas-multiplas" data-grupo="Processador" data-termos="filas-multiplas" data-leitura="filas">
+  <h2>Múltiplas filas</h2>
+  <p class="cs-def">A fila de prontos vira várias filas, uma por classe de processo (sistema, interativos, lote). Cada fila tem seu próprio algoritmo: round-robin para interativos, FCFS para lote.</p>
+  <ul class="b">
+    <li>Num sistema real convivem necessidades diferentes: o editor de texto quer resposta rápida, a compilação quer throughput, o controle do motor quer prazo. Um algoritmo só não serve para todos.</li>
+    <li>Entre as filas também há uma regra: em geral, prioridade fixa (a fila de baixo só roda quando as de cima estão vazias) ou fatias de CPU (80% para interativos, 20% para lote).</li>
+    <li>O processo é classificado ao ser criado e fica preso naquela fila. Se o comportamento dele mudar, o SO não percebe.</li>
+    <li>A fila de baixo pode sofrer starvation.</li>
+  </ul>
+  <div data-ref-mn="mn-filas"></div>
+</section>
+
+<section class="cs" id="mlfq" data-grupo="Processador" data-termos="mlfq" data-leitura="filas">
+  <h2>Múltiplas filas com realimentação (MLFQ)</h2>
+  <p class="cs-def">Nas múltiplas filas com realimentação (multilevel feedback queue), o processo muda de fila conforme o comportamento. O SO aprende quem é cpu-bound e quem é io-bound sem ninguém avisar.</p>
+  <ul class="b">
+    <li>Todo processo novo entra na fila de cima, de maior prioridade e quantum pequeno (8 ms, por exemplo).</li>
+    <li>Gastou o quantum inteiro sem bloquear? Comportamento de cpu-bound: desce uma fila. As filas de baixo têm prioridade menor e quantum maior (16 ms, 32 ms…); a última costuma ser FCFS.</li>
+    <li>Bloqueou para E/S antes do fim do quantum? Comportamento de io-bound: fica na fila em que está (ou sobe).</li>
+    <li>Resultado: io-bound e interativos ficam em cima, com resposta rápida; cpu-bound descem e rodam com quantum maior, com menos troca de contexto.</li>
+    <li>Contra starvation lá embaixo: <a href="#prioridade">aging</a>, quem espera demais sobe.</li>
+  </ul>
+  <div data-ref-loop="mlfq"></div>
+</section>
+
+<section class="cs" id="smp" data-grupo="Processador" data-termos="smp,afinidade" data-leitura="filas">
+  <h2>Mais de um processador: SMP e afinidade</h2>
+  <p class="cs-def">SMP (multiprocessamento simétrico): vários processadores iguais compartilhando a mesma memória. Qualquer processador pode rodar qualquer processo.</p>
+  <ul class="b">
+    <li>Fila única compartilhada: o balanceamento de carga é automático, mas todos os processadores disputam a mesma fila, que precisa de exclusão mútua (<a href="/m8/comp/05-sincronizacao-deadlocks">aula 05</a>).</li>
+    <li>Uma fila por processador: sem disputa, mas um pode ficar ocioso enquanto outro tem fila cheia, então o SO migra processos de vez em quando.</li>
+    <li>Afinidade de processador: preferir rodar o processo de novo no mesmo processador, porque a cache dele ainda guarda os dados do processo (localidade, <a href="/m8/comp/02-fundamentos-memoria">aula 02</a>). Migrar custa uma cache fria.</li>
+  </ul>
+</section>
+
+<section class="cs" id="tempo-real" data-grupo="Processador" data-termos="tempo-real,deadline,jitter" data-leitura="filas">
+  <h2>Tempo real: deadline e jitter</h2>
+  <p class="cs-def">Num sistema de tempo real, a resposta certa entregue tarde é uma resposta errada. As tarefas têm deadline (prazo máximo para terminar), e o comportamento correto depende de cumprir esses prazos.</p>
+  <ul class="b">
+    <li>O airbag que dispara 200 ms depois da batida falhou, mesmo tendo "calculado certo".</li>
+    <li>O que importa é a previsibilidade do pior caso, não a média.</li>
+    <li>Tempo real crítico (hard): perder um prazo é falha do sistema (freio ABS, marca-passo). Não crítico (soft): perder às vezes degrada a qualidade (um quadro de vídeo que pula).</li>
+    <li>O livro destaca que o escalonamento de tempo real usa prioridade fixa e preempção, sem quantum e sem aging: a tarefa mais importante sempre ganha, na hora (o EDF, em <a href="#rate-monotonic">rate monotonic e EDF</a>, é a exceção).</li>
+    <li>Jitter: a variação no momento em que uma tarefa periódica realmente roda.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b"><li>Um sensor lido "a cada 10 ms" que às vezes é lido aos 9 e às vezes aos 14 tem jitter de 5 ms.</li></ul>
+  </div>
+</section>
+
+<section class="cs" id="rate-monotonic" data-grupo="Processador" data-termos="rate-monotonic,edf" data-leitura="filas">
+  <h2>Rate monotonic e EDF</h2>
+  <p class="cs-def">Rate monotonic (taxa monotônica) usa prioridade fixa: quem tem o período menor tem prioridade maior. EDF (earliest deadline first) usa prioridade dinâmica: roda quem tem o prazo mais próximo.</p>
+  <ul class="b">
+    <li>São as duas regras clássicas para tarefas periódicas: cada tarefa i repete a cada período Tᵢ e precisa de Cᵢ de CPU por vez.</li>
+    <li>Rate monotonic garante todos os prazos se a utilização total ficar abaixo de um limite.</li>
+    <li>EDF funciona até 100% de utilização, mas é mais difícil de implementar e de prever quando sobrecarrega.</li>
+  </ul>
+  <div class="cs-formula">
+    <div class="formula">U = Σ Cᵢ / Tᵢ &nbsp;&nbsp;·&nbsp;&nbsp; rate monotonic garante se U ≤ n·(2^(1/n) − 1)</div>
+    <ul class="b">
+      <li>U: a fração da CPU que as tarefas pedem. Σ: soma de todas as tarefas. n: número de tarefas.</li>
+      <li>O limite vale 1 para n = 1, 0,828 para n = 2, 0,780 para n = 3 e tende a 0,69 com muitas tarefas.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b"><li>Passar do limite não quer dizer que vai falhar: quer dizer que o teste simples não garante, e é preciso analisar o pior caso tarefa por tarefa.</li></ul>
+  </div>
+  <div class="cs-ponderada">
+    <p>É o elo mais forte com a pulseira, que tem uma tarefa periódica com prazo (a amostra) e outra que pode esperar (o log). Exemplo com outros números: um robô tem a tarefa <i>motor</i> (C = 3 ms, T = 20 ms) e a tarefa <i>rádio</i> (C = 10 ms, T = 50 ms). U = 3/20 + 10/50 = 0,15 + 0,20 = 0,35, abaixo de 0,828: com rate monotonic, motor (período menor) fica com a prioridade maior e os dois prazos estão garantidos. No pior caso, o motor espera no máximo o que uma seção não preemptível do rádio segurar a CPU.</p>
+    <p>Perguntas: <em>qual tarefa da pulseira ganha prioridade maior e por quê? A thread do BLE pode atrasar a do sensor (pense em preempção e na inversão de prioridade da <a href="/m8/comp/05-sincronizacao-deadlocks">aula 05</a>)? Qual é o pior caso do sensor contra o prazo de 5 ms?</em></p>
+  </div>
+</section>
+
+<!-- ================= Memória principal ================= -->
+<section class="cs" id="mmu" data-grupo="Memória principal" data-termos="endereco-logico,mmu,registradores-base-limite" data-leitura="memoria">
+  <h2>Endereço lógico, MMU e registradores base e limite</h2>
+  <p class="cs-def">O programa é escrito como se começasse no endereço 0: o endereço que ele usa é o endereço lógico. A MMU (memory management unit), um circuito entre a CPU e a memória, traduz cada um para o endereço físico (<a href="/m8/comp/02-fundamentos-memoria">aula 02</a>) a cada acesso.</p>
+  <ul class="b">
+    <li>Com vários processos, o SO decide onde cada um fica na memória principal, impede que um mexa na memória do outro e aproveita o espaço. Da solução mais simples à que motivou a memória virtual: contígua, partições fixas, partições variáveis, swapping.</li>
+    <li>O endereço físico depende de onde o SO colocou o processo.</li>
+    <li>Na forma mais simples, a MMU tem dois registradores. Base: onde o processo começa na memória física. Limite: o tamanho da área dele.</li>
+  </ul>
+  <div class="cs-formula">
+    <div class="formula">físico = base + lógico, se lógico &lt; limite</div>
+    <ul class="b"><li>Senão, a MMU gera uma interrupção de erro e o SO mata o processo.</li></ul>
+  </div>
+  <div class="cs-uso">
+    <ul class="b"><li>Base = 30 000 e limite = 12 000. O lógico 5 000 vira 35 000. O lógico 13 000 passa do limite: acesso proibido.</li></ul>
+  </div>
+  <div data-ref-mn="mn-mmu"></div>
+</section>
+
+<section class="cs" id="relocacao" data-grupo="Memória principal" data-termos="relocacao" data-leitura="memoria">
+  <h2>Relocação</h2>
+  <p class="cs-def">Relocação dinâmica: trocar o processo de lugar sem reescrever o programa. Mover o processo na memória é só mudar o <a href="#mmu">registrador base</a>.</p>
+  <ul class="b">
+    <li>Sem ela, os endereços teriam de ser corrigidos no programa (relocação estática, na carga) ou fixados na compilação (código absoluto).</li>
+  </ul>
+</section>
+
+<section class="cs" id="alocacao-contigua" data-grupo="Memória principal" data-termos="alocacao-contigua,overlay" data-leitura="memoria">
+  <h2>Alocação contígua simples e overlay</h2>
+  <p class="cs-def">Na alocação contígua cada programa ocupa um trecho seguido, sem buracos. Na forma simples, dos primeiros sistemas monoprogramáveis, a memória se divide em duas áreas: uma para o SO e outra para o único programa do usuário.</p>
+  <ul class="b">
+    <li>Proteção: um registrador marca onde termina o SO; o programa não pode acessar abaixo dele.</li>
+    <li>Desperdício: se o programa é menor que a área, o resto fica parado. E um programa maior que a memória não roda.</li>
+    <li>Para o segundo problema existiu o overlay: o programador divide o programa em módulos que não precisam estar na memória ao mesmo tempo, e eles se revezam numa mesma área. Funcionava, mas o trabalho de dividir era todo do programador.</li>
+  </ul>
+</section>
+
+<section class="cs" id="particao-fixa" data-grupo="Memória principal" data-termos="particao-fixa,fragmentacao-interna" data-leitura="memoria">
+  <h2>Partições fixas e fragmentação interna</h2>
+  <p class="cs-def">Com multiprogramação, a memória é dividida em partições fixas (alocação particionada estática): pedaços de tamanhos definidos quando o sistema liga, um processo por partição.</p>
+  <ul class="b">
+    <li>Com código absoluto, o programa só podia rodar na partição para a qual foi compilado, mesmo com outras livres. Com código relocável, vai para qualquer partição em que caiba.</li>
+    <li>O SO guarda uma tabela de partições: início, tamanho e se está livre.</li>
+    <li>O problema é a fragmentação interna: espaço preso dentro da partição, que ninguém mais pode usar.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b"><li>Processo de 5,5 KB numa partição de 8 KB: 2,5 KB presos dentro dela. Processo de 6 KB numa de 16 KB: perde 10 KB.</li></ul>
+  </div>
+  <div data-ref-mn="mn-particoes"></div>
+</section>
+
+<section class="cs" id="particao-variavel" data-grupo="Memória principal" data-termos="particao-variavel,fragmentacao-externa,compactacao" data-leitura="memoria">
+  <h2>Partições variáveis, fragmentação externa e compactação</h2>
+  <p class="cs-def">Em partições variáveis (alocação particionada dinâmica), cada processo recebe exatamente o tamanho que pede. Acaba a fragmentação interna.</p>
+  <ul class="b">
+    <li>Quando processos terminam, ficam buracos de tamanhos variados espalhados entre os ocupados. Com o tempo aparece a fragmentação externa: há memória livre suficiente no total, mas em pedaços pequenos demais para o próximo pedido.</li>
+    <li>Saída 1: juntar buracos vizinhos quando um processo termina (coalescência).</li>
+    <li>Saída 2: a compactação, mover os processos para um lado e juntar todo o espaço livre num bloco só. Exige <a href="#relocacao">relocação dinâmica</a> e para tudo enquanto copia.</li>
+    <li>Qual buraco escolher para um pedido: <a href="#fits">first, best ou worst-fit</a>.</li>
+  </ul>
+  <p class="prova">Fragmentação interna: espaço perdido dentro da área dada ao processo (partições fixas, última página na paginação). Fragmentação externa: memória livre total suficiente, mas espalhada em buracos que não servem (partições variáveis, segmentação, alocação contígua de arquivos). Compactação resolve a externa.</p>
+</section>
+
+<section class="cs" id="fits" data-grupo="Memória principal" data-termos="first-fit,best-fit,worst-fit" data-leitura="memoria">
+  <h2>First-fit, best-fit e worst-fit</h2>
+  <p class="cs-def">Quando um pedido cabe em vários buracos, a estratégia escolhe qual usar: o primeiro (first-fit), o menor (best-fit) ou o maior (worst-fit).</p>
+  <ul class="b">
+    <li>First-fit: o primeiro buraco, a partir do início da memória, em que o pedido cabe. Rápido, porque para de procurar cedo.</li>
+    <li>Best-fit: o menor buraco em que cabe. Deixa a menor sobra. Precisa olhar a lista inteira.</li>
+    <li>Worst-fit: o maior buraco. A ideia é que a sobra seja grande o bastante para servir a outro pedido.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>No exemplo da figura, best-fit atende os quatro pedidos e os outros dois não.</li>
+      <li>Com outra sequência de pedidos o resultado muda: simulações mostram first-fit e best-fit parecidos em aproveitamento, com first-fit mais rápido; worst-fit costuma ser o pior.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>A sobra do best-fit costuma ser tão pequena que vira lixo inútil.</li>
+      <li>Worst-fit, na prática, acaba rápido com os buracos grandes.</li>
+    </ul>
+  </div>
+  <div data-ref="fig-aloc"></div>
+</section>
+
+<section class="cs" id="swapping" data-grupo="Memória principal" data-termos="swapping" data-leitura="memoria">
+  <h2>Swapping</h2>
+  <p class="cs-def">Quando não cabe mais ninguém, o SO tira um processo inteiro da memória e grava no disco (swap out), trazendo outro no lugar. Mais tarde o primeiro volta (swap in).</p>
+  <ul class="b">
+    <li>Em geral volta para outro endereço: por isso precisa de <a href="#relocacao">relocação dinâmica</a>.</li>
+    <li>Os candidatos a sair são os processos em espera, que não vão usar a CPU tão cedo.</li>
+    <li>O espaço no disco usado para isso é a área de swap (arquivo ou partição de swap).</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b"><li>É caro. Um processo de 100 MB com disco de 200 MB/s leva 100 / 200 = 0,5 s para sair e 0,5 s para voltar: 1 s inteiro só de cópia.</li></ul>
+  </div>
+  <div data-ref-mn="mn-swapping"></div>
+</section>
+
+<!-- ================= Memória virtual ================= -->
+<section class="cs" id="paginacao" data-grupo="Memória virtual" data-termos="paginacao,moldura,bit-referencia" data-leitura="paginacao">
+  <h2>Paginação: páginas, molduras e bits da tabela</h2>
+  <p class="cs-def">A paginação divide o espaço de endereçamento do processo em páginas de tamanho fixo (4 KB, por exemplo) e a memória física em molduras (frames, páginas reais) do mesmo tamanho. Qualquer página cabe em qualquer moldura.</p>
+  <ul class="b">
+    <li>Partições exigem que o processo inteiro esteja na memória e num trecho contínuo. A memória virtual (<a href="/m8/comp/02-fundamentos-memoria">aula 02</a>) quebra as duas exigências: o processo é picado em pedaços, cada pedaço vai para qualquer lugar livre, e só os pedaços em uso precisam estar na memória.</li>
+    <li>Não existe mais fragmentação externa: todo buraco tem exatamente o tamanho de uma página.</li>
+    <li>Sobra só fragmentação interna na última página: em média, meia página por processo.</li>
+    <li>Cada processo tem sua tabela de páginas (<a href="/m8/comp/02-fundamentos-memoria">aula 02</a>). Cada entrada guarda o número da moldura e bits de controle:</li>
+  </ul>
+  <ul class="b">
+    <li>Bit de validade: 1 se a página está na memória, 0 se está no disco (ou não existe). É o bit que dispara o <a href="#page-fault">page fault</a>.</li>
+    <li>Bit de referência: o hardware liga quando a página é acessada. Os algoritmos de substituição usam para saber quem foi usado recentemente.</li>
+    <li>Bit de modificação: o dirty bit da <a href="/m8/comp/02-fundamentos-memoria">aula 02</a>. Ligado quando a página foi escrita; aí ela precisa ser gravada no disco antes de sair da memória.</li>
+    <li>Bits de proteção: leitura, escrita, execução. Uma página de código marcada só-leitura pode ser compartilhada por vários processos (bibliotecas, editores abertos várias vezes).</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b"><li>Processo de 18 000 bytes com páginas de 4 096: usa 5 páginas = 20 480 bytes, perde 2 480.</li></ul>
+  </div>
+  <div data-ref-mn="mn-paginas"></div>
+</section>
+
+<section class="cs" id="traducao" data-grupo="Memória virtual" data-termos="" data-leitura="paginacao">
+  <h2>Traduzindo um endereço: página e deslocamento</h2>
+  <p class="cs-def">Todo endereço virtual se parte em dois: o número da página virtual e o deslocamento (offset), a posição do byte dentro da página. Só o número da página é trocado; o deslocamento passa direto.</p>
+  <div class="cs-formula">
+    <div class="formula">página = endereço div tamanho     ·     deslocamento = endereço mod tamanho     ·     físico = moldura × tamanho + deslocamento</div>
+    <ul class="b"><li>Com páginas de 4 KB = 2¹² bytes, em binário: os 12 bits de baixo são o deslocamento e o resto é a página.</li></ul>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Endereço 20 500 = (5, 20) (a conta de <a href="#unidades">div e mod</a>).</li>
+      <li>A tabela diz que a página 5 está na moldura 3. Físico = 3 × 4 096 + 20 = 12 288 + 20 = 12 308.</li>
+      <li>Se a entrada 5 estiver com bit de validade 0, não há moldura para usar: é um page fault.</li>
+    </ul>
+  </div>
+  <div data-ref-mn="mn-endereco"></div>
+</section>
+
+<section class="cs" id="page-fault" data-grupo="Memória virtual" data-termos="page-fault" data-leitura="paginacao">
+  <h2>Page fault</h2>
+  <p class="cs-def">O processo tentou acessar uma página que não está na memória. A MMU vê bit de validade 0 na entrada da tabela de páginas e gera uma interrupção: o page fault.</p>
+  <ul class="b">
+    <li>A instrução não pode continuar. O SO trata o page fault: carrega a página do disco numa moldura, atualiza a tabela e manda reexecutar a instrução que falhou.</li>
+    <li>Acompanhe na figura a tradução do endereço 20 500, com o page fault no meio.</li>
+  </ul>
+  <div data-ref="fig-trad"></div>
+</section>
+
+<section class="cs" id="paginacao-demanda" data-grupo="Memória virtual" data-termos="paginacao-demanda" data-leitura="paginacao">
+  <h2>Políticas de busca: paginação por demanda</h2>
+  <p class="cs-def">Paginação por demanda: uma página só é trazida quando alguém a acessa, ou seja, quando dá page fault. O processo começa com zero páginas na memória e vai carregando o que usa.</p>
+  <ul class="b">
+    <li>Paginação antecipada (prepaging): traz também as páginas vizinhas, apostando na localidade espacial. Acerta: economiza page faults. Erra: gasta disco e memória à toa.</li>
+  </ul>
+</section>
+
+<section class="cs" id="tea" data-grupo="Memória virtual" data-termos="tempo-efetivo-acesso" data-leitura="paginacao">
+  <h2>O preço de um page fault: tempo efetivo de acesso</h2>
+  <p class="cs-def">O tempo efetivo de acesso (TEA) é a média ponderada entre um acesso normal à memória e um page fault, pesada pela probabilidade p de page fault por acesso.</p>
+  <div class="cs-formula">
+    <div class="formula">TEA = (1 − p) × 100 ns + p × 8 000 000 ns</div>
+    <ul class="b"><li>100 ns: acesso à memória. 8 ms = 8 000 000 ns: tratar um page fault (ir ao disco e voltar). p: probabilidade de page fault por acesso.</li></ul>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Com p = 0,001 (um page fault a cada mil acessos): 0,999 × 100 + 0,001 × 8 000 000 = 99,9 + 8 000 = 8 099,9 ns ≈ 8,1 µs. A memória ficou 81 vezes mais lenta.</li>
+      <li>Para ficar no máximo 10% mais lenta (TEA ≤ 110 ns): 100 + p × 7 999 900 ≤ 110, então p ≤ 10 / 7 999 900 ≈ 0,00000125. Um page fault a cada 800 mil acessos.</li>
+      <li>Por isso a localidade (<a href="/m8/comp/02-fundamentos-memoria">aula 02</a>) é o que faz a memória virtual funcionar: quase todo acesso cai numa página que já está na memória.</li>
+    </ul>
+  </div>
+  <div class="cs-ponderada">
+    <p>A ferramenta é o TEA: um page fault custa milissegundos e acontece em momentos que o código não controla. Exemplo com outros números: um controlador de drone tem prazo de 2 ms por ciclo; se uma página do laço de controle estiver no disco, um único page fault de 6 ms estoura três ciclos seguidos. Por isso sistemas de tempo real travam as páginas críticas na memória (no Linux, <code>mlock</code>) ou nem usam memória virtual (muitos microcontroladores não têm MMU). Pergunta: <em>o laço que processa a amostra pode sofrer um page fault ou outra espera imprevisível de memória?</em></p>
+  </div>
+</section>
+
+<section class="cs" id="tabela-niveis" data-grupo="Memória virtual" data-termos="tabela-multinivel" data-leitura="paginacao">
+  <h2>Tamanho da página e tabelas em níveis</h2>
+  <p class="cs-def">A tabela de páginas em níveis quebra a tabela em pedaços: um diretório aponta para tabelas de segundo nível, e as de regiões não usadas nem existem.</p>
+  <ul class="b">
+    <li>Página grande: tabela menor e menos page faults, mas mais fragmentação interna e mais lixo trazido junto. Página pequena: o contrário. 4 KB é o tamanho mais comum hoje.</li>
+    <li>O preço dos níveis são mais acessos à memória por tradução (um por nível). A TLB (<a href="/m8/comp/02-fundamentos-memoria">aula 02</a>) esconde isso: com hit rate alto, quase nenhuma tradução precisa percorrer os níveis.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Por que a tabela pode ficar enorme: endereço de 32 bits com páginas de 4 KB dá 32 − 12 = 20 bits de página, ou seja 2²⁰ ≈ 1 milhão de entradas. Com 4 bytes cada: 4 MB de tabela por processo, quase toda vazia.</li>
+      <li>Em dois níveis, os 20 bits viram 10 + 10: os primeiros escolhem uma entrada num diretório de 1 024 posições, que aponta para uma tabela de segundo nível de 1 024 entradas.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="segmentacao" data-grupo="Memória virtual" data-termos="segmentacao,segmentacao-paginada" data-leitura="paginacao">
+  <h2>Segmentação e segmentação com paginação</h2>
+  <p class="cs-def">Na segmentação o programa é dividido pelas partes lógicas que o programador enxerga: código, dados globais, pilha de execução, cada biblioteca. Cada parte é um segmento, de tamanho variável.</p>
+  <ul class="b">
+    <li>A tabela de segmentos guarda base e limite de cada um: a MMU de <a href="#mmu">base e limite</a>, só que um par por segmento.</li>
+    <li>Vantagem: proteção e compartilhamento fazem sentido por segmento (código só-leitura e compartilhado, dados privados).</li>
+    <li>Desvantagem: segmentos de tamanho variável trazem de volta a fragmentação externa e o problema de escolher buraco (<a href="#fits">first/best/worst-fit</a>).</li>
+    <li>Segmentação com paginação: cada segmento é paginado. Fica a visão lógica dos segmentos sem a fragmentação externa.</li>
+  </ul>
+  <div class="cs-formula">
+    <div class="formula">segmentação: endereço = (segmento, deslocamento)     ·     com paginação: endereço = (segmento, página, deslocamento)</div>
+  </div>
+  <div data-ref-mn="mn-segmentacao"></div>
+</section>
+
+<section class="cs" id="substituicao" data-grupo="Memória virtual" data-termos="substituicao-paginas,alocacao-local-global,string-referencias" data-leitura="substituicao">
+  <h2>Substituição de páginas: vítima, local e global</h2>
+  <p class="cs-def">Quando dá page fault e a memória está cheia, o SO precisa escolher uma página para tirar, a vítima. Essa escolha é a substituição de páginas, e um erro custa outro page fault logo depois.</p>
+  <ul class="b">
+    <li>No page fault da <a href="#page-fault">figura da tradução</a> havia uma moldura livre; aqui não há.</li>
+    <li>Se o bit de modificação da vítima estiver ligado, ela é gravada no disco antes; se não, basta descartar (o disco já tem uma cópia igual). Trocar uma página suja custa duas operações de disco.</li>
+    <li>Alocação fixa: cada processo tem um número fixo de molduras. Alocação variável: o número muda conforme a necessidade.</li>
+    <li>Substituição local: a vítima sai das molduras do próprio processo que deu page fault. Substituição global: pode sair de qualquer processo. A global aproveita melhor a memória; a local isola um processo guloso dos outros.</li>
+    <li>Para comparar algoritmos, usa-se uma string de referências: a lista das páginas acessadas, em ordem. Conta-se quantos page faults cada algoritmo gera com um certo número de molduras.</li>
+  </ul>
+</section>
+
+<section class="cs" id="algoritmos-substituicao" data-grupo="Memória virtual" data-termos="otimo-opt,fifo-paginas,lru,relogio,nru,lfu" data-leitura="substituicao">
+  <h2>Algoritmos de substituição: ótimo, FIFO, LRU, relógio, NRU e LFU</h2>
+  <p class="cs-def">O algoritmo de substituição escolhe a vítima. O ótimo tira a página que vai demorar mais para ser usada de novo; os outros são medidos contra ele.</p>
+  <ul class="b">
+    <li>Algoritmo ótimo (OPT ou MIN): gera o menor número possível de page faults, mas exige conhecer o futuro. Serve de régua para medir os outros.</li>
+    <li>FIFO: tira a página que está há mais tempo na memória, numa fila. Fácil, mas ignora o uso.</li>
+    <li>LRU (least recently used): tira a página usada há mais tempo. Aposta que o passado recente prevê o futuro próximo (localidade temporal). Chega perto do ótimo. Mas o LRU exato é caro: registrar a hora de cada acesso exige que o hardware tenha um contador ou uma lista reordenada a cada acesso.</li>
+    <li>Algoritmo do relógio (segunda chance): aproximação barata do LRU. As molduras formam um círculo com um ponteiro. No page fault, olha o bit de referência da página apontada: se for 1, zera e dá uma segunda chance (avança); se for 0, essa é a vítima.</li>
+    <li>NRU (not recently used): separa as páginas em quatro classes pelos bits de referência e de modificação (não usada e limpa, não usada e suja, usada e limpa, usada e suja) e tira uma da classe mais baixa.</li>
+    <li>LFU (least frequently used): tira a menos acessada no total. Defeito: uma página muito usada no começo e nunca mais fica com contagem alta e não sai.</li>
+    <li>Aleatório: escolhe qualquer uma. Não gasta nada para decidir, e é a referência de "pior razoável".</li>
+    <li>O livro ainda cita o FIFO com buffer de páginas: as vítimas vão para uma lista e, se forem acessadas de novo logo, voltam sem ir ao disco.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b"><li>Na figura, escolha o algoritmo e o número de molduras e acompanhe cada referência. A string padrão é a do exemplo clássico da <a href="#belady">anomalia de Belady</a>.</li></ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>FIFO: a página mais antiga pode ser a mais usada (uma variável global, o laço principal).</li>
+    </ul>
+  </div>
+  <div data-ref-mn="mn-relogio"></div>
+  <div data-ref="fig-subst"></div>
+</section>
+
+<section class="cs" id="belady" data-grupo="Memória virtual" data-termos="belady" data-leitura="substituicao">
+  <h2>Anomalia de Belady</h2>
+  <p class="cs-def">No FIFO, aumentar o número de molduras pode aumentar o número de page faults. A intuição (mais molduras, menos page faults) quase sempre vale, mas não para o FIFO.</p>
+  <ul class="b">
+    <li>Acontece porque o FIFO com 4 molduras guarda páginas diferentes das que guardaria com 3: o conjunto de 3 não está contido no de 4.</li>
+    <li>LRU e ótimo nunca sofrem a anomalia. Eles são algoritmos de pilha: o que fica na memória com n molduras está sempre contido no que ficaria com n + 1.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>String 1 2 3 4 1 2 5 1 2 3 4 5: o FIFO dá 9 page faults com 3 molduras e 10 com 4. Mude as molduras de 3 para 4 na <a href="#algoritmos-substituicao">figura de substituição</a> e confira.</li>
+      <li>Na mesma string, LRU dá 10 e 8 page faults; ótimo, 7 e 6.</li>
+    </ul>
+  </div>
+  <p class="prova">Anomalia de Belady: no FIFO, aumentar o número de molduras pode aumentar o número de page faults (string 1 2 3 4 1 2 5 1 2 3 4 5: 9 page faults com 3 molduras, 10 com 4). LRU e ótimo não sofrem. O ótimo é irrealizável (precisa do futuro) e serve de referência.</p>
+</section>
+
+<section class="cs" id="thrashing" data-grupo="Memória virtual" data-termos="thrashing" data-leitura="substituicao">
+  <h2>Thrashing</h2>
+  <p class="cs-def">O sistema em thrashing passa mais tempo trocando páginas com o disco do que executando. A CPU fica ociosa esperando o disco.</p>
+  <ul class="b">
+    <li>Começa num processo com menos molduras do que as páginas que usa o tempo todo: ele dá page fault, tira uma página que vai precisar já, dá outro page fault, e assim por diante. Com muitos processos assim, o sistema entra em thrashing.</li>
+    <li>Solução: reduzir a multiprogramação, suspendendo processos inteiros (<a href="#swapping">swapping</a>) até sobrar memória para os que ficam (critério: <a href="#working-set">working set</a>).</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b"><li>A armadilha: o SO vê a CPU ociosa e pensa "cabe mais um processo". Coloca mais um, que rouba molduras dos outros, e piora tudo.</li></ul>
+  </div>
+  <div data-ref-loop="thrashing"></div>
+</section>
+
+<section class="cs" id="working-set" data-grupo="Memória virtual" data-termos="working-set" data-leitura="substituicao">
+  <h2>Working set</h2>
+  <p class="cs-def">O working set é o conjunto de páginas que o processo está usando "agora". Se todas cabem na memória, ele roda quase sem page faults; se não cabem, entra em thrashing.</p>
+  <ul class="b">
+    <li>Num trecho de laço apertado o working set é pequeno; quando o programa muda de fase (sai de uma função e entra noutra), ele cresce e depois encolhe de novo.</li>
+    <li>Regra do SO: só deixe rodar processos cuja soma dos working sets cabe nas molduras disponíveis. Se não cabe, suspenda alguém. Isso evita thrashing e mantém a multiprogramação tão alta quanto possível.</li>
+    <li>Medir o working set exato é caro. Na prática, o SO acompanha a taxa de page faults de cada processo: muitos page faults, dá mais molduras; poucos, tira.</li>
+  </ul>
+  <div class="cs-formula">
+    <div class="formula">W(t, Δ) = páginas distintas referenciadas nas últimas Δ referências antes do instante t</div>
+    <ul class="b"><li>Δ: a janela do working set. Proposto por Peter Denning a partir da localidade.</li></ul>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Δ = 6. As referências mais recentes foram 2 6 1 5 7 7 7 7 5 1 (a última é o 1). As 6 últimas são 7 7 7 7 5 1, então W = {1, 5, 7}: o processo precisa de 3 molduras agora.</li>
+      <li>Bem antes, com 2 6 1 5 7 7, o working set era {1, 2, 5, 6, 7}, 5 páginas.</li>
+    </ul>
+  </div>
+  <p class="prova">Thrashing: o sistema gasta mais tempo paginando do que executando, porque os processos têm menos molduras que o working set. Aumentar a multiprogramação piora; a saída é suspender processos até a soma dos working sets caber na memória.</p>
+</section>
+
+<!-- ================= Arquivos ================= -->
+<section class="cs" id="sistema-arquivos" data-grupo="Arquivos" data-termos="sistema-arquivos,arquivo" data-leitura="arquivos">
+  <h2>Sistema de arquivos e arquivos</h2>
+  <p class="cs-def">A memória principal perde tudo quando a energia acaba; o que precisa durar fica no disco, uma sequência enorme de blocos numerados. O sistema de arquivos é a parte do SO que transforma esses blocos em arquivos com nome, pastas e permissões.</p>
+  <ul class="b">
+    <li>Arquivo: conjunto de dados relacionados, guardado em memória secundária e identificado por um nome. Muitas vezes o nome tem uma extensão (<code>.txt</code>, <code>.c</code>) que indica o tipo.</li>
+    <li>Atributos que o SO guarda junto: tamanho, dono, proteção, datas de criação e de último acesso e modificação, localização no disco.</li>
+    <li>Operações, todas por syscalls: criar, abrir, ler, gravar, posicionar, fechar, apagar, renomear.</li>
+    <li>"Abrir" busca os atributos uma vez e guarda numa tabela de arquivos abertos, para as próximas leituras não precisarem procurar de novo.</li>
+  </ul>
+</section>
+
+<section class="cs" id="metodo-acesso" data-grupo="Arquivos" data-termos="metodo-acesso" data-leitura="arquivos">
+  <h2>Organização e método de acesso</h2>
+  <p class="cs-def">Organização é como os dados ficam arrumados dentro do arquivo; método de acesso é como o programa chega a eles.</p>
+  <ul class="b">
+    <li>Organização sequencial: uma fileira de registros ou de bytes. Hoje quase todo SO vê o arquivo como uma sequência de bytes e deixa a estrutura para o programa.</li>
+    <li>Organização relativa e indexada: registros de tamanho fixo numerados, ou com uma chave e um índice que leva a cada registro.</li>
+    <li>Acesso sequencial: lê do começo para o fim, na ordem gravada.</li>
+    <li>Acesso direto: pula para o registro n sem ler os anteriores.</li>
+    <li>Acesso indexado: consulta um índice pela chave e depois acessa direto.</li>
+  </ul>
+</section>
+
+<section class="cs" id="diretorio" data-grupo="Arquivos" data-termos="diretorio,caminho" data-leitura="arquivos">
+  <h2>Diretórios e caminhos</h2>
+  <p class="cs-def">Um diretório (pasta) é uma tabela que associa nomes a arquivos (e aos atributos ou à localização deles). O próprio diretório é guardado como um arquivo especial.</p>
+  <ul class="b">
+    <li>Nível único: um diretório para tudo e para todos. Dois usuários não podem ter arquivos com o mesmo nome.</li>
+    <li>Dois níveis: um diretório mestre (MFD) com um diretório por usuário (UFD). Resolve os nomes, mas não deixa organizar em grupos.</li>
+    <li>Hierárquico: diretórios dentro de diretórios, em quantos níveis quiser, a partir de uma raiz. É o modelo de todos os SOs atuais.</li>
+    <li>Caminho absoluto: o endereço completo a partir da raiz. Caminho relativo: a partir do diretório de trabalho atual.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b"><li>Absoluto: <code>/home/ana/notas.txt</code>. Estando em <code>/home</code>, o mesmo arquivo é <code>ana/notas.txt</code> (relativo).</li></ul>
+  </div>
+  <div data-ref-mn="mn-diretorio"></div>
+</section>
+
+<section class="cs" id="alocacao-arquivos" data-grupo="Arquivos" data-termos="bloco-disco,alocacao-encadeada,fat,alocacao-indexada" data-leitura="arquivos">
+  <h2>Alocação de espaço no disco: contígua, encadeada, FAT e indexada</h2>
+  <p class="cs-def">O disco é dividido em blocos de tamanho fixo (4 KB, por exemplo). A alocação decide em quais blocos o arquivo vai e como o SO lembra disso.</p>
+  <ul class="b">
+    <li>Contígua (a <a href="#alocacao-contigua">alocação contígua</a> aplicada ao disco): o arquivo ocupa blocos seguidos, e o diretório guarda só o primeiro bloco e o tamanho. Leitura sequencial rapidíssima (o braço do disco quase não se mexe) e acesso direto fácil (bloco n = início + n).</li>
+    <li>Defeitos da contígua: os mesmos das <a href="#particao-variavel">partições variáveis</a>. Fragmentação externa, escolha de buraco por first/best/worst-fit, compactação periódica (desfragmentar). E o SO precisa saber o tamanho final na criação; se o arquivo crescer e o bloco seguinte estiver ocupado, é preciso mudá-lo de lugar.</li>
+    <li>Alocação encadeada: cada bloco guarda, no fim, o número do próximo bloco do arquivo. O diretório guarda o primeiro (e o último). Qualquer bloco livre serve: sem fragmentação externa, e o arquivo cresce à vontade.</li>
+    <li>Defeitos da encadeada: só serve bem para acesso sequencial. Para ler o bloco 100, é preciso ler os 99 anteriores para seguir a corrente. Se um ponteiro se corromper, o resto do arquivo se perde. E parte de cada bloco vai para o ponteiro.</li>
+    <li>FAT (file allocation table, do MS-DOS e dos pen drives): variante famosa da encadeada. Os ponteiros saem dos blocos e vão para uma tabela única, que fica na memória. Seguir a corrente passa a ser consultar a tabela, sem ler o disco.</li>
+    <li>Alocação indexada: os ponteiros de todos os blocos do arquivo ficam juntos num bloco de índice. Acesso direto rápido (o índice diz onde está o bloco n) e sem fragmentação externa. Custo: o espaço do índice, mesmo para arquivos minúsculos. A versão do Unix é o <a href="#i-node">i-node</a>.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b"><li>Com blocos de 4 KB, um arquivo de 10 KB ocupa 3 blocos.</li></ul>
+  </div>
+  <p class="prova">Alocação de arquivos: contígua (rápida, acesso direto fácil, mas fragmentação externa e precisa saber o tamanho); encadeada (sem fragmentação externa, mas acesso direto lento e ponteiro corrompido perde o resto; a FAT põe a corrente numa tabela); indexada (bloco de índice, acesso direto rápido; i-node do Unix com ponteiros diretos e indiretos).</p>
+  <div data-ref-loop="arquivos"></div>
+</section>
+
+<section class="cs" id="i-node" data-grupo="Arquivos" data-termos="i-node" data-leitura="arquivos">
+  <h2>I-node</h2>
+  <p class="cs-def">No Unix e no Linux cada arquivo tem uma ficha, o i-node (index node), com todos os atributos e os ponteiros para os blocos. O diretório só associa o nome ao número do i-node.</p>
+  <ul class="b">
+    <li>É a estrutura de alocação indexada do Unix. 15 ponteiros: 12 diretos (apontam blocos de dados), 1 indireto simples (aponta um bloco cheio de ponteiros), 1 indireto duplo (ponteiros para blocos de ponteiros) e 1 indireto triplo.</li>
+  </ul>
+  <div class="cs-formula">
+    <div class="formula">ponteiros por bloco = tamanho do bloco / tamanho do ponteiro</div>
+  </div>
+  <div class="cs-uso">
+    <p>Blocos de 4 KB e ponteiros de 4 bytes: cada bloco de ponteiros guarda 4 096 / 4 = 1 024 ponteiros.</p>
+    <ul class="b">
+      <li>12 diretos: 12 × 4 KB = 48 KB. Arquivos pequenos (a maioria) se resolvem aqui, sem nenhum acesso extra.</li>
+      <li>Indireto simples: 1 024 × 4 KB = 4 MB.</li>
+      <li>Indireto duplo: 1 024 × 1 024 × 4 KB = 2²⁰ × 2¹² = 2³² bytes = 4 GB.</li>
+      <li>Indireto triplo: 1 024³ × 4 KB = 2⁴² bytes = 4 TB.</li>
+      <li>Total ≈ 4 TB. Arquivo pequeno com acesso rápido, arquivo enorme possível: é por isso que o desenho é assimétrico.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="espaco-livre" data-grupo="Arquivos" data-termos="vetor-bits,lista-livres" data-leitura="arquivos">
+  <h2>Espaço livre: vetor de bits e lista de blocos livres</h2>
+  <p class="cs-def">O SO precisa saber quais blocos do disco estão livres. No vetor de bits há um bit por bloco; na lista de blocos livres, cada bloco livre aponta o próximo.</p>
+  <ul class="b">
+    <li>Vetor de bits (mapa de bits): 1 = livre e 0 = ocupado (ou o contrário). Achar n blocos livres seguidos é procurar n bits seguidos.</li>
+    <li>Lista de blocos livres: cada bloco livre guarda o número do próximo livre, como na <a href="#alocacao-arquivos">alocação encadeada</a>. Não ocupa espaço extra, mas achar blocos seguidos é difícil.</li>
+    <li>Tabela de blocos livres contíguos: guarda pares (primeiro bloco, quantidade), ótimo quando o espaço livre está em trechos grandes.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b"><li>Disco de 1 TB com blocos de 4 KB: 2⁴⁰ / 2¹² = 2²⁸ blocos → 2²⁸ bits = 2²⁵ bytes = 32 MB de mapa.</li></ul>
+  </div>
+</section>
+
+<section class="cs" id="protecao-arquivos" data-grupo="Arquivos" data-termos="acl,buffer-cache" data-leitura="arquivos">
+  <h2>Proteção de acesso (ACL) e buffer cache</h2>
+  <p class="cs-def">A proteção diz quem pode fazer o quê com cada arquivo. O buffer cache é a área da memória onde o SO guarda os blocos de disco usados recentemente.</p>
+  <ul class="b">
+    <li>Proteção, do mais simples ao mais fino: senha por arquivo; grupos de usuários (no Unix, permissões de leitura, escrita e execução para dono, grupo e outros, o <code>rwxr-x---</code>); e a lista de controle de acesso (ACL), que diz para cada usuário ou grupo o que ele pode fazer com aquele arquivo.</li>
+    <li>Buffer cache: uma leitura repetida não vai ao disco.</li>
+    <li>Na escrita, o mesmo dilema da cache da <a href="/m8/comp/02-fundamentos-memoria">aula 02</a>: gravar logo no disco (seguro, lento) ou só depois (rápido, mas uma queda de energia perde o que estava só na memória). Por isso existe "remover o pen drive com segurança".</li>
+  </ul>
+</section>
+
+<!-- ================= E/S e discos ================= -->
+<section class="cs" id="camadas-es" data-grupo="E/S e discos" data-termos="subsistema-es,driver,controlador" data-leitura="es">
+  <h2>As camadas de E/S: subsistema, driver e controlador</h2>
+  <p class="cs-def">O SO esconde a variedade dos dispositivos atrás de camadas (processo → subsistema de E/S → driver → controlador → dispositivo), para o programa só chamar <code>read</code> e <code>write</code>.</p>
+  <ul class="b">
+    <li>Cada dispositivo é de um jeito: teclado manda um caractere de vez em quando, disco manda blocos de 4 KB, sensor manda uma leitura por período.</li>
+    <li>Subsistema de E/S: a parte do kernel independente de dispositivo. Dá nomes uniformes, controla quem pode usar o quê, mantém buffers e cache, trata erros comuns.</li>
+    <li>Driver (device driver): o código que sabe falar com um modelo específico de dispositivo. Traduz "ler bloco 512" nos comandos e registradores daquele controlador. Roda no kernel, por isso um driver com defeito derruba o sistema todo.</li>
+    <li>Controlador: o hardware que fica entre o barramento e o dispositivo (a placa controladora de disco, o chip do Bluetooth). Tem registradores de comando, de status e de dados, e às vezes um buffer próprio.</li>
+    <li>Dispositivo: o aparelho em si (o disco, o teclado, o sensor).</li>
+  </ul>
+  <div data-ref-mn="mn-camadas"></div>
+</section>
+
+<section class="cs" id="tipos-dispositivo" data-grupo="E/S e discos" data-termos="dispositivo-bloco" data-leitura="es">
+  <h2>Dispositivo de bloco e de caractere; E/S síncrona e assíncrona</h2>
+  <p class="cs-def">Dispositivo de bloco: guarda dados em blocos endereçáveis e permite acesso direto (disco, SSD). Dispositivo de caractere: um fluxo de bytes sem endereço (teclado, mouse, porta serial, a maioria dos sensores).</p>
+  <ul class="b">
+    <li>E/S síncrona: o processo pede e fica bloqueado até terminar (o caso comum).</li>
+    <li>E/S assíncrona: o processo pede, continua trabalhando e é avisado quando acabar.</li>
+  </ul>
+</section>
+
+<section class="cs" id="modos-es" data-grupo="E/S e discos" data-termos="e-s-programada,polling,e-s-interrupcao,dma" data-leitura="es">
+  <h2>Polling, interrupção e DMA</h2>
+  <p class="cs-def">Três jeitos de a CPU conversar com o dispositivo: perguntar sem parar se ele terminou (polling), ser avisada por uma interrupção, ou deixar um controlador de DMA copiar o bloco inteiro sozinho.</p>
+  <ul class="b">
+    <li>E/S programada com polling (busy waiting, <a href="/m8/comp/05-sincronizacao-deadlocks">aula 05</a>): a CPU manda o comando e fica lendo o registrador de status do controlador em laço ("já terminou? já terminou?"). Simples, mas a CPU fica presa enquanto o dispositivo trabalha.</li>
+    <li>E/S dirigida por interrupção: a CPU manda o comando e vai rodar outro processo. Quando o dispositivo termina, o controlador gera uma interrupção (<a href="/m8/comp/04-processos-threads">aula 04</a>) e o SO trata. A CPU só trabalha no começo e no fim. Mas se o dispositivo transfere muitos dados, cada palavra ainda gera uma interrupção e passa pela CPU.</li>
+    <li>DMA (direct memory access, acesso direto à memória): um controlador de DMA copia o bloco inteiro entre o dispositivo e a memória sozinho, sem a CPU. A CPU só diz "copie 4 KB do dispositivo para o endereço X" e recebe uma única interrupção no fim.</li>
+    <li>Enquanto o DMA copia, CPU e DMA disputam o barramento de memória de vez em quando (o DMA "rouba ciclos"), mas a CPU segue trabalhando.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Polling de um mouse, consultado 60 vezes por segundo, cada consulta custando 400 ciclos numa CPU de 1 GHz: 60 × 400 = 24 000 ciclos/s, ou 24 000 / 10⁹ = 0,0024% da CPU. Barato: polling é razoável para dispositivos lentos e consultados de vez em quando.</li>
+      <li>Polling de um dispositivo que transfere 4 MB/s, de 4 em 4 bytes: 1 milhão de consultas por segundo × 400 ciclos = 4 × 10⁸ ciclos/s = 40% da CPU. Caro demais.</li>
+      <li>O mesmo dispositivo com interrupção por palavra: 1 milhão de interrupções por segundo, cada uma de 500 ciclos = 50% da CPU.</li>
+      <li>Com DMA, em blocos de 4 KB: 4 MB / 4 KB = 1 000 interrupções por segundo × 500 ciclos = 5 × 10⁵ ciclos/s = 0,05% da CPU.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b"><li>Interrupção por palavra pode sair mais cara que polling (50% contra 40% no exemplo): interrupção tem custo fixo alto.</li></ul>
+  </div>
+  <div class="cs-ponderada">
+    <p>A ferramenta é a conta acima: custo por evento vezes eventos por segundo, e quanto tempo a CPU fica presa esperando. Exemplo com outros números: um módulo de GPS manda 10 leituras por segundo; uma estação meteorológica sobe 2 MB de log por dia. Para o GPS, a interrupção avisa quando há leitura nova e a CPU dorme no meio, o que poupa bateria. Para o log, o DMA leva o bloco ao rádio sem a CPU copiar byte a byte. Perguntas: <em>a leitura do sensor de distância deve chegar por polling ou por interrupção, e o que isso faz com o tempo até a amostra começar a ser processada? O envio pelo BLE ocupa a CPU durante a transmissão ou pode ir por DMA e <a href="#buffering">buffer</a>?</em></p>
+  </div>
+  <div data-ref-loop="dma"></div>
+</section>
+
+<section class="cs" id="buffering" data-grupo="E/S e discos" data-termos="buffering,spooling" data-leitura="es">
+  <h2>Buffering e spooling</h2>
+  <p class="cs-def">Buffering: uma área de memória (o buffer) guarda dados em trânsito, para compensar a diferença de velocidade entre quem produz e quem consome. É o produtor-consumidor da <a href="/m8/comp/05-sincronizacao-deadlocks">aula 05</a> aplicado a E/S.</p>
+  <ul class="b">
+    <li>Buffer duplo: enquanto o dispositivo enche um buffer, o processo esvazia o outro; depois trocam. Nenhum dos dois para para esperar o outro.</li>
+    <li>Spooling: o caso da impressora. Ela só atende um trabalho por vez, mas vários processos querem imprimir. Cada processo grava a saída num arquivo no disco (o spool) e segue em frente; um processo do sistema manda os arquivos para a impressora, um por vez, na ordem.</li>
+  </ul>
+</section>
+
+<section class="cs" id="disco" data-grupo="E/S e discos" data-termos="trilha,setor,cilindro" data-leitura="discos">
+  <h2>Disco rígido: trilha, setor e cilindro</h2>
+  <p class="cs-def">Um ou mais pratos giram juntos, a 5 400, 7 200 ou 15 000 rotações por minuto (rpm). Cada face tem círculos concêntricos, as trilhas, cortadas em setores (512 bytes ou 4 KB), a menor unidade que o disco lê ou grava.</p>
+  <ul class="b">
+    <li>O disco magnético é o dispositivo em que a ordem dos pedidos mais pesa no desempenho, porque uma parte do custo é mecânica: mexer um braço.</li>
+    <li>Um braço leva uma cabeça de leitura por face. As cabeças se movem juntas, então as trilhas na mesma posição de todos os pratos formam um cilindro. Os pedidos ao disco são identificados pelo cilindro.</li>
+  </ul>
+  <div data-ref-mn="mn-disco"></div>
+</section>
+
+<section class="cs" id="tempo-acesso-disco" data-grupo="E/S e discos" data-termos="seek,latencia-rotacional,tempo-transferencia" data-leitura="discos">
+  <h2>Tempo de acesso: seek, latência rotacional e transferência</h2>
+  <p class="cs-def">Um acesso ao disco soma três tempos: mover o braço (seek), esperar o setor passar (latência rotacional) e ler os bits (transferência).</p>
+  <div class="cs-formula">
+    <div class="formula">tempo de acesso = seek + latência rotacional + transferência</div>
+    <ul class="b">
+      <li>Seek: mover o braço até o cilindro certo. É o maior pedaço, alguns ms, e depende da distância.</li>
+      <li>Latência rotacional: esperar o setor certo passar debaixo da cabeça. Em média, meia volta.</li>
+      <li>Tempo de transferência: ler os bits do setor enquanto ele passa. Pequeno.</li>
+    </ul>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Disco de 7 200 rpm. Uma volta: 60 s / 7 200 = 0,00833 s = 8,33 ms. Latência média = meia volta = 4,17 ms.</li>
+      <li>Seek médio de 5 ms e transferência de 4 KB a 200 MB/s (4 / 200 000 s = 0,02 ms): o acesso leva 5 + 4,17 + 0,02 ≈ 9,2 ms. Isso é 92 mil vezes um acesso à memória de 100 ns.</li>
+      <li>Seek e latência são quase tudo; reduzir o seek é o que o <a href="#escalonamento-disco">escalonamento de disco</a> consegue fazer.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="escalonamento-disco" data-grupo="E/S e discos" data-termos="escalonamento-disco,sstf,scan,c-scan" data-leitura="discos">
+  <h2>Escalonamento de disco: FCFS, SSTF, SCAN e C-SCAN</h2>
+  <p class="cs-def">Vários processos pedem cilindros diferentes ao mesmo tempo. O escalonamento de disco escolhe a ordem de atendimento para reduzir a distância total que o braço percorre.</p>
+  <ul class="b">
+    <li>FCFS: atende na ordem de chegada. Justo e sem starvation, mas o braço vai e volta à toa.</li>
+    <li>SSTF (shortest seek time first): atende o pedido mais próximo da posição atual. É o <a href="#sjf">SJF</a> do disco. Pode causar starvation de pedidos nas pontas, se sempre chegarem pedidos perto do meio.</li>
+    <li>SCAN (algoritmo do elevador): o braço vai até a ponta numa direção atendendo tudo no caminho, depois inverte. Sem starvation, mas os cilindros do meio são visitados duas vezes por ida e volta, e os das pontas, uma: quem está na ponta espera mais.</li>
+    <li>C-SCAN (SCAN circular): atende só subindo; ao chegar na ponta, volta direto para o cilindro 0 sem atender ninguém e recomeça. A espera fica mais uniforme entre os cilindros.</li>
+    <li>Variações comuns: LOOK e C-LOOK, que fazem o mesmo que SCAN e C-SCAN mas só vão até o último pedido de cada lado, sem ir até a ponta do disco.</li>
+    <li>Em SSD (disco de estado sólido, memória flash sem partes móveis) não há seek nem latência rotacional. Os algoritmos que reordenam por cilindro perdem o sentido, e o SO usa algo próximo de FCFS.</li>
+  </ul>
+  <div class="cs-uso">
+    <p>200 cilindros (0 a 199), cabeça no 70 indo para cima, fila 130, 20, 95, 180, 40, 150, 75, 10:</p>
+    <ul class="b">
+      <li>FCFS: 720 cilindros.</li>
+      <li>SSTF: 280 cilindros.</li>
+      <li>SCAN: 318 cilindros.</li>
+      <li>C-SCAN: 169 cilindros atendendo, mais 199 do retorno.</li>
+    </ul>
+  </div>
+  <p class="prova">Escalonamento de disco: FCFS é justo e lento; SSTF minimiza o seek a cada passo, mas pode causar starvation; SCAN (elevador) varre de ponta a ponta; C-SCAN só atende num sentido e volta direto, deixando a espera mais uniforme.</p>
+  <div data-ref="fig-disco"></div>
+</section>
+
+<section class="cs" id="raid" data-grupo="E/S e discos" data-termos="raid" data-leitura="discos">
+  <h2>RAID</h2>
+  <p class="cs-def">RAID (redundant array of independent disks): vários discos que o SO enxerga como um só, para ganhar velocidade, segurança, ou as duas.</p>
+  <ul class="b">
+    <li>RAID 0 (striping): os blocos se espalham pelos discos e são lidos em paralelo. Rápido, sem redundância: um disco que quebra perde tudo.</li>
+    <li>RAID 1 (espelhamento): cada bloco é gravado em dois discos. Aguenta a perda de um; custa metade da capacidade.</li>
+    <li>RAID 5: blocos espalhados mais um bloco de paridade (um resumo que permite recalcular um bloco perdido), também espalhada. Aguenta a perda de um disco e gasta só um disco de capacidade.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b"><li>4 discos de 2 TB: RAID 0 = 8 TB úteis; RAID 1 = 4 TB; RAID 5 = (4 − 1) × 2 = 6 TB.</li></ul>
+  </div>
+</section>

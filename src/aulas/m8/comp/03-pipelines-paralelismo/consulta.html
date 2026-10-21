@@ -3,42 +3,12 @@
      Figuras, loops, desenhos de margem e tabelas vêm do conteudo.html (data-ref, data-ref-loop, data-ref-mn, data-ref-tbl). -->
 
 <!-- ================= Base ================= -->
-<section class="cs" id="encontro" data-grupo="Para o encontro" data-termos="" data-leitura="encontro">
-  <h2>O encontro em 15 minutos</h2>
-  <p class="cs-def">O encontro começa com um quiz rápido do autoestudo, revisa os conceitos em chips reais com uma caixa de segurança, faz exercícios no hardware do projeto e termina numa decisão de projeto. Os slides de 19/10 já avisaram o que vem neste encontro: paralelismo entre núcleos e o Meltdown.</p>
-  
-  <h3>Caminho curto</h3>
-  <p>Se o tempo é pouco, leia nesta ordem:</p>
-  <ol class="caminho">
-   <li><a href="#pipeline">A ideia do pipeline</a>: throughput × latência e por que o speedup real fica abaixo do número de stages.</li>
-   <li><a href="#hazard">Hazards e stalls</a>: os três tipos e a conta CPI = 1 + stalls, a mais cobrada.</li>
-   <li><a href="#forwarding">Forwarding</a>: resolve quase todo hazard de dados; o load seguido de uso ainda custa 1 stall.</li>
-   <li><a href="#hazard-controle">Branches e predição</a>: branch penalty e o preditor de 2 bits num laço.</li>
-   <li><a href="#especulacao">Especulação e ROB</a>: só a ideia de executar fora de ordem e fazer o commit em ordem. Sem ela, o Spectre não faz sentido.</li>
-   <li><a href="#nucleos">Mais núcleos</a>: Amdahl com N núcleos e por que 4 núcleos não dão 4 vezes.</li>
-   <li><a href="#reais">Pipelines de verdade</a> e <a href="#seguranca">Spectre e Meltdown</a>: o pipeline dos chips do projeto e o ataque anunciado para este encontro.</li>
-  </ol>
-  <p class="depois">Complementos do professor para este encontro: o <a href="https://www.youtube.com/watch?v=QnpDwbLHOfY" target="_blank" rel="noopener">vídeo do DesCOMPlica</a> (14 min) cobre pipeline, hazards de dados e de controle e forwarding; o <a href="https://www.lighterra.com/papers/modernmicroprocessors/" target="_blank" rel="noopener">guia da Lighterra</a> passa por todo o caminho curto em 90 minutos. A versão curta deles aparece nas seções, no bloco "Em resumo".</p>
-  <p class="depois">Pode deixar para depois: <a href="#ilp">ILP e loop unrolling</a> (dependência verdadeira × de nome; desenrolar amortiza o controle do laço) · <a href="#tomasulo">Tomasulo</a> (renomear elimina WAR e WAW) · <a href="#emissao-multipla">superescalar e VLIW</a> (quem escolhe o que emite junto: o hardware ou o compilador) · <a href="#limites-ilp">limites do ILP</a> (na prática, menos de 10 por ciclo; daí os núcleos).</p>
-
-  <h3>Cinco ideias para levar</h3>
-  <ol class="ideias">
-   <li>Pipeline aumenta quantas instruções terminam por segundo. Cada instrução continua levando o mesmo tempo, e o stage mais lento dita o clock.</li>
-   <li>CPI real = 1 + stalls. Cada hazard soma frequência × ciclos perdidos.</li>
-   <li>Prever e especular escondem a espera dos branches, mas deixam o tempo variável: média boa, pior caso difícil de garantir.</li>
-   <li>O ILP de uma thread se esgotou. O ganho agora vem de núcleos, e Amdahl limita: 1 / ((1 − F) + F/N).</li>
-   <li>A especulação desfaz registradores e memória, mas não desfaz a cache. Spectre e Meltdown moram nessa diferença.</li>
-  </ol>
-
-  <h3>Quiz de treino</h3>
-  <p>Perguntas no formato do quiz do encontro, escritas para treino. Responda de cabeça e abra para conferir.</p>
-  <details class="treino"><summary><span class="q">Q1 · Definição</span> O pipeline diminui o tempo de cada instrução? A) sim B) não, aumenta quantas terminam por segundo C) só com forwarding</summary><p>B. Cada instrução ainda passa por todos os stages e ganha o overhead dos registradores de pipeline. O que sobe é o throughput.</p></details>
-  <details class="treino"><summary><span class="q">Q2 · Notação</span> Em CPI = 1 + stalls, de onde vem o 1 e o que entra em "stalls"?</summary><p>O 1 é o pipeline ideal terminando uma instrução por ciclo. "Stalls" é a média de ciclos perdidos por instrução: para cada hazard, frequência × ciclos que ele custa, somados.</p></details>
-  <details class="treino"><summary><span class="q">Q3 · Limite</span> Stages de 200, 150, 250, 250 e 150 ps, mais 20 ps de registrador. Speedup sobre a versão sem pipeline (1000 ps por instrução)? A) 5 B) 4 C) menos de 4</summary><p>C. O ciclo vira o stage mais lento + registrador = 250 + 20 = 270 ps. Speedup = 1000 / 270 ≈ 3,7.</p></details>
-  <details class="treino"><summary><span class="q">Q4 · Armadilha</span> Com forwarding, um hazard de dados nunca mais causa stall?</summary><p>Causa. Load seguido de uso custa 1 stall: o dado só existe no fim do MEM, e a instrução seguinte precisaria dele no começo do EX, no mesmo ciclo.</p></details>
-  <details class="treino"><summary><span class="q">Q5 · Conta</span> 20% das instruções são branches, o preditor erra 10% deles e cada erro custa 3 ciclos. Quanto isso soma ao CPI?</summary><p>0,20 × 0,10 × 3 = 0,06 ciclo por instrução.</p></details>
-  <details class="treino"><summary><span class="q">Q6 · Limite</span> 80% do programa dá para dividir entre núcleos. Speedup com 4 núcleos? E com infinitos?</summary><p>1 / (0,2 + 0,8/4) = 1 / 0,4 = 2,5. Com infinitos, 1 / 0,2 = 5. Os 20% que não se dividem mandam.</p></details>
-  <details class="treino"><summary><span class="q">Q7 · Segurança</span> Se o ROB joga fora a instrução especulada errada, de onde o Spectre tira o segredo?</summary><p>Da cache. A linha que a instrução especulada carregou continua lá. Medindo o tempo de acesso (2 ns ou mais de 100 ns, como na aula 02), o atacante descobre qual linha foi tocada e, com ela, o valor secreto.</p></details>
+<section class="cs" id="encontro" data-grupo="Resumo" data-termos="" data-leitura="encontro">
+  <h2>Resumo</h2>
+  <p class="cs-def">O essencial de pipeline e paralelismo em poucas linhas.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 120"><rect class="k" x="8" y="6" width="24" height="18" rx="3"/><text class="tm" x="20" y="15">IF</text><rect class="k" x="34" y="6" width="24" height="18" rx="3"/><text class="tm" x="46" y="15">ID</text><rect class="acf" x="60" y="6" width="24" height="18" rx="3"/><text class="tm" x="72" y="15">EX</text><rect class="k" x="86" y="6" width="24" height="18" rx="3"/><text class="tm" x="98" y="15">MEM</text><rect class="k" x="112" y="6" width="24" height="18" rx="3"/><text class="tm" x="124" y="15">WB</text><rect class="k" x="34" y="30" width="24" height="18" rx="3"/><text class="tm" x="46" y="39">IF</text><rect class="k" x="60" y="30" width="24" height="18" rx="3"/><text class="tm" x="72" y="39">ID</text><rect class="acf" x="86" y="30" width="24" height="18" rx="3"/><text class="tm" x="98" y="39">EX</text><rect class="k" x="112" y="30" width="24" height="18" rx="3"/><text class="tm" x="124" y="39">MEM</text><rect class="k" x="138" y="30" width="24" height="18" rx="3"/><text class="tm" x="150" y="39">WB</text><rect class="k" x="60" y="54" width="24" height="18" rx="3"/><text class="tm" x="72" y="63">IF</text><rect class="k" x="86" y="54" width="24" height="18" rx="3"/><text class="tm" x="98" y="63">ID</text><rect class="acf" x="112" y="54" width="24" height="18" rx="3"/><text class="tm" x="124" y="63">EX</text><rect class="k" x="138" y="54" width="24" height="18" rx="3"/><text class="tm" x="150" y="63">MEM</text><rect class="k" x="164" y="54" width="24" height="18" rx="3"/><text class="tm" x="176" y="63">WB</text><rect class="k" x="86" y="78" width="24" height="18" rx="3"/><text class="tm" x="98" y="87">IF</text><rect class="k" x="112" y="78" width="24" height="18" rx="3"/><text class="tm" x="124" y="87">ID</text><rect class="acf" x="138" y="78" width="24" height="18" rx="3"/><text class="tm" x="150" y="87">EX</text><rect class="k" x="164" y="78" width="24" height="18" rx="3"/><text class="tm" x="176" y="87">MEM</text><rect class="k" x="190" y="78" width="24" height="18" rx="3"/><text class="tm" x="202" y="87">WB</text><text class="tm st" x="8" y="114">ciclo →  uma instrução termina por ciclo</text></svg>Quatro instruções sobrepostas: cada uma leva 5 ciclos, mas sai uma por ciclo.</aside>
+  <ul class="b"><li>Pipeline aumenta quantas instruções terminam por segundo; cada instrução leva o mesmo tempo, e o stage mais lento dita o clock.</li><li>CPI real = 1 + stalls. Cada hazard soma frequência × ciclos perdidos.</li><li>Prever e especular escondem a espera dos branches, mas deixam o tempo variável: média boa, pior caso difícil.</li><li>O ILP de uma thread se esgotou (parede do ILP e da potência). O ganho agora vem de núcleos, limitado por Amdahl: 1 / ((1 − F) + F/N).</li><li>Os chips do projeto (AVR, Cortex-M0+) têm 2 stages, em ordem e sem especulação: tempo previsível.</li><li>A especulação desfaz registradores, mas não a cache: é daí que vêm Spectre e Meltdown.</li></ul>
+  <div class="cs-pegadinhas"><ul class="b"><li>Forwarding não salva o load seguido de uso: ainda custa 1 stall.</li><li>Speedup real fica abaixo do número de stages (stage mais lento + registrador de pipeline).</li><li>4 núcleos não dão 4 vezes: só se F = 1.</li><li>Predicação não é predição: uma elimina o branch, a outra aposta nele.</li></ul></div>
 </section>
 
 <section class="cs" id="metrica" data-grupo="Base" data-termos="ipc" data-leitura="antes">
@@ -340,6 +310,17 @@ if (aa != bb) { … }       // branch b3: se b1 e b2 zeraram os dois, aa == bb</
 
 <section class="cs" id="predicacao" data-grupo="Branches" data-termos="predicacao" data-leitura="controle">
   <h2>Predicação: trocar o branch por uma instrução condicional</h2>
+  <aside class="mn" data-vis="predicacao" aria-hidden="true"><svg viewBox="0 0 240 124">
+<line class="s" x1="120" y1="4" x2="120" y2="104" style="stroke-dasharray:3 3"/>
+<text class="tm" x="60" y="8">com branch</text><text class="tm" x="180" y="8">com predicação</text>
+<polygon class="am" points="60,18 92,36 60,54 28,36"/><text class="tm" x="60" y="36">a &gt; b?</text>
+<path class="s" d="M40 46 L28 70" marker-end="url(#mnarrow)"/><path class="s" d="M80 46 L92 70" marker-end="url(#mnarrow)"/>
+<rect class="k" x="6" y="72" width="44" height="22" rx="4"/><text class="tm" x="28" y="83">x = a</text>
+<rect class="k" x="70" y="72" width="44" height="22" rx="4"/><text class="tm" x="92" y="83">x = b</text>
+<rect class="k" x="140" y="22" width="80" height="22" rx="4"/><text class="tm" x="180" y="33">x = b</text>
+<path class="s" d="M180 44 L180 64" marker-end="url(#mnarrow)"/>
+<rect class="acf" x="140" y="66" width="80" height="22" rx="4"/><text class="tm" x="180" y="77">cmov x, a</text>
+<text class="tm" x="60" y="114">aposta e pode errar</text><text class="tm" x="180" y="114">sem aposta</text></svg>O branch aposta num caminho; a predicação executa sem apostar.</aside>
   <p class="cs-def">Em vez de pular para um lado ou para o outro, o processador executa uma instrução que só tem efeito se a condição for verdadeira, como o <code>cmov</code> (move condicional) do x86. Sem branch, não há aposta para errar.</p>
   <div class="cs-resumo"><p>Ganha em blocos pequenos: no exemplo do guia, o trecho cai de 3 para 2 ciclos e some o risco de erro de predição. Perde em blocos grandes, porque os dois lados passam a ser executados. O ARM antigo tinha quase toda instrução condicional; o Itanium também.</p><p class="cs-fonte"><a href="https://www.lighterra.com/papers/modernmicroprocessors/" target="_blank" rel="noopener">Lighterra · seção 8 ↗</a></p></div>
   <div class="cs-uso"><pre><code>// com branch                 // com predicação
@@ -572,6 +553,10 @@ SUB.D F12, F8, F14    ; não depende de ninguém, mas fica preso atrás do ADD.D
 <!-- ================= Limites e multithreading ================= -->
 <section class="cs" id="limites-ilp" data-grupo="Limites e multithreading" data-termos="janela-instrucoes" data-leitura="limites">
   <h2>Os limites do ILP: quanto ILP existe?</h2>
+  <aside class="mn" data-vis="limites-ilp" aria-hidden="true"><svg viewBox="0 0 240 104">
+<text class="tm st" x="2" y="26">clock</text><rect class="k" x="62" y="18" width="100" height="16" rx="2"/><rect class="acf" x="162" y="18" width="20" height="16" rx="2"/><text class="ta st" x="188" y="26" style="font-size:11px">+20%</text>
+<text class="tm st" x="2" y="62">potência</text><rect class="k" x="62" y="54" width="100" height="16" rx="2"/><rect class="rd" x="162" y="54" width="50" height="16" rx="2"/><text class="tm st" x="216" y="62" style="fill:var(--red)">+50%</text>
+<text class="tm st" x="2" y="94">P ∝ f × V², e a tensão sobe junto</text></svg>A parede da potência: +20% de clock pode custar +50% de potência.</aside>
   <p class="cs-def">Mesmo num processador perfeito o paralelismo dos programas é limitado, e com limites realistas o número despenca. Espremer mais ILP custa área e energia demais para o ganho.</p>
   <div class="cs-resumo"><ul class="b"><li>Parede da potência: subir o clock em 20% pode pedir 50% mais potência, porque a tensão sobe junto (potência ∝ f × V²). O teto prático fica em 150 a 200 W num desktop e abaixo de 5 W num celular.</li><li>Parede do ILP: programas comuns têm 2 a 3 instruções independentes por ciclo, no máximo; a média do SPECint fica abaixo de 2.</li></ul><p class="cs-fonte"><a href="https://www.lighterra.com/papers/modernmicroprocessors/" target="_blank" rel="noopener">Lighterra · seção 11 ↗</a></p></div>
   <ul class="b">
@@ -611,6 +596,7 @@ SUB.D F12, F8, F14    ; não depende de ninguém, mas fica preso atrás do ADD.D
 
 <section class="cs" id="nucleos" data-grupo="Paralelismo entre núcleos" data-termos="" data-leitura="nucleos">
   <h2>Multicore e Amdahl com N núcleos</h2>
+  <aside class="mn" data-vis="nucleos" aria-hidden="true"><svg viewBox="0 0 240 150"><line class="s" x1="30" y1="130" x2="232" y2="130"/><line class="s" x1="30" y1="130" x2="30" y2="14"/><text class="tm" x="30" y="142">1</text><text class="tm" x="80" y="142">2</text><text class="tm" x="130" y="142">4</text><text class="tm" x="180" y="142">8</text><text class="tm" x="230" y="142">16</text><text class="tm st" x="34" y="12">speedup</text><text class="tm" x="214" y="150"></text><text class="tm" x="20" y="108">2</text><text class="tm" x="20" y="86">4</text><text class="tm" x="20" y="64">6</text><text class="tm" x="20" y="42">8</text><polyline class="ac" points="30,119.0 80,109.0 130,91.7 180,64.8 230,29.4" style="fill:none;stroke-width:2"/><polyline class="am" points="30,119.0 80,111.7 130,102.5 180,93.3 230,86.0" style="fill:none;stroke-width:2"/><polyline class="rd" points="30,119.0 80,115.3 130,112.4 180,110.4 230,109.3" style="fill:none;stroke-width:2"/><text class="ta" x="206" y="22" style="font-size:11px">95%</text><text class="tam" x="214" y="78" style="font-size:11px">80%</text><text class="tm" x="214" y="100" style="fill:var(--red)">50%</text><text class="tm" x="130" y="150"></text></svg>Speedup de Amdahl com 1 a 16 núcleos, para 95%, 80% e 50% do programa paralelizável.</aside>
   <p class="cs-def">Com o ILP esgotado e o clock parado desde perto de 2005, o ganho vem de várias threads em núcleos diferentes. Quem divide o trabalho é o programador.</p>
   <div class="cs-resumo"><ul class="b"><li>Núcleo mais largo ou mais núcleos? A lógica que despacha instruções cresce com o quadrado da largura: um núcleo de 8 por ciclo é mais de 4 vezes maior que um de 4.</li><li>Em 2011, com cerca de 1 bilhão de transistores cada, a Intel fez 4 núcleos largos (Sandy Bridge) e a Sun, 16 núcleos simples com 8 threads cada (Niagara 3). Celulares misturam núcleos grandes e pequenos (big.LITTLE).</li><li>SIMD é o outro caminho: uma instrução para vários dados (SSE, AVX, NEON). Rende muito em imagem, vídeo e áudio e quase nada em compiladores e bancos de dados.</li></ul><p class="cs-fonte"><a href="https://www.lighterra.com/papers/modernmicroprocessors/" target="_blank" rel="noopener">Lighterra · seções 14 e 15 ↗</a></p></div>
   <div data-ref-tbl="tbl-niveis-paralelismo"></div>
@@ -628,6 +614,7 @@ SUB.D F12, F8, F14    ; não depende de ninguém, mas fica preso atrás do ADD.D
 
 <section class="cs" id="reais" data-grupo="Chips reais e segurança" data-termos="latencia-interrupcao,sio,spinlock-hw" data-leitura="reais">
   <h2>Pipelines reais e os dois núcleos do RP2040</h2>
+  <aside class="mn" data-vis="reais" aria-hidden="true"><svg viewBox="0 0 240 152"><text class="tm st" x="2" y="11">AVR</text><rect class="gr" x="72" y="6" width="9.2" height="10" rx="2"/><text class="tm st" x="86.2" y="11">2</text><text class="tm st" x="2" y="27">Cortex-M0+</text><rect class="gr" x="72" y="22" width="9.2" height="10" rx="2"/><text class="tm st" x="86.2" y="27">2</text><text class="tm st" x="2" y="43">Ibex</text><rect class="gr" x="72" y="38" width="9.2" height="10" rx="2"/><text class="tm st" x="86.2" y="43">2</text><text class="tm st" x="2" y="59">Cortex-A9</text><rect class="bl" x="72" y="54" width="36.8" height="10" rx="2"/><text class="tm st" x="113.8" y="59">8</text><text class="tm st" x="2" y="75">Cortex-A72</text><rect class="bl" x="72" y="70" width="69.0" height="10" rx="2"/><text class="tm st" x="146.0" y="75">15</text><text class="tm st" x="2" y="91">Skylake</text><rect class="bl" x="72" y="86" width="87.4" height="10" rx="2"/><text class="tm st" x="164.4" y="91">14–19</text><text class="tm st" x="2" y="107">Zen</text><rect class="bl" x="72" y="102" width="87.4" height="10" rx="2"/><text class="tm st" x="164.4" y="107">17–19</text><text class="tm st" x="2" y="123">Pentium 4</text><rect class="rd" x="72" y="118" width="92.0" height="10" rx="2"/><text class="tm st" x="169.0" y="123">20</text><text class="tm st" x="2" y="139">Prescott</text><rect class="rd" x="72" y="134" width="142.6" height="10" rx="2"/><text class="tm st" x="219.6" y="139">31</text></svg>Stages do pipeline. Em verde, os chips do projeto.</aside>
   <p class="cs-def">Os chips do projeto (AVR, Cortex-M0+, Ibex) têm pipeline de 2 stages, em ordem e sem especulação. O Core i7 do livro tem 14, fora de ordem e especulativo.</p>
   <div data-ref-tbl="tbl-pipelines-reais"></div>
   <ul class="b">
@@ -645,6 +632,14 @@ SUB.D F12, F8, F14    ; não depende de ninguém, mas fica preso atrás do ADD.D
 
 <section class="cs" id="seguranca" data-grupo="Chips reais e segurança" data-termos="estado-microarquitetural,execucao-transitoria,kpti" data-leitura="seguranca">
   <h2>Spectre e Meltdown</h2>
+  <aside class="mn" data-vis="seguranca" aria-hidden="true"><svg viewBox="0 0 240 150">
+<rect class="bl" x="4" y="4" width="232" height="26" rx="5"/><text class="tm st" x="12" y="17">1 · treina: o if passa a ser "tomado"</text>
+<path class="s" d="M120 30 L120 38" marker-end="url(#mnarrow)"/>
+<rect class="bl" x="4" y="40" width="232" height="26" rx="5"/><text class="tm st" x="12" y="53">2 · especula: lê s e toca B[s × 4096]</text>
+<path class="s" d="M120 66 L120 74" marker-end="url(#mnarrow)"/>
+<rect class="am" x="4" y="76" width="232" height="26" rx="5"/><text class="tm st" x="12" y="89">3 · desfaz: y some, a linha fica</text>
+<path class="s" d="M120 102 L120 110" marker-end="url(#mnarrow)"/>
+<rect class="rd" x="4" y="112" width="232" height="26" rx="5"/><text class="tm st" x="12" y="125">4 · mede: a leitura rápida revela s</text></svg>Spectre em quatro passos.</aside>
   <p class="cs-def">Ataques de execução transitória: o ROB desfaz registradores e memória, mas a linha que a especulação trouxe para a cache fica, e o tempo de acesso revela o segredo.</p>
   <ul class="b">
     <li>Estado microarquitetural: cache, preditor, TLB. O programa não vê, mas dá para medir pelo tempo (Flush+Reload, aula 02).</li>

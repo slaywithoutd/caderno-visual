@@ -75,28 +75,44 @@ export function initDefinicoes() {
   addEventListener('hashchange', destacar); destacar();
 }
 
-/* Modo compacto do Consulta: cada seção mostra só o essencial (título, definição, "Em resumo", fórmula e
-   "cai na prova"); o resto (como usar, pegadinhas, figuras, tabelas, desenhos) vai para um "Detalhes" que
-   abre com um clique. As seções do encontro e do treino ficam abertas. Chegar a uma seção por link abre os
-   detalhes dela. O botão do topo abre ou recolhe todos, e a escolha fica no navegador. */
-const SEMPRE_ABERTAS = new Set(['encontro', 'treino']);
-const VISIVEL = '.cs-def, .cs-resumo, .cs-formula, p.prova';
+/* Modo compacto do Consulta.
+   - À vista sempre: título, definição (cs-def), "Em resumo", fórmula, "cai na prova" e todo recurso visual
+     (desenho de margem, loop, figura, tabela).
+   - Vai para um "Detalhes" fechado só o trecho que não é essencial E tem mais de 5 linhas na tela
+     (como usar, pegadinhas, listas, código). Trecho curto fica à vista: não vale um clique.
+   - Cada desenho de margem sobe para perto do texto visível, para o texto contornar o desenho em vez de
+     ele ficar sozinho no fim da seção.
+   - A seção "Resumo" (id encontro) fica inteira. Chegar a uma seção por link abre os detalhes dela; o botão
+     do topo abre ou recolhe todos, e a escolha fica no navegador. */
+const SEMPRE_ABERTAS = new Set(['encontro']);
+const ESSENCIAL = 'h2, .cs-def, .cs-resumo, .cs-formula, p.prova, aside.mn, figure, .tbl, .widget';
+const LINHAS_MIN = 5;
 const PARTES = [
-  ['.cs-uso', 'como usar'], ['.cs-pegadinhas', 'pegadinhas'], ['.cs-ponderada', 'ponderada'],
-  ['figure.fig', 'figura'], ['aside.loop', 'animação'], ['aside.mn:not(.loop)', 'desenho'], ['.tbl', 'tabela'],
+  ['.cs-uso', 'como usar'], ['.cs-pegadinhas', 'pegadinhas'], ['.cs-ponderada', 'ponderada'], ['pre', 'código'],
 ];
 export function initCompacto() {
-  const secoes = [...document.querySelectorAll('#aula-root section.cs')].filter((s) => !SEMPRE_ABERTAS.has(s.id));
+  const secoes = [...document.querySelectorAll('#aula-root section.cs')];
   const todos = [];
   for (const sec of secoes) {
-    const resto = [...sec.children].filter((el) => el.tagName !== 'H2' && !el.matches(VISIVEL));
-    if (!resto.length) continue;
-    const det = H('details', { class: 'cs-detalhes' });
-    const tem = PARTES.filter(([sel]) => resto.some((el) => el.matches(sel) || el.querySelector(sel))).map(([, nome]) => nome);
-    det.innerHTML = `<summary>Detalhes${tem.length ? ` <span>${tem.join(' · ')}</span>` : ''}</summary>`;
-    sec.appendChild(det);
-    resto.forEach((el) => det.appendChild(el));
-    todos.push(det);
+    const linha = parseFloat(getComputedStyle(sec).lineHeight) || 28;
+    if (!SEMPRE_ABERTAS.has(sec.id)) {
+      const longos = [...sec.children].filter((el) => !el.matches(ESSENCIAL) && el.offsetHeight > LINHAS_MIN * linha);
+      if (longos.length) {
+        const det = H('details', { class: 'cs-detalhes' });
+        const tem = PARTES.filter(([sel]) => longos.some((el) => el.matches(sel) || el.querySelector(sel))).map(([, nome]) => nome);
+        det.innerHTML = `<summary>Detalhes${tem.length ? ` <span>${tem.join(' · ')}</span>` : ''}</summary>`;
+        sec.appendChild(det);
+        longos.forEach((el) => det.appendChild(el));
+        todos.push(det);
+      }
+    }
+    /* desenhos de margem: o 1º entra logo abaixo do título; os outros, intercalados com os blocos de texto */
+    const desenhos = [...sec.children].filter((el) => el.matches('aside.mn'));
+    const blocos = [...sec.children].filter((el) => !el.matches('h2, aside.mn, details.cs-detalhes, figure, .tbl'));
+    desenhos.forEach((d, i) => {
+      const alvo = blocos[Math.min(i * 2, blocos.length - 1)];
+      if (alvo) alvo.before(d);
+    });
   }
   const botao = document.getElementById('cs-tudo');
   let abertos = false;

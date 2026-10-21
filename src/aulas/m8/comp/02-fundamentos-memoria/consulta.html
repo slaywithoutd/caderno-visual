@@ -3,46 +3,16 @@
      Figuras, loops e desenhos de margem vêm do conteudo.html (data-ref, data-ref-loop, data-ref-mn). -->
 
 <!-- ================= Base ================= -->
-<section class="cs" id="encontro" data-grupo="Para o encontro" data-termos="" data-leitura="encontro">
-  <h2>O encontro de 19/10 em 15 minutos</h2>
-  <p class="cs-def">O encontro teve cinco partes: quiz do autoestudo, revisão das portas lógicas até a memória, exercícios, aplicação ao projeto e o Desafio 01.</p>
-  
-
-  <h3>Caminho curto, na ordem do encontro</h3>
-  <ol class="caminho">
-   <li><a href="#equacao-cpu">Equação da CPU</a>: Tempo = IC × CPI × T_clock e quem mexe em cada termo (quiz Q2, slide 14).</li>
-   <li><a href="#amdahl">Lei de Amdahl</a>: o ganho e o teto 1 / (1 − F) (quiz Q3 e exercício 1).</li>
-   <li><a href="#portas-logicas">Dos circuitos ao projeto</a>, primeira metade: NAND, Von Neumann × Harvard, ISA, a mesma função em quatro ISAs e a cadeia de compilação (slides 7 a 12).</li>
-   <li><a href="#hierarquia">Hierarquia e localidade</a>: a parede da memória, as latências medidas e SRAM, DRAM e flash (slides 16, 17 e 21).</li>
-   <li><a href="#cache">Como a cache funciona</a>: as quatro perguntas e o AMAT (quiz Q1, slide 18 e exercício 2).</li>
-   <li><a href="#memoria-virtual">Memória virtual e TLB</a>: tradução e proteção por página (slide 20).</li>
-   <li><a href="#coerencia-luisi">Dos circuitos ao projeto</a>, segunda metade: coerência, XIP, segurança, os três exercícios e a ISA da rotina (slides 19 e 23 a 34).</li>
-  </ol>
-  <p class="depois">Pode deixar para depois: <a href="#binario">bits e unidades</a> (base, consulte se uma unidade travar) · <a href="#energia">energia</a> (do encontro, só isto: a frequência parou perto de 2005, com o fim de Dennard, porque a potência dinâmica cresce com V² × f) · <a href="#confiabilidade">confiabilidade e custo</a> (não apareceu nos slides) · <a href="#otimizacoes">otimizações de cache</a> (o encontro usou só os três Cs e o AMAT).</p>
-
-  <h3>As cinco ideias do encontro</h3>
-  <ol class="ideias">
-   <li>Tudo vira porta lógica e tudo vira instrução. A ISA é o contrato entre software e hardware, e o compilador traduz para ela.</li>
-   <li>Von Neumann junta programa e dado: flexível, mas com gargalo e com o risco de dado virar código. Harvard separa: mais rápido e mais rígido. Os chips reais misturam os dois.</li>
-   <li>Tempo = IC × CPI × T_clock, e o ganho total fica limitado pela parte que não melhorou (Amdahl).</li>
-   <li>A memória não acompanhou o processador. A hierarquia funciona por localidade, e o AMAT mede o quanto funciona.</li>
-   <li>Arquitetura também é segurança: tempo de cache, Rowhammer e injeção de código exploram decisões de projeto, não só bugs.</li>
-  </ol>
-
-  <h3>O quiz do encontro</h3>
-  <p>As três perguntas do slide 4, com as respostas do slide 5.</p>
-  <details class="treino"><summary><span class="q">Q1 · Definição</span> A taxa de falta (miss rate) de uma cache é a fração de quê?</summary><p>Dos acessos que não acham o dado na cache: misses ÷ acessos. 5 misses em 100 leituras dão 5% de miss rate e 95% de hit rate.</p></details>
-  <details class="treino"><summary><span class="q">Q2 · Notação</span> Em Tempo = IC × CPI × T_clock, o que é cada termo? Qual o compilador mais altera?</summary><p>IC: instruções executadas. CPI: ciclos por instrução, em média. T_clock: duração de um ciclo, 1/f. O compilador mexe sobretudo no IC, e um pouco no CPI, pelas instruções que escolhe.</p></details>
-  <details class="treino"><summary><span class="q">Q3 · Limite</span> Uma parte que ocupa 50% do tempo fica 10 vezes mais rápida. O programa inteiro fica quantas vezes mais rápido? A) 10 B) 5 C) menos de 2</summary><p>C. 1 / (0,5 + 0,5/10) = 1 / 0,55 ≈ 1,8. Mesmo com a parte infinitamente rápida, não passa de 2.</p></details>
-
-  <h3>As duas armadilhas do slide 15</h3>
-  <ul class="b">
-   <li>Comparar processadores pelo clock. O de 2 GHz pode terminar antes do de 3 GHz: outra ISA muda IC e CPI, outra organização muda o CPI. Vale o tempo de programas reais.</li>
-   <li>Esquecer o tempo de acerto no AMAT. Todo acesso paga o hit: AMAT = hit time + miss rate × miss penalty. Se o enunciado der o tempo total de um miss, a penalidade é esse tempo menos o do hit.</li>
-  </ul>
-
-  <h3>Desafio 01</h3>
-  <p>Individual, na folha, frente e verso. Conta sem desenvolvimento não vale. A decisão do verso segue quatro partes: a decisão na primeira frase, sem "depende"; do que você abre mão e quem sente; um número da questão 3 e como ele pesou; o que faria você mudar de ideia. Os <a href="#exercicios-luisi">exercícios da aula</a> treinam as contas e a <a href="#projeto-isa">ISA da rotina</a> treina a decisão.</p>
+<section class="cs" id="encontro" data-grupo="Resumo" data-termos="" data-leitura="encontro">
+  <h2>Resumo</h2>
+  <p class="cs-def">O essencial de desempenho e memória em poucas linhas.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 120"><text class="tm st" x="4" y="10">se a L1 levasse 1 s…</text>
+<text class="st" x="4" y="32" style="font-size:12px">L1</text><rect class="acf" x="44" y="24" width="8" height="16" rx="3"/><text class="tm st" x="58" y="32">1 s</text>
+<text class="st" x="4" y="56" style="font-size:12px">L2</text><rect class="bl" x="44" y="48" width="22" height="16" rx="3"/><text class="tm st" x="72" y="56">3,5 s</text>
+<text class="st" x="4" y="80" style="font-size:12px">L3</text><rect class="am" x="44" y="72" width="66" height="16" rx="3"/><text class="tm st" x="116" y="80">32 s</text>
+<text class="st" x="4" y="104" style="font-size:12px">DRAM</text><rect class="rd" x="44" y="96" width="128" height="16" rx="3"/><text class="tm st" x="178" y="104">1 min 40</text></svg>Latências do Xeon medido em aula, na escala L1 = 1 s.</aside>
+  <ul class="b"><li>Tempo = IC × CPI / f. O clock sozinho não decide: o compilador mexe no IC e a organização, no CPI.</li><li>Amdahl: o ganho total fica preso à parte que não melhorou. Teto: 1 / (1 − F).</li><li>A ISA é o contrato entre software e hardware. Von Neumann junta código e dado, Harvard separa, e os chips reais misturam os dois.</li><li>A memória ficou para trás do processador. A hierarquia funciona por localidade, temporal e espacial.</li><li>AMAT = hit time + miss rate × miss penalty mede o quanto a cache ajuda.</li><li>Arquitetura também é segurança: tempo de cache, Rowhammer e dado que vira código.</li></ul>
+  <div class="cs-pegadinhas"><ul class="b"><li>Esquecer o hit time no AMAT: todo acesso paga o hit.</li><li>Penalidade é o tempo a mais do miss. Se o enunciado der o tempo total, desconte o hit.</li><li>Comparar processadores só pelo clock.</li><li>AMAT é média; num dispositivo de apoio, o pior caso pesa mais.</li></ul></div>
 </section>
 
 <section class="cs" id="binario" data-grupo="Base" data-termos="binario,bit-byte,hexadecimal,endereco-memoria" data-leitura="antes">

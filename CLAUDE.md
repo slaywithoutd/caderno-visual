@@ -47,15 +47,14 @@ Os encontros de João Luisi seguem sempre o mesmo formato (slides de 19/10/2026,
 
 Regras que saíram disso, para toda aula do eixo:
 
-- A primeira seção do `consulta.html` é `<section class="cs" id="encontro" data-grupo="Para o encontro">`,
-  "O encontro em 15 minutos": `p.cs-def` com o formato do encontro, caminho curto (`ol.caminho`, 4 a 7
-  seções essenciais, com o motivo e link para a seção do Consulta), `p.depois` com o que pode ficar para
-  depois, cinco ideias (`ol.ideias`) e o quiz em `details.treino`. Antes do encontro, o quiz é autoral;
-  depois, vira o quiz real do slide. A seção `treino` (grupo "Treino para o encontro") traz os exercícios
-  e o projeto com os gabaritos; o quiz mora só no `encontro`. Nas aulas antigas, a mesma seção existe
-  no `conteudo.html` (fonte, não publicada).
-- Toda aula futura do eixo tem seções de chips reais, segurança, exercícios no hardware do projeto
-  e aplicação ao projeto. Exercícios e decisões autorais são identificados como treino (autorais).
+- Pegue do encontro o **conteúdo e a ênfase** (o que o professor cobra, os chips e ataques que ele usa),
+  não o **formato** dele: nada de quiz, "caminho curto" ou roteiro de encontro dentro da aula.
+- A primeira seção do `consulta.html` é `<section class="cs" id="encontro" data-grupo="Resumo">`, título
+  "Resumo": um `cs-def` de uma linha, um desenho de margem que resume a aula, 5 ou 6 bullets do que fica
+  e um `cs-pegadinhas` com 3 ou 4 pegadinhas. Sem perguntas, sem links de "leia nesta ordem", sem texto
+  sobre as fontes. Se a dona mandar complementos (vídeo, artigo), eles entram como "Em resumo" nas seções.
+- Toda aula futura do eixo traz os chips reais e a segurança como conteúdo. Exercícios autorais, se houver,
+  ficam numa seção de treino no fim e são identificados como autorais.
 - Leia os slides do encontro anterior: eles anunciam o que vem ("fica para quarta"). O que foi anunciado
   entra na aula seguinte antes do encontro.
 - Depois do encontro, `integrar-notas` confere os slides página por página em `cobertura.json` e
@@ -269,8 +268,13 @@ Regras do modo Consulta:
      complemento do professor (vídeo, artigo), em paráfrase e com a fonte num `<p class="cs-fonte">`.
      Serve para ler o essencial sem abrir o resto; não pode trazer conceito que a seção não explique.
    - Modo compacto (`initCompacto` em `src/lib/consulta.js`): ficam à vista o título, `cs-def`, `cs-resumo`,
-     `cs-formula` e `p.prova`; o resto vai para um "Detalhes" fechado. As seções `encontro` e `treino` ficam
-     abertas. Chegar por link abre os detalhes da seção; um botão no topo abre ou recolhe todos.
+     `cs-formula`, `p.prova` e todo recurso visual (desenho, loop, figura, tabela). Vai para um "Detalhes"
+     fechado só o que não é essencial **e** passa de 5 linhas na tela; trecho curto fica à vista. O Resumo
+     fica inteiro. Chegar por link abre os detalhes da seção; um botão no topo abre ou recolhe todos.
+   - **Mais visual, menos texto.** Toda seção que explica um mecanismo, compara coisas ou tem números ganha
+     um recurso visual: desenho de margem (`aside.mn`, SVG de 240 de largura), tabela ou figura. O desenho
+     de margem fica logo abaixo do `h2` (o script o coloca lá) e o texto contorna; se houver espaço à
+     direita do texto, ele vai para fora da coluna.
    - A leitura dos símbolos de uma fórmula ("f é…, s é…") fica dentro do `.cs-formula`, logo abaixo dela.
    - Tabelas (`data-ref-tbl`) e `h3` podem entrar onde o conteúdo pede (uma seção longa como "Otimizações"
      usa h3); o resto da ordem vale.
@@ -391,9 +395,11 @@ banqueiro" porque o livro brasileiro usa assim).
 - Só o modo Consulta é publicado. A barra de Definições fica à direita, com busca que filtra enquanto
   digita. As duas barras (sumário e Definições) mudam de largura arrastando a borda e recolhem; a escolha
   fica no navegador (`src/lib/paineis.js`). Em telas pequenas, entram no fluxo sem cobrir o artigo.
-- O conteúdo se ajusta ao espaço entre as barras com container queries (`container: conteudo` em
-  `.layout-consulta .content`): figura em duas colunas só com 720px ou mais; desenho de margem para de
-  flutuar abaixo de 620px. Componente novo usa `@container conteudo`, nunca a largura da janela.
+- A coluna de texto nunca se mexe: ela fica onde estaria com as barras no tamanho padrão. Mudar ou recolher
+  uma barra só muda o espaço livre, e o espaço livre vai para as imagens: a figura passo a passo cresce
+  para os lados (`--esq-livre`/`--dir-livre`) e o desenho de margem sai do texto (`html.margem-livre`).
+  As barras não passam por cima do texto. Figura decide 1 ou 2 colunas pela própria largura
+  (`@container fig`). Blocos com fundo ou borda são `flow-root`, para encolher ao lado de um desenho.
 - Termo do glossário no texto: o 1º clique abre a janelinha (definição, fórmula, ver também); o 2º clique,
   no termo ou no nome dentro da janelinha, leva à seção dona do termo (`src/lib/glossary.js`).
 - Home: matérias e eixos são retráteis (`details`), e o que a dona fecha continua fechado. Aulas por data

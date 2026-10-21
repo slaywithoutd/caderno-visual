@@ -3,41 +3,21 @@
      Figuras, loops, desenhos de margem e tabelas vêm do conteudo.html (data-ref, data-ref-loop, data-ref-mn, data-ref-tbl). -->
 
 <!-- ================= Base ================= -->
-<section class="cs" id="encontro" data-grupo="Para o encontro" data-termos="" data-leitura="encontro">
-  <h2>O encontro em 15 minutos</h2>
-  <p class="cs-def">O encontro começa com um quiz rápido do autoestudo, revisa os conceitos em chips reais com uma caixa de segurança, faz exercícios no hardware do projeto e termina numa decisão de projeto. Nesta aula, o "chip real" é o laço principal disputando variáveis com a interrupção do botão, e os dois núcleos do RP2040.</p>
-  
-  <h3>Caminho curto</h3>
-  <p>Se o tempo é pouco, leia nesta ordem:</p>
-  <ol class="caminho">
-   <li><a href="#race-condition">Race condition</a>: por que <code>x = x + 1</code> em dois fluxos perde atualizações. Todo o resto existe por causa disso.</li>
-   <li><a href="#regiao-critica">Região crítica e hardware</a>: os quatro requisitos, desabilitar interrupções, Test-and-Set e o custo do busy waiting.</li>
-   <li><a href="#semaforo">Semáforos</a>: P e V, mutex e contador, e a inversão de prioridade da Mars Pathfinder.</li>
-   <li><a href="#produtor-consumidor">Produtor/consumidor</a>: os três semáforos, a ordem dos P e a conta N ≥ r × T.</li>
-   <li><a href="#isr-compartilhada">Nos chips do projeto</a>: interrupção e laço principal, a leitura rasgada do AVR e os spinlocks do RP2040.</li>
-   <li><a href="#deadlock">Deadlock</a>: as quatro condições de Coffman e o grafo de alocação.</li>
-   <li><a href="#estrategias">Tratar deadlock</a>: ordem global e o algoritmo do banqueiro, a conta mais cobrada.</li>
-  </ol>
-  <p class="depois">Pode deixar para depois: <a href="#tentativas-software">Peterson e as tentativas</a> (mostram de onde vêm os quatro requisitos; na prática se usam instruções atômicas) · <a href="#monitor">monitores e mensagens</a> (monitor é semáforo que o compilador escreve por você; mensagem assíncrona é produtor/consumidor com o SO cuidando do buffer) · <a href="#toctou">TOCTOU e Dirty COW</a> (race condition provocada de propósito: conferir e usar não podem ter uma janela entre si).</p>
-
-  <h3>Cinco ideias para levar</h3>
-  <ol class="ideias">
-   <li>Uma linha de C pode virar várias instruções. Se outro fluxo entra no meio, o resultado depende da sorte.</li>
-   <li>Região crítica curta: dentro dela só se copiam dados; o trabalho lento fica fora.</li>
-   <li>Desabilitar interrupções protege do próprio núcleo. Contra o outro núcleo, só um lock que os dois respeitam (no RP2040, o spinlock do SIO).</li>
-   <li>Semáforo dorme, spinlock gira. Girar só compensa com vários núcleos e espera curtíssima.</li>
-   <li>Deadlock precisa das quatro condições de Coffman. Pedir os locks sempre na mesma ordem quebra a espera circular, e é a prevenção mais barata.</li>
-  </ol>
-
-  <h3>Quiz de treino</h3>
-  <p>Perguntas no formato do quiz do encontro, escritas para treino. Responda de cabeça e abra para conferir.</p>
-  <details class="treino"><summary><span class="q">Q1 · Definição</span> Race condition exige o quê? A) duas threads lendo a mesma variável B) um dado compartilhado, pelo menos uma escrita e resultado que depende da ordem C) dois núcleos</summary><p>B. Só ler junto não estraga nada, e um núcleo basta: a interrupção ou o escalonador entram no meio do LOAD, ADD, STORE.</p></details>
-  <details class="treino"><summary><span class="q">Q2 · Notação</span> Semáforo com s = 1, na versão em que s pode ficar negativo. Três threads fazem P(s) e ninguém faz V. Quanto vale s e quantas estão na fila?</summary><p>s = 1 − 3 = −2. Uma passou; |−2| = 2 dormem na fila.</p></details>
-  <details class="treino"><summary><span class="q">Q3 · Limite</span> No RP2040, desabilitar as interrupções garante exclusão mútua? A) sim B) só entre a interrupção e o laço do mesmo núcleo C) nunca</summary><p>B. O outro núcleo roda o próprio código sem precisar de interrupção nenhuma. Entre núcleos, use um spinlock do SIO ou mensagens pela FIFO.</p></details>
-  <details class="treino"><summary><span class="q">Q4 · Conta</span> Banqueiro com 8 instâncias. Alocado (2, 3, 1), Máximo (6, 4, 5). O estado é seguro?</summary><p>Disponível = 8 − (2 + 3 + 1) = 2. Precisa = (4, 1, 4). P2: 1 ≤ 2, livre = 2 + 3 = 5. P1: 4 ≤ 5, livre = 5 + 2 = 7. P3: 4 ≤ 7, livre = 8. Seguro, sequência ⟨P2, P1, P3⟩.</p></details>
-  <details class="treino"><summary><span class="q">Q5 · Armadilha</span> Ciclo no grafo de alocação é sempre deadlock?</summary><p>Só se cada recurso tiver uma instância. Com várias, um processo de fora do ciclo pode devolver uma instância e desfazer a espera.</p></details>
-  <details class="treino"><summary><span class="q">Q6 · Armadilha</span> Declarar a variável como <code>volatile</code> resolve a race entre a interrupção e o laço?</summary><p>Não. volatile obriga o compilador a ler da memória toda vez. Ele não junta LOAD, ADD e STORE numa instrução, nem os 4 bytes de um <code>long</code> no AVR. Falta a região crítica.</p></details>
-  <details class="treino"><summary><span class="q">Q7 · Segurança</span> O que é TOCTOU, e por que repetir o ataque milhões de vezes ajuda o atacante?</summary><p>Time-of-check to time-of-use: o programa confere uma coisa e só depois a usa; se ela muda entre os dois passos, a conferência valeu para outra. A janela é curta, então o atacante repete até o escalonador intercalar do jeito que ele quer.</p></details>
+<section class="cs" id="encontro" data-grupo="Resumo" data-termos="" data-leitura="encontro">
+  <h2>Resumo</h2>
+  <p class="cs-def">O essencial de sincronização e deadlock em poucas linhas.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 132">
+<circle class="bl" cx="56" cy="30" r="17"/><text x="56" y="30" style="font-size:12px">P1</text>
+<rect class="am" x="164" y="18" width="40" height="24" rx="4"/><text x="184" y="30" style="font-size:12px">R1</text>
+<circle class="bl" cx="184" cy="100" r="17"/><text x="184" y="100" style="font-size:12px">P2</text>
+<rect class="am" x="36" y="88" width="40" height="24" rx="4"/><text x="56" y="100" style="font-size:12px">R2</text>
+<path class="s" d="M74 30 L162 30" marker-end="url(#mnarrow)"/><text class="tm" x="118" y="22">P1 pede R1</text>
+<path class="s" d="M184 43 L184 81" marker-end="url(#mnarrow)"/><text class="tm st" x="190" y="62">é de P2</text>
+<path class="s" d="M166 100 L78 100" marker-end="url(#mnarrow)"/><text class="tm" x="122" y="92">P2 pede R2</text>
+<path class="s" d="M56 87 L56 49" marker-end="url(#mnarrow)"/><text class="tm st" x="2" y="68">é de P1</text>
+<text class="tm" x="120" y="124">ciclo de espera: ninguém anda</text></svg>Espera circular: cada processo segura o que o outro precisa.</aside>
+  <ul class="b"><li>Uma linha de C pode virar várias instruções; se outro fluxo entra no meio, o resultado depende da sorte.</li><li>Região crítica curta: dentro dela só se copiam dados, e o trabalho lento fica fora.</li><li>Desabilitar interrupções protege do próprio núcleo; contra o outro núcleo, só um lock que os dois respeitam (no RP2040, o spinlock do SIO).</li><li>Semáforo dorme, spinlock gira. Girar só compensa com vários núcleos e espera curtíssima.</li><li>Deadlock precisa das quatro condições de Coffman; pedir os locks sempre na mesma ordem quebra a espera circular.</li></ul>
+  <div class="cs-pegadinhas"><ul class="b"><li>volatile não é lock: não junta LOAD, ADD e STORE numa instrução só.</li><li>Race condition não precisa de dois núcleos: uma interrupção no meio basta.</li><li>Ciclo no grafo de alocação só é deadlock garantido com uma instância por recurso.</li><li>No banqueiro, estado inseguro não quer dizer deadlock; quer dizer que ele pode acontecer.</li></ul></div>
 </section>
 
 <section class="cs" id="notacao" data-grupo="Base" data-leitura="antes">

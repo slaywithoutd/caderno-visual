@@ -3,39 +3,17 @@
      Figuras, loops, desenhos de margem e tabelas vêm do conteudo.html (data-ref, data-ref-loop, data-ref-mn, data-ref-tbl). -->
 
 <!-- ================= Base ================= -->
-<section class="cs" id="encontro" data-grupo="Para o encontro" data-termos="" data-leitura="encontro">
-  <h2>O encontro em 15 minutos</h2>
-  <p class="cs-def">O encontro começa por um quiz do autoestudo, revisa cada conceito num chip real com uma caixa de segurança, faz exercícios com o hardware do projeto e termina numa decisão de projeto.</p>
-  
-  <h3>Caminho curto</h3>
-  <p>Se o tempo é pouco, leia nesta ordem:</p>
-  <ol class="caminho">
-    <li><a href="#gantt">Algoritmos de escalonamento</a>: a tabela de espera, turnaround e resposta é a conta mais provável do quiz.</li>
-    <li><a href="#tempo-real">Tempo real com números</a>: pior caso, teste de utilização e a linha do tempo de rate monotonic contra EDF.</li>
-    <li><a href="#paginacao">Memória virtual</a> e <a href="#substituicao">substituição de páginas</a>: tradução de endereço, o preço de um page fault e a anomalia de Belady.</li>
-    <li><a href="#memoria-mcu">Memória sem MMU</a>: o que muda no RP2040 e por que o heap não se compacta.</li>
-    <li><a href="#flash-desgaste">Flash e EEPROM</a>: setor, desgaste e a conta de vida útil.</li>
-    <li><a href="#botao">O botão</a>: polling, interrupção e DMA com os números do RP2040.</li>
-    <li><a href="#ataque-dma">Segurança</a>: ataque por DMA, cold boot e negação de serviço por esgotamento.</li>
-  </ol>
-  <p class="depois">Pode deixar para depois: <a href="#particao-fixa">partições</a> (fixas dão fragmentação interna, variáveis dão externa) · <a href="#filas-multiplas">múltiplas filas</a> (MLFQ desce quem gasta o quantum inteiro) · <a href="#sistema-arquivos">arquivos</a> (o i-node com ponteiros diretos e indiretos) · <a href="#disco">discos</a> (SSTF pode causar starvation, C-SCAN deixa a espera uniforme) · <a href="#reais">sistemas reais</a> (a tabela Linux, FreeRTOS, Uno).</p>
-  <h3>Cinco ideias para levar</h3>
-  <ol class="ideias">
-    <li>Escalonar começa pelo critério: a média (espera, throughput) ou o pior caso (prazo).</li>
-    <li>Em tempo real, C é o pior caso, e o teste de utilização só vale com preempção: um trecho que bloqueia derruba a garantia.</li>
-    <li>Memória virtual troca previsibilidade por espaço; sem MMU, você ganha previsibilidade e perde a compactação.</li>
-    <li>Flash e EEPROM se gastam por gravação: vida útil = ciclos ÷ gravações por dia no mesmo lugar.</li>
-    <li>Polling, interrupção e DMA se escolhem pela conta: custo por evento × eventos por segundo, mais o pior caso de latência.</li>
-  </ol>
-  <h3>Quiz de treino</h3>
-  <p>Perguntas autorais no formato do quiz do encontro. Responda de cabeça e abra para conferir.</p>
-  <details class="treino"><summary><span class="q">Q1 · Definição</span> Um sistema de tempo real é aquele que: A) roda rápido; B) cumpre prazos, e resposta atrasada conta como errada; C) usa prioridade dinâmica?</summary><p>B. Rapidez ajuda, mas o que define é o prazo. Veja <a href="#tempo-real">tempo real</a>.</p></details>
-  <details class="treino"><summary><span class="q">Q2 · Notação</span> Em U = Σ Cᵢ/Tᵢ, o que são Cᵢ e Tᵢ? Por que Cᵢ não pode ser a média?</summary><p>Cᵢ é o tempo de CPU de uma execução da tarefa i no pior caso; Tᵢ é o período. Com a média, uma execução ruim estoura um prazo que o teste disse estar garantido.</p></details>
-  <details class="treino"><summary><span class="q">Q3 · Limite</span> Tarefas (C = 2, T = 5) e (C = 4, T = 7). Rate monotonic garante? E EDF?</summary><p>U = 0,40 + 0,57 = 0,97, acima de 0,828: rate monotonic não garante, e de fato a segunda tarefa perde o prazo em t = 7. EDF garante, porque U ≤ 1.</p></details>
-  <details class="treino"><summary><span class="q">Q4 · Conta</span> Um byte da EEPROM do ATmega328P (100 000 ciclos) é gravado uma vez por segundo. Quando sai da garantia? A) 27 horas; B) 27 dias; C) 27 anos.</summary><p>A. 100 000 s / 3 600 ≈ 27,8 horas.</p></details>
-  <details class="treino"><summary><span class="q">Q5 · Armadilha</span> Com FIFO, passar de 3 para 4 molduras sempre reduz os page faults?</summary><p>Não. Na string 1 2 3 4 1 2 5 1 2 3 4 5, o FIFO dá 9 page faults com 3 molduras e 10 com 4: a anomalia de Belady.</p></details>
-  <details class="treino"><summary><span class="q">Q6 · Conta</span> Polling do botão a cada 10 ms, 100 ciclos por leitura, a 125 MHz. Quanto da CPU? Qual o pior atraso?</summary><p>100 × 100 = 10 000 ciclos/s; 10 000 / 125 000 000 = 0,008%. Até 10 ms para ver o aperto (20 ms, se o debounce exige duas leituras iguais).</p></details>
-  <details class="treino"><summary><span class="q">Q7 · Limite</span> Por que o RP2040 não compacta o heap quando ele fragmenta?</summary><p>Compactar exige relocação dinâmica. Sem MMU, mover um bloco quebra todo ponteiro que aponta para ele.</p></details>
+<section class="cs" id="encontro" data-grupo="Resumo" data-termos="" data-leitura="encontro">
+  <h2>Resumo</h2>
+  <p class="cs-def">O essencial de gerência de recursos em poucas linhas.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 104">
+<line class="s" x1="18" y1="62" x2="222" y2="62"/><text class="tm" x="18" y="74">0</text><text class="tm" x="220" y="74">1</text>
+<rect class="acf" x="18" y="34" width="194" height="20" rx="3"/><text x="96" y="44" style="font-size:12px">U = 0,97</text>
+<line class="rd" x1="184" y1="22" x2="184" y2="66" style="stroke-dasharray:3 3"/><text class="tm" x="160" y="14">RM: 0,83</text>
+<line class="gr" x1="220" y1="22" x2="220" y2="66"/><text class="tm" x="220" y="86">EDF: 1</text>
+<text class="tm st" x="4" y="98">(C=2, T=5) e (C=4, T=7)</text></svg>Duas tarefas: o rate monotonic não garante, o EDF garante.</aside>
+  <ul class="b"><li>Escalonar começa pelo critério: a média (espera, throughput) ou o pior caso (prazo).</li><li>Em tempo real, C é o pior caso, e o teste de utilização só vale com preempção.</li><li>Memória virtual troca previsibilidade por espaço; sem MMU, você ganha previsibilidade e perde a compactação.</li><li>Flash e EEPROM se gastam por gravação: vida útil = ciclos ÷ gravações por dia no mesmo lugar.</li><li>Polling, interrupção e DMA se escolhem pela conta: custo por evento × eventos por segundo, mais o pior caso de latência.</li></ul>
+  <div class="cs-pegadinhas"><ul class="b"><li>Tempo real é cumprir prazo, não ser rápido.</li><li>C no teste de utilização é o pior caso, nunca a média.</li><li>FIFO com mais molduras pode dar mais page faults (anomalia de Belady).</li><li>Sem MMU não dá para compactar o heap: mover um bloco quebra os ponteiros para ele.</li></ul></div>
 </section>
 
 <section class="cs" id="gerente" data-grupo="Base" data-termos="" data-leitura="antes">

@@ -42,7 +42,7 @@ a{color:var(--accent);text-underline-offset:2px}
 .progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:20}
 
 /* grade principal: sidebar presa à borda esquerda da tela, conteúdo centralizado no espaço restante */
-.layout{margin-left:var(--side-w)}
+.layout{margin-left:var(--side-base,272px)}
 .content{min-width:0;max-width:1160px;margin:0 auto;padding-inline:32px 48px}
 .side{position:fixed;top:0;left:0;bottom:0;width:var(--side-w);overflow-y:auto;scrollbar-width:none;padding:calc(56px + env(safe-area-inset-top, 0px)) 16px 28px 32px}
 @media (max-width:1020px){
@@ -552,7 +552,7 @@ html.lendo .puxador,html.lendo .side-btn,html.lendo .side-fechar{display:none}
    Os rótulos dos blocos vêm daqui (::before); ninguém digita "Como usar" no HTML. */
 html.modo-consulta{--mw:100%;--defs-w:var(--defs-w-aberta,280px)}
 html.defs-recolhidas{--defs-w:0px}
-.layout-consulta{padding-right:var(--defs-w)}
+.layout-consulta{padding-right:var(--defs-base,280px)}
 .layout-consulta .content{max-width:880px;margin-inline:auto;container:conteudo / inline-size}
 .cs-hero{margin-bottom:2.4rem}
 .cs-ajuda{color:var(--muted);font-size:.92rem;margin:.4rem 0 0}
@@ -592,7 +592,6 @@ section.cs ul.b{margin-bottom:.6em}
 section.cs p{max-width:72ch}
 section.cs .tbl{margin:.8rem 0}
 section.cs figure.fig{margin:1.6rem 0 .6rem}
-section.cs .mn{float:right;clear:right;width:min(40%,260px);margin:.2rem 0 1rem 24px}
 section.cs::after{content:'';display:block;clear:both}
 section.cs p.prova{margin:1rem 0}
 section.cs.cs-flash > h2{animation:csflash 1.6s ease}
@@ -603,18 +602,28 @@ a.gterm.glink:hover{color:var(--accent)}
 .cs-fim h3 a:hover{color:var(--accent)}
 .cs-cola{display:grid;gap:14px}
 .cs-cola-nome{font-size:.7rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
-/* figuras e desenhos de margem se ajustam à largura que sobrou entre as barras, e não à da janela */
+/* O texto fica parado; as imagens usam o espaço livre ao lado dele (--esq-livre/--dir-livre, lib/paineis.js).
+   Figura passo a passo: cresce para os lados e decide 1 ou 2 colunas pela própria largura (container fig). */
+.modo-consulta figure.fig{container:fig / inline-size}
 .modo-consulta .fig-head,.modo-consulta .fig-ctrl{width:100%}
 .modo-consulta .fig-body{grid-template-columns:1fr;row-gap:18px}
 .modo-consulta .fig-side{min-height:0}
 .modo-consulta ol.fig-notes{position:static;max-height:260px}
-@container conteudo (min-width:720px){
+@container fig (min-width:720px){
   .modo-consulta .fig-body{grid-template-columns:minmax(0,1.8fr) minmax(0,1fr);row-gap:0}
   .modo-consulta .fig-side{min-height:220px}
   .modo-consulta ol.fig-notes{position:absolute;max-height:none}
 }
+@media (min-width:1021px){
+  .layout-consulta section.cs figure.fig{margin-left:calc(-1 * var(--esq-livre, 0px));margin-right:calc(-1 * var(--dir-livre, 0px))}
+}
+/* Desenho de margem: com espaço à direita do texto, mora fora dele (html.margem-livre); sem espaço, o texto
+   contorna. Blocos com fundo ou borda viram flow-root para encolher ao lado do desenho, sem passar por baixo. */
+section.cs aside.mn{float:right;clear:right;width:min(42%,250px);margin:.25rem 0 .9rem 24px}
+html.margem-livre section.cs aside.mn{width:240px;margin:.25rem calc(-240px - 32px) .9rem 0}
+section.cs :is(.cs-resumo,.cs-formula,.cs-uso,.cs-pegadinhas,.cs-ponderada,ul.b,ol,pre,.def,p.prova,.tbl){display:flow-root}
 @container conteudo (max-width:620px){
-  section.cs .mn,section.cs .mn.loop{float:none;width:100%;max-width:320px;margin:.6rem auto 1.2rem}
+  section.cs aside.mn,section.cs aside.mn.loop{float:none;width:100%;max-width:320px;margin:.6rem auto 1.2rem}
 }
 
 /* barra de Definições (direita, recolhível; no celular fica no fluxo da página) */

@@ -3,6 +3,43 @@
      Figuras, loops, desenhos de margem e tabelas vêm do conteudo.html (data-ref, data-ref-loop, data-ref-mn, data-ref-tbl). -->
 
 <!-- ================= Base ================= -->
+<section class="cs" id="encontro" data-grupo="Para o encontro" data-termos="" data-leitura="encontro">
+  <h2>O encontro em 15 minutos</h2>
+  <p class="cs-def">O encontro começa com um quiz rápido do autoestudo, revisa os conceitos em chips reais com uma caixa de segurança, faz exercícios no hardware do projeto e termina numa decisão de projeto. Os slides de 19/10 já avisaram o que vem neste encontro: paralelismo entre núcleos e o Meltdown.</p>
+  
+  <h3>Caminho curto</h3>
+  <p>Se o tempo é pouco, leia nesta ordem:</p>
+  <ol class="caminho">
+   <li><a href="#pipeline">A ideia do pipeline</a>: throughput × latência e por que o speedup real fica abaixo do número de stages.</li>
+   <li><a href="#hazard">Hazards e stalls</a>: os três tipos e a conta CPI = 1 + stalls, a mais cobrada.</li>
+   <li><a href="#forwarding">Forwarding</a>: resolve quase todo hazard de dados; o load seguido de uso ainda custa 1 stall.</li>
+   <li><a href="#hazard-controle">Branches e predição</a>: branch penalty e o preditor de 2 bits num laço.</li>
+   <li><a href="#especulacao">Especulação e ROB</a>: só a ideia de executar fora de ordem e fazer o commit em ordem. Sem ela, o Spectre não faz sentido.</li>
+   <li><a href="#nucleos">Mais núcleos</a>: Amdahl com N núcleos e por que 4 núcleos não dão 4 vezes.</li>
+   <li><a href="#reais">Pipelines de verdade</a> e <a href="#seguranca">Spectre e Meltdown</a>: o pipeline dos chips do projeto e o ataque anunciado para este encontro.</li>
+  </ol>
+  <p class="depois">Pode deixar para depois: <a href="#ilp">ILP e loop unrolling</a> (dependência verdadeira × de nome; desenrolar amortiza o controle do laço) · <a href="#tomasulo">Tomasulo</a> (renomear elimina WAR e WAW) · <a href="#emissao-multipla">superescalar e VLIW</a> (quem escolhe o que emite junto: o hardware ou o compilador) · <a href="#limites-ilp">limites do ILP</a> (na prática, menos de 10 por ciclo; daí os núcleos).</p>
+
+  <h3>Cinco ideias para levar</h3>
+  <ol class="ideias">
+   <li>Pipeline aumenta quantas instruções terminam por segundo. Cada instrução continua levando o mesmo tempo, e o stage mais lento dita o clock.</li>
+   <li>CPI real = 1 + stalls. Cada hazard soma frequência × ciclos perdidos.</li>
+   <li>Prever e especular escondem a espera dos branches, mas deixam o tempo variável: média boa, pior caso difícil de garantir.</li>
+   <li>O ILP de uma thread se esgotou. O ganho agora vem de núcleos, e Amdahl limita: 1 / ((1 − F) + F/N).</li>
+   <li>A especulação desfaz registradores e memória, mas não desfaz a cache. Spectre e Meltdown moram nessa diferença.</li>
+  </ol>
+
+  <h3>Quiz de treino</h3>
+  <p>Perguntas no formato do quiz do encontro, escritas para treino. Responda de cabeça e abra para conferir.</p>
+  <details class="treino"><summary><span class="q">Q1 · Definição</span> O pipeline diminui o tempo de cada instrução? A) sim B) não, aumenta quantas terminam por segundo C) só com forwarding</summary><p>B. Cada instrução ainda passa por todos os stages e ganha o overhead dos registradores de pipeline. O que sobe é o throughput.</p></details>
+  <details class="treino"><summary><span class="q">Q2 · Notação</span> Em CPI = 1 + stalls, de onde vem o 1 e o que entra em "stalls"?</summary><p>O 1 é o pipeline ideal terminando uma instrução por ciclo. "Stalls" é a média de ciclos perdidos por instrução: para cada hazard, frequência × ciclos que ele custa, somados.</p></details>
+  <details class="treino"><summary><span class="q">Q3 · Limite</span> Stages de 200, 150, 250, 250 e 150 ps, mais 20 ps de registrador. Speedup sobre a versão sem pipeline (1000 ps por instrução)? A) 5 B) 4 C) menos de 4</summary><p>C. O ciclo vira o stage mais lento + registrador = 250 + 20 = 270 ps. Speedup = 1000 / 270 ≈ 3,7.</p></details>
+  <details class="treino"><summary><span class="q">Q4 · Armadilha</span> Com forwarding, um hazard de dados nunca mais causa stall?</summary><p>Causa. Load seguido de uso custa 1 stall: o dado só existe no fim do MEM, e a instrução seguinte precisaria dele no começo do EX, no mesmo ciclo.</p></details>
+  <details class="treino"><summary><span class="q">Q5 · Conta</span> 20% das instruções são branches, o preditor erra 10% deles e cada erro custa 3 ciclos. Quanto isso soma ao CPI?</summary><p>0,20 × 0,10 × 3 = 0,06 ciclo por instrução.</p></details>
+  <details class="treino"><summary><span class="q">Q6 · Limite</span> 80% do programa dá para dividir entre núcleos. Speedup com 4 núcleos? E com infinitos?</summary><p>1 / (0,2 + 0,8/4) = 1 / 0,4 = 2,5. Com infinitos, 1 / 0,2 = 5. Os 20% que não se dividem mandam.</p></details>
+  <details class="treino"><summary><span class="q">Q7 · Segurança</span> Se o ROB joga fora a instrução especulada errada, de onde o Spectre tira o segredo?</summary><p>Da cache. A linha que a instrução especulada carregou continua lá. Medindo o tempo de acesso (2 ns ou mais de 100 ns, como na aula 02), o atacante descobre qual linha foi tocada e, com ela, o valor secreto.</p></details>
+</section>
+
 <section class="cs" id="metrica" data-grupo="Base" data-termos="ipc" data-leitura="antes">
   <h2>A métrica da aula: tempo de CPU, CPI e IPC</h2>
   <p class="cs-def">IPC (instruções por ciclo) é o inverso do CPI. Quando o processador termina mais de uma instrução por ciclo, o CPI fica menor que 1 e fica mais fácil falar em IPC.</p>
@@ -607,10 +644,6 @@ SUB.D F12, F8, F14    ; não depende de ninguém, mas fica preso atrás do ADD.D
   <h2>Treino para o encontro</h2>
   <p class="cs-def">Quiz, exercícios e uma decisão de projeto no formato do encontro, autorais, com valores de exemplo.</p>
   <div class="cs-uso">
-    <details class="treino"><summary><span class="q">Q1</span> Pipeline diminui o tempo de cada instrução?</summary><p>Não. Aumenta o throughput; cada instrução ganha o overhead dos registradores.</p></details>
-    <details class="treino"><summary><span class="q">Q2</span> Stages de 200, 150, 250, 250, 150 ps + 20 ps de registrador. Speedup sobre 1000 ps?</summary><p>Ciclo 270 ps; 1000 / 270 ≈ 3,7.</p></details>
-    <details class="treino"><summary><span class="q">Q3</span> 20% branches, 10% de erro, 3 ciclos por erro. Quanto soma ao CPI?</summary><p>0,20 × 0,10 × 3 = 0,06.</p></details>
-    <details class="treino"><summary><span class="q">Q4</span> F = 0,8 com 4 núcleos? Com infinitos?</summary><p>1 / (0,2 + 0,2) = 2,5; teto 5.</p></details>
     <details class="treino"><summary><span class="q">Ex. 1</span> Interpretador: 150 instruções de máquina por instrução da rotina, 20% branches. M0+ a 125 MHz (branch tomado +1, 60% tomados) × notebook a 3 GHz (CPI base 0,5, 8% de erro, 17 ciclos).</summary><p>M0+: CPI 1,12; 150 × 1,12 × 8 ns = 1,344 µs. Notebook: CPI 0,5 + 0,272 = 0,772; ≈ 38,6 ns, com 35% do CPI em erros de predição. Contra 160 s de pessoa, nenhum dos dois importa: decidem energia, custo e pior caso.</p></details>
     <details class="treino"><summary><span class="q">Ex. 2</span> As mesmas etapas em 2 stages, como no M0+. E com 15% de load-use no de 5?</summary><p>Melhor divisão 600 | 400: ciclo 620 ps, speedup 1,6. Com stalls, o de 5 faz 1,15 × 270 ≈ 310 ps por instrução, contra 620. O de 2 ganha em área, energia, branch e previsibilidade.</p></details>
     <details class="treino"><summary><span class="q">Ex. 3</span> A cada 10 ms: botão 0,2 ms, som 1,2, LEDs 0,1, rádio 0,5. Som e rádio podem ir ao núcleo 1.</summary><p>F = 1,7 / 2,0 = 0,85; Amdahl promete 1,74. Real: som no núcleo 1 (1,2 ms), resto no núcleo 0 (0,8 ms), speedup 2,0 / 1,2 ≈ 1,67. Avisar "pare o som" pela FIFO do SIO ou por variável com spinlock. A CPU já fica 80% parada com um núcleo: o segundo vale por isolamento, não por velocidade.</p></details>

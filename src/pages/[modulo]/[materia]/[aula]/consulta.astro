@@ -3,7 +3,7 @@
    Texto em consulta.html; figuras e loops vêm do conteudo.html (ver montarConsulta no catálogo). */
 import Aula from '../../../../layouts/Aula.astro';
 import Cartoes from '../../../../components/Cartoes.astro';
-import { aulas, materia, modulo, glossarioDaAula, hrefGlossario, montarConsulta, tempoLeitura, htmlTempo, formatarTempo } from '../../../../lib/catalogo.js';
+import { aulas, materia, modulo, glossarioDaAula, hrefGlossario, montarConsulta, tempoLeitura, htmlTempo, rotuloAula } from '../../../../lib/catalogo.js';
 
 export function getStaticPaths() {
   return aulas.filter((a) => a.consulta).map((a) => ({ params: { modulo: a.modulo, materia: a.materia, aula: a.slug }, props: { aula: a } }));
@@ -44,15 +44,15 @@ const defs = Object.entries(aula.glossario)
   .sort((a, b) => a.t.localeCompare(b.t, 'pt-BR', { sensitivity: 'base' }));
 const jsonDefs = JSON.stringify(defs).replace(/</g, '\\u003c');
 const jsonGl = JSON.stringify({ termos: glossarioDaAula(aula), listar: Object.keys(aula.glossario), global: hrefGlossario, secaoDe: C.secaoDe }).replace(/</g, '\\u003c');
-const modo = { atual: 'consulta', leitura: aula.hrefLeitura, consulta: aula.hrefConsulta, secaoDe: C.secaoDe, leituraDe: C.leituraDe, chaves: C.chaves };
+const modo = { atual: 'consulta' };
 const tempo = tempoLeitura({ html: C.html, extras: [...aula.cartoes.flat(), ...aula.cola.flat()].join(' '), cartoes: aula.cartoes.length });
 ---
-<Aula titulo={aula.titulo} rotulo={`Aula ${aula.numero} · Consulta`} materia={mat} modulo={mod} secoes={secoes} descricao={aula.resumo} modo={modo}>
+<Aula titulo={aula.titulo} rotulo={rotuloAula(aula)} materia={mat} modulo={mod} secoes={secoes} descricao={aula.resumo} modo={modo}>
   <div data-aula={aula.id} id="aula-root" class="cs-root">
     <header class="hero prose cs-hero" id="top">
-      <div class="kicker">{aula.tema} · Aula {aula.numero} · Consulta</div>
+      <div class="kicker">{aula.tema} · {rotuloAula(aula)}</div>
       <h1>{aula.titulo}</h1>
-      <Fragment set:html={htmlTempo(tempo, 'Consulta')} />
+      <Fragment set:html={htmlTempo(tempo)} />
       <p class="cs-ajuda">Um conceito por seção. Procure um termo em <b>Definições</b>; cada termo leva à única seção que fala dele.</p>
     </header>
     <Fragment set:html={html} />
@@ -92,6 +92,7 @@ const tempo = tempoLeitura({ html: C.html, extras: [...aula.cartoes.flat(), ...a
   )}
 
   <aside class="defs" id="defs" slot="direita" aria-label="Definições">
+    <div class="puxador puxador-defs" data-painel="defs" role="separator" aria-orientation="vertical" aria-label="Largura das definições" title="Arraste para mudar a largura"></div>
     <div class="defs-head">
       <span class="defs-tit">Definições</span>
       <button class="defs-fechar" id="defs-fechar" type="button" aria-label="Recolher definições" title="Recolher definições" aria-controls="defs">›</button>

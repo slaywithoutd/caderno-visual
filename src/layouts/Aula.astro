@@ -1,34 +1,36 @@
 ---
-/* Layout das páginas de leitura (aula, consulta e revisão): sidebar flutuante com sumário,
-   switch Leitura/Consulta, barra de progresso, popover do glossário e o miolo da página.
-   `modo` (só nas páginas de aula): { atual, leitura, consulta, secaoDe, leituraDe } — ver lib/modo.js.
-   Slot "direita": a barra de Definições do modo Consulta. */
+/* Layout das páginas de leitura (aula, revisão e glossário): sidebar flutuante com sumário,
+   barra de progresso, popover do glossário e o miolo da página. O site publica só o modo Consulta.
+   `modo` (só nas páginas de aula): { atual: 'consulta' } liga o layout com a barra de Definições.
+   Slot "direita": a barra de Definições. As duas barras mudam de largura e recolhem (lib/paineis.js). */
 import Base from './Base.astro';
-import ModoSwitch from '../components/ModoSwitch.astro';
 import { site, url } from '../lib/catalogo.js';
 const { titulo, rotulo, materia, modulo, secoes, descricao = '', modo = null } = Astro.props;
 const consulta = modo?.atual === 'consulta';
-const jsonModo = modo ? JSON.stringify(modo).replace(/</g, '\\u003c') : '';
-/* para o redirecionamento antes de desenhar: o outro modo desta aula, se existir */
-const alt = modo ? (consulta ? modo.leitura : modo.consulta) : null;
 let n = 0;
 ---
 <Base title={`${titulo} · ${materia.titulo}`} description={descricao}>
-  <script is:inline define:vars={{ atual: modo?.atual || '', alt }}>
-    /* modo salvo (Leitura/Consulta): se a aula existe no outro modo, vai para ele antes de desenhar */
-    try { var m = localStorage.getItem('caderno-modo'); if (atual && alt && m && m !== atual) location.replace(alt); } catch (e) {}
+  <script is:inline define:vars={{ atual: modo?.atual || '' }}>
+    /* larguras e barras recolhidas salvas no navegador: aplica antes de desenhar (evita pular) */
+    try {
+      var d = document.documentElement, ls = localStorage;
+      if (ls.getItem('caderno-side-w')) d.style.setProperty('--side-w', ls.getItem('caderno-side-w') + 'px');
+      if (ls.getItem('caderno-defs-w')) d.style.setProperty('--defs-w-aberta', ls.getItem('caderno-defs-w') + 'px');
+      if (ls.getItem('caderno-side-recolhida') === 'true') d.classList.add('side-recolhida');
+      if (ls.getItem('caderno-definicoes-recolhidas') === 'true') d.classList.add('defs-recolhidas');
+    } catch (e) {}
     /* aplica o modo leitura (óculos) salvo antes de desenhar a página (evita piscar) */
-    try { if (localStorage.getItem('caderno-lendo') === '1') { var d = document.documentElement; d.classList.add('lendo'); d.style.setProperty('--z', Math.min(2, Math.max(1.2, (innerWidth - 48) / 900)).toFixed(3)); } } catch (e) {}
+    try { if (localStorage.getItem('caderno-lendo') === '1') { var d2 = document.documentElement; d2.classList.add('lendo'); d2.style.setProperty('--z', Math.min(2, Math.max(1.2, (innerWidth - 48) / 900)).toFixed(3)); } } catch (e) {}
     if (atual === 'consulta') document.documentElement.classList.add('modo-consulta');
   </script>
   <div class="progress" id="progress"></div>
   <div id="pop" role="dialog" aria-live="polite"></div>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><marker id="mnarrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mnarrow"/></marker></defs></svg>
-  <ModoSwitch disponivel={!modo || !!modo.consulta} leituraDisponivel={!modo || !!modo.leitura} />
-  {modo && <script type="application/json" id="modo-data" set:html={jsonModo}></script>}
 
   <div class={`layout${consulta ? ' layout-consulta' : ''}`}>
-    <aside class="side">
+    <aside class="side" id="side">
+      <div class="puxador puxador-side" data-painel="side" role="separator" aria-orientation="vertical" aria-label="Largura do sumário" title="Arraste para mudar a largura"></div>
+      <button class="painel-fechar side-fechar" id="side-fechar" type="button" aria-label="Recolher sumário" title="Recolher sumário">‹</button>
       <details class="side-box" id="side-box" open>
         <summary>Nesta página</summary>
         <a class="side-back" href={url('/')}>← {site.titulo}</a>
@@ -52,6 +54,7 @@ let n = 0;
     </main>
     <slot name="direita" />
   </div>
+  <button class="side-btn" id="side-btn" type="button" aria-controls="side" title="Mostrar o sumário">Sumário ›</button>
   <button id="oculos" class="oculos-btn" type="button" aria-pressed="false" aria-label="Modo leitura" title="Colocar os óculos (modo leitura)">
     <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
       <circle class="lente" cx="9.5" cy="18" r="5.5" /><circle class="lente" cx="22.5" cy="18" r="5.5" />
@@ -61,6 +64,6 @@ let n = 0;
 </Base>
 
 <script>
-  import { initModo } from '../lib/modo.js';
-  initModo();
+  import { initPaineis } from '../lib/paineis.js';
+  initPaineis();
 </script>

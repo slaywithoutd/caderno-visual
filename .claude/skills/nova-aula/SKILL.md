@@ -38,6 +38,11 @@ lógica do assunto, não pela ordem da lista de autoestudos. Cada seção ganha 
 
 ## 3. Criar a pasta `src/aulas/<modulo>/<materia>/<NN-slug>/`
 
+**O site publica só o modo Consulta (desde 21/10/2026).** Toda aula nova segue a exceção "Aula somente
+Consulta": `modos: ["consulta"]`, sem `conteudo.html`, com figuras, loops e desenhos direto no
+`consulta.html` e a seção `encontro` em primeiro. Preencha `data` no meta.json com a data do encontro.
+As linhas sobre `conteudo.html` abaixo valem só para mexer nas aulas antigas.
+
 Se a pessoa pedir somente Consulta, siga a exceção "Aula somente Consulta" em `CLAUDE.md`:
 `modos: ["consulta"]`, sem `conteudo.html` nem `data-leitura`, visuais nativos e fontes no fim.
 Nesse caso, escreva diretamente o passo 5; não produza uma Leitura artificial. Para UX, priorize

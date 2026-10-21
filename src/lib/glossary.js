@@ -72,22 +72,42 @@ export function initGlossary(G, { listar = Object.keys(G), global = null, secaoD
     });
   }
 
-  /* popover */
+  /* popover: o 1º clique num termo abre a janelinha; o 2º clique (no termo ou no nome dentro dela) leva ao destino:
+     a seção dona do termo nesta página (modo Consulta), o cartão do glossário da página, a aula de origem
+     ou o glossário coletivo, nesta ordem. */
   const pop = document.getElementById('pop'); let anchor = null;
+  const temCartoes = !!list;
+  function destino(k) {
+    const e = G[k];
+    if (secaoDe && secaoDe[k]) return { href: `#${secaoDe[k]}`, rotulo: 'ir para a seção' };
+    if (temCartoes && aqui.has(k)) return { href: `#gl-${k}`, rotulo: 'abrir no glossário' };
+    if (e.origem) return { href: e.origem.href, rotulo: e.origem.rotulo };
+    return global ? { href: `${global}#gl-${k}`, rotulo: 'abrir no glossário coletivo' } : null;
+  }
   function openPop(k, el) {
     const e = G[k]; if (!e) return; anchor = el;
-    pop.innerHTML = `<div class="p-term">${e.t}</div><div class="p-def">${e.d}</div>` + (e.a ? `<div class="p-a"><span class="gl-k">como se fosse</span>${e.a}</div>` : '') + (e.x ? `<div class="p-x"><span class="gl-k">pra ir além</span>${e.x}</div>` : '') +
-      `<div class="p-foot">${(e.see || []).filter((s) => G[s]).map((s) => `<button class="seebtn" type="button" data-see="${s}">${G[s].t}</button>`).join('')}${e.origem && !aqui.has(k) ? `<a class="gl-origem" href="${e.origem.href}">${e.origem.rotulo}</a>` : ''}<a class="seebtn p-go" href="${hrefDe(k)}">abrir no glossário →</a></div>`;
+    const ir = destino(k);
+    const nome = ir ? `<a class="p-term" href="${ir.href}" title="${ir.rotulo}">${e.t}</a>` : `<div class="p-term">${e.t}</div>`;
+    pop.innerHTML = nome + (e.f ? `<div class="p-f">${e.f}</div>` : '') + `<div class="p-def">${e.d}</div>` + (e.a ? `<div class="p-a"><span class="gl-k">como se fosse</span>${e.a}</div>` : '') + (e.x ? `<div class="p-x"><span class="gl-k">pra ir além</span>${e.x}</div>` : '') +
+      `<div class="p-foot">${(e.see || []).filter((s) => G[s]).map((s) => `<button class="seebtn" type="button" data-see="${s}">${G[s].t}</button>`).join('')}${ir ? `<a class="seebtn p-go" href="${ir.href}">${ir.rotulo} →</a>` : ''}</div>`;
     pop.classList.add('on'); document.querySelectorAll('.gterm.act').forEach((t) => t.classList.remove('act')); if (el.classList.contains('gterm')) el.classList.add('act');
     const r = el.getBoundingClientRect(), w = pop.offsetWidth, h = pop.offsetHeight; const left = Math.min(Math.max(12, r.left), innerWidth - w - 12); let top = r.bottom + 8; if (top + h > innerHeight - 8 && r.top - h - 8 > 8) top = r.top - h - 8;
     pop.style.left = left + scrollX + 'px'; pop.style.top = top + scrollY + 'px';
   }
   function closePop() { pop.classList.remove('on'); document.querySelectorAll('.gterm.act').forEach((t) => t.classList.remove('act')); anchor = null; }
   document.addEventListener('click', (e) => {
-    const t = e.target.closest('.gterm'); if (t && t.tagName === 'A') { closePop(); return; }
-    if (t) { e.stopPropagation(); if (anchor === t && pop.classList.contains('on')) closePop(); else openPop(t.dataset.g, t); return; }
+    const t = e.target.closest('.gterm');
+    if (t) {
+      e.stopPropagation();
+      const aberto = anchor === t && pop.classList.contains('on');
+      if (!aberto) { e.preventDefault(); openPop(t.dataset.g, t); return; }
+      /* 2º clique: segue para o destino (o link do próprio termo, ou o do nome na janelinha) */
+      const ir = destino(t.dataset.g); closePop();
+      if (t.tagName !== 'A') { e.preventDefault(); if (ir) location.href = ir.href; }
+      return;
+    }
     const s = e.target.closest('[data-see]'); if (s) { openPop(s.dataset.see, anchor || s); return; }
-    if (e.target.closest('.p-go,.gl-origem')) { closePop(); return; }
+    if (e.target.closest('.p-go,.p-term,.gl-origem')) { closePop(); return; }
     if (!e.target.closest('#pop')) closePop();
   });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePop(); });

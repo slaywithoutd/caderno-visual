@@ -3,6 +3,41 @@
      Figuras, loops, desenhos de margem e tabelas vêm do conteudo.html (data-ref, data-ref-loop, data-ref-mn, data-ref-tbl). -->
 
 <!-- ================= Base ================= -->
+<section class="cs" id="encontro" data-grupo="Para o encontro" data-termos="" data-leitura="encontro">
+  <h2>O encontro em 15 minutos</h2>
+  <p class="cs-def">O encontro começa por um quiz do autoestudo, revisa cada conceito num chip real com uma caixa de segurança, faz exercícios com o hardware do projeto e termina numa decisão de projeto.</p>
+  
+  <h3>Caminho curto</h3>
+  <p>Se o tempo é pouco, leia nesta ordem:</p>
+  <ol class="caminho">
+    <li><a href="#gantt">Algoritmos de escalonamento</a>: a tabela de espera, turnaround e resposta é a conta mais provável do quiz.</li>
+    <li><a href="#tempo-real">Tempo real com números</a>: pior caso, teste de utilização e a linha do tempo de rate monotonic contra EDF.</li>
+    <li><a href="#paginacao">Memória virtual</a> e <a href="#substituicao">substituição de páginas</a>: tradução de endereço, o preço de um page fault e a anomalia de Belady.</li>
+    <li><a href="#memoria-mcu">Memória sem MMU</a>: o que muda no RP2040 e por que o heap não se compacta.</li>
+    <li><a href="#flash-desgaste">Flash e EEPROM</a>: setor, desgaste e a conta de vida útil.</li>
+    <li><a href="#botao">O botão</a>: polling, interrupção e DMA com os números do RP2040.</li>
+    <li><a href="#ataque-dma">Segurança</a>: ataque por DMA, cold boot e negação de serviço por esgotamento.</li>
+  </ol>
+  <p class="depois">Pode deixar para depois: <a href="#particao-fixa">partições</a> (fixas dão fragmentação interna, variáveis dão externa) · <a href="#filas-multiplas">múltiplas filas</a> (MLFQ desce quem gasta o quantum inteiro) · <a href="#sistema-arquivos">arquivos</a> (o i-node com ponteiros diretos e indiretos) · <a href="#disco">discos</a> (SSTF pode causar starvation, C-SCAN deixa a espera uniforme) · <a href="#reais">sistemas reais</a> (a tabela Linux, FreeRTOS, Uno).</p>
+  <h3>Cinco ideias para levar</h3>
+  <ol class="ideias">
+    <li>Escalonar começa pelo critério: a média (espera, throughput) ou o pior caso (prazo).</li>
+    <li>Em tempo real, C é o pior caso, e o teste de utilização só vale com preempção: um trecho que bloqueia derruba a garantia.</li>
+    <li>Memória virtual troca previsibilidade por espaço; sem MMU, você ganha previsibilidade e perde a compactação.</li>
+    <li>Flash e EEPROM se gastam por gravação: vida útil = ciclos ÷ gravações por dia no mesmo lugar.</li>
+    <li>Polling, interrupção e DMA se escolhem pela conta: custo por evento × eventos por segundo, mais o pior caso de latência.</li>
+  </ol>
+  <h3>Quiz de treino</h3>
+  <p>Perguntas autorais no formato do quiz do encontro. Responda de cabeça e abra para conferir.</p>
+  <details class="treino"><summary><span class="q">Q1 · Definição</span> Um sistema de tempo real é aquele que: A) roda rápido; B) cumpre prazos, e resposta atrasada conta como errada; C) usa prioridade dinâmica?</summary><p>B. Rapidez ajuda, mas o que define é o prazo. Veja <a href="#tempo-real">tempo real</a>.</p></details>
+  <details class="treino"><summary><span class="q">Q2 · Notação</span> Em U = Σ Cᵢ/Tᵢ, o que são Cᵢ e Tᵢ? Por que Cᵢ não pode ser a média?</summary><p>Cᵢ é o tempo de CPU de uma execução da tarefa i no pior caso; Tᵢ é o período. Com a média, uma execução ruim estoura um prazo que o teste disse estar garantido.</p></details>
+  <details class="treino"><summary><span class="q">Q3 · Limite</span> Tarefas (C = 2, T = 5) e (C = 4, T = 7). Rate monotonic garante? E EDF?</summary><p>U = 0,40 + 0,57 = 0,97, acima de 0,828: rate monotonic não garante, e de fato a segunda tarefa perde o prazo em t = 7. EDF garante, porque U ≤ 1.</p></details>
+  <details class="treino"><summary><span class="q">Q4 · Conta</span> Um byte da EEPROM do ATmega328P (100 000 ciclos) é gravado uma vez por segundo. Quando sai da garantia? A) 27 horas; B) 27 dias; C) 27 anos.</summary><p>A. 100 000 s / 3 600 ≈ 27,8 horas.</p></details>
+  <details class="treino"><summary><span class="q">Q5 · Armadilha</span> Com FIFO, passar de 3 para 4 molduras sempre reduz os page faults?</summary><p>Não. Na string 1 2 3 4 1 2 5 1 2 3 4 5, o FIFO dá 9 page faults com 3 molduras e 10 com 4: a anomalia de Belady.</p></details>
+  <details class="treino"><summary><span class="q">Q6 · Conta</span> Polling do botão a cada 10 ms, 100 ciclos por leitura, a 125 MHz. Quanto da CPU? Qual o pior atraso?</summary><p>100 × 100 = 10 000 ciclos/s; 10 000 / 125 000 000 = 0,008%. Até 10 ms para ver o aperto (20 ms, se o debounce exige duas leituras iguais).</p></details>
+  <details class="treino"><summary><span class="q">Q7 · Limite</span> Por que o RP2040 não compacta o heap quando ele fragmenta?</summary><p>Compactar exige relocação dinâmica. Sem MMU, mover um bloco quebra todo ponteiro que aponta para ele.</p></details>
+</section>
+
 <section class="cs" id="gerente" data-grupo="Base" data-termos="" data-leitura="antes">
   <h2>O SO como gerente de recursos</h2>
   <p class="cs-def">Há poucos recursos e muitos processos querendo: uma CPU (ou poucas), uma memória principal finita, um disco, alguns dispositivos. A gerência de recursos é a parte do SO que decide quem fica com o quê, e por quanto tempo.</p>
@@ -976,13 +1011,6 @@
   <h2>Treino para o encontro</h2>
   <p class="cs-def">Quiz, exercícios e decisão de projeto autorais, no formato dos encontros, com os mesmos números do modo Leitura.</p>
   <div class="cs-uso">
-    <details class="treino"><summary><span class="q">Q1 · Definição</span> Tempo real é: A) rodar rápido; B) cumprir prazos; C) prioridade dinâmica?</summary><p>B. Resposta atrasada conta como errada.</p></details>
-    <details class="treino"><summary><span class="q">Q2 · Notação</span> Em U = Σ Cᵢ/Tᵢ, o que são Cᵢ e Tᵢ?</summary><p>Cᵢ: CPU de uma execução no pior caso. Tᵢ: período. Com a média, um caso ruim estoura o prazo "garantido".</p></details>
-    <details class="treino"><summary><span class="q">Q3 · Limite</span> (C 2, T 5) e (C 4, T 7): RM garante? EDF?</summary><p>U = 0,97 &gt; 0,828: RM não garante e perde em t = 7. EDF garante (U ≤ 1).</p></details>
-    <details class="treino"><summary><span class="q">Q4 · Conta</span> Byte de EEPROM (100 000 ciclos) gravado 1 vez por segundo dura quanto?</summary><p>100 000 s ≈ 27,8 horas.</p></details>
-    <details class="treino"><summary><span class="q">Q5 · Armadilha</span> FIFO com mais molduras sempre dá menos page faults?</summary><p>Não: Belady, 9 com 3 molduras e 10 com 4 em 1 2 3 4 1 2 5 1 2 3 4 5.</p></details>
-    <details class="treino"><summary><span class="q">Q6 · Conta</span> Polling a cada 10 ms, 100 ciclos, 125 MHz: CPU e pior atraso?</summary><p>0,008%; até 10 ms (20 ms com debounce de duas leituras).</p></details>
-    <details class="treino"><summary><span class="q">Q7 · Limite</span> Por que o RP2040 não compacta o heap?</summary><p>Sem MMU não há relocação dinâmica: mover um bloco quebra os ponteiros.</p></details>
     <details class="treino"><summary><span class="q">Exercício 1</span> Som (1, 5), botão (1, 10), piscar (2, 20), cuidador (20, 100), em ms, no FreeRTOS</summary><p>U = 0,2 + 0,1 + 0,1 + 0,2 = 0,6 ≤ 0,757 (n = 4): garantido. Prioridades no FreeRTOS: som 4, botão 3, piscar 2, cuidador 1. Apagar um setor com interrupções desligadas (até 400 ms) derruba até 80 prazos do som: apague só entre rotinas e junte o log na SRAM. Leitura: o pior caso vem do bloqueio, não da utilização.</p></details>
     <details class="treino"><summary><span class="q">Exercício 2</span> Progresso de 4 bytes a cada aperto, 40 por dia: EEPROM ou flash?</summary><p>Mesmo endereço: 2 500 dias ≈ 6,8 anos. Anel de 256: 640 000 dias. Flash com registros de 16 B: 1 apagamento a cada 6,4 dias, 640 000 dias. Salvar o tempo a cada segundo no mesmo byte (≈ 4 840 por dia): ≈ 21 dias. Leitura: conta quantas vezes você grava no mesmo lugar.</p></details>
     <details class="treino"><summary><span class="q">Exercício 3</span> Botão e som no RP2040 a 125 MHz</summary><p>Polling: 0,008%, pior caso 20 ms com confirmação. Interrupção: 120 ns até o tratador; bounce de 10 bordas sem filtro: 2 150 ciclos = 17,2 µs. Som: 0,64% por amostra contra 0,0025% com DMA. Escolha: interrupção com debounce e som por DMA. Leitura: decide a energia e o pior caso com a flash ocupada.</p></details>

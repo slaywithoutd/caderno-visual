@@ -3,6 +3,41 @@
      Figuras, loops, desenhos de margem e tabelas vêm do conteudo.html (data-ref, data-ref-loop, data-ref-mn, data-ref-tbl). -->
 
 <!-- ================= Base: o que o SO faz ================= -->
+<section class="cs" id="encontro" data-grupo="Para o encontro" data-termos="" data-leitura="encontro">
+  <h2>O encontro em 15 minutos</h2>
+  <p class="cs-def">O encontro começa por um quiz do autoestudo, revisa o assunto em chips reais (Arduino, RP2040, Linux) com uma caixa de segurança, faz exercícios com os números do hardware do projeto e termina numa decisão para o módulo de controle.</p>
+  
+  <h3>Caminho curto</h3>
+  <p>Se o tempo é pouco, leia nesta ordem:</p>
+  <ol class="caminho">
+   <li><a href="#modos">Antes de começar</a>: modo usuário e modo kernel, syscall, interrupção e como o kernel é organizado. Tudo o que vem depois se apoia nisso.</li>
+   <li><a href="#pcb">Contexto e PCB</a>: o que o SO guarda para parar um processo e continuar depois.</li>
+   <li><a href="#estados">Estados do processo</a>: as seis transições válidas e as duas que não existem.</li>
+   <li><a href="#troca-contexto">Troca de contexto</a>: a conta q / (q + s) e o pior caso de espera.</li>
+   <li><a href="#threads">Threads</a>: o que é compartilhado, o que é de cada uma e o preço disso.</li>
+   <li><a href="#superloop">Em chips reais</a>: superloop, FreeRTOS no RP2040 e Linux no Raspberry Pi, com modos e MPU.</li>
+   <li><a href="#treino">Aplicação ao projeto</a>: o módulo de controle precisa de SO?</li>
+  </ol>
+  <p class="depois">Pode deixar para depois: <a href="#tipos">Criação e tipos</a> (fork + exec, CPU-bound × I/O-bound) · <a href="#modelos">ULT × KLT</a> (N:1 bloqueia tudo; 1:1 dá paralelismo) · <a href="#seguranca">Segurança</a> (leia antes do encontro se der: costuma virar pergunta) · <a href="#treino">Exercícios</a> (para treinar a conta).</p>
+  <h3>Cinco ideias para levar</h3>
+  <ol class="ideias">
+   <li>O hardware dá ao SO três ferramentas: dois modos de operação, interrupções e o temporizador. Sem elas não há proteção nem preempção.</li>
+   <li>Processo = contexto de hardware + contexto de software + espaço de endereçamento, tudo anotado no PCB.</li>
+   <li>Troca de contexto é overhead. Fração útil = q / (q + s), e num dispositivo de apoio o que pesa é o pior caso de espera.</li>
+   <li>Thread divide a memória com as outras: é barata e conversa rápido, mas não tem isolamento. Isolar exige ajuda do hardware: MMU num PC, MPU num microcontrolador.</li>
+   <li>Num microcontrolador, superloop, RTOS ou Linux é decisão de projeto. As tarefas do FreeRTOS são threads, e só a MPU separa uma da outra.</li>
+  </ol>
+  <h3>Quiz de treino</h3>
+  <p>Perguntas autorais no formato do quiz do encontro. Responda de cabeça e abra para conferir.</p>
+  <details class="treino"><summary><span class="q">Q1 · Definição</span> Uma tarefa do FreeRTOS no RP2040 se parece mais com um processo ou com uma thread?</summary><p>Com uma thread. Ela tem pilha de execução, registradores salvos e estado próprios, mas enxerga a mesma memória que todas as outras tarefas: o RP2040 não tem MMU, então não há espaço de endereçamento separado (<a href="#rtos">RTOS</a>).</p></details>
+  <details class="treino"><summary><span class="q">Q2 · Notação</span> Em fração útil = q / (q + s), o que são q e s? Com q = 1 ms e s = 2 µs, quanto vai em overhead?</summary><p>q é o quantum, s é o tempo de uma troca de contexto. Overhead = s / (q + s) = 0,002 / 1,002 ≈ 0,2 %.</p></details>
+  <details class="treino"><summary><span class="q">Q3 · Limite</span> Quatro processos em revezamento, q = 10 ms e s = 0,1 ms. Quanto um deles espera, no pior caso, para voltar à CPU? A) 30 ms B) 30,3 ms C) 30,4 ms</summary><p>C. Entre sair e voltar passam os outros 3 quanta e 4 trocas: (n − 1) × q + n × s = 3 × 10 + 4 × 0,1 = 30,4 ms.</p></details>
+  <details class="treino"><summary><span class="q">Q4 · Armadilha</span> Qual destas transições não existe? A) espera → pronto B) espera → executando C) executando → pronto</summary><p>B. Quem sai da espera entra na fila de prontos e disputa a CPU de novo.</p></details>
+  <details class="treino"><summary><span class="q">Q5 · Definição</span> Em que arquitetura de kernel os drivers rodam como programas em modo usuário? A) monolítico B) microkernel C) camadas</summary><p>B. No microkernel, só o mínimo fica em modo kernel; drivers e sistema de arquivos são servidores em modo usuário que conversam por mensagens.</p></details>
+  <details class="treino"><summary><span class="q">Q6 · Conta</span> O ATmega328P do Arduino Uno leva no mínimo 4 ciclos para responder a uma interrupção. Quanto tempo é isso a 16 MHz?</summary><p>4 / (16 × 10⁶ Hz) = 0,25 µs. Com o salto do vetor (3 ciclos), a primeira instrução do tratador começa depois de 7 ciclos ≈ 0,44 µs.</p></details>
+  <details class="treino"><summary><span class="q">Q7 · Armadilha</span> Certo ou errado: "a memória virtual protege uma thread da outra dentro do mesmo processo".</summary><p>Errado. Threads do mesmo processo usam a mesma tabela de páginas. A memória virtual separa processos; entre threads não há proteção nenhuma.</p></details>
+</section>
+
 <section class="cs" id="escalas" data-grupo="Base: o que o SO faz" data-termos="" data-leitura="antes">
   <h2>Escalas de tempo</h2>
   <p class="cs-def">As unidades estão na <a href="/m8/comp/02-fundamentos-memoria">aula 02</a>; a tabela diz o que cabe em cada uma nesta aula.</p>
@@ -613,13 +648,6 @@ void loop() {
   <h2>Treino para o encontro</h2>
   <p class="cs-def">Quiz, exercícios e decisão de projeto no formato dos encontros de João Luisi. Perguntas autorais; dados marcados como exemplo não são medidas.</p>
   <div class="cs-uso">
-    <details class="treino"><summary><span class="q">Q1 · Definição</span> Tarefa do FreeRTOS no RP2040: processo ou thread?</summary><p>Thread: pilha, registradores e estado próprios, memória comum (sem MMU).</p></details>
-    <details class="treino"><summary><span class="q">Q2 · Notação</span> q = 1 ms e s = 2 µs: overhead?</summary><p>s / (q + s) = 0,002 / 1,002 ≈ 0,2 %.</p></details>
-    <details class="treino"><summary><span class="q">Q3 · Limite</span> 4 processos, q = 10 ms, s = 0,1 ms: pior espera para voltar? A) 30 B) 30,3 C) 30,4 ms</summary><p>C. 3 × 10 + 4 × 0,1 = 30,4 ms.</p></details>
-    <details class="treino"><summary><span class="q">Q4 · Armadilha</span> Qual não existe: espera → pronto, espera → executando, executando → pronto?</summary><p>Espera → executando.</p></details>
-    <details class="treino"><summary><span class="q">Q5 · Definição</span> Em que arquitetura os drivers rodam em modo usuário?</summary><p>Microkernel.</p></details>
-    <details class="treino"><summary><span class="q">Q6 · Conta</span> ATmega328P, 4 ciclos a 16 MHz?</summary><p>0,25 µs; com o salto do vetor (7 ciclos), ≈ 0,44 µs.</p></details>
-    <details class="treino"><summary><span class="q">Q7 · Armadilha</span> "A memória virtual protege uma thread da outra no mesmo processo."</summary><p>Errado: threads do processo usam a mesma tabela de páginas.</p></details>
     <details class="treino"><summary><span class="q">Exercício 1</span> Superloop no Uno: botão 5 µs, LEDs 40 µs, 8 bytes de EEPROM a 3,3 ms</summary>
       <ul class="b">
         <li>(a) 0,005 + 0,040 + 26,4 = 26,445 ms por volta; ≈ 37,8 voltas/s.</li>

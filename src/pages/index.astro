@@ -1,11 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
-import ModoSwitch from '../components/ModoSwitch.astro';
 import { site, modulos, aulasDe, eixosDe, hrefRevisao, hrefRevisaoEixo, hrefGlossario, glossarioGlobal, tempoAula, formatarTempo } from '../lib/catalogo.js';
 const nTermos = Object.keys(glossarioGlobal).length;
+const nAulas = (n) => `${n} ${n === 1 ? 'aula' : 'aulas'}`;
 ---
 <Base title={site.titulo} description={site.subtitulo}>
-  <ModoSwitch />
   <main class="home">
     <header class="home-head">
       <h1>{site.titulo}</h1>
@@ -21,45 +20,48 @@ const nTermos = Object.keys(glossarioGlobal).length;
           const eixos = eixosDe(mod.slug, mat.slug);
           const variosEixos = eixos.length > 1;
           return (
-            <section class="home-area" id={`${mod.slug}-${mat.slug}`}>
-              <div class="area-head">
+            <details class="home-area" id={`${mod.slug}-${mat.slug}`} data-dobra={`${mod.slug}-${mat.slug}`} open>
+              <summary class="area-head">
                 <div>
-                  <h3>{mat.titulo}</h3>
+                  <h3>{mat.titulo} <span class="area-n">{lista.length ? nAulas(lista.length) : 'nenhuma aula'}</span></h3>
                   {mat.descricao && <p>{mat.descricao}</p>}
                 </div>
                 {!!lista.length && <a class="rev-link" href={hrefRevisao(mod.slug, mat.slug)}>{variosEixos ? 'Revisão da matéria →' : 'Revisão para a prova →'}</a>}
-              </div>
+              </summary>
               {lista.length === 0 && <p class="area-vazia">Nenhuma aula ainda.</p>}
-              {eixos.map((eixo) => (
-                <div class="home-eixo">
-                  {variosEixos && (
-                    <div class="eixo-head">
-                      <div>
-                        <h4>{eixo.titulo}</h4>
-                        {eixo.descricao && <p>{eixo.descricao}</p>}
-                      </div>
-                      <a class="rev-link" href={hrefRevisaoEixo(mod.slug, mat.slug, eixo.slug)}>Revisão do eixo →</a>
-                    </div>
-                  )}
+              {eixos.map((eixo) => {
+                const aulasLista = (
                   <ol class="aula-list">
                     {eixo.aulas.map((a) => (
                       <li>
-                        <a class="aula-row" href={a.href} data-consulta={a.hrefConsulta || undefined}>
-                          <span class="aula-num">{a.numero}</span>
+                        <a class="aula-row" href={a.href}>
+                          <span class={`aula-num${a.dataRotulo ? '' : ' sem-data'}`} title={a.data ? `Encontro de ${a.dataRotulo}` : 'Data do encontro ainda não registrada'}>{a.dataRotulo || '—'}</span>
                           <span class="aula-body">
                             <span class="aula-title">{a.titulo}</span>
                             <span class="aula-resumo">{a.resumo}</span>
                             <span class="aula-tags">{(a.topicos || []).map((t) => <span>{t}</span>)}</span>
                           </span>
-                          <span class="aula-meta"><span class="aula-tempo">~{formatarTempo(tempoAula(a).minutos)} de leitura</span></span>
+                          <span class="aula-meta"><span class="aula-tempo">~{formatarTempo(tempoAula(a).minutos)}</span></span>
                           <span class="aula-go" aria-hidden="true">→</span>
                         </a>
                       </li>
                     ))}
                   </ol>
-                </div>
-              ))}
-            </section>
+                );
+                return variosEixos ? (
+                  <details class="home-eixo" data-dobra={`${mod.slug}-${mat.slug}-${eixo.slug}`} open>
+                    <summary class="eixo-head">
+                      <div>
+                        <h4>{eixo.titulo} <span class="area-n">{nAulas(eixo.aulas.length)}</span></h4>
+                        {eixo.descricao && <p>{eixo.descricao}</p>}
+                      </div>
+                      <a class="rev-link" href={hrefRevisaoEixo(mod.slug, mat.slug, eixo.slug)}>Revisão do eixo →</a>
+                    </summary>
+                    {aulasLista}
+                  </details>
+                ) : <div class="home-eixo">{aulasLista}</div>;
+              })}
+            </details>
           );
         })}
       </section>
@@ -68,8 +70,20 @@ const nTermos = Object.keys(glossarioGlobal).length;
 </Base>
 
 <script>
-  import { initModo } from '../lib/modo.js';
-  initModo();
+  /* matérias e eixos retráteis: o que você fechou continua fechado na próxima visita (só neste navegador) */
+  const CHAVE = 'caderno-home-fechados';
+  let fechados = [];
+  try { fechados = JSON.parse(localStorage.getItem(CHAVE) || '[]'); } catch {}
+  const dobras = [...document.querySelectorAll('details[data-dobra]')];
+  dobras.forEach((d) => {
+    if (fechados.includes(d.dataset.dobra)) d.open = false;
+    d.addEventListener('toggle', () => {
+      const s = new Set(fechados);
+      if (d.open) s.delete(d.dataset.dobra); else s.add(d.dataset.dobra);
+      fechados = [...s];
+      try { localStorage.setItem(CHAVE, JSON.stringify(fechados)); } catch {}
+    });
+  });
 </script>
 
 <style>
@@ -81,21 +95,27 @@ const nTermos = Object.keys(glossarioGlobal).length;
   .home-gl .muted{font-weight:400;font-size:.88rem}
   .mod-title{font-size:.78rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 18px}
   .home-area{margin-bottom:2.6rem}
-  .area-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:4px}
+  .area-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:4px;cursor:pointer;list-style:none}
+  .area-head::-webkit-details-marker,.eixo-head::-webkit-details-marker{display:none}
+  .area-head h3::before,.eixo-head h4::before{content:'▾';display:inline-block;width:1.1em;color:var(--muted);font-size:.8em;transition:transform .2s}
+  details:not([open]) > .area-head h3::before,details:not([open]) > .eixo-head h4::before{transform:rotate(-90deg)}
+  .area-n{font-family:var(--f-mono);font-size:.72rem;font-weight:400;letter-spacing:0;text-transform:none;color:var(--muted);margin-left:6px}
+  details.home-area:not([open]){margin-bottom:1.2rem}
   .area-head h3{font-size:1.25rem;margin:0 0 2px}
   .area-head p{font-size:.9rem;color:var(--muted);margin:0}
   .rev-link{font-size:.85rem;text-decoration:none;white-space:nowrap}
   .home-eixo{margin-top:6px}
-  .eixo-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding:22px 8px 6px}
+  .eixo-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding:22px 8px 6px;cursor:pointer;list-style:none}
   .eixo-head h4{font-size:.8rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);margin:0 0 3px}
   .eixo-head p{font-size:.86rem;color:var(--muted);margin:0;max-width:560px}
   .area-vazia{color:var(--muted);font-size:.92rem;padding:14px 8px;margin:0}
   .aula-list{list-style:none;margin:0;padding:0}
   .aula-list li{border-bottom:1px solid var(--line)}
-  .aula-row{display:grid;grid-template-columns:48px minmax(0,1fr) auto 24px;gap:6px 20px;align-items:start;padding:22px 8px;text-decoration:none;color:inherit;border-radius:10px;transition:background .2s}
+  .aula-row{display:grid;grid-template-columns:52px minmax(0,1fr) auto 24px;gap:6px 20px;align-items:start;padding:22px 8px;text-decoration:none;color:inherit;border-radius:10px;transition:background .2s}
   .aula-row:hover{background:var(--surface2)}
   .aula-row:hover .aula-go{color:var(--accent);transform:translateX(3px)}
-  .aula-num{font-family:var(--f-mono);font-size:.9rem;color:var(--muted);padding-top:3px}
+  .aula-num{font-family:var(--f-mono);font-size:.82rem;color:var(--muted);padding-top:4px}
+  .aula-num.sem-data{opacity:.6}
   .aula-body{display:flex;flex-direction:column;gap:6px;min-width:0}
   .aula-title{font-weight:600;font-size:1.15rem;color:var(--fg)}
   .aula-resumo{color:var(--fg2);font-size:.95rem;line-height:1.55}

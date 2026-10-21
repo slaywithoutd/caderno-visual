@@ -356,6 +356,10 @@ header.hero{padding-bottom:28px;margin-bottom:28px;border-bottom:1px solid var(-
 #pop{position:absolute;z-index:60;width:360px;max-width:calc(100vw - 32px);background:var(--surface);border:1px solid var(--line2);border-top:3px solid var(--accent);border-radius:8px;padding:14px 16px;box-shadow:0 14px 36px rgba(20,30,45,.18);display:none;font-size:.88rem;line-height:1.55}
 #pop.on{display:block}
 #pop .p-term{font-weight:600;font-size:1rem;margin-bottom:6px;color:var(--fg)}
+#pop a.p-term{display:inline-block;text-decoration:none}
+#pop a.p-term::after{content:' →';color:var(--accent);font-weight:400}
+#pop a.p-term:hover{color:var(--accent)}
+#pop .p-f{font-family:var(--f-mono);font-size:.8rem;background:var(--surface2);border:1px solid var(--line);border-radius:6px;padding:5px 8px;margin:0 0 8px;overflow-x:auto}
 #pop .p-def{color:var(--fg2)}
 #pop .p-a,#pop .p-x{font-size:.84rem;color:var(--muted);margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
 #pop .gl-k,.gl-card .gl-k{display:block;font-size:.68rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
@@ -517,23 +521,39 @@ details.treino p,details.treino ul.b{margin:.5em 0}
 .leitura{display:flex;align-items:center;gap:8px;font-size:.88rem;color:var(--muted);margin:-.2rem 0 1rem}
 .leitura svg{width:16px;height:16px;flex:0 0 auto}
 
-/* ================= switch Leitura / Consulta ================= */
-.modo-switch{position:fixed;top:14px;right:18px;z-index:40;display:flex;padding:3px;border:1px solid var(--line);border-radius:999px;background:var(--bg);box-shadow:0 2px 10px rgba(0,0,0,.05)}
-.modo-switch button{font:500 .8rem var(--f-body);color:var(--muted);background:none;border:0;border-radius:999px;padding:5px 13px;cursor:pointer;transition:background .2s,color .2s}
-.modo-switch button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
-.modo-switch button:not([aria-pressed="true"]):not(:disabled):hover{color:var(--fg)}
-.modo-switch button:disabled{opacity:.4;cursor:not-allowed}
-html.lendo .modo-switch{display:none}
+/* ================= barras laterais ajustáveis (lib/paineis.js) =================
+   Arrastar a borda muda --side-w / --defs-w-aberta; ‹ recolhe. Só em telas largas (no celular as barras entram no fluxo). */
+.puxador{display:none}
+@media (min-width:1021px){
+  .puxador{display:block;position:fixed;top:0;bottom:0;width:9px;z-index:35;cursor:col-resize;touch-action:none}
+  .puxador::after{content:'';position:absolute;top:0;bottom:0;left:4px;width:1px;background:transparent;transition:background .15s}
+  .puxador:hover::after,.puxador:focus-visible::after,html.arrastando .puxador::after{background:var(--accent);width:2px}
+  .puxador:focus-visible{outline:none}
+  .puxador-side{left:calc(var(--side-w) - 5px)}
+  .puxador-defs{right:calc(var(--defs-w) - 5px)}
+  html.defs-recolhidas .puxador-defs{display:none}
+  .side-fechar{position:absolute;top:calc(14px + env(safe-area-inset-top, 0px));right:4px}
+  html.side-recolhida{--side-w:0px}
+  html.side-recolhida .side{display:none}
+  html.side-recolhida .side-btn{display:block}
+}
+html.arrastando,html.arrastando *{cursor:col-resize!important;user-select:none}
+.painel-fechar{border:0;background:none;font-size:1.2rem;line-height:1;color:var(--muted);cursor:pointer;padding:8px}
+.painel-fechar:hover{color:var(--fg)}
+@media (max-width:1020px){.side-fechar{display:none}}
+.side-btn{display:none;position:fixed;left:12px;top:12px;z-index:31;font:500 .82rem var(--f-body);padding:8px;border-radius:4px;border:0;background:var(--bg);color:var(--muted);cursor:pointer}
+.side-btn:hover,.defs-btn:hover{color:var(--fg)}
+html.lendo .puxador,html.lendo .side-btn,html.lendo .side-fechar{display:none}
 .toc li.toc-grupo{font-size:.68rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 0 4px;padding-left:2px;list-style:none}
 
 /* ================= modo Consulta =================
    Uma <section class="cs"> por conceito, sempre na mesma ordem de blocos:
    p.cs-def → div.cs-formula → div.cs-uso → div.cs-pegadinhas → div.cs-ponderada → figuras/loops.
    Os rótulos dos blocos vêm daqui (::before); ninguém digita "Como usar" no HTML. */
-html.modo-consulta{--mw:100%;--defs-w:280px}
+html.modo-consulta{--mw:100%;--defs-w:var(--defs-w-aberta,280px)}
 html.defs-recolhidas{--defs-w:0px}
 .layout-consulta{padding-right:var(--defs-w)}
-.layout-consulta .content{max-width:880px;margin-inline:auto}
+.layout-consulta .content{max-width:880px;margin-inline:auto;container:conteudo / inline-size}
 .cs-hero{margin-bottom:2.4rem}
 .cs-ajuda{color:var(--muted);font-size:.92rem;margin:.4rem 0 0}
 section.cs{padding:2.2rem 0 1.4rem;border-top:1px solid var(--line);scroll-margin-top:16px}
@@ -567,12 +587,22 @@ a.gterm.glink:hover{color:var(--accent)}
 .cs-fim h3 a:hover{color:var(--accent)}
 .cs-cola{display:grid;gap:14px}
 .cs-cola-nome{font-size:.7rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
-@media (max-width:1100px){.modo-consulta .fig-body{grid-template-columns:1fr}}
-@media (min-width:1101px){.modo-consulta .fig-body{grid-template-columns:minmax(0,1.8fr) minmax(0,1fr)}.modo-consulta .fig-head,.modo-consulta .fig-ctrl{width:100%}}
-@media (max-width:640px){section.cs .mn{float:none;width:100%;margin:.4rem 0 1rem}}
+/* figuras e desenhos de margem se ajustam à largura que sobrou entre as barras, e não à da janela */
+.modo-consulta .fig-head,.modo-consulta .fig-ctrl{width:100%}
+.modo-consulta .fig-body{grid-template-columns:1fr;row-gap:18px}
+.modo-consulta .fig-side{min-height:0}
+.modo-consulta ol.fig-notes{position:static;max-height:260px}
+@container conteudo (min-width:720px){
+  .modo-consulta .fig-body{grid-template-columns:minmax(0,1.8fr) minmax(0,1fr);row-gap:0}
+  .modo-consulta .fig-side{min-height:220px}
+  .modo-consulta ol.fig-notes{position:absolute;max-height:none}
+}
+@container conteudo (max-width:620px){
+  section.cs .mn,section.cs .mn.loop{float:none;width:100%;max-width:320px;margin:.6rem auto 1.2rem}
+}
 
 /* barra de Definições (direita, recolhível; no celular fica no fluxo da página) */
-.defs{position:fixed;top:58px;right:0;bottom:0;width:var(--defs-w);padding:8px 20px 24px 16px;display:flex;flex-direction:column;gap:10px;background:transparent;z-index:30}
+.defs{position:fixed;top:16px;right:0;bottom:0;width:var(--defs-w);padding:8px 20px 24px 16px;display:flex;flex-direction:column;gap:10px;background:transparent;z-index:30}
 .defs[hidden]{display:none}
 .defs-head{display:flex;align-items:center;justify-content:space-between}
 .defs-tit{font-size:.72rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
@@ -592,7 +622,7 @@ a.gterm.glink:hover{color:var(--accent)}
 .def-f{font-family:var(--f-mono);font-size:.8rem;background:var(--surface2);border:1px solid var(--line);border-radius:6px;padding:6px 8px;margin:0 0 .5rem;overflow-x:auto}
 .def-ir{font-size:.8rem;text-decoration:none}
 .defs-vazio{font-size:.85rem;color:var(--muted)}
-.defs-btn{display:none;position:fixed;right:12px;top:68px;z-index:31;font:500 .82rem var(--f-body);padding:8px;border-radius:4px;border:0;background:var(--bg);color:var(--muted);cursor:pointer}
+.defs-btn{display:none;position:fixed;right:12px;top:12px;z-index:31;font:500 .82rem var(--f-body);padding:8px;border-radius:4px;border:0;background:var(--bg);color:var(--muted);cursor:pointer}
 html.defs-recolhidas .defs-btn{display:block}
 @media (max-width:760px){
   .layout-consulta{padding-right:0;display:flex;flex-direction:column}

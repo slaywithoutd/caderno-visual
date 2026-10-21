@@ -1,5 +1,6 @@
 {
   "numero": "03",
+  "data": "2026-10-21",
   "titulo": "Arquitetura de computadores: pipelines e paralelismo",
   "tema": "Do silício ao sistema operacional",
   "resumo": "Pipeline de 5 stages, hazards, forwarding e branch prediction; Tomasulo, especulação com ROB, superescalar e multithreading; multicore e Amdahl com N núcleos; o pipeline dos chips do projeto (AVR, Cortex-M0+ do RP2040); Spectre e Meltdown; exercícios e decisão de projeto no formato do encontro.",

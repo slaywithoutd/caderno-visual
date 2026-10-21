@@ -47,14 +47,15 @@ Os encontros de João Luisi seguem sempre o mesmo formato (slides de 19/10/2026,
 
 Regras que saíram disso, para toda aula do eixo:
 
-- A primeira seção do `conteudo.html` é `id="encontro"`, "O encontro em 15 minutos": caminho curto
-  (`ol.caminho`, 4 a 7 seções essenciais, com o motivo), `p.depois` com o que pode ficar para depois,
-  cinco ideias (`ol.ideias`) e um quiz em `details.treino`. Antes do encontro, o quiz é autoral; depois,
-  vira o quiz real do slide. No Consulta, a seção `treino` (grupo "Treino para o encontro") traz o quiz e
-  os gabaritos enxutos, com `data-leitura="encontro,exercicios,projeto"`.
+- A primeira seção do `consulta.html` é `<section class="cs" id="encontro" data-grupo="Para o encontro">`,
+  "O encontro em 15 minutos": `p.cs-def` com o formato do encontro, caminho curto (`ol.caminho`, 4 a 7
+  seções essenciais, com o motivo e link para a seção do Consulta), `p.depois` com o que pode ficar para
+  depois, cinco ideias (`ol.ideias`) e o quiz em `details.treino`. Antes do encontro, o quiz é autoral;
+  depois, vira o quiz real do slide. A seção `treino` (grupo "Treino para o encontro") traz os exercícios
+  e o projeto com os gabaritos; o quiz mora só no `encontro`. Nas aulas antigas, a mesma seção existe
+  no `conteudo.html` (fonte, não publicada).
 - Toda aula futura do eixo tem seções de chips reais, segurança, exercícios no hardware do projeto
-  (`id="exercicios"`) e aplicação ao projeto (`id="projeto"`), nos dois modos. Exercícios e decisões
-  autorais são identificados como treino (`base-tag` "Treino · autoral").
+  e aplicação ao projeto. Exercícios e decisões autorais são identificados como treino (autorais).
 - Leia os slides do encontro anterior: eles anunciam o que vem ("fica para quarta"). O que foi anunciado
   entra na aula seguinte antes do encontro.
 - Depois do encontro, `integrar-notas` confere os slides página por página em `cobertura.json` e
@@ -66,8 +67,9 @@ Regras que saíram disso, para toda aula do eixo:
 src/data/estrutura.js            módulos, matérias (m8: comp, mat, negocios, ux, lideranca) e eixos de cada matéria
 src/aulas/<modulo>/<materia>/<aula>/
   meta.json                      título, resumo, tópicos, seções do sumário, fontes   (obrigatório)
-  conteudo.html                  texto da aula, modo Leitura (só as seções de conteúdo)  (obrigatório)
-  consulta.html                  a mesma aula por conceito, modo Consulta                 (obrigatório em aula nova)
+  consulta.html                  a aula, por conceito: é a página publicada               (obrigatório)
+  conteudo.html                  só nas aulas antigas: fonte das figuras, loops, desenhos e tabelas que o
+                                 consulta.html cita por data-ref (não é publicado; não crie em aula nova)
   index.js                       importa figuras.js e loops.js (roda no navegador)
   figuras.js                     figuras passo a passo (StepFig) e widgets
   loops.js                       animações em loop
@@ -89,13 +91,17 @@ A página da aula monta sozinha, depois do `conteudo.html`: **Revisão rápida**
 **Da aula** (de `notas/`, só aparece se houver arquivo), **Glossário** e **Fontes** (de `meta.json`).
 Não escreva essas seções no `conteudo.html`. O sumário da sidebar é `meta.secoes` + essas extras.
 
-Slug da aula: `NN-assunto-curto` (ex.: `02-automatos-finitos`). `numero` em `meta.json` = `NN`.
+Slug da aula: `NN-assunto-curto` (ex.: `02-automatos-finitos`). `numero` em `meta.json` = `NN`; ele só
+ordena as pastas e não aparece no site. **`data`** (AAAA-MM-DD) é a data do encontro presencial: a home
+ordena as aulas por ela e mostra "19/10" no lugar do número; aula sem `data` vai para o fim com "—".
+Quando a dona disser a data de um encontro, preencha.
 
 ## meta.json
 
 ```json
 {
   "numero": "02",
+  "data": "2026-10-19",
   "titulo": "Autômatos finitos",
   "tema": "Linguagens formais e autômatos",
   "resumo": "Uma frase com o que a aula cobre.",
@@ -222,13 +228,15 @@ Use a primeira aula de `m8/ux` como referência. Não force fórmulas, ponderada
 ajudarem o assunto. Exercícios autorais devem ser identificados, com justificativas e limites,
 sem atribuir perguntas ou respostas ao professor. Os dois validadores também cobrem esse formato.
 
-Por padrão, toda aula tem dois modos, trocados por um switch global no topo (a escolha fica no navegador e vale para
-todas as aulas; ao trocar, a página cai no mesmo assunto do outro modo):
+**O site publica só o modo Consulta** (decisão da dona em 21/10/2026). O modo Leitura e o switch foram
+removidos; `/<modulo>/<materia>/<aula>` redireciona para `/<modulo>/<materia>/<aula>/consulta`.
 
-- **Leitura** (`conteudo.html`): a aula na ordem das fontes, para aprender da primeira vez.
-- **Consulta** (`consulta.html`, página `/<modulo>/<materia>/<aula>/consulta`): o **mesmo** conteúdo, mais
-  curto e reorganizado por conceito, para revisar e procurar. Nada some (informação, fórmula, conta, figura,
-  "cai na prova", ponderada) e nada é inventado.
+- Aula nova: escreva só o `consulta.html`, com `"modos": ["consulta"]` no meta.json e os visuais direto
+  nele (como na seção "Aula somente Consulta" acima). As regras de escrita, Base, notação e glossário
+  continuam valendo: elas agora se aplicam ao `consulta.html`.
+- Aulas antigas (m8/comp 01 a 06): o `conteudo.html` fica como fonte das figuras, loops, desenhos de margem
+  e tabelas citados por `data-ref`. Conteúdo novo entra no `consulta.html`; só mexa no `conteudo.html`
+  para mudar uma figura ou tabela citada. Nada some e nada é inventado.
 
 Regras do modo Consulta:
 
@@ -374,8 +382,16 @@ banqueiro" porque o livro brasileiro usa assim).
 - Texto na coluna de 3/4; a margem de 1/4 recebe desenhos, loops e os passos das figuras.
 - Figuras sem caixa. Barra de controles (play, ‹, ›, reiniciar, progresso) **acima** da figura.
 - Figura passo a passo anima só com o mouse em cima e avança na hora em que ele entra.
-- Dois modos por aula, Leitura e Consulta, com switch global no topo (`src/lib/modo.js`). No Consulta, a
-  barra de Definições fica à direita, com opção de recolher e busca que filtra enquanto digita. Em telas pequenas, entra no fluxo sem cobrir o artigo.
+- Só o modo Consulta é publicado. A barra de Definições fica à direita, com busca que filtra enquanto
+  digita. As duas barras (sumário e Definições) mudam de largura arrastando a borda e recolhem; a escolha
+  fica no navegador (`src/lib/paineis.js`). Em telas pequenas, entram no fluxo sem cobrir o artigo.
+- O conteúdo se ajusta ao espaço entre as barras com container queries (`container: conteudo` em
+  `.layout-consulta .content`): figura em duas colunas só com 720px ou mais; desenho de margem para de
+  flutuar abaixo de 620px. Componente novo usa `@container conteudo`, nunca a largura da janela.
+- Termo do glossário no texto: o 1º clique abre a janelinha (definição, fórmula, ver também); o 2º clique,
+  no termo ou no nome dentro da janelinha, leva à seção dona do termo (`src/lib/glossary.js`).
+- Home: matérias e eixos são retráteis (`details`), e o que a dona fecha continua fechado. Aulas por data
+  do encontro.
 - Nenhuma animação roda (nem com o mouse em cima, nem loop) sem que **pelo menos 80%** dela esteja na
   tela (`fracaoVisivel` em `src/lib/dom.js`). Loops começam do início quando aparecem e congelam ao sair.
 - Toda página de leitura (aula, revisão, glossário) mostra o **tempo de leitura** logo abaixo do título,

@@ -1,5 +1,6 @@
 {
   "numero": "02",
+  "data": "2026-10-19",
   "titulo": "Arquitetura de computadores: fundamentos e memória",
   "tema": "Do silício ao sistema operacional",
   "resumo": "Como medir desempenho (equação da CPU, Lei de Amdahl), por que energia travou o clock e trouxe o multicore, confiabilidade e custo do chip, e a hierarquia de memória: localidade, caches, AMAT, memória virtual e TLB.",

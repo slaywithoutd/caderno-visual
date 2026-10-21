@@ -33,8 +33,10 @@ export const aulas = Object.entries(metas)
       ...meta,
       modulo, materia, slug,
       id: `${modulo}/${materia}/${slug}`,
-      href: url(`/${modulo}/${materia}/${slug}${meta.modos?.length === 1 && meta.modos[0] === 'consulta' ? '/consulta' : ''}`),
-      hrefLeitura: meta.modos?.length === 1 && meta.modos[0] === 'consulta' ? null : url(`/${modulo}/${materia}/${slug}`),
+      /* o site publica só o modo Consulta; o conteudo.html continua como fonte das figuras, loops e tabelas */
+      href: url(`/${modulo}/${materia}/${slug}${consultas[`${dir}/consulta.html`] ? '/consulta' : ''}`),
+      hrefLeitura: consultas[`${dir}/consulta.html`] ? null : url(`/${modulo}/${materia}/${slug}`),
+      dataRotulo: meta.data ? meta.data.slice(8, 10) + '/' + meta.data.slice(5, 7) : '',
       conteudo: conteudos[`${dir}/conteudo.html`] || '',
       consulta: consultas[`${dir}/consulta.html`] || '',
       hrefConsulta: consultas[`${dir}/consulta.html`] ? url(`/${modulo}/${materia}/${slug}/consulta`) : null,
@@ -49,7 +51,12 @@ export const aulas = Object.entries(metas)
 
 export const materia = (m, s) => modulos.find((x) => x.slug === m)?.materias.find((x) => x.slug === s);
 export const modulo = (m) => modulos.find((x) => x.slug === m);
-export const aulasDe = (m, s) => aulas.filter((a) => a.modulo === m && a.materia === s);
+/* ordem real do curso: pela data do encontro (meta.data, AAAA-MM-DD); aula sem data vai para o fim, na ordem das pastas.
+   A lista `aulas` continua na ordem das pastas porque o glossário global usa a primeira definição de cada termo. */
+const porData = (a, b) => (a.data && b.data ? a.data.localeCompare(b.data) : a.data ? -1 : b.data ? 1 : a.id.localeCompare(b.id));
+export const aulasDe = (m, s) => aulas.filter((a) => a.modulo === m && a.materia === s).sort(porData);
+/* rótulo curto de uma aula onde antes aparecia "Aula 03": a data do encontro, quando se sabe */
+export const rotuloAula = (a) => (a.dataRotulo ? `Encontro de ${a.dataRotulo}` : 'Sem data de encontro');
 export const hrefRevisao = (m, s) => url(`/${m}/${s}/revisao`);
 export const hrefGlossario = url('/glossario');
 
@@ -87,7 +94,7 @@ export const glossarioGlobal = (() => {
       }
     }
     for (const [k, v] of Object.entries(a.glossario)) {
-      if (!G[k]) G[k] = { ...v, origem: { rotulo: `Aula ${a.numero} · ${mat ? mat.titulo : a.materia}`, href: `${a.href}#${destinosConsulta[k] || `gl-${k}`}`, aula: a.id, tema: a.tema || '' } };
+      if (!G[k]) G[k] = { ...v, origem: { rotulo: `${mat ? mat.titulo : a.materia} · ${a.titulo}`, href: `${a.href}#${destinosConsulta[k] || `gl-${k}`}`, aula: a.id, tema: a.tema || '' } };
     }
   }
   return G;
@@ -143,7 +150,7 @@ export function tempoLeitura({ html = '', extras = '', figuras = null, loops = n
 }
 
 export const tempoAula = (a) => tempoLeitura({
-  html: a.conteudo || a.consulta,
+  html: a.consulta ? montarConsulta(a).html : a.conteudo,
   extras: [...a.notas.map((n) => n.raw), ...a.cartoes.flat(), ...a.cola.flat()].join(' '),
   cartoes: a.cartoes.length,
 });

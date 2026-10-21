@@ -4,18 +4,323 @@
   "criterio": "Preparação para o encontro antes dos slides existirem. Registra o que foi conferido e o que continua pendente; não equivale a certificação de leitura integral dos livros.",
   "fontes": [
     {
+      "id": "luisi-s03",
+      "url": "arquivo enviado pela dona: S02 - Pipelines-paralelismo.pdf (não republicado)",
+      "escopo": "Slides do encontro de 21/10/2026, páginas 1–36",
+      "acesso": "integral",
+      "metodo": "Texto extraído das 36 páginas e figuras conferidas visualmente onde carregavam informação (grafo da rotina, diagramas de pipeline).",
+      "totalUnidades": 36,
+      "unidades": [
+        {
+          "paginas": [
+            1,
+            2,
+            3,
+            6,
+            20,
+            27,
+            36
+          ],
+          "assunto": "Capa, roteiro, divisórias e referências",
+          "antes": "coberto",
+          "justificativa": "Roteiro e referências (Hennessy 1.2, cap. 3, apêndice C; Machado e Maia 2.2.7 e 2.2.8) registrados no meta.json.",
+          "leitura": [
+            "encontro"
+          ],
+          "consulta": [
+            "encontro"
+          ]
+        },
+        {
+          "paginas": [
+            4,
+            5
+          ],
+          "assunto": "Quiz: dependência de nome, bolha e ganho de 5 estágios",
+          "antes": "parcial",
+          "justificativa": "Conceitos existiam; faltava a conta k + (N − 1) do item 3, acrescentada.",
+          "leitura": [
+            "pipeline",
+            "dados"
+          ],
+          "consulta": [
+            "speedup-pipeline",
+            "dependencias",
+            "stall"
+          ]
+        },
+        {
+          "paginas": [
+            7
+          ],
+          "assunto": "Cinco estágios e tempo com e sem pipeline",
+          "antes": "parcial",
+          "justificativa": "Estágios cobertos; fórmula N × k contra k + (N − 1) acrescentada.",
+          "leitura": [
+            "pipeline"
+          ],
+          "consulta": [
+            "stages",
+            "speedup-pipeline"
+          ]
+        },
+        {
+          "paginas": [
+            8
+          ],
+          "assunto": "Três hazards e o custo das bolhas",
+          "antes": "coberto",
+          "justificativa": "Já explicado com CPI = 1 + stalls e ganho = profundidade / (1 + stalls).",
+          "leitura": [
+            "hazards"
+          ],
+          "consulta": [
+            "hazard",
+            "cpi-stalls"
+          ]
+        },
+        {
+          "paginas": [
+            9
+          ],
+          "assunto": "Adiantamento e a bolha do load em RISC-V",
+          "antes": "parcial",
+          "justificativa": "Mecanismo coberto em MIPS; tabela de leitura do RISC-V acrescentada.",
+          "leitura": [
+            "dados",
+            "antes"
+          ],
+          "consulta": [
+            "forwarding",
+            "assembly"
+          ]
+        },
+        {
+          "paginas": [
+            10
+          ],
+          "assunto": "Dependências e renomeação com registradores físicos",
+          "antes": "coberto",
+          "justificativa": "RAW, WAR, WAW, controle e renomeação já explicados.",
+          "leitura": [
+            "ilp",
+            "tomasulo"
+          ],
+          "consulta": [
+            "hazard-dados",
+            "dependencias",
+            "renomeacao"
+          ]
+        },
+        {
+          "paginas": [
+            11
+          ],
+          "assunto": "Contador de 2 bits, correlação, torneio e TAGE",
+          "antes": "parcial",
+          "justificativa": "Faltavam gshare e TAGE; acrescentados com desenho da evolução.",
+          "leitura": [
+            "controle"
+          ],
+          "consulta": [
+            "preditor-2bits",
+            "correlacionado",
+            "esquemas-desvio"
+          ]
+        },
+        {
+          "paginas": [
+            12
+          ],
+          "assunto": "Superescalar, fora de ordem, renomeação e ROB (BOOM)",
+          "antes": "coberto",
+          "justificativa": "Já explicado; o BOOM aparece nos preditores e na armadilha do pipeline fundo.",
+          "leitura": [
+            "multipla",
+            "tomasulo",
+            "especulacao"
+          ],
+          "consulta": [
+            "emissao-multipla",
+            "escalonamento-dinamico",
+            "rob"
+          ]
+        },
+        {
+          "paginas": [
+            13
+          ],
+          "assunto": "ILP medido com acumuladores",
+          "antes": "omitido",
+          "justificativa": "Seção nova com os números medidos e a relação latência × vazão.",
+          "leitura": [
+            "ilp"
+          ],
+          "consulta": [
+            "acumuladores"
+          ]
+        },
+        {
+          "paginas": [
+            14
+          ],
+          "assunto": "Especulação, estado da arquitetura e Spectre/Meltdown",
+          "antes": "coberto",
+          "justificativa": "Já explicado na especulação e na seção de segurança.",
+          "leitura": [
+            "especulacao",
+            "seguranca"
+          ],
+          "consulta": [
+            "especulacao",
+            "seguranca"
+          ]
+        },
+        {
+          "paginas": [
+            15
+          ],
+          "assunto": "Multithreading grosso, fino, SMT e PortSmash",
+          "antes": "parcial",
+          "justificativa": "Faltava a segurança do SMT (PortSmash, OpenBSD); acrescentada.",
+          "leitura": [
+            "limites"
+          ],
+          "consulta": [
+            "multithreading"
+          ]
+        },
+        {
+          "paginas": [
+            16
+          ],
+          "assunto": "Quatro modos de paralelismo e Flynn",
+          "antes": "parcial",
+          "justificativa": "Faltava o paralelismo de requisição; acrescentado.",
+          "leitura": [
+            "nucleos"
+          ],
+          "consulta": [
+            "nucleos"
+          ]
+        },
+        {
+          "paginas": [
+            17
+          ],
+          "assunto": "RISC × CISC no livro e hoje",
+          "antes": "omitido",
+          "justificativa": "Seção nova com a tabela do Machado e Maia contra os chips de hoje.",
+          "leitura": [
+            "multipla"
+          ],
+          "consulta": [
+            "risc-cisc-hoje"
+          ]
+        },
+        {
+          "paginas": [
+            18
+          ],
+          "assunto": "Ibex, Hazard3, CVA6 e XiangShan",
+          "antes": "parcial",
+          "justificativa": "Ibex existia; Hazard3, CVA6 e XiangShan acrescentados, e o gráfico de estágios atualizado.",
+          "leitura": [
+            "reais"
+          ],
+          "consulta": [
+            "reais"
+          ]
+        },
+        {
+          "paginas": [
+            19
+          ],
+          "assunto": "Armadilhas: latência e pipeline fundo",
+          "antes": "parcial",
+          "justificativa": "A armadilha do pipeline fundo, com BOOM e Pentium 4, foi acrescentada.",
+          "leitura": [
+            "limites"
+          ],
+          "consulta": [
+            "falacias",
+            "speedup-pipeline"
+          ]
+        },
+        {
+          "paginas": [
+            21,
+            22,
+            23,
+            24,
+            25,
+            26
+          ],
+          "assunto": "Exercícios: previsor, bolha do load e dois temporizadores",
+          "antes": "omitido-exercicio",
+          "justificativa": "Os três exercícios entram com as contas no lugar dos exercícios autorais.",
+          "leitura": [
+            "exercicios"
+          ],
+          "consulta": [
+            "treino"
+          ]
+        },
+        {
+          "paginas": [
+            28,
+            29,
+            30,
+            31
+          ],
+          "assunto": "Projeto: a rotina fora de ordem, sintaxe e LGPD",
+          "antes": "omitido-contexto-novo",
+          "justificativa": "Seção nova no lugar da decisão autoral de um ou dois núcleos.",
+          "leitura": [
+            "projeto"
+          ],
+          "consulta": [
+            "rotina-fora-de-ordem"
+          ]
+        },
+        {
+          "paginas": [
+            32
+          ],
+          "assunto": "Resumo do encontro",
+          "antes": "parcial",
+          "justificativa": "O Resumo da aula passou a seguir as cinco ideias do slide.",
+          "leitura": [
+            "encontro"
+          ],
+          "consulta": [
+            "encontro"
+          ]
+        },
+        {
+          "paginas": [
+            33,
+            34,
+            35
+          ],
+          "assunto": "Demonstração e atividade no Colab",
+          "antes": "omitido-atividade",
+          "justificativa": "O que cada parte mede está no bloco Colab dos exercícios; as respostas ficam no guia de aula, fora do site.",
+          "leitura": [
+            "exercicios"
+          ],
+          "consulta": [
+            "treino"
+          ]
+        }
+      ]
+    },
+    {
       "id": "luisi-s02-anuncios",
       "url": "https://drive.google.com/file/d/1xZpjGw2EloQZEmDTIUcoHX6T7KCCNIij/view",
       "escopo": "S02 - Arquitetura Fundamentos e Memoria.pdf, 19/10/2026: apenas os slides que anunciam este encontro (13: paralelismo entre núcleos; 17 e 20: Spectre e Meltdown, 'fica para quarta')",
       "acesso": "parcial",
       "limitacao": "As 37 páginas foram conferidas na matriz da aula 02. Aqui só se registra o que elas anunciam para este encontro."
-    },
-    {
-      "id": "luisi-encontro-03",
-      "url": "pendente: PDF ainda não recebido",
-      "escopo": "Slides do encontro de pipelines e paralelismo (21/10/2026)",
-      "acesso": "indisponivel",
-      "limitacao": "O PDF ainda não existe para o caderno. Integrar depois do encontro com a skill integrar-notas e preencher esta matriz página por página."
     },
     {
       "id": "hennessy-cap3",

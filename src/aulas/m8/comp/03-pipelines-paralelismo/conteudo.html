@@ -973,16 +973,7 @@ SUB.D F12, F8, F14    ; não depende de ninguém, mas fica preso atrás do ADD.D
 
   <h3>Dois jeitos de responder</h3>
  </div>
-  <div class="tbl prose" id="tbl-um-ou-dois">
-    <table>
-      <thead><tr><th></th><th>Um núcleo, um laço só</th><th>Dois núcleos com papéis fixos</th></tr></thead>
-      <tbody>
-        <tr><td>Como fica</td><td>um laço lê o botão, avança a rotina, gera o som e trata o rádio</td><td>núcleo 0: botão, temporizadores e aviso ao cuidador, tudo na SRAM. Núcleo 1: som, rádio e interpretador</td></tr>
-        <tr><td>Número que pesa</td><td>2 ms de trabalho a cada 10 ms: sobra 80%</td><td>o aviso nunca espera o rádio nem uma gravação da flash</td></tr>
-        <tr><td>Do que abre mão</td><td>uma tarefa lenta atrasa todas as outras</td><td>simplicidade: FIFO, spinlocks e testes da conversa entre núcleos</td></tr>
-      </tbody>
-    </table>
-  </div>
+  
  <div class="prose">
   <p>Exemplo de decisão no formato do encontro (um exemplo, não um gabarito):</p>
   <ul class="b">

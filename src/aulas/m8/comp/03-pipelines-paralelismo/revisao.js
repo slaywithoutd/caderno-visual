@@ -18,16 +18,20 @@ export const cartoes = [
   ['O que é uma exceção precisa?', 'No desvio para o tratador, tudo antes da instrução culpada foi efetivado e nada depois dela mudou o estado. Com execução fora de ordem, exige commit em ordem.', 'excecao-precisa'],
   ['Superescalar × VLIW: quem decide quais instruções vão juntas?', 'Superescalar: o hardware, a cada ciclo. VLIW: o compilador, que monta pacotes com uma vaga por unidade (vagas vazias levam nop).', 'emissao-multipla'],
   ['F = 0,8 do programa dá para dividir. Speedup com 4 núcleos? E o teto?', '1 / (0,2 + 0,8/4) = 2,5. Com infinitos núcleos, 1 / 0,2 = 5.', 'nucleos'],
-  ['Som (1,2 ms) e rádio (0,5 ms) podem ir ao núcleo 1; botão (0,2) e LEDs (0,1) ficam no 0. Speedup real com 2 núcleos?', 'Melhor divisão: só o som no núcleo 1 (1,2 ms), o resto no 0 (0,8 ms). Vale o mais carregado: 2,0 / 1,2 ≈ 1,67, abaixo dos 1,74 de Amdahl.', 'treino'],
   ['Quantos stages têm o Cortex-M0+ e o AVR, e o que isso traz?', '2 cada, em ordem e sem especulação: tempo tabelado, pior caso perto da média, pouca perda por branch e nenhuma execução transitória.', 'reais'],
   ['Latência de interrupção do Cortex-M0+ a 125 MHz?', '15 ciclos sem espera de memória: 15 × 8 ns = 120 ns. É o melhor caso; rotina na flash com miss na XIP soma a espera da flash.', 'reais'],
   ['Por que o RP2040 tem spinlocks de hardware no SIO?', 'O Cortex-M0+ não tem instruções atômicas de ler e escrever para montar locks. O SIO oferece 32 spinlocks e duas FIFOs de 8 palavras entre os núcleos.', 'reais'],
   ['Como o Spectre (variante 1) tira um segredo se a especulação é desfeita?', 'Treina o preditor, tira B da cache e chama com índice fora do limite. Na especulação, lê s = A[x] e toca B[s × 4096]. O ROB desfaz y, mas a linha fica na cache; cronometrando B, a leitura rápida revela s.', 'seguranca'],
   ['O que o Meltdown explora e qual foi a correção nos SOs?', 'A exceção de permissão só sai no commit; antes disso, o valor do kernel passou para uma instrução que deixou rastro na cache. Correção: KPTI, kernel fora da tabela de páginas do programa.', 'seguranca'],
-  ['Stages de 200, 150, 250, 250 e 150 ps, 20 ps de registrador. Ciclo e speedup com 5 stages? E com 2?', '5 stages: 270 ps, speedup 3,7. 2 stages (600 | 400): 620 ps, speedup 1,6.', 'treino'],
   ['Predicação × predição de desvio: qual a diferença?', 'Predição aposta no caminho do branch e pode errar. Predicação elimina o branch com uma instrução condicional (cmov): sem aposta, mas executa os dois lados.', 'predicacao'],
   ['Quais são as duas paredes que pararam o "mais clock, mais ILP"?', 'Potência: +20% de clock pode custar +50% de potência (P ∝ f × V²), teto de 150 a 200 W. ILP: programas comuns têm só 2 a 3 instruções independentes por ciclo.', 'limites-ilp'],
   ['Por que não fazer um núcleo de 16 instruções por ciclo em vez de vários núcleos?', 'A lógica de despacho cresce com o quadrado da largura (8 por ciclo já é mais de 4 vezes maior que 4), e os programas não têm tanto ILP. Mais núcleos rendem mais por transistor.', 'nucleos'],
+  ['Pipeline de k estágios com N instruções: quantos ciclos sem e com pipeline?', 'Sem: N × k. Com: k + (N − 1). Com k = 5 e N = 1 bilhão, a razão tende a 5.', 'speedup-pipeline'],
+  ['25% de desvios, 2 ciclos por erro. CPI sem previsão, com 85% e com 95% de acerto?', '1 + 0,25 × 2 = 1,5; 1 + 0,25 × 0,15 × 2 = 1,075; 1 + 0,25 × 0,05 × 2 = 1,025. Ganhos: 1,40× e só 1,05×.', 'treino'],
+  ['lw t0; andi t1, t0; addi a0; slli t1. Onde há bolha e como tirar?', 'Entre o lw e o andi (load seguido de uso): 9 ciclos. Subindo o addi para logo depois do lw: 8 ciclos. Ele não pode subir acima do lw (WAR em a0).', 'treino'],
+  ['Por que 8 acumuladores não somam mais rápido que 4 no Xeon do slide?', 'Com 1 acumulador mede-se a latência (~2 ciclos). A curva para quando acumuladores ≈ latência × somas por ciclo; ali o limite é a vazão (~2 somas por ciclo).', 'acumuladores'],
+  ['O que o PortSmash mostrou sobre SMT?', 'Que as duas threads de um núcleo dividem unidades e uma pode medir a outra: recuperou uma chave do OpenSSL (2018). O OpenBSD desligou o SMT por padrão.', 'multithreading'],
+  ['Na rotina de vestir, por que 20 ordens válidas de 120?', '5! = 120. Sapato depois de meia e calça: 1/3 das ordens; camisa antes da blusa: 1/2. 120 × 1/3 × 1/2 = 20.', 'rotina-fora-de-ordem'],
 ];
 
 export const cola = [

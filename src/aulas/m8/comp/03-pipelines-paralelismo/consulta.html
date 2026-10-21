@@ -7,8 +7,8 @@
   <h2>Resumo</h2>
   <p class="cs-def">O essencial de pipeline e paralelismo em poucas linhas.</p>
   <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 120"><rect class="k" x="8" y="6" width="24" height="18" rx="3"/><text class="tm" x="20" y="15">IF</text><rect class="k" x="34" y="6" width="24" height="18" rx="3"/><text class="tm" x="46" y="15">ID</text><rect class="acf" x="60" y="6" width="24" height="18" rx="3"/><text class="tm" x="72" y="15">EX</text><rect class="k" x="86" y="6" width="24" height="18" rx="3"/><text class="tm" x="98" y="15">MEM</text><rect class="k" x="112" y="6" width="24" height="18" rx="3"/><text class="tm" x="124" y="15">WB</text><rect class="k" x="34" y="30" width="24" height="18" rx="3"/><text class="tm" x="46" y="39">IF</text><rect class="k" x="60" y="30" width="24" height="18" rx="3"/><text class="tm" x="72" y="39">ID</text><rect class="acf" x="86" y="30" width="24" height="18" rx="3"/><text class="tm" x="98" y="39">EX</text><rect class="k" x="112" y="30" width="24" height="18" rx="3"/><text class="tm" x="124" y="39">MEM</text><rect class="k" x="138" y="30" width="24" height="18" rx="3"/><text class="tm" x="150" y="39">WB</text><rect class="k" x="60" y="54" width="24" height="18" rx="3"/><text class="tm" x="72" y="63">IF</text><rect class="k" x="86" y="54" width="24" height="18" rx="3"/><text class="tm" x="98" y="63">ID</text><rect class="acf" x="112" y="54" width="24" height="18" rx="3"/><text class="tm" x="124" y="63">EX</text><rect class="k" x="138" y="54" width="24" height="18" rx="3"/><text class="tm" x="150" y="63">MEM</text><rect class="k" x="164" y="54" width="24" height="18" rx="3"/><text class="tm" x="176" y="63">WB</text><rect class="k" x="86" y="78" width="24" height="18" rx="3"/><text class="tm" x="98" y="87">IF</text><rect class="k" x="112" y="78" width="24" height="18" rx="3"/><text class="tm" x="124" y="87">ID</text><rect class="acf" x="138" y="78" width="24" height="18" rx="3"/><text class="tm" x="150" y="87">EX</text><rect class="k" x="164" y="78" width="24" height="18" rx="3"/><text class="tm" x="176" y="87">MEM</text><rect class="k" x="190" y="78" width="24" height="18" rx="3"/><text class="tm" x="202" y="87">WB</text><text class="tm st" x="8" y="114">uma instrução termina por ciclo</text></svg>Quatro instruções sobrepostas: cada uma leva 5 ciclos, mas sai uma por ciclo.</aside>
-  <ul class="b"><li>Pipeline aumenta quantas instruções terminam por segundo; cada instrução leva o mesmo tempo, e o stage mais lento dita o clock.</li><li>CPI real = 1 + stalls. Cada hazard soma frequência × ciclos perdidos.</li><li>Prever e especular escondem a espera dos branches, mas deixam o tempo variável: média boa, pior caso difícil.</li><li>O ILP de uma thread se esgotou (parede do ILP e da potência). O ganho agora vem de núcleos, limitado por Amdahl: 1 / ((1 − F) + F/N).</li><li>Os chips do projeto (AVR, Cortex-M0+) têm 2 stages, em ordem e sem especulação: tempo previsível.</li><li>A especulação desfaz registradores, mas não a cache: é daí que vêm Spectre e Meltdown.</li></ul>
-  <div class="cs-pegadinhas"><ul class="b"><li>Forwarding não salva o load seguido de uso: ainda custa 1 stall.</li><li>Speedup real fica abaixo do número de stages (stage mais lento + registrador de pipeline).</li><li>4 núcleos não dão 4 vezes: só se F = 1.</li><li>Predicação não é predição: uma elimina o branch, a outra aposta nele.</li></ul></div>
+  <ul class="b"><li>Pipeline aumenta a vazão, não encurta a instrução. Ganho ideal = profundidade (N × k ciclos contra k + (N − 1)); bolhas e desvios comem parte dele.</li><li>Só a dependência verdadeira (RAW) obriga a esperar. As de nome (WAR, WAW) somem com a renomeação; as de controle, com previsão e especulação.</li><li>Prever bem vale muito, até certo ponto: CPI = 1 + f_desvio × taxa de erro × penalidade, e pipeline mais fundo aumenta a penalidade.</li><li>Paralelismo em camadas: instruções (ILP), dados (SIMD), threads (SMT e vários núcleos) e requisições.</li><li>Desempenho também cobra em segurança: especulação e SMT abriram Spectre, Meltdown e PortSmash.</li><li>Os chips do projeto (AVR, Cortex-M0+, Ibex, Hazard3) ficam em ordem e sem especulação: tempo previsível.</li></ul>
+  <div class="cs-pegadinhas"><ul class="b"><li>Pipeline não acelera cada instrução: a latência até sobe um pouco.</li><li>Pipeline mais fundo não é sempre melhor: o erro de previsão fica mais caro (Pentium 4 com 31 estágios; o Core voltou a 14).</li><li>Load seguido de uso custa 1 bolha mesmo com adiantamento; uma instrução independente no meio esconde a bolha.</li><li>A especulação desfeita não desfaz a cache.</li></ul></div>
 </section>
 
 <section class="cs" id="metrica" data-grupo="Base" data-termos="ipc" data-leitura="antes">
@@ -40,9 +40,20 @@
 </section>
 
 <section class="cs" id="assembly" data-grupo="Base" data-termos="mips-isa" data-leitura="antes">
-  <h2>O assembly dos exemplos: MIPS64</h2>
+  <h2>O assembly dos exemplos: MIPS64 e RISC-V</h2>
   <p class="cs-def">O livro usa a arquitetura MIPS de 64 bits (MIPS64), um conjunto de instruções simples, do tipo RISC, em que cada instrução faz uma coisa só.</p>
   <div data-ref-tbl="tbl-assembly"></div>
+  <ul class="b"><li>Os slides do encontro usam RISC-V, com outra grafia para as mesmas ideias. Leia assim:</li></ul>
+  <div class="tbl"><table><thead><tr><th>RISC-V</th><th>Leia como</th><th>No MIPS do livro</th></tr></thead><tbody>
+  <tr><td><code>add t0, t1, t2</code></td><td>t0 ← t1 + t2</td><td><code>DADD</code></td></tr>
+  <tr><td><code>addi t0, t0, 1</code></td><td>t0 ← t0 + 1 (imediato)</td><td><code>DADDUI</code></td></tr>
+  <tr><td><code>mul t0, t1, t2</code></td><td>t0 ← t1 × t2</td><td><code>DMUL</code></td></tr>
+  <tr><td><code>lw t0, 0(a0)</code></td><td>t0 ← Memória[a0 + 0], 4 bytes (load word)</td><td><code>LD</code> (8 bytes)</td></tr>
+  <tr><td><code>sw t0, 4(a0)</code></td><td>Memória[a0 + 4] ← t0 (store word)</td><td><code>SD</code></td></tr>
+  <tr><td><code>andi t1, t0, 255</code></td><td>t1 ← t0 E 255: fica só o byte de baixo</td><td><code>ANDI</code></td></tr>
+  <tr><td><code>slli t1, t1, 2</code></td><td>t1 ← t1 × 4 (desloca 2 bits à esquerda)</td><td><code>DSLL</code></td></tr>
+  <tr><td><code>t0…t6</code>, <code>a0…a7</code></td><td>registradores temporários e de argumentos</td><td><code>R1…R31</code></td></tr>
+  </tbody></table></div>
 </section>
 
 <section class="cs" id="branch" data-grupo="Base" data-termos="desvio,desvio-tomado,endereco-alvo" data-leitura="antes,controle">
@@ -98,8 +109,9 @@
   </ul>
   <div class="cs-formula">
     <div class="formula">tempo por instrução com pipeline = tempo por instrução sem pipeline / número de stages</div>
+    <div class="formula">sem pipeline: N × k ciclos · com pipeline: k + (N − 1) ciclos</div>
     <div class="formula">Speedup ideal = k</div>
-    <ul class="b"><li>k: número de stages. Com 5 stages, até 5 vezes mais instruções por segundo.</li></ul>
+    <ul class="b"><li>k: número de stages; N: número de instruções. A 1ª instrução leva k ciclos para sair; depois sai uma por ciclo.</li><li>Com k = 5 e N = 1 bilhão: 5 × 10⁹ / (10⁹ + 4) ≈ 5. O ganho tende à profundidade, nunca ao número de instruções.</li></ul>
   </div>
   <div class="cs-uso">
     <p>Exemplo do apêndice C. Sem pipeline, ciclo de 1 ns; ULA e branches gastam 4 ciclos, acessos à memória 5. Frequências: 40% ULA, 20% branches, 40% memória. O pipeline acrescenta 0,2 ns por ciclo (registradores de pipeline e diferenças de tempo do clock).</p>
@@ -286,13 +298,17 @@ XOR  R10, R1, R11    ; lê R1</code></pre>
 </section>
 
 <section class="cs" id="correlacionado" data-grupo="Branches" data-termos="preditor-correlacionado,preditor-torneio" data-leitura="controle">
-  <h2>Preditores correlacionados e de torneio</h2>
+  <h2>Preditores correlacionados, de torneio e TAGE</h2>
+  <aside class="mn" data-vis="preditores" aria-hidden="true"><svg viewBox="0 0 240 120"><rect class="k" x="4" y="10" width="50" height="34" rx="5"/><text class="tm" x="29" y="22" style="font-size:9px">2 bits</text><text class="tm" x="29" y="34" style="font-size:9px">contador</text><path class="s" d="M54 27 L62 27" marker-end="url(#mnarrow)"/><rect class="bl" x="64" y="10" width="54" height="34" rx="5"/><text class="tm" x="91" y="22" style="font-size:9px">correlação</text><text class="tm" x="91" y="34" style="font-size:9px">gshare</text><path class="s" d="M118 27 L126 27" marker-end="url(#mnarrow)"/><rect class="bl" x="128" y="10" width="50" height="34" rx="5"/><text class="tm" x="153" y="22" style="font-size:9px">torneio</text><text class="tm" x="153" y="34" style="font-size:9px">seletor</text><path class="s" d="M178 27 L186 27" marker-end="url(#mnarrow)"/><rect class="acf" x="188" y="10" width="48" height="34" rx="5"/><text class="tm" x="212" y="22" style="font-size:9px">TAGE</text><text class="tm" x="212" y="34" style="font-size:9px">tabelas</text><line class="ac" x1="8" y1="62" x2="232" y2="62" marker-end="url(#mnarrow)"/><text class="tm" x="120" y="78">mais história, mais acerto</text><text class="tm" x="120" y="94">mais área no chip</text><text class="tm" x="120" y="112">BOOM v3 e XiangShan usam TAGE</text></svg>A evolução dos preditores, do slide 11.</aside>
   <p class="cs-def">Um preditor correlacionado (ou de dois níveis) olha também o resultado dos últimos m branches executados, de qualquer branch do programa (o histórico global). Para cada combinação desse histórico, há um preditor de n bits separado.</p>
   <ul class="b">
     <li>Serve para branches cujo resultado depende de outros branches que vieram antes.</li>
     <li>Notação (m, n): m branches de histórico, contadores de n bits. O preditor de 2 bits comum é o (0, 2).</li>
     <li>Preditor de torneio: dois preditores, um global (histórico de todos os branches) e um local (histórico só daquele branch), e um seletor que aprende qual dos dois acerta mais para cada branch. O seletor é outro contador de 2 bits.</li>
     <li>O torneio foi a técnica de ponta dos anos 2000 (Alpha 21264); os processadores atuais, como o Core i7, usam combinações parecidas, com vários níveis.</li>
+    <li>gshare: mistura (XOR) o histórico global com o endereço do branch para escolher o contador. É a forma mais comum de preditor correlacionado.</li>
+    <li>TAGE (Seznec, 2006): várias tabelas, cada uma com um histórico de tamanho diferente, crescendo em progressão geométrica; vale a tabela de histórico mais longo que casou. O BOOM v3 e o XiangShan usam TAGE.</li>
+    <li>A escada dos slides: 2 bits → correlação → torneio → TAGE. Mais história do programa, mais acerto e mais área no chip.</li>
   </ul>
   <div class="cs-formula">
     <div class="formula">bits = 2ᵐ × n × número de linhas</div>
@@ -391,6 +407,26 @@ else       x = b;             x = (a &gt; b) ? a : x;   // cmov</code></pre></di
   </div>
   <div data-ref-mn="mn-unroll"></div>
   <div data-ref="fig-unroll"></div>
+</section>
+
+<section class="cs" id="acumuladores" data-grupo="ILP e compilador" data-termos="" data-leitura="ilp">
+  <h2>ILP medido: a soma com vários acumuladores</h2>
+  <aside class="mn" data-vis="acumuladores" aria-hidden="true"><svg viewBox="0 0 240 136"><text class="tm st" x="2" y="8">speedup da soma de 4096 doubles</text>
+  <text class="tm st" x="2" y="30">1</text><rect class="k" x="16" y="22" width="40" height="16" rx="2"/><text class="tm st" x="62" y="30">1,00×  0,62 ns</text>
+  <text class="tm st" x="2" y="56">2</text><rect class="bl" x="16" y="48" width="80" height="16" rx="2"/><text class="tm st" x="102" y="56">2,00×  0,31 ns</text>
+  <text class="tm st" x="2" y="82">4</text><rect class="acf" x="16" y="74" width="156" height="16" rx="2"/><text class="tm st" x="178" y="82">3,89×</text>
+  <text class="tm st" x="2" y="108">8</text><rect class="acf" x="16" y="100" width="158" height="16" rx="2"/><text class="tm st" x="180" y="108">3,95×</text>
+  <text class="tm st" x="2" y="130">acumuladores · Xeon, gcc -O2</text></svg>De 4 para 8 acumuladores quase não muda: o limite virou a vazão.</aside>
+  <p class="cs-def">Somar um vetor com um acumulador só cria uma cadeia de RAW: cada soma espera a anterior. Com vários acumuladores independentes, o núcleo sobrepõe as somas até bater no limite de quantas ele começa por ciclo.</p>
+  <div class="cs-formula"><div class="formula">acumuladores que saturam ≈ latência da soma × somas começadas por ciclo</div><ul class="b"><li>Latência: ciclos até uma soma ficar pronta. Somas por ciclo: a vazão da unidade de soma.</li></ul></div>
+  <div class="cs-uso">
+<pre><code>// 1 acumulador: cada soma espera a anterior
+for (i = 0; i &lt; N; i++) a += v[i];
+// 4 acumuladores: quatro cadeias independentes
+for (i = 0; i &lt; N; i += 4) { a += v[i]; b += v[i+1]; c += v[i+2]; d += v[i+3]; }</code></pre>
+    <ul class="b"><li>Medido pelo professor num Xeon na nuvem (gcc -O2 sem vetorização, mediana de 15 execuções): 1 acumulador, 0,62 ns por soma (uns 2 ciclos); 4 acumuladores, 0,16 ns (umas 2 somas por ciclo); 8 não melhora.</li><li>Com uma soma de 4 ciclos e 2 por ciclo, a curva iria até 8 acumuladores.</li></ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b"><li>Com 1 acumulador você mede a latência da soma, não a vazão.</li><li>É o loop unrolling feito à mão. Com double, o compilador só reordena as somas se você permitir (por exemplo, -ffast-math), porque mudar a ordem muda o arredondamento.</li></ul></div>
 </section>
 
 <!-- ================= Escalonamento dinâmico ================= -->
@@ -550,6 +586,19 @@ SUB.D F12, F8, F14    ; não depende de ninguém, mas fica preso atrás do ADD.D
   </div>
 </section>
 
+<section class="cs" id="risc-cisc-hoje" data-grupo="Emissão múltipla" data-termos="" data-leitura="multipla">
+  <h2>RISC × CISC: o livro e o chip de hoje</h2>
+  <p class="cs-def">O Machado e Maia (2.2.8) define RISC e CISC por cinco traços. Nos núcleos de alto desempenho de hoje, a diferença ficou na ISA: por dentro, os dois executam do mesmo jeito.</p>
+  <div class="tbl"><table><thead><tr><th>RISC (livro)</th><th>CISC (livro)</th><th>E hoje?</th></tr></thead><tbody>
+  <tr><td>instruções executadas pelo hardware</td><td>instruções interpretadas por microcódigo</td><td>o x86 quebra cada instrução em micro-operações estilo RISC desde o Pentium Pro (1995); o microcódigo fica para as raras</td></tr>
+  <tr><td>formato fixo</td><td>vários formatos</td><td>continua: x86 de 1 a 15 bytes; RISC-V e ARM com 4 (ou 2 nas versões compactas)</td></tr>
+  <tr><td>só load e store acessam a memória</td><td>qualquer instrução acessa a memória</td><td>continua na ISA; por dentro, o x86 separa o acesso em micro-operações de load e store</td></tr>
+  <tr><td>muitos registradores</td><td>poucos registradores</td><td>RISC-V: 32 inteiros; x86-64: 16</td></tr>
+  <tr><td>uso intenso de pipeline</td><td>pouco uso de pipeline</td><td>mudou: nos núcleos rápidos, os dois têm pipeline fundo, superescalar e fora de ordem; os simples seguem em ordem</td></tr>
+  </tbody></table></div>
+  <ul class="b"><li>Na ISA da rotina da <a href="/m8/comp/02-fundamentos-memoria/consulta#projeto-isa">aula 02</a>, PASSO é o estilo CISC (uma instrução faz o passo inteiro) e SINAL, ESPERA e VAI são o estilo RISC.</li></ul>
+</section>
+
 <!-- ================= Limites e multithreading ================= -->
 <section class="cs" id="limites-ilp" data-grupo="Limites e multithreading" data-termos="janela-instrucoes" data-leitura="limites">
   <h2>Os limites do ILP: quanto ILP existe?</h2>
@@ -579,6 +628,7 @@ SUB.D F12, F8, F14    ; não depende de ninguém, mas fica preso atrás do ADD.D
     <li>Granularidade grossa: só troca de thread em esperas longas, como um miss na cache L2. Não atrapalha a thread principal, mas não aproveita esperas curtas.</li>
     <li>SMT (simultaneous multithreading, multithreading simultâneo): num superescalar dinâmico, emite no mesmo ciclo instruções de várias threads. A renomeação e as estações de reserva já resolvem as dependências; basta saber de qual thread cada instrução é. O Hyper-Threading da Intel (2 threads por core no Core i7) e o IBM Power7 (4 threads) usam SMT.</li>
   </ul>
+  <div class="cs-pegadinhas"><ul class="b"><li>Segurança: as threads de um núcleo dividem caches e unidades, e uma pode medir a outra. O PortSmash (2018) recuperou uma chave privada do OpenSSL medindo a disputa pelas portas de execução; no mesmo ano, o OpenBSD desligou o SMT por padrão.</li></ul></div>
   <div data-ref-mn="mn-multithreading"></div>
 </section>
 
@@ -589,6 +639,7 @@ SUB.D F12, F8, F14    ; não depende de ninguém, mas fica preso atrás do ADD.D
     <ul class="b">
       <li>Falácia: processador com clock maior é mais rápido. O Pentium 4 tinha clock alto com um pipeline muito profundo, mas os erros de predição e o CPI alto faziam o Core i7, com clock menor, ser bem mais rápido e gastar menos energia. A <a href="#metrica">equação do tempo de CPU</a> tem três fatores.</li>
       <li>Falácia: com a mesma tecnologia e o mesmo conjunto de instruções, é fácil prever qual de dois processadores será mais rápido ou mais econômico. Os comparativos do livro mostram que a ordem muda de programa para programa.</li>
+      <li>Armadilha: pipeline mais fundo é sempre melhor. Cada estágio a mais aumenta a penalidade de um erro de previsão e a espera do load: no BOOM v1, v2 e v3, 7, 10 e 12 ciclos por erro. O Pentium 4 chegou a 31 estágios, e a Intel recuou para 14 no Core.</li>
       <li>Armadilha: às vezes "maior e mais simples" ganha de "esperto". Um preditor simples com muitas linhas pode errar menos que um <a href="#correlacionado">preditor de torneio</a> sofisticado do mesmo tamanho, conforme o programa.</li>
     </ul>
   </div>
@@ -602,6 +653,7 @@ SUB.D F12, F8, F14    ; não depende de ninguém, mas fica preso atrás do ADD.D
   <div data-ref-tbl="tbl-niveis-paralelismo"></div>
   <ul class="b">
     <li>Flynn (<a href="/m8/comp/02-fundamentos-memoria/consulta#paralelismo">aula 02</a>): pipeline e emissão múltipla são SISD; instruções vetoriais e GPU, SIMD; SMT e multicore, MIMD.</li>
+    <li>O Hennessy (1.2) conta quatro modos de explorar o paralelismo: instrução (ILP), dados (SIMD, vetores, GPU), thread (SMT e vários núcleos) e requisição: muitas tarefas independentes, como um servidor atendendo milhares de usuários. A taxonomia é grosseira: chips reais misturam as classes.</li>
   </ul>
   <div class="cs-formula"><div class="formula">Speedup(N) = 1 / ((1 − F) + F/N)</div><p>F é a fração do tempo original que dá para dividir; N, o número de núcleos. Teto com N infinito: 1 / (1 − F). É a <a href="/m8/comp/02-fundamentos-memoria/consulta#amdahl">Lei de Amdahl</a> com S = N.</p></div>
   <div class="cs-uso"><p>Programa de 10 s, 8 s divisíveis (F = 0,8): 2 núcleos → 2 + 4 = 6 s (1,67); 4 → 4 s (2,5); 8 → 3 s (3,3); infinitos → 2 s (5).</p></div>
@@ -614,11 +666,12 @@ SUB.D F12, F8, F14    ; não depende de ninguém, mas fica preso atrás do ADD.D
 
 <section class="cs" id="reais" data-grupo="Chips reais e segurança" data-termos="latencia-interrupcao,sio,spinlock-hw" data-leitura="reais">
   <h2>Pipelines reais e os dois núcleos do RP2040</h2>
-  <aside class="mn" data-vis="reais" aria-hidden="true"><svg viewBox="0 0 240 152"><text class="tm st" x="2" y="11">AVR</text><rect class="gr" x="72" y="6" width="9.2" height="10" rx="2"/><text class="tm st" x="86.2" y="11">2</text><text class="tm st" x="2" y="27">Cortex-M0+</text><rect class="gr" x="72" y="22" width="9.2" height="10" rx="2"/><text class="tm st" x="86.2" y="27">2</text><text class="tm st" x="2" y="43">Ibex</text><rect class="gr" x="72" y="38" width="9.2" height="10" rx="2"/><text class="tm st" x="86.2" y="43">2</text><text class="tm st" x="2" y="59">Cortex-A9</text><rect class="bl" x="72" y="54" width="36.8" height="10" rx="2"/><text class="tm st" x="113.8" y="59">8</text><text class="tm st" x="2" y="75">Cortex-A72</text><rect class="bl" x="72" y="70" width="69.0" height="10" rx="2"/><text class="tm st" x="146.0" y="75">15</text><text class="tm st" x="2" y="91">Skylake</text><rect class="bl" x="72" y="86" width="87.4" height="10" rx="2"/><text class="tm st" x="164.4" y="91">14–19</text><text class="tm st" x="2" y="107">Zen</text><rect class="bl" x="72" y="102" width="87.4" height="10" rx="2"/><text class="tm st" x="164.4" y="107">17–19</text><text class="tm st" x="2" y="123">Pentium 4</text><rect class="rd" x="72" y="118" width="92.0" height="10" rx="2"/><text class="tm st" x="169.0" y="123">20</text><text class="tm st" x="2" y="139">Prescott</text><rect class="rd" x="72" y="134" width="142.6" height="10" rx="2"/><text class="tm st" x="219.6" y="139">31</text></svg>Stages do pipeline. Em verde, os chips do projeto.</aside>
+  <aside class="mn" data-vis="reais" aria-hidden="true"><svg viewBox="0 0 240 152"><text class="tm st" x="2" y="11">AVR</text><rect class="gr" x="72" y="6" width="9.2" height="10" rx="2"/><text class="tm st" x="86.2" y="11">2</text><text class="tm st" x="2" y="27">Cortex-M0+</text><rect class="gr" x="72" y="22" width="9.2" height="10" rx="2"/><text class="tm st" x="86.2" y="27">2</text><text class="tm st" x="2" y="43">Ibex</text><rect class="gr" x="72" y="38" width="9.2" height="10" rx="2"/><text class="tm st" x="86.2" y="43">2</text><text class="tm st" x="2" y="59">Hazard3</text><rect class="gr" x="72" y="54" width="13.8" height="10" rx="2"/><text class="tm st" x="90.8" y="59">3</text><text class="tm st" x="2" y="75">CVA6</text><rect class="bl" x="72" y="70" width="27.6" height="10" rx="2"/><text class="tm st" x="104.6" y="75">6</text><text class="tm st" x="2" y="91">Cortex-A72</text><rect class="bl" x="72" y="86" width="69.0" height="10" rx="2"/><text class="tm st" x="146.0" y="91">15</text><text class="tm st" x="2" y="107">Skylake</text><rect class="bl" x="72" y="102" width="87.4" height="10" rx="2"/><text class="tm st" x="164.4" y="107">14–19</text><text class="tm st" x="2" y="123">Pentium 4</text><rect class="rd" x="72" y="118" width="92.0" height="10" rx="2"/><text class="tm st" x="169.0" y="123">20</text><text class="tm st" x="2" y="139">Prescott</text><rect class="rd" x="72" y="134" width="142.6" height="10" rx="2"/><text class="tm st" x="219.6" y="139">31</text></svg>Stages do pipeline. Em verde, os chips do projeto.</aside>
   <p class="cs-def">Os chips do projeto (AVR, Cortex-M0+, Ibex) têm pipeline de 2 stages, em ordem e sem especulação. O Core i7 do livro tem 14, fora de ordem e especulativo.</p>
   <div data-ref-tbl="tbl-pipelines-reais"></div>
   <ul class="b">
     <li>Pipeline curto: tempo tabelado, pior caso perto da média, branch perde pouco, nenhuma execução transitória.</li>
+    <li>A escada dos slides de 21/10, do simples ao agressivo: Ibex (2 estágios, em ordem, núcleo do OpenTitan); Hazard3 (3, em ordem, no RP2350 do Pico 2, ao lado de dois Cortex-M33); CVA6 (6, em ordem, 64 bits, roda Linux); XiangShan Kunminghu (fora de ordem, decodifica 6 por ciclo, ROB de 160 entradas, TAGE). Quanto mais à direita, mais desempenho por ciclo, mais área e energia e tempo menos previsível.</li>
     <li>Latência de interrupção no Cortex-M0+: 15 ciclos sem espera de memória. A 125 MHz, 120 ns. Rotina na flash com miss na XIP soma a espera da flash.</li>
     <li>RP2040: dois Cortex-M0+ que dividem 264 KB de SRAM. <code>multicore_launch_core1(funcao)</code> liga o núcleo 1.</li>
     <li>SIO: duas FIFOs de 8 palavras de 32 bits (uma por sentido) e 32 spinlocks de hardware. Existem porque o Cortex-M0+ não tem instruções atômicas de ler e escrever.</li>
@@ -657,14 +710,45 @@ SUB.D F12, F8, F14    ; não depende de ninguém, mas fica preso atrás do ADD.D
   </ul></div>
 </section>
 
-<section class="cs" id="treino" data-grupo="Treino para o encontro" data-termos="" data-leitura="encontro,exercicios,projeto">
-  <h2>Treino para o encontro</h2>
-  <p class="cs-def">Quiz, exercícios e uma decisão de projeto no formato do encontro, autorais, com valores de exemplo.</p>
+<section class="cs" id="treino" data-grupo="Exercícios e projeto" data-termos="" data-leitura="exercicios">
+  <h2>Exercícios do encontro de 21/10</h2>
+  <p class="cs-def">Os três exercícios dos slides, com as contas, e o que a atividade no Colab mede.</p>
   <div class="cs-uso">
-    <details class="treino"><summary><span class="q">Ex. 1</span> Interpretador: 150 instruções de máquina por instrução da rotina, 20% branches. M0+ a 125 MHz (branch tomado +1, 60% tomados) × notebook a 3 GHz (CPI base 0,5, 8% de erro, 17 ciclos).</summary><p>M0+: CPI 1,12; 150 × 1,12 × 8 ns = 1,344 µs. Notebook: CPI 0,5 + 0,272 = 0,772; ≈ 38,6 ns, com 35% do CPI em erros de predição. Contra 160 s de pessoa, nenhum dos dois importa: decidem energia, custo e pior caso.</p></details>
-    <details class="treino"><summary><span class="q">Ex. 2</span> As mesmas etapas em 2 stages, como no M0+. E com 15% de load-use no de 5?</summary><p>Melhor divisão 600 | 400: ciclo 620 ps, speedup 1,6. Com stalls, o de 5 faz 1,15 × 270 ≈ 310 ps por instrução, contra 620. O de 2 ganha em área, energia, branch e previsibilidade.</p></details>
-    <details class="treino"><summary><span class="q">Ex. 3</span> A cada 10 ms: botão 0,2 ms, som 1,2, LEDs 0,1, rádio 0,5. Som e rádio podem ir ao núcleo 1.</summary><p>F = 1,7 / 2,0 = 0,85; Amdahl promete 1,74. Real: som no núcleo 1 (1,2 ms), resto no núcleo 0 (0,8 ms), speedup 2,0 / 1,2 ≈ 1,67. Avisar "pare o som" pela FIFO do SIO ou por variável com spinlock. A CPU já fica 80% parada com um núcleo: o segundo vale por isolamento, não por velocidade.</p></details>
-    <div data-ref-tbl="tbl-um-ou-dois"></div>
-    <p>Decisão no formato do encontro: decisão na primeira frase, do que abre mão e quem sente, um número que pesou, o que faria mudar de ideia. Exemplo na <a href="/m8/comp/03-pipelines-paralelismo#projeto">aplicação ao projeto</a>.</p>
+    <details class="treino"><summary><span class="q">Ex. 1</span> Quanto vale um previsor? 25% de desvios, 2 ciclos por erro, previsores de 85% e 95%.</summary>
+      <div class="formula">CPI = 1 + f_desvio × taxa de erro × penalidade</div>
+      <ul class="b"><li>Sem previsão: 1 + 0,25 × 2 = 1,5.</li><li>85%: 1 + 0,25 × 0,15 × 2 = 1,075. 95%: 1 + 0,25 × 0,05 × 2 = 1,025.</li><li>Nenhum → 85%: 1,5 / 1,075 ≈ 1,40×. 85% → 95%: 1,075 / 1,025 ≈ 1,05×. Retorno decrescente: o segundo só mexe nos 15% de erros que sobraram. E na rotina de vestir nada disso se nota: o gargalo é a pessoa.</li></ul></details>
+    <details class="treino"><summary><span class="q">Ex. 2</span> A bolha do load no laço do interpretador (lw, andi, addi, slli).</summary>
+<pre><code>1  lw   t0, 0(a0)     # lê a próxima instrução da rotina
+2  andi t1, t0, 255   # separa o código da operação
+3  addi a0, a0, 4     # avança para a seguinte
+4  slli t1, t1, 2     # código × 4: posição na tabela de saltos</code></pre>
+      <ul class="b"><li>RAW: 1 → 2 em t0; 2 → 4 em t1.</li><li>Bolha entre a 1 e a 2 (load seguido de uso): 9 ciclos do 1º IF ao último WB, contra 8 sem bolha.</li><li>Subindo a 3 para logo depois da 1, o adiantamento chega a tempo: 8 ciclos. A 3 não pode subir acima da 1: a 1 lê a0 e a 3 escreve a0 (WAR).</li></ul></details>
+    <details class="treino"><summary><span class="q">Ex. 3</span> Dois temporizadores: renomeação e superescalar de 2 vias.</summary>
+<pre><code>1  lw   t0, 0(a0)    4  lw   t0, 4(a0)
+2  addi t0, t0, 1    5  addi t0, t0, 1
+3  sw   t0, 0(a0)    6  sw   t0, 4(a0)</code></pre>
+      <ul class="b"><li>RAW: 1 → 2 → 3 e 4 → 5 → 6, em t0. Entre os blocos, só o nome: WAR de 3 para 4 e WAW de 2 para 4. 0(a0) e 4(a0) são endereços diferentes.</li><li>Trocando o t0 do segundo bloco por t1, somem a WAR e a WAW entre os blocos.</li><li>No superescalar de 2 vias: ciclo 1, os dois lw; ciclo 2, os dois addi; ciclo 3, os dois sw. 3 ciclos, IPC = 6 / 3 = 2. É o que a renomeação faz sozinha no hardware.</li></ul></details>
+    <details class="treino"><summary><span class="q">Colab</span> O que cada parte da atividade mede.</summary>
+      <ul class="b"><li>Parte 1: soma condicional com o vetor embaralhado e ordenado. O embaralhado é mais lento perto do limiar 128, onde o previsor erra cerca de metade; custo de um erro ≈ (t_embaralhado − t_ordenado) / número de erros.</li><li>Parte 2: K acumuladores. K = 1 mede a latência da soma; a curva para quando K ≈ latência × somas por ciclo.</li><li>Parte 3: 2 threads no mesmo núcleo. Em cadeia, o SMT quase dobra (a unidade ficava ociosa); independentes, quase não ganha (a unidade já estava cheia).</li><li>Parte 4: if bem previsto × código sem desvio, respondido no formato de decisão em 4 partes.</li></ul></details>
   </div>
+</section>
+
+<section class="cs" id="rotina-fora-de-ordem" data-grupo="Exercícios e projeto" data-termos="" data-leitura="projeto">
+  <h2>A rotina fora de ordem</h2>
+  <aside class="mn" data-vis="rotina-grafo" aria-hidden="true"><svg viewBox="0 0 240 130"><rect class="k" x="6" y="8" width="64" height="24" rx="5"/><text class="tm" x="38" y="20">meia</text><rect class="k" x="6" y="44" width="64" height="24" rx="5"/><text class="tm" x="38" y="56">calça</text><rect class="rd" x="150" y="26" width="72" height="24" rx="5"/><text class="tm" x="186" y="38">sapato</text><path class="s" d="M70 20 L148 34" marker-end="url(#mnarrow)"/><path class="s" d="M70 56 L148 42" marker-end="url(#mnarrow)"/><rect class="k" x="6" y="84" width="64" height="24" rx="5"/><text class="tm" x="38" y="96">camisa</text><rect class="rd" x="150" y="84" width="72" height="24" rx="5"/><text class="tm" x="186" y="96">blusa</text><path class="s" d="M70 96 L148 96" marker-end="url(#mnarrow)"/><text class="tm" x="120" y="124">20 ordens válidas de 120</text></svg>Seta = "precisa vir antes". Só essas três setas são dependência verdadeira.</aside>
+  <p class="cs-def">A rotina de vestir tem as mesmas dependências de um programa: a meia precisa vir antes do sapato (verdadeira), mas "sempre foi nessa ordem" é só costume (falsa, como as de nome). Respeitando só as verdadeiras, o módulo pode acender todos os passos que já podem ser feitos.</p>
+  <ul class="b">
+    <li>Instrução = passo; RAW = o sapato precisa da meia; execução em ordem = sequência fixa; fora de ordem = a pessoa escolhe, respeitando as setas; especular = acender o próximo antes do botão; erro de previsão = acendeu o objeto errado.</li>
+    <li>Por que 20 de 120: 5 peças dão 5! = 120 ordens. O sapato fica depois da meia e da calça em 1 de cada 3 ordens, e a camisa antes da blusa em metade: 120 × 1/3 × 1/2 = 20. A sequência fixa usa só 1.</li>
+  </ul>
+  <div class="cs-uso">
+<pre><code>rotina vestir
+  meia
+  calça
+  camisa
+  blusa   depois de camisa
+  sapato  depois de meia, calça</code></pre>
+    <ul class="b"><li>O compilador monta o grafo, recusa ciclos ("meia depois de sapato" e "sapato depois de meia": ninguém começa nunca) e passos sem dispositivo, e gera a lista de quem espera quem.</li><li>O módulo acende todos os passos sem seta pendente; a cada botão, marca o passo como feito e acorda quem esperava por ele, como um resultado pronto no fora de ordem.</li><li>Horários e demoras registrados pelo módulo são dado de saúde: dado pessoal sensível pela LGPD (art. 5º, II). Onde fica e quem lê é decisão de projeto.</li></ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b"><li>Ordem livre não serve para todo paciente: para alguns, a ordem fixa faz parte da terapia. É a pergunta para o parceiro.</li></ul></div>
 </section>

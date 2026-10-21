@@ -621,7 +621,8 @@ a.gterm.glink:hover{color:var(--accent)}
    contorna. Blocos com fundo ou borda viram flow-root para encolher ao lado do desenho, sem passar por baixo. */
 section.cs aside.mn{float:right;clear:right;width:min(42%,250px);margin:.25rem 0 .9rem 24px}
 html.margem-livre section.cs aside.mn{width:240px;margin:.25rem calc(-240px - 32px) .9rem 0}
-section.cs :is(.cs-resumo,.cs-formula,.cs-uso,.cs-pegadinhas,.cs-ponderada,ul.b,ol,pre,.def,p.prova,.tbl){display:flow-root}
+/* só caixas com fundo ou borda: listas e parágrafos contornam o desenho e voltam à largura toda quando ele acaba */
+section.cs :is(.cs-resumo,.cs-formula .formula,.cs-ponderada,pre,.def,p.prova,.tbl,details.treino){display:flow-root}
 @container conteudo (max-width:620px){
   section.cs aside.mn,section.cs aside.mn.loop{float:none;width:100%;max-width:320px;margin:.6rem auto 1.2rem}
 }

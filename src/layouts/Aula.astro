@@ -9,7 +9,7 @@ const { titulo, rotulo, materia, modulo, secoes, descricao = '', modo = null } =
 const consulta = modo?.atual === 'consulta';
 let n = 0;
 ---
-<Base title={`${titulo} · ${materia.titulo}`} description={descricao}>
+<Base title={`${titulo} · ${materia.titulo}`} description={descricao} oculos>
   <script is:inline define:vars={{ atual: modo?.atual || '' }}>
     /* larguras e barras recolhidas salvas no navegador: aplica antes de desenhar (evita pular) */
     try {

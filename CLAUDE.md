@@ -388,6 +388,10 @@ banqueiro" porque o livro brasileiro usa assim).
 ## Decisões de design (não desfazer sem a dona pedir)
 
 - Visual limpo de post técnico (Medium/ByteByteGo): fundo claro, IBM Plex Sans/Mono, cor só nos diagramas.
+- Tema e contraste: botão no canto inferior direito (acima dos óculos, `src/components/Tema.astro`) com
+  Auto/Claro/Escuro e contraste Normal/Alto, salvos no navegador e aplicados no `<head>` antes de desenhar.
+  O alto contraste liga sozinho se o sistema pede mais contraste. Toda cor vem dos tokens do `:root`
+  (nada de cor fixa em CSS ou SVG), para os quatro esquemas funcionarem; no alto, todo texto passa de 7:1.
 - Sidebar flutuante presa à esquerda, sem fundo, sem barra de rolagem visível; mostra só a aula atual.
 - Texto na coluna de 3/4; a margem de 1/4 recebe desenhos, loops e os passos das figuras.
 - Figuras sem caixa. Barra de controles (play, ‹, ›, reiniciar, progresso) **acima** da figura.

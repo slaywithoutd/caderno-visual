@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
-const { title, description = '' } = Astro.props;
+import Tema from '../components/Tema.astro';
+const { title, description = '', oculos = false } = Astro.props;
 ---
 <!doctype html>
 <html lang="pt-BR">
@@ -9,6 +10,17 @@ const { title, description = '' } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <script is:inline>
+      /* tema e contraste salvos (botão de tema): aplica antes de desenhar. Sem escolha salva, o contraste
+         alto liga sozinho se o sistema pede mais contraste. */
+      (function () {
+        var d = document.documentElement, t, c;
+        try { t = localStorage.getItem('caderno-tema'); c = localStorage.getItem('caderno-contraste'); } catch (e) {}
+        if (t === 'claro') d.setAttribute('data-theme', 'light');
+        if (t === 'escuro') d.setAttribute('data-theme', 'dark');
+        if (c === 'alto' || (!c && window.matchMedia && matchMedia('(prefers-contrast: more)').matches)) d.setAttribute('data-contraste', 'alto');
+      })();
+    </script>
     <link rel="icon" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/favicon.svg`} type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -16,5 +28,6 @@ const { title, description = '' } = Astro.props;
   </head>
   <body>
     <slot />
+    <Tema semOculos={!oculos} />
   </body>
 </html>

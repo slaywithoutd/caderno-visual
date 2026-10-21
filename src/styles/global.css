@@ -33,6 +33,37 @@
   --red:#f07575; --red-soft:#3a1f22;
   color-scheme:dark;
 }
+/* Alto contraste (botão de tema, src/components/Tema.astro): texto preto/branco puro, linhas e cores mais fortes.
+   Vale por cima do claro e do escuro; no automático segue o tema do sistema. */
+:root[data-contraste="alto"]{
+  --bg:#ffffff; --surface:#ffffff; --surface2:#eef1f5; --line:#7d8796; --line2:#4f5967;
+  --fg:#000000; --fg2:#0d1117; --muted:#2f3845;
+  --accent:#0038a8; --accent-soft:#d9e5fb;
+  --green:#00663a; --green-soft:#d6f0e2;
+  --amber:#7a3f00; --amber-soft:#fbe6c8;
+  --blue:#0038a8; --blue-soft:#d9e5fb;
+  --red:#a8001c; --red-soft:#f9d9de;
+}
+@media (prefers-color-scheme: dark){:root[data-contraste="alto"]:not([data-theme="light"]){
+  --bg:#000000; --surface:#0b0d10; --surface2:#171b21; --line:#6f7a88; --line2:#a3adba;
+  --fg:#ffffff; --fg2:#f2f4f7; --muted:#cfd6df;
+  --accent:#93c2ff; --accent-soft:#132542;
+  --green:#7ff0b4; --green-soft:#0d2a1e;
+  --amber:#ffc56b; --amber-soft:#33230c;
+  --blue:#93c2ff; --blue-soft:#132542;
+  --red:#ff9494; --red-soft:#3a1418;
+}}
+:root[data-theme="dark"][data-contraste="alto"]{
+  --bg:#000000; --surface:#0b0d10; --surface2:#171b21; --line:#6f7a88; --line2:#a3adba;
+  --fg:#ffffff; --fg2:#f2f4f7; --muted:#cfd6df;
+  --accent:#93c2ff; --accent-soft:#132542;
+  --green:#7ff0b4; --green-soft:#0d2a1e;
+  --amber:#ffc56b; --amber-soft:#33230c;
+  --blue:#93c2ff; --blue-soft:#132542;
+  --red:#ff9494; --red-soft:#3a1418;
+}
+:root[data-contraste="alto"] body{-webkit-font-smoothing:auto}
+:root[data-contraste="alto"] :is(.gterm,a.gterm.glink){text-decoration-thickness:2px}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:17px;line-height:1.7;padding-inline:0;padding-block:0 96px;-webkit-font-smoothing:antialiased}
@@ -450,6 +481,20 @@ p.prova::before{content:'Cai na prova'}
    html.lendo: o conteúdo recebe zoom --z (definido em lib/oculos.js pela largura da tela), vai de
    ponta a ponta, a sidebar some e os desenhos de margem flutuam com o texto contornando. */
 .oculos-btn{position:fixed;right:calc(20px + env(safe-area-inset-right, 0px));bottom:calc(20px + env(safe-area-inset-bottom, 0px));z-index:40;width:52px;height:52px;border-radius:50%;border:1px solid var(--line2);background:var(--surface);color:var(--fg);display:grid;place-items:center;cursor:pointer;box-shadow:0 6px 20px rgba(20,30,45,.14);transition:transform .2s ease,box-shadow .2s ease}
+/* botão de tema (src/components/Tema.astro): acima dos óculos, com um menu de tema e contraste */
+.tema-btn{position:fixed;right:calc(26px + env(safe-area-inset-right, 0px));bottom:calc(84px + env(safe-area-inset-bottom, 0px));z-index:41;width:40px;height:40px;border-radius:50%;border:1px solid var(--line2);background:var(--surface);color:var(--fg);display:grid;place-items:center;cursor:pointer;box-shadow:0 6px 20px rgba(20,30,45,.14)}
+.sem-oculos .tema-btn{bottom:calc(20px + env(safe-area-inset-bottom, 0px))}
+.tema-btn:focus-visible,.tema-menu button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.tema-btn svg{width:22px;height:22px}
+.tema-menu{position:fixed;right:calc(76px + env(safe-area-inset-right, 0px));bottom:calc(84px + env(safe-area-inset-bottom, 0px));z-index:42;width:230px;padding:12px 14px;border:1px solid var(--line2);border-radius:12px;background:var(--surface);color:var(--fg);box-shadow:0 14px 36px rgba(20,30,45,.2);font-size:.88rem}
+.sem-oculos .tema-menu{bottom:calc(20px + env(safe-area-inset-bottom, 0px))}
+.tema-menu[hidden]{display:none}
+.tema-menu .tm-grupo{font-size:.68rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:2px 0 6px}
+.tema-menu .tm-opcoes{display:flex;gap:4px;margin-bottom:12px}
+.tema-menu .tm-opcoes:last-child{margin-bottom:0}
+.tema-menu button{flex:1;font:500 .82rem var(--f-body);padding:6px 4px;border-radius:8px;border:1px solid var(--line);background:var(--surface2);color:var(--fg2);cursor:pointer}
+.tema-menu button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+html.lendo .tema-btn{bottom:calc(84px + env(safe-area-inset-bottom, 0px))}
 .oculos-btn:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(20,30,45,.18)}
 .oculos-btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .oculos-btn svg{width:30px;height:30px}

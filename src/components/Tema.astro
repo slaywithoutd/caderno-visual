@@ -1,0 +1,57 @@
+---
+/* Botão de tema (canto inferior direito, acima dos óculos): Automático / Claro / Escuro e contraste
+   Normal / Alto. A escolha fica no navegador e vale para todas as páginas. O tema salvo é aplicado no
+   <head> (layouts/Base.astro), antes de desenhar, para a página não piscar. */
+const { semOculos = false } = Astro.props;
+---
+<div class={`tema${semOculos ? ' sem-oculos' : ''}`}>
+  <button class="tema-btn" id="tema-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="tema-menu" title="Tema e contraste">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5" /><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor" stroke="none" /></svg>
+  </button>
+  <div class="tema-menu" id="tema-menu" role="dialog" aria-label="Tema e contraste" hidden>
+    <div class="tm-grupo">Tema</div>
+    <div class="tm-opcoes" role="group" aria-label="Tema">
+      <button type="button" data-tema="auto" aria-pressed="false" title="Segue o claro ou escuro do sistema">Auto</button>
+      <button type="button" data-tema="claro" aria-pressed="false">Claro</button>
+      <button type="button" data-tema="escuro" aria-pressed="false">Escuro</button>
+    </div>
+    <div class="tm-grupo">Contraste</div>
+    <div class="tm-opcoes" role="group" aria-label="Contraste">
+      <button type="button" data-contraste="normal" aria-pressed="false">Normal</button>
+      <button type="button" data-contraste="alto" aria-pressed="false" title="Texto preto ou branco puro e linhas mais fortes">Alto</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const raiz = document.documentElement;
+  const btn = document.getElementById('tema-btn');
+  const menu = document.getElementById('tema-menu');
+  const ler = (k, padrao) => { try { return localStorage.getItem(k) || padrao; } catch { return padrao; } };
+  const gravar = (k, v) => { try { localStorage.setItem(k, v); } catch { /* sem storage: vale só nesta página */ } };
+  const marcar = () => {
+    const tema = ler('caderno-tema', 'auto');
+    const contraste = raiz.getAttribute('data-contraste') === 'alto' ? 'alto' : 'normal';
+    menu.querySelectorAll('[data-tema]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tema === tema)));
+    menu.querySelectorAll('[data-contraste]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.contraste === contraste)));
+  };
+  const abrir = (sim) => { menu.hidden = !sim; btn.setAttribute('aria-expanded', String(sim)); if (sim) marcar(); };
+  btn.addEventListener('click', (e) => { e.stopPropagation(); abrir(menu.hidden); });
+  menu.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const t = e.target.closest('[data-tema]');
+    if (t) {
+      gravar('caderno-tema', t.dataset.tema);
+      if (t.dataset.tema === 'auto') raiz.removeAttribute('data-theme');
+      else raiz.setAttribute('data-theme', t.dataset.tema === 'escuro' ? 'dark' : 'light');
+    }
+    const c = e.target.closest('[data-contraste]');
+    if (c) {
+      gravar('caderno-contraste', c.dataset.contraste);
+      if (c.dataset.contraste === 'alto') raiz.setAttribute('data-contraste', 'alto'); else raiz.removeAttribute('data-contraste');
+    }
+    marcar();
+  });
+  document.addEventListener('click', () => { if (!menu.hidden) abrir(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !menu.hidden) { abrir(false); btn.focus(); } });
+</script>

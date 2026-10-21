@@ -14,34 +14,143 @@
     "Memória virtual e TLB"
   ],
   "secoes": [
-    ["antes", "Antes de começar"],
-    ["computador", "Dentro do computador"],
-    ["desempenho", "Desempenho e equação da CPU"],
-    ["amdahl", "Lei de Amdahl"],
-    ["energia", "Energia e potência"],
-    ["custo", "Confiabilidade e custo"],
-    ["hierarquia", "Hierarquia e localidade"],
-    ["cache", "Como a cache funciona"],
-    ["otimizacoes", "Otimizações de cache"],
-    ["virtual", "Memória virtual e TLB"],
-    ["fundamentos-presencial", "Da aula: circuitos, segurança e projeto"]
+    [
+      "encontro",
+      "O encontro de 19/10 em 15 minutos"
+    ],
+    [
+      "antes",
+      "Antes de começar"
+    ],
+    [
+      "computador",
+      "Dentro do computador"
+    ],
+    [
+      "desempenho",
+      "Desempenho e equação da CPU"
+    ],
+    [
+      "amdahl",
+      "Lei de Amdahl"
+    ],
+    [
+      "energia",
+      "Energia e potência"
+    ],
+    [
+      "custo",
+      "Confiabilidade e custo"
+    ],
+    [
+      "hierarquia",
+      "Hierarquia e localidade"
+    ],
+    [
+      "cache",
+      "Como a cache funciona"
+    ],
+    [
+      "otimizacoes",
+      "Otimizações de cache"
+    ],
+    [
+      "virtual",
+      "Memória virtual e TLB"
+    ],
+    [
+      "fundamentos-presencial",
+      "Da aula: circuitos, segurança e projeto"
+    ]
   ],
   "fontes": [
-    { "tipo": "Aula presencial", "titulo": "João Luisi · S02 - Arquitetura Fundamentos e Memoria · 19/10/2026 · 37 páginas conferidas", "url": "https://drive.google.com/file/d/1xZpjGw2EloQZEmDTIUcoHX6T7KCCNIij/view", "secao": "fundamentos-presencial" },
-    { "tipo": "Documentação", "titulo": "Arduino Memory Guide", "url": "https://docs.arduino.cc/learn/programming/memory-guide/", "secao": "fundamentos-presencial" },
-    { "tipo": "Documentação", "titulo": "RP2040 Datasheet · XIP e flash", "url": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf", "secao": "fundamentos-presencial" },
-    { "tipo": "Documentação", "titulo": "RISC-V · tamanhos de instrução e extensão comprimida", "url": "https://docs.riscv.org/reference/isa/v20240411/unpriv/intro.html", "secao": "computador" },
-    { "tipo": "Documentação", "titulo": "Intel Optimization Manual · instruções x86 até 15 bytes", "url": "https://www.intel.com/content/dam/doc/manual/64-ia-32-architectures-optimization-manual.pdf", "secao": "computador" },
-    { "tipo": "Documentação", "titulo": "OpenTitan Earl Grey · arquitetura", "url": "https://opentitan.org/book/hw/top_earlgrey/doc/design/index.html", "secao": "fundamentos-presencial" },
-    { "tipo": "Livro", "titulo": "Hennessy & Patterson, Arquitetura de computadores: uma abordagem quantitativa, cap. 1 · Fundamentos do projeto e análise quantitativa, seções 1.1–1.4 (p. 1–68)", "secao": "computador" },
-    { "tipo": "Livro", "titulo": "Hennessy & Patterson, cap. 1 · Medindo desempenho e princípios quantitativos, seções 1.8–1.9", "secao": "desempenho" },
-    { "tipo": "Livro", "titulo": "Hennessy & Patterson, cap. 1 · Lei de Amdahl, seção 1.9", "secao": "amdahl" },
-    { "tipo": "Livro", "titulo": "Hennessy & Patterson, cap. 1 · Tendências de potência e energia, seção 1.5", "secao": "energia" },
-    { "tipo": "Livro", "titulo": "Hennessy & Patterson, cap. 1 · Tendências de custo e dependabilidade, seções 1.6–1.7", "secao": "custo" },
-    { "tipo": "Livro", "titulo": "Hennessy & Patterson, cap. 2 · Projeto da hierarquia de memória, seções 2.1 e 2.3 (p. 69–148)", "secao": "hierarquia" },
-    { "tipo": "Livro", "titulo": "Hennessy & Patterson, cap. 2 · seção 2.1 e Apêndice B (revisão de caches)", "secao": "cache" },
-    { "tipo": "Livro", "titulo": "Hennessy & Patterson, cap. 2 · Dez otimizações avançadas de cache, seção 2.2, e Apêndice B (seis otimizações básicas)", "secao": "otimizacoes" },
-    { "tipo": "Livro", "titulo": "Hennessy & Patterson, cap. 2 · Proteção: memória virtual e máquinas virtuais, seção 2.4", "secao": "virtual" }
+    {
+      "tipo": "Aula presencial",
+      "titulo": "João Luisi · roteiro, quiz, armadilhas, resumo e Desafio 01 (slides 2, 4, 5, 15, 35 e 36)",
+      "url": "https://drive.google.com/file/d/1xZpjGw2EloQZEmDTIUcoHX6T7KCCNIij/view",
+      "secao": "encontro"
+    },
+    {
+      "tipo": "Aula presencial",
+      "titulo": "João Luisi · S02 - Arquitetura Fundamentos e Memoria · 19/10/2026 · 37 páginas conferidas",
+      "url": "https://drive.google.com/file/d/1xZpjGw2EloQZEmDTIUcoHX6T7KCCNIij/view",
+      "secao": "fundamentos-presencial"
+    },
+    {
+      "tipo": "Documentação",
+      "titulo": "Arduino Memory Guide",
+      "url": "https://docs.arduino.cc/learn/programming/memory-guide/",
+      "secao": "fundamentos-presencial"
+    },
+    {
+      "tipo": "Documentação",
+      "titulo": "RP2040 Datasheet · XIP e flash",
+      "url": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf",
+      "secao": "fundamentos-presencial"
+    },
+    {
+      "tipo": "Documentação",
+      "titulo": "RISC-V · tamanhos de instrução e extensão comprimida",
+      "url": "https://docs.riscv.org/reference/isa/v20240411/unpriv/intro.html",
+      "secao": "computador"
+    },
+    {
+      "tipo": "Documentação",
+      "titulo": "Intel Optimization Manual · instruções x86 até 15 bytes",
+      "url": "https://www.intel.com/content/dam/doc/manual/64-ia-32-architectures-optimization-manual.pdf",
+      "secao": "computador"
+    },
+    {
+      "tipo": "Documentação",
+      "titulo": "OpenTitan Earl Grey · arquitetura",
+      "url": "https://opentitan.org/book/hw/top_earlgrey/doc/design/index.html",
+      "secao": "fundamentos-presencial"
+    },
+    {
+      "tipo": "Livro",
+      "titulo": "Hennessy & Patterson, Arquitetura de computadores: uma abordagem quantitativa, cap. 1 · Fundamentos do projeto e análise quantitativa, seções 1.1–1.4 (p. 1–68)",
+      "secao": "computador"
+    },
+    {
+      "tipo": "Livro",
+      "titulo": "Hennessy & Patterson, cap. 1 · Medindo desempenho e princípios quantitativos, seções 1.8–1.9",
+      "secao": "desempenho"
+    },
+    {
+      "tipo": "Livro",
+      "titulo": "Hennessy & Patterson, cap. 1 · Lei de Amdahl, seção 1.9",
+      "secao": "amdahl"
+    },
+    {
+      "tipo": "Livro",
+      "titulo": "Hennessy & Patterson, cap. 1 · Tendências de potência e energia, seção 1.5",
+      "secao": "energia"
+    },
+    {
+      "tipo": "Livro",
+      "titulo": "Hennessy & Patterson, cap. 1 · Tendências de custo e dependabilidade, seções 1.6–1.7",
+      "secao": "custo"
+    },
+    {
+      "tipo": "Livro",
+      "titulo": "Hennessy & Patterson, cap. 2 · Projeto da hierarquia de memória, seções 2.1 e 2.3 (p. 69–148)",
+      "secao": "hierarquia"
+    },
+    {
+      "tipo": "Livro",
+      "titulo": "Hennessy & Patterson, cap. 2 · seção 2.1 e Apêndice B (revisão de caches)",
+      "secao": "cache"
+    },
+    {
+      "tipo": "Livro",
+      "titulo": "Hennessy & Patterson, cap. 2 · Dez otimizações avançadas de cache, seção 2.2, e Apêndice B (seis otimizações básicas)",
+      "secao": "otimizacoes"
+    },
+    {
+      "tipo": "Livro",
+      "titulo": "Hennessy & Patterson, cap. 2 · Proteção: memória virtual e máquinas virtuais, seção 2.4",
+      "secao": "virtual"
+    }
   ],
   "observacao": "A leitura originalmente indicada é Hennessy & Patterson, p. 1–148. O PDF de Luisi cita a 6ª edição (tradução de 2019), capítulos 1 e 2, e acrescenta Machado & Maia, 5ª edição, capítulo 2. A afirmação anterior de que a fonte era a 5ª edição de Hennessy foi retirada: não havia comprovação. As referências de seções e páginas do livro são indicações, não registro de extração integral verificada; não se garante equivalência à leitura de todas essas páginas. A aula presencial foi conferida nas 37 páginas do PDF. Exercícios são reexplicados com suas hipóteses; medições do professor são específicas daquele sistema. O enunciado completo do Desafio 01 não está no PDF."
 }

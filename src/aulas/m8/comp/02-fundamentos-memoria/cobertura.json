@@ -11,28 +11,398 @@
       "metodo": "Texto visível no Drive, com controle explícito das 37 páginas; inspeção visual do quadro de ISA. Não foi republicado o PDF.",
       "totalUnidades": 37,
       "unidades": [
-        {"paginas": [1,2,3,6,22,29,35,36,37], "assunto": "Roteiro, divisórias, síntese, orientações e bibliografia", "antes": "parcial", "justificativa": "Referências do professor adicionadas; decisão e desenvolvimento das contas ensinados. A folha completa do Desafio 01 não está no arquivo.", "leitura": ["fundamentos-presencial"], "consulta": ["projeto-isa","exercicios-luisi"], "evidencias": ["Desafio 01"]},
-        {"paginas": [4,5], "assunto": "Quiz: miss rate, equação da CPU e Amdahl", "antes": "coberto-conceito-sem-questoes-da-aula", "justificativa": "Fundamentos já existiam; quiz agora tem dados e resolução identificáveis.", "leitura": ["fundamentos-presencial","desempenho","amdahl"], "consulta": ["exercicios-luisi","equacao-cpu","amdahl"], "evidencias": ["CPI"]},
-        {"paginas": [7], "assunto": "NAND universal e tabela-verdade", "antes": "omitido", "justificativa": "Definições, construções de NOT/AND/OR e tabela acrescentadas nos dois modos.", "leitura": ["fundamentos-presencial"], "consulta": ["portas-logicas"], "evidencias": ["NAND(A,A)"]},
-        {"paginas": [8], "assunto": "Anatomia de OpenTitan e lockstep", "antes": "omitido", "justificativa": "Blocos de processamento, memória, interfaces e segurança contextualizados, sem tratar versões diferentes como idênticas.", "leitura": ["fundamentos-presencial"], "consulta": ["chip-real"], "evidencias": ["Ibex","lockstep","OTP"]},
-        {"paginas": [9], "assunto": "Von Neumann, Harvard e separação de código/dados", "antes": "omitido", "justificativa": "Modelos, diagrama autoral e limites de segurança integrados.", "leitura": ["fundamentos-presencial"], "consulta": ["harvard-von-neumann","seguranca-arquitetura"], "evidencias": ["Harvard modificada"]},
-        {"paginas": [10,11], "assunto": "Sete dimensões da ISA e mesma função em quatro alvos", "antes": "parcial-com-erro", "justificativa": "As sete dimensões já existiam; exemplos e ressalvas foram integrados. Corrigidos limite x86 de 18 para 15 bytes e generalização de tamanho fixo em ARM/RISC-V.", "leitura": ["computador","fundamentos-presencial"], "consulta": ["isa","toolchain"], "evidencias": ["15 bytes","Thumb"]},
-        {"paginas": [12], "assunto": "Toolchain, interpretação e confiança no compilador", "antes": "superficial", "justificativa": "Havia apenas uma menção ao compilador. Agora há artefatos, funções das ferramentas, bytecode e risco da cadeia.", "leitura": ["fundamentos-presencial"], "consulta": ["toolchain","seguranca-arquitetura"], "evidencias": ["linker","loader","Thompson"]},
-        {"paginas": [13], "assunto": "Moore, Dennard e mudança para multicore", "antes": "coberto", "justificativa": "Conceitos permanecem nas seções existentes; gráfico não é uma previsão universal.", "leitura": ["computador","energia"], "consulta": ["tendencias","dennard"], "evidencias": []},
-        {"paginas": [14,15], "assunto": "Equação da CPU, Amdahl e armadilhas de clock/AMAT", "antes": "coberto-com-necessidade-de-aplicacao", "justificativa": "Mantida teoria e acrescentados exercícios com distinção explícita entre miss penalty e tempo total.", "leitura": ["desempenho","amdahl","cache","fundamentos-presencial"], "consulta": ["equacao-cpu","amdahl","amat","exercicios-luisi"], "evidencias": ["AMAT"]},
-        {"paginas": [16,17], "assunto": "Memory wall, latências medidas e canal lateral", "antes": "parcial", "justificativa": "Hierarquia já existia; relações medidas e limite de generalização foram incluídos. Timing como risco ganhou seção própria.", "leitura": ["fundamentos-presencial"], "consulta": ["exercicios-luisi","seguranca-arquitetura"], "evidencias": ["Xeon","3,5","Flush+Reload"]},
-        {"paginas": [18], "assunto": "Quatro perguntas da cache e AMAT multinível", "antes": "coberto", "justificativa": "Preservadas seções e exercícios existentes; nenhum conceito precisa ser redefinido num apêndice.", "leitura": ["cache","otimizacoes"], "consulta": ["mapeamento","enderecamento-cache","substituicao","escrita","multinivel"], "evidencias": []},
-        {"paginas": [19], "assunto": "Coerência e estados MESI", "antes": "superficial", "justificativa": "Uma menção ao quarto C não ensinava o mecanismo. Agora há sequência x=7/x=9, estados e distinção de sincronização.", "leitura": ["fundamentos-presencial"], "consulta": ["coerencia-luisi"], "evidencias": ["MESI","Modified"]},
-        {"paginas": [20], "assunto": "Tradução, permissões, isolamento e Meltdown", "antes": "parcial", "justificativa": "Tradução e máquinas virtuais já estavam cobertas; riscos e limites de isolamento foram explicitados.", "leitura": ["virtual","fundamentos-presencial"], "consulta": ["memoria-virtual","tlb","maquina-virtual","seguranca-arquitetura"], "evidencias": ["Meltdown"]},
-        {"paginas": [21], "assunto": "SRAM, DRAM, flash e Rowhammer", "antes": "parcial", "justificativa": "Tecnologias já existiam; Rowhammer e distinção de timing de cache foram acrescentados.", "leitura": ["hierarquia","fundamentos-presencial"], "consulta": ["tecnologias","seguranca-arquitetura"], "evidencias": ["Rowhammer"]},
-        {"paginas": [23,24], "assunto": "Exercício 1: custo da interpretação e gargalo humano", "antes": "omitido-exercicio", "justificativa": "Contas reexecutadas; denominador de F inclui o tempo humano e o tempo original da CPU. Arredondamento do slide explicado.", "leitura": ["fundamentos-presencial"], "consulta": ["exercicios-luisi"], "evidencias": ["57,6","160","1,44"]},
-        {"paginas": [25,26], "assunto": "Exercício 2: XIP e indisponibilidade da flash", "antes": "omitido-aplicacao", "justificativa": "AMAT era conhecido, mas faltava a aplicação ao RP2040. Acrescentados XIP e limites de mover código para SRAM.", "leitura": ["fundamentos-presencial"], "consulta": ["xip-firmware","exercicios-luisi"], "evidencias": ["XIP","1,1","16 KiB"]},
-        {"paginas": [27,28], "assunto": "Exercício 3: EEPROM, flash e decisão de atualização", "antes": "omitido", "justificativa": "Capacidade livre, floor, hipóteses e trade-offs explicados; não confundir bytecode com segurança automática.", "leitura": ["fundamentos-presencial"], "consulta": ["exercicios-luisi","toolchain"], "evidencias": ["19968","26 rotinas"]},
-        {"paginas": [30,31,32,33,34], "assunto": "Projeto: ISA de domínio, rotina de vestir e decisão justificada", "antes": "omitido-contexto-novo", "justificativa": "Projeto separado da ponderada da pulseira. Contagem 20/148 B, regra de validação e seus limites; exemplos da aula, não design obrigatório do grupo.", "leitura": ["fundamentos-presencial"], "consulta": ["projeto-isa"], "evidencias": ["148","51 rotinas","120 s"]}
+        {
+          "paginas": [
+            1,
+            2,
+            3,
+            6,
+            22,
+            29,
+            35,
+            36,
+            37
+          ],
+          "assunto": "Roteiro, divisórias, síntese, orientações e bibliografia",
+          "antes": "parcial",
+          "justificativa": "Referências do professor adicionadas; decisão e desenvolvimento das contas ensinados. A folha completa do Desafio 01 não está no arquivo.",
+          "leitura": [
+            "fundamentos-presencial",
+            "encontro"
+          ],
+          "consulta": [
+            "projeto-isa",
+            "exercicios-luisi"
+          ],
+          "evidencias": [
+            "Desafio 01"
+          ]
+        },
+        {
+          "paginas": [
+            4,
+            5
+          ],
+          "assunto": "Quiz: miss rate, equação da CPU e Amdahl",
+          "antes": "coberto-conceito-sem-questoes-da-aula",
+          "justificativa": "Fundamentos já existiam; quiz agora tem dados e resolução identificáveis.",
+          "leitura": [
+            "fundamentos-presencial",
+            "desempenho",
+            "amdahl",
+            "encontro"
+          ],
+          "consulta": [
+            "exercicios-luisi",
+            "equacao-cpu",
+            "amdahl"
+          ],
+          "evidencias": [
+            "CPI"
+          ]
+        },
+        {
+          "paginas": [
+            7
+          ],
+          "assunto": "NAND universal e tabela-verdade",
+          "antes": "omitido",
+          "justificativa": "Definições, construções de NOT/AND/OR e tabela acrescentadas nos dois modos.",
+          "leitura": [
+            "fundamentos-presencial"
+          ],
+          "consulta": [
+            "portas-logicas"
+          ],
+          "evidencias": [
+            "NAND(A,A)"
+          ]
+        },
+        {
+          "paginas": [
+            8
+          ],
+          "assunto": "Anatomia de OpenTitan e lockstep",
+          "antes": "omitido",
+          "justificativa": "Blocos de processamento, memória, interfaces e segurança contextualizados, sem tratar versões diferentes como idênticas.",
+          "leitura": [
+            "fundamentos-presencial"
+          ],
+          "consulta": [
+            "chip-real"
+          ],
+          "evidencias": [
+            "Ibex",
+            "lockstep",
+            "OTP"
+          ]
+        },
+        {
+          "paginas": [
+            9
+          ],
+          "assunto": "Von Neumann, Harvard e separação de código/dados",
+          "antes": "omitido",
+          "justificativa": "Modelos, diagrama autoral e limites de segurança integrados.",
+          "leitura": [
+            "fundamentos-presencial"
+          ],
+          "consulta": [
+            "harvard-von-neumann",
+            "seguranca-arquitetura"
+          ],
+          "evidencias": [
+            "Harvard modificada"
+          ]
+        },
+        {
+          "paginas": [
+            10,
+            11
+          ],
+          "assunto": "Sete dimensões da ISA e mesma função em quatro alvos",
+          "antes": "parcial-com-erro",
+          "justificativa": "As sete dimensões já existiam; exemplos e ressalvas foram integrados. Corrigidos limite x86 de 18 para 15 bytes e generalização de tamanho fixo em ARM/RISC-V.",
+          "leitura": [
+            "computador",
+            "fundamentos-presencial"
+          ],
+          "consulta": [
+            "isa",
+            "toolchain"
+          ],
+          "evidencias": [
+            "15 bytes",
+            "Thumb"
+          ]
+        },
+        {
+          "paginas": [
+            12
+          ],
+          "assunto": "Toolchain, interpretação e confiança no compilador",
+          "antes": "superficial",
+          "justificativa": "Havia apenas uma menção ao compilador. Agora há artefatos, funções das ferramentas, bytecode e risco da cadeia.",
+          "leitura": [
+            "fundamentos-presencial"
+          ],
+          "consulta": [
+            "toolchain",
+            "seguranca-arquitetura"
+          ],
+          "evidencias": [
+            "linker",
+            "loader",
+            "Thompson"
+          ]
+        },
+        {
+          "paginas": [
+            13
+          ],
+          "assunto": "Moore, Dennard e mudança para multicore",
+          "antes": "coberto",
+          "justificativa": "Conceitos permanecem nas seções existentes; gráfico não é uma previsão universal.",
+          "leitura": [
+            "computador",
+            "energia"
+          ],
+          "consulta": [
+            "tendencias",
+            "dennard"
+          ],
+          "evidencias": []
+        },
+        {
+          "paginas": [
+            14,
+            15
+          ],
+          "assunto": "Equação da CPU, Amdahl e armadilhas de clock/AMAT",
+          "antes": "coberto-com-necessidade-de-aplicacao",
+          "justificativa": "Mantida teoria e acrescentados exercícios com distinção explícita entre miss penalty e tempo total.",
+          "leitura": [
+            "desempenho",
+            "amdahl",
+            "cache",
+            "fundamentos-presencial",
+            "encontro"
+          ],
+          "consulta": [
+            "equacao-cpu",
+            "amdahl",
+            "amat",
+            "exercicios-luisi"
+          ],
+          "evidencias": [
+            "AMAT"
+          ]
+        },
+        {
+          "paginas": [
+            16,
+            17
+          ],
+          "assunto": "Memory wall, latências medidas e canal lateral",
+          "antes": "parcial",
+          "justificativa": "Hierarquia já existia; relações medidas e limite de generalização foram incluídos. Timing como risco ganhou seção própria.",
+          "leitura": [
+            "fundamentos-presencial"
+          ],
+          "consulta": [
+            "exercicios-luisi",
+            "seguranca-arquitetura"
+          ],
+          "evidencias": [
+            "Xeon",
+            "3,5",
+            "Flush+Reload"
+          ]
+        },
+        {
+          "paginas": [
+            18
+          ],
+          "assunto": "Quatro perguntas da cache e AMAT multinível",
+          "antes": "coberto",
+          "justificativa": "Preservadas seções e exercícios existentes; nenhum conceito precisa ser redefinido num apêndice.",
+          "leitura": [
+            "cache",
+            "otimizacoes"
+          ],
+          "consulta": [
+            "mapeamento",
+            "enderecamento-cache",
+            "substituicao",
+            "escrita",
+            "multinivel"
+          ],
+          "evidencias": []
+        },
+        {
+          "paginas": [
+            19
+          ],
+          "assunto": "Coerência e estados MESI",
+          "antes": "superficial",
+          "justificativa": "Uma menção ao quarto C não ensinava o mecanismo. Agora há sequência x=7/x=9, estados e distinção de sincronização.",
+          "leitura": [
+            "fundamentos-presencial"
+          ],
+          "consulta": [
+            "coerencia-luisi"
+          ],
+          "evidencias": [
+            "MESI",
+            "Modified"
+          ]
+        },
+        {
+          "paginas": [
+            20
+          ],
+          "assunto": "Tradução, permissões, isolamento e Meltdown",
+          "antes": "parcial",
+          "justificativa": "Tradução e máquinas virtuais já estavam cobertas; riscos e limites de isolamento foram explicitados.",
+          "leitura": [
+            "virtual",
+            "fundamentos-presencial"
+          ],
+          "consulta": [
+            "memoria-virtual",
+            "tlb",
+            "maquina-virtual",
+            "seguranca-arquitetura"
+          ],
+          "evidencias": [
+            "Meltdown"
+          ]
+        },
+        {
+          "paginas": [
+            21
+          ],
+          "assunto": "SRAM, DRAM, flash e Rowhammer",
+          "antes": "parcial",
+          "justificativa": "Tecnologias já existiam; Rowhammer e distinção de timing de cache foram acrescentados.",
+          "leitura": [
+            "hierarquia",
+            "fundamentos-presencial"
+          ],
+          "consulta": [
+            "tecnologias",
+            "seguranca-arquitetura"
+          ],
+          "evidencias": [
+            "Rowhammer"
+          ]
+        },
+        {
+          "paginas": [
+            23,
+            24
+          ],
+          "assunto": "Exercício 1: custo da interpretação e gargalo humano",
+          "antes": "omitido-exercicio",
+          "justificativa": "Contas reexecutadas; denominador de F inclui o tempo humano e o tempo original da CPU. Arredondamento do slide explicado.",
+          "leitura": [
+            "fundamentos-presencial"
+          ],
+          "consulta": [
+            "exercicios-luisi"
+          ],
+          "evidencias": [
+            "57,6",
+            "160",
+            "1,44"
+          ]
+        },
+        {
+          "paginas": [
+            25,
+            26
+          ],
+          "assunto": "Exercício 2: XIP e indisponibilidade da flash",
+          "antes": "omitido-aplicacao",
+          "justificativa": "AMAT era conhecido, mas faltava a aplicação ao RP2040. Acrescentados XIP e limites de mover código para SRAM.",
+          "leitura": [
+            "fundamentos-presencial"
+          ],
+          "consulta": [
+            "xip-firmware",
+            "exercicios-luisi"
+          ],
+          "evidencias": [
+            "XIP",
+            "1,1",
+            "16 KiB"
+          ]
+        },
+        {
+          "paginas": [
+            27,
+            28
+          ],
+          "assunto": "Exercício 3: EEPROM, flash e decisão de atualização",
+          "antes": "omitido",
+          "justificativa": "Capacidade livre, floor, hipóteses e trade-offs explicados; não confundir bytecode com segurança automática.",
+          "leitura": [
+            "fundamentos-presencial"
+          ],
+          "consulta": [
+            "exercicios-luisi",
+            "toolchain"
+          ],
+          "evidencias": [
+            "19968",
+            "26 rotinas"
+          ]
+        },
+        {
+          "paginas": [
+            30,
+            31,
+            32,
+            33,
+            34
+          ],
+          "assunto": "Projeto: ISA de domínio, rotina de vestir e decisão justificada",
+          "antes": "omitido-contexto-novo",
+          "justificativa": "Projeto separado da ponderada da pulseira. Contagem 20/148 B, regra de validação e seus limites; exemplos da aula, não design obrigatório do grupo.",
+          "leitura": [
+            "fundamentos-presencial"
+          ],
+          "consulta": [
+            "projeto-isa"
+          ],
+          "evidencias": [
+            "148",
+            "51 rotinas",
+            "120 s"
+          ]
+        }
       ]
     },
-    {"id": "hennessy-leitura-indicada", "url": "https://www.educate.elsevier.com/book/details/9780128119051", "escopo": "Leitura indicada p. 1–148; slides citam tradução da 6ª edição, cap. 1 e 2", "acesso": "nao-verificado", "limitacao": "Catálogo oficial consultado, não texto integral do livro. Sem comprovação da equivalência de páginas entre traduções/edições. A indicação anterior de 5ª edição foi removida."},
-    {"id": "machado-cap2", "url": "https://drive.google.com/file/d/1xZpjGw2EloQZEmDTIUcoHX6T7KCCNIij/view", "escopo": "Machado & Maia, 5ª edição, capítulo 2, acrescentado na bibliografia do professor", "acesso": "nao-verificado", "limitacao": "Referência observada no slide 37, mas capítulo não fornecido nem lido integralmente."},
-    {"id": "desafio01-folha", "url": "https://drive.google.com/file/d/1xZpjGw2EloQZEmDTIUcoHX6T7KCCNIij/view", "escopo": "Folha individual frente e verso mencionada no slide 36", "acesso": "indisponivel", "limitacao": "O PDF mostra orientações, não o enunciado completo da folha. Não inventar as questões ou suas respostas."}
+    {
+      "id": "hennessy-leitura-indicada",
+      "url": "https://www.educate.elsevier.com/book/details/9780128119051",
+      "escopo": "Leitura indicada p. 1–148; slides citam tradução da 6ª edição, cap. 1 e 2",
+      "acesso": "nao-verificado",
+      "limitacao": "Catálogo oficial consultado, não texto integral do livro. Sem comprovação da equivalência de páginas entre traduções/edições. A indicação anterior de 5ª edição foi removida."
+    },
+    {
+      "id": "machado-cap2",
+      "url": "https://drive.google.com/file/d/1xZpjGw2EloQZEmDTIUcoHX6T7KCCNIij/view",
+      "escopo": "Machado & Maia, 5ª edição, capítulo 2, acrescentado na bibliografia do professor",
+      "acesso": "nao-verificado",
+      "limitacao": "Referência observada no slide 37, mas capítulo não fornecido nem lido integralmente."
+    },
+    {
+      "id": "desafio01-folha",
+      "url": "https://drive.google.com/file/d/1xZpjGw2EloQZEmDTIUcoHX6T7KCCNIij/view",
+      "escopo": "Folha individual frente e verso mencionada no slide 36",
+      "acesso": "indisponivel",
+      "limitacao": "O PDF mostra orientações, não o enunciado completo da folha. Não inventar as questões ou suas respostas."
+    }
   ]
 }

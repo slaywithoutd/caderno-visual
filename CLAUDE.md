@@ -30,6 +30,36 @@ equivalência ao livro. Conceitos, pré-requisitos, fórmulas, hipóteses, diagr
 ser inventariados antes da síntese; `checar-termos` sozinho não detecta omissões. Execute
 `npm run checar-cobertura` e revise semanticamente a matriz: o script só verifica rastreabilidade.
 
+## O encontro presencial (Computação, eixo "Do silício ao sistema operacional")
+
+A aula do caderno existe para a dona chegar preparada ao encontro e fazer o Desafio. Uma aula longa que
+só resume o livro não serve (aconteceu na aula 02: 1h22 de leitura e o encontro cobrou outra coisa).
+Os encontros de João Luisi seguem sempre o mesmo formato (slides de 19/10/2026, aula 02):
+
+1. Quiz do autoestudo: 3 perguntas (definição, notação, limite/conta).
+2. Revisão com chips reais (RP2040/Cortex-M0+, Arduino Uno/AVR, OpenTitan, Xeon) e números medidos,
+   uma caixa **Segurança** por conceito (ataque real e a decisão de arquitetura que ele explora) e
+   **armadilhas** no formato "errado / certo".
+3. Exercícios do mecânico ao aberto no hardware do projeto, com uma linha de **Leitura** do número.
+4. Aplicação ao projeto TAPI: a rotina de vestir, o compilador e o módulo de controle. Decisão em quatro
+   partes: decisão na primeira frase; do que abre mão e quem sente; um número que pesou; o que faria mudar.
+5. Encerramento com cinco ideias e um Desafio individual (conta sem desenvolvimento não vale).
+
+Regras que saíram disso, para toda aula do eixo:
+
+- A primeira seção do `conteudo.html` é `id="encontro"`, "O encontro em 15 minutos": caminho curto
+  (`ol.caminho`, 4 a 7 seções essenciais, com o motivo), `p.depois` com o que pode ficar para depois,
+  cinco ideias (`ol.ideias`) e um quiz em `details.treino`. Antes do encontro, o quiz é autoral; depois,
+  vira o quiz real do slide. No Consulta, a seção `treino` (grupo "Treino para o encontro") traz o quiz e
+  os gabaritos enxutos, com `data-leitura="encontro,exercicios,projeto"`.
+- Toda aula futura do eixo tem seções de chips reais, segurança, exercícios no hardware do projeto
+  (`id="exercicios"`) e aplicação ao projeto (`id="projeto"`), nos dois modos. Exercícios e decisões
+  autorais são identificados como treino (`base-tag` "Treino · autoral").
+- Leia os slides do encontro anterior: eles anunciam o que vem ("fica para quarta"). O que foi anunciado
+  entra na aula seguinte antes do encontro.
+- Depois do encontro, `integrar-notas` confere os slides página por página em `cobertura.json` e
+  reescreve a seção `encontro` com o que de fato aconteceu.
+
 ## Estrutura
 
 ```

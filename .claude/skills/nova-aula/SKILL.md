@@ -74,6 +74,18 @@ Use a aula `m8/comp/01-conceitos` como referência de densidade e formato.
 - Matérias não técnicas (negócios, UX, liderança) também ganham visuais: frameworks como
   diagramas, processos como passo a passo, comparações como tabelas e desenhos.
 
+## 4b. Preparar para o encontro presencial
+
+Se a matéria tem encontro com formato conhecido (Computação: veja "O encontro presencial" no `CLAUDE.md`),
+a aula abre com a seção `encontro` e termina com `exercicios` e `projeto`. Antes de escrever:
+
+- Leia os slides do encontro anterior da mesma matéria (`notas/` da aula anterior ou o PDF enviado) e
+  liste o que eles anunciaram para este encontro. Cada item anunciado precisa ter seção na aula nova.
+- Para cada conceito central, pergunte: em que chip do projeto ele aparece, que número medido o mostra,
+  que ataque ou falha real ele explica, e que decisão do módulo de controle ele muda.
+- Caminho curto: marque o que é essencial para o quiz e os exercícios; o resto vai para "depois".
+  Se o caminho curto passar de 7 itens, a aula está sem foco.
+
 ## 5. Modo Consulta
 
 Depois do `conteudo.html` pronto, escreva o `consulta.html` seguindo "Modo Consulta" do `CLAUDE.md`

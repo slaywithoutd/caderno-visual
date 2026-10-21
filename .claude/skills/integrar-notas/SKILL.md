@@ -42,6 +42,17 @@ Leia todo o `notas/` (markdown, o texto dos PDFs com a skill de PDF, e as fotos)
 6. Exemplo resolvido no quadro que ajuda a entender → considere uma figura passo a passo.
 7. Não apague os arquivos de `notas/`: eles são o registro original.
 
+## Depois de um encontro de Computação
+
+1. Leia o PDF dos slides inteiro (extraia o texto de todas as páginas e confira visualmente diagramas e
+   tabelas). Preencha `cobertura.json` página por página; fonte que era `indisponivel` passa a `integral`.
+2. Reescreva a seção `encontro` com o encontro real: caminho curto na ordem dos slides, as cinco ideias
+   do resumo, o quiz do slide com as respostas, as armadilhas e o Desafio. Troque o quiz autoral pelo real.
+3. Compare os exercícios e a aplicação ao projeto dos slides com as seções `exercicios` e `projeto`:
+   o que o professor fez entra com atribuição; o treino autoral que sobrar continua marcado como autoral.
+4. Procure nos slides o que eles anunciam para o próximo encontro e leve para a aula seguinte agora.
+5. Releia a aula procurando erros factuais que os slides corrigem (edição do livro, números).
+
 ## Conferir
 
 Build sem erro, abrir a aula no `npm run dev`, checar a seção "Da aula" e a revisão da matéria

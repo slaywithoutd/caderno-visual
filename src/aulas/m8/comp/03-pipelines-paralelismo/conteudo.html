@@ -4,6 +4,51 @@
   <div class="hero-sym"><span>IF ID <b>EX</b> MEM WB</span><span>CPI = 1 + <b>stalls</b></span><span>RAW · WAR · WAW</span><span>ROB <b>→</b> commit</span></div>
 </header>
 
+<!-- ============ 0 ============ -->
+<section class="chap" id="encontro">
+ <div class="prose">
+  <span class="num">00</span>
+  <h2>O encontro em 15 minutos</h2>
+  <div class="src"><span class="base-tag">Guia de estudo · autoral</span><span class="bk">no formato dos encontros de João Luisi</span></div>
+  <p>O encontro começa com um quiz rápido do autoestudo, revisa os conceitos em chips reais com uma caixa de segurança, faz exercícios no hardware do projeto e termina numa decisão de projeto. Os slides de 19/10 já avisaram o que vem hoje: paralelismo entre núcleos e o Meltdown.</p>
+  <p>Esta seção é o caminho curto. O resto da página serve para consultar quando uma conta travar.</p>
+
+  <h3>Caminho curto</h3>
+  <p>Se o tempo é pouco, leia nesta ordem:</p>
+  <ol class="caminho">
+   <li><a href="#pipeline">A ideia do pipeline</a>: throughput × latência e por que o speedup real fica abaixo do número de stages.</li>
+   <li><a href="#hazards">Hazards e stalls</a>: os três tipos e a conta CPI = 1 + stalls, a mais cobrada.</li>
+   <li><a href="#dados">Forwarding</a>: resolve quase todo hazard de dados; o load seguido de uso ainda custa 1 stall.</li>
+   <li><a href="#controle">Branches e predição</a>: branch penalty e o preditor de 2 bits num laço.</li>
+   <li><a href="#especulacao">Especulação e ROB</a>: só a ideia de executar fora de ordem e fazer o commit em ordem. Sem ela, o Spectre não faz sentido.</li>
+   <li><a href="#nucleos">Mais núcleos</a>: Amdahl com N núcleos e por que 4 núcleos não dão 4 vezes.</li>
+   <li><a href="#reais">Pipelines de verdade</a> e <a href="#seguranca">Spectre e Meltdown</a>: o pipeline dos chips do projeto e o ataque anunciado para hoje.</li>
+  </ol>
+  <p class="depois">Pode deixar para depois: <a href="#ilp">ILP e loop unrolling</a> (dependência verdadeira × de nome; desenrolar amortiza o controle do laço) · <a href="#tomasulo">Tomasulo</a> (renomear elimina WAR e WAW) · <a href="#multipla">superescalar e VLIW</a> (quem escolhe o que emite junto: o hardware ou o compilador) · <a href="#limites">limites do ILP</a> (na prática, menos de 10 por ciclo; daí os núcleos).</p>
+
+  <h3>Cinco ideias para levar</h3>
+  <ol class="ideias">
+   <li>Pipeline aumenta quantas instruções terminam por segundo. Cada instrução continua levando o mesmo tempo, e o stage mais lento dita o clock.</li>
+   <li>CPI real = 1 + stalls. Cada hazard soma frequência × ciclos perdidos.</li>
+   <li>Prever e especular escondem a espera dos branches, mas deixam o tempo variável: média boa, pior caso difícil de garantir.</li>
+   <li>O ILP de uma thread se esgotou. O ganho agora vem de núcleos, e Amdahl limita: 1 / ((1 − F) + F/N).</li>
+   <li>A especulação desfaz registradores e memória, mas não desfaz a cache. Spectre e Meltdown moram nessa diferença.</li>
+  </ol>
+
+  <h3>Quiz de treino</h3>
+  <p>Perguntas no formato do quiz do encontro, escritas para treino. Responda de cabeça e abra para conferir.</p>
+  <details class="treino"><summary><span class="q">Q1 · Definição</span> O pipeline diminui o tempo de cada instrução? A) sim B) não, aumenta quantas terminam por segundo C) só com forwarding</summary><p>B. Cada instrução ainda passa por todos os stages e ganha o overhead dos registradores de pipeline. O que sobe é o throughput.</p></details>
+  <details class="treino"><summary><span class="q">Q2 · Notação</span> Em CPI = 1 + stalls, de onde vem o 1 e o que entra em "stalls"?</summary><p>O 1 é o pipeline ideal terminando uma instrução por ciclo. "Stalls" é a média de ciclos perdidos por instrução: para cada hazard, frequência × ciclos que ele custa, somados.</p></details>
+  <details class="treino"><summary><span class="q">Q3 · Limite</span> Stages de 200, 150, 250, 250 e 150 ps, mais 20 ps de registrador. Speedup sobre a versão sem pipeline (1000 ps por instrução)? A) 5 B) 4 C) menos de 4</summary><p>C. O ciclo vira o stage mais lento + registrador = 250 + 20 = 270 ps. Speedup = 1000 / 270 ≈ 3,7.</p></details>
+  <details class="treino"><summary><span class="q">Q4 · Armadilha</span> Com forwarding, um hazard de dados nunca mais causa stall?</summary><p>Causa. Load seguido de uso custa 1 stall: o dado só existe no fim do MEM, e a instrução seguinte precisaria dele no começo do EX, no mesmo ciclo.</p></details>
+  <details class="treino"><summary><span class="q">Q5 · Conta</span> 20% das instruções são branches, o preditor erra 10% deles e cada erro custa 3 ciclos. Quanto isso soma ao CPI?</summary><p>0,20 × 0,10 × 3 = 0,06 ciclo por instrução.</p></details>
+  <details class="treino"><summary><span class="q">Q6 · Limite</span> 80% do programa dá para dividir entre núcleos. Speedup com 4 núcleos? E com infinitos?</summary><p>1 / (0,2 + 0,8/4) = 1 / 0,4 = 2,5. Com infinitos, 1 / 0,2 = 5. Os 20% que não se dividem mandam.</p></details>
+  <details class="treino"><summary><span class="q">Q7 · Segurança</span> Se o ROB joga fora a instrução especulada errada, de onde o Spectre tira o segredo?</summary><p>Da cache. A linha que a instrução especulada carregou continua lá. Medindo o tempo de acesso (2 ns ou mais de 100 ns, como na aula 02), o atacante descobre qual linha foi tocada e, com ela, o valor secreto.</p></details>
+ </div>
+</section>
+
+<hr class="sep">
+
 <!-- ============ 1 ============ -->
 <section class="chap" id="antes">
  <div class="prose">
@@ -696,5 +741,256 @@ SUB.D F12, F8, F14    ; não depende de ninguém, mas fica preso atrás do ADD.D
     <li><i>Falácia</i>: com a mesma tecnologia e o mesmo conjunto de instruções, é fácil prever qual de dois processadores será mais rápido ou mais econômico. Os comparativos do livro mostram que a ordem muda de programa para programa.</li>
     <li><i>Armadilha</i>: às vezes "maior e mais simples" ganha de "esperto". Um preditor simples com muitas linhas pode errar menos que um preditor de torneio sofisticado do mesmo tamanho, conforme o programa.</li>
   </ul>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 11 ============ -->
+<section class="chap" id="nucleos">
+ <div class="prose">
+  <span class="num">11</span>
+  <h2>Mais núcleos: paralelismo entre threads</h2>
+  <div class="src"><span class="base-tag">Base · além do cap. 3</span><span class="bk">Hennessy &amp; Patterson · cap. 1 (classes de paralelismo) e cap. 5 (só a ideia)</span><span class="bk">João Luisi · 19/10/2026 · slide 13</span></div>
+  <p>A seção anterior terminou com o ILP esgotado. O gráfico de cinquenta anos dos slides de 19/10 mostra o resto da história: a frequência parou perto de 2005 (fim de <a href="/m8/comp/02-fundamentos-memoria#energia">Dennard</a>, aula 02) e o número de núcleos começou a subir. O ganho passou a vir de várias threads rodando ao mesmo tempo, cada uma num núcleo.</p>
+  <p>Até aqui, toda a aula espremia paralelismo de uma thread só. Esta tabela junta os cinco lugares onde o paralelismo aparece:</p>
+ </div>
+  <div class="tbl prose" id="tbl-niveis-paralelismo">
+    <table>
+      <thead><tr><th>Onde</th><th>O que roda junto</th><th>Quem encontra o paralelismo</th><th>Exemplo</th></tr></thead>
+      <tbody>
+        <tr><td>Pipeline</td><td>etapas de instruções diferentes</td><td>hardware, sozinho</td><td>os 2 stages do Cortex-M0+</td></tr>
+        <tr><td>Emissão múltipla e fora de ordem</td><td>instruções independentes da mesma thread</td><td>hardware (ou compilador, no VLIW)</td><td>Core i7: até 4 por ciclo</td></tr>
+        <tr><td>SIMD</td><td>a mesma operação em vários dados</td><td>compilador ou programador</td><td>instruções vetoriais, GPU</td></tr>
+        <tr><td>Multithreading (SMT)</td><td>threads diferentes no mesmo núcleo</td><td>sistema operacional + hardware</td><td>Hyper-Threading</td></tr>
+        <tr><td>Multicore</td><td>threads diferentes em núcleos diferentes</td><td>programador, que divide o trabalho</td><td>os 2 núcleos do RP2040</td></tr>
+      </tbody>
+    </table>
+  </div>
+ <div class="prose">
+  <p>Na <a href="/m8/comp/02-fundamentos-memoria#computador">taxonomia de Flynn</a> da aula 02, pipeline e emissão múltipla continuam SISD (uma thread, um fluxo de dados), a linha SIMD é a própria, e SMT e multicore são MIMD. O que pesa na prática é a terceira coluna: no multicore, alguém precisa escrever o programa em pedaços.</p>
+
+  <h3>Amdahl com N núcleos</h3>
+  <p>Comece por um exemplo. Um programa leva 10 s. Desses, 8 s dá para dividir entre núcleos e 2 s não (ler a entrada, juntar o resultado).</p>
+  <ul class="b">
+    <li>2 núcleos: 2 + 8/2 = 6 s. Speedup 10 / 6 ≈ 1,67.</li>
+    <li>4 núcleos: 2 + 8/4 = 4 s. Speedup 2,5.</li>
+    <li>8 núcleos: 2 + 8/8 = 3 s. Speedup 3,3.</li>
+    <li>Infinitos núcleos: sobram os 2 s. Speedup 5, e não passa disso.</li>
+  </ul>
+  <p>É a <a href="/m8/comp/02-fundamentos-memoria#amdahl">Lei de Amdahl</a> da aula 02 com a melhoria S igual ao número de núcleos:</p>
+  <div class="formula">Speedup(N) = 1 / ((1 − F) + F/N)</div>
+  <ul class="b">
+    <li>F é a fração do tempo original que dá para dividir (0,8 no exemplo); N, o número de núcleos.</li>
+    <li>Teto com N infinito: 1 / (1 − F). Com F = 0,8, o teto é 5.</li>
+  </ul>
+  <div class="def warn"><span class="lab">Armadilha · 4 núcleos, 4 vezes</span><p>Errado: "com 4 núcleos fica 4 vezes mais rápido". Certo: só se F = 1. E a fórmula ainda é otimista: ela supõe que a parte paralela se divide em pedaços iguais.</p></div>
+
+  <h3>O que a fórmula não mostra</h3>
+  <ul class="b">
+    <li>Tarefas que não se dividem: se o trabalho é "áudio 1,2 ms" e "rádio 0,5 ms", dois núcleos não fazem cada um 0,85 ms. O tempo é o do núcleo mais carregado (exercício 3).</li>
+    <li>Conversa entre núcleos: um avisar o outro e esperar por ele. É o assunto da <a href="/m8/comp/05-sincronizacao-deadlocks">aula 05</a>.</li>
+    <li>Coerência de cache: cada escrita num dado compartilhado invalida a cópia do outro núcleo (o <a href="/m8/comp/02-fundamentos-memoria#fundamentos-presencial">MESI</a> da aula 02). Duas variáveis diferentes na mesma linha de cache já causam esse vai e vem.</li>
+    <li>Se o problema cresce junto com o número de núcleos (mais dados para o mesmo tempo), a parte paralela cresce e o ganho também. Essa leitura otimista é a lei de Gustafson.</li>
+  </ul>
+  <div class="def"><span class="lab">Recapitulando</span><p>Amdahl com N núcleos: Speedup = 1 / ((1 − F) + F/N). Com F = 0,8, 4 núcleos dão 2,5 e infinitos núcleos não passam de 5.</p></div>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 12 ============ -->
+<section class="chap" id="reais">
+ <div class="prose">
+  <span class="num">12</span>
+  <h2>Pipelines de verdade: do Arduino ao notebook</h2>
+  <div class="src"><a class="vd" href="https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf" target="_blank" rel="noopener">Datasheet ATmega328P ↗</a><a class="vd" href="https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf" target="_blank" rel="noopener">Datasheet RP2040 ↗</a><a class="vd" href="https://ibex-core.readthedocs.io/en/latest/03_reference/pipeline_details.html" target="_blank" rel="noopener">Ibex · pipeline ↗</a><span class="bk">Hennessy &amp; Patterson · cap. 3 · Core i7</span></div>
+  <p>Os slides de 19/10 usaram quatro chips: o ATmega328P do Arduino Uno, o RP2040 com dois Cortex-M0+, o OpenTitan com o núcleo Ibex e um Xeon na nuvem. Veja onde cada um fica entre "pipeline curto e simples" e "pipeline longo e esperto":</p>
+ </div>
+  <div class="tbl prose" id="tbl-pipelines-reais">
+    <table>
+      <thead><tr><th>Núcleo</th><th>Onde aparece</th><th>Stages</th><th>Como executa</th></tr></thead>
+      <tbody>
+        <tr><td>AVR (ATmega328P)</td><td>Arduino Uno</td><td>2: busca a próxima instrução enquanto executa a atual</td><td>em ordem, sem predição; um branch condicional tomado gasta 2 ciclos, não tomado, 1</td></tr>
+        <tr><td>Cortex-M0+</td><td>RP2040 (Raspberry Pi Pico), 2 núcleos</td><td>2</td><td>em ordem, sem predição nem especulação</td></tr>
+        <tr><td>Ibex (RISC-V)</td><td>OpenTitan</td><td>2 (com opção de um 3º, de escrita)</td><td>em ordem</td></tr>
+        <tr><td>Core i7 920</td><td>exemplo do livro</td><td>14</td><td>especulativo, fora de ordem, até 4 por ciclo, SMT; erro de predição ≈ 17 ciclos</td></tr>
+      </tbody>
+    </table>
+  </div>
+ <div class="prose">
+  <p>Os chips do projeto ficam na ponta simples. Isso tem três consequências que caem direto nas decisões:</p>
+  <ul class="b">
+    <li>O tempo é tabelado: o manual dá os ciclos de cada instrução e você soma. Com pouca coisa variando, o pior caso fica perto da média.</li>
+    <li>Um branch tomado joga fora pouca coisa, porque há poucas instruções dentro do pipeline. No Core i7, um erro de predição joga fora uns 17 ciclos de trabalho.</li>
+    <li>Sem preditor e sem ROB, não existe execução especulativa. O tipo de vazamento da <a href="#seguranca">próxima seção</a> não acontece nesses núcleos.</li>
+  </ul>
+
+  <h3>Latência de interrupção</h3>
+  <p>O botão da rotina chega como interrupção (aula 02). A <b>latência de interrupção</b> é o tempo entre o pedido e a primeira instrução da rotina que trata o pedido.</p>
+  <ul class="b">
+    <li>No Cortex-M0+, a Arm dá 15 ciclos, numa memória sem espera. A 125 MHz: 15 / 125 MHz = 120 ns.</li>
+    <li>Esse número é o melhor caso do hardware. Se a rotina estiver na flash e der miss na cache XIP, soma a espera da flash. Por isso o exercício 2 da aula 02 pôs a rotina do botão na SRAM.</li>
+    <li>Num processador especulativo, a mesma interrupção ainda precisa esvaziar ou esperar o pipeline cheio de instruções em voo, e o tempo varia mais.</li>
+  </ul>
+
+  <h3>Os dois núcleos do RP2040</h3>
+  <ul class="b">
+    <li>São dois Cortex-M0+ iguais, que dividem os 264 KB de SRAM e os periféricos. No Pico SDK, o núcleo 0 roda o <code>main</code> e <code>multicore_launch_core1(funcao)</code> põe o núcleo 1 para rodar outra função.</li>
+    <li>Para os núcleos conversarem, o chip tem o <b>SIO</b> (single-cycle I/O): um bloco ligado direto aos dois núcleos, com duas filas (FIFOs) de 8 palavras de 32 bits, uma em cada sentido, e 32 <b>spinlocks de hardware</b>.</li>
+    <li>Os spinlocks existem porque o Cortex-M0+ não tem as instruções atômicas de "ler e escrever sem ninguém no meio" que a <a href="/m8/comp/05-sincronizacao-deadlocks">aula 05</a> usa para fazer locks. O hardware oferece a trava pronta.</li>
+  </ul>
+  <div class="def warn"><span class="lab">Pegadinha · dois núcleos e uma flash</span><p>Enquanto a flash é gravada (uma rotina nova chegando, por exemplo), nenhum dos dois núcleos consegue buscar código nela. Se o núcleo 1 grava e o núcleo 0 executa da flash, o núcleo 0 para junto. O SDK tem funções para pausar o outro núcleo durante a gravação; a alternativa é manter na SRAM tudo o que o outro núcleo precisa.</p></div>
+  <div class="def"><span class="lab">Recapitulando</span><p>Microcontroladores como o Cortex-M0+ e o AVR têm pipeline de 2 stages, em ordem e sem especulação: tempo previsível e quase nenhuma perda por branch. Processadores de notebook trocam previsibilidade por média.</p></div>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 13 ============ -->
+<section class="chap" id="seguranca">
+ <div class="prose">
+  <span class="num">13</span>
+  <h2>Quando a especulação vaza: Spectre e Meltdown</h2>
+  <div class="src"><a class="vd" href="https://spectreattack.com/spectre.pdf" target="_blank" rel="noopener">Kocher et al. · Spectre ↗</a><a class="vd" href="https://meltdownattack.com/meltdown.pdf" target="_blank" rel="noopener">Lipp et al. · Meltdown ↗</a><span class="bk">João Luisi · 19/10/2026 · slides 17 e 20</span></div>
+  <p>O <a href="#especulacao">ROB</a> desfaz uma aposta errada: nada do caminho errado chega aos registradores nem à memória. Em 2018, dois ataques mostraram o que ele não desfaz.</p>
+  <ul class="b">
+    <li><b>Estado microarquitetural</b> é o que o processador guarda por dentro e o programa não vê diretamente: o conteúdo da cache, a tabela do preditor, a TLB.</li>
+    <li><b>Execução transitória</b> é a das instruções que rodam por especulação e depois são jogadas fora. Elas nunca chegam ao commit, mas podem ter trazido uma linha para a cache.</li>
+    <li>A aula 02 mostrou que o tempo denuncia onde o dado estava: uns 2 ns na L1, mais de 100 ns na DRAM. Medir esse tempo é o <a href="/m8/comp/02-fundamentos-memoria#fundamentos-presencial">side channel</a> Flush+Reload.</li>
+  </ul>
+
+  <h3>Spectre, passo a passo</h3>
+  <p>A vítima tem um código que confere o limite do vetor antes de ler. Parece seguro:</p>
+<pre><code>if (x &lt; tamanho_A) {        // o preditor aposta "sim"
+    y = B[A[x] * 4096];     // lê A[x] e toca uma linha de B
+}</code></pre>
+  <ol class="caminho">
+    <li>Treino: o atacante chama esse código muitas vezes com x válido. O preditor aprende que o <code>if</code> é tomado.</li>
+    <li>Preparação: o atacante tira B da cache.</li>
+    <li>Ataque: chama com um x fora do limite, que aponta para um byte secreto s. O <code>tamanho_A</code> não está na cache, então a comparação demora. Enquanto isso, o processador especula: lê s = A[x] e acessa B[s × 4096].</li>
+    <li>Desfazer: a comparação termina, a aposta estava errada e o ROB descarta y. A linha B[s × 4096] fica na cache.</li>
+    <li>Medir: o atacante lê B[0], B[4096], B[2 × 4096]… e cronometra cada leitura. A única rápida diz quanto vale s. Repete para o próximo byte.</li>
+  </ol>
+  <ul class="b">
+    <li>O × 4096 põe cada valor possível de s numa página diferente, longe o bastante para uma leitura não trazer a vizinha junto.</li>
+    <li>Nenhuma instrução leu o segredo "de verdade": o vazamento está todo no tempo.</li>
+  </ul>
+
+  <h3>Meltdown</h3>
+  <ul class="b">
+    <li>Um programa comum tenta ler um endereço do kernel. A <a href="/m8/comp/02-fundamentos-memoria#virtual">permissão da página</a> proíbe, e a exceção acontece.</li>
+    <li>Só que a exceção é <a href="#especulacao">precisa</a>: ela espera a instrução chegar à cabeça do ROB. Nos processadores vulneráveis, o valor proibido já tinha seguido para a instrução seguinte, que tocou uma linha de B. O resto é igual ao Spectre.</li>
+    <li>A correção nos sistemas operacionais foi o <b>KPTI</b> (kernel page-table isolation): enquanto o programa roda, o kernel nem aparece na tabela de páginas dele. Custa desempenho, porque cada syscall troca de tabela e perde entradas da TLB. Processadores mais novos corrigiram no próprio hardware.</li>
+  </ul>
+
+  <h3>Quem precisa se preocupar</h3>
+  <ul class="b">
+    <li>Processadores especulativos e fora de ordem: os de notebook e servidor, e núcleos Cortex-A como o do Raspberry Pi 4. Defesas contra o Spectre: barreiras que mandam esperar o branch, mascarar o índice para ele não sair do vetor nem por especulação, e navegadores que separam cada site num processo.</li>
+    <li>O Cortex-M0+ e o AVR não especulam, então não têm execução transitória. Os riscos deles são outros, como a injeção de código e as rotinas maliciosas da aula 02.</li>
+  </ul>
+  <div class="def warn"><span class="lab">Armadilha · "o ROB desfaz tudo"</span><p>Errado: "a especulação errada é descartada, então não deixa rastro". Certo: ela desfaz o estado da arquitetura (registradores e memória). Cache, preditor e TLB guardam rastros que dá para medir.</p></div>
+  <div class="def"><span class="lab">Recapitulando</span><p>Spectre e Meltdown usam execução transitória: a especulação errada é desfeita nos registradores, mas a linha que ela trouxe para a cache fica, e o tempo de acesso revela o segredo.</p></div>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 14 ============ -->
+<section class="chap" id="exercicios">
+ <div class="prose">
+  <span class="num">14</span>
+  <h2>Exercícios no estilo do encontro</h2>
+  <div class="src"><span class="base-tag">Treino · autoral</span><span class="bk">valores de exemplo no hardware do projeto</span></div>
+  <p>Três exercícios de treino, do mecânico ao aberto, com os chips do projeto. Os números são de exemplo, como nos slides de 19/10. Tente antes de abrir o gabarito.</p>
+
+  <h3>Exercício 1 · o interpretador em dois pipelines</h3>
+  <p>O interpretador da rotina (aula 02) gasta 150 instruções de máquina para cada instrução da rotina, e 20% delas são branches.</p>
+  <ul class="b">
+    <li>(a) No Cortex-M0+ a 125 MHz: instrução comum em 1 ciclo, branch tomado com 1 ciclo a mais, 60% dos branches tomados. Qual o CPI? Quanto tempo leva uma instrução da rotina?</li>
+    <li>(b) Num núcleo de notebook a 3 GHz: CPI de 0,5 sem erros de predição (emite 2 por ciclo em média), preditor que erra 8% dos branches, 17 ciclos por erro. CPI e tempo?</li>
+    <li>(c) A pessoa leva 40 s para vestir cada peça. Qual dos dois você escolhe para o módulo, e por quê?</li>
+  </ul>
+  <details class="treino"><summary><span class="q">Gabarito</span> Exercício 1</summary>
+   <ul class="b">
+    <li>(a) CPI = 1 + 0,20 × 0,60 × 1 = 1,12. Tempo = 150 × 1,12 / 125 MHz = 168 ciclos × 8 ns = 1,344 µs.</li>
+    <li>(b) CPI = 0,5 + 0,20 × 0,08 × 17 = 0,5 + 0,272 = 0,772. Tempo = 150 × 0,772 / 3 GHz = 115,8 ciclos × 0,333 ns ≈ 38,6 ns. Os erros de predição são 0,272 / 0,772 ≈ 35% do CPI.</li>
+    <li>(c) O notebook é uns 35 vezes mais rápido (1344 / 38,6), e não faz diferença: a rotina inteira gasta microssegundos contra 160 s de pessoa (a conta de Amdahl da aula 02).</li>
+   </ul>
+   <p>Leitura. O despacho de um interpretador (um <code>switch</code> que pula para um de muitos lugares) costuma ser o branch mais difícil de prever, por isso pesa tanto no pipeline longo. No módulo, o que decide é energia, custo e um pior caso que você consegue somar. O pipeline curto ganha.</p>
+  </details>
+
+  <h3>Exercício 2 · dividir em stages</h3>
+  <p>Sem pipeline, uma instrução passa por cinco etapas de 200, 150, 250, 250 e 150 ps (1000 ps no total). Cada registrador de pipeline acrescenta 20 ps.</p>
+  <ul class="b">
+    <li>(a) Com 5 stages, qual o ciclo e o speedup?</li>
+    <li>(b) Juntando etapas vizinhas em só 2 stages, como no Cortex-M0+, qual a melhor divisão, o ciclo e o speedup?</li>
+    <li>(c) No de 5 stages, 15% das instruções sofrem 1 stall de load-use; no de 2, nenhuma. Qual termina uma instrução mais rápido, em média? Por que um fabricante escolheria o de 2?</li>
+  </ul>
+  <details class="treino"><summary><span class="q">Gabarito</span> Exercício 2</summary>
+   <ul class="b">
+    <li>(a) Ciclo = maior etapa + registrador = 250 + 20 = 270 ps. Speedup = 1000 / 270 ≈ 3,7.</li>
+    <li>(b) As duas divisões que equilibram melhor: 200 + 150 + 250 = 600 | 250 + 150 = 400, ou 200 + 150 = 350 | 250 + 250 + 150 = 650. A primeira ganha: ciclo = 600 + 20 = 620 ps, speedup = 1000 / 620 ≈ 1,6.</li>
+    <li>(c) 5 stages: 1,15 × 270 ≈ 310 ps por instrução. 2 stages: 1 × 620 = 620 ps. O de 5 é 2 vezes mais rápido.</li>
+   </ul>
+   <p>Leitura. O de 2 stages tem menos registradores de pipeline (menos área e energia), perde menos em cada branch e tem tempo mais fácil de prever. Para um chip de bateria que passa quase todo o tempo esperando um botão, isso vale mais que o dobro de velocidade.</p>
+  </details>
+
+  <h3>Exercício 3 · os dois núcleos do RP2040</h3>
+  <p>A cada 10 ms, o módulo de controle faz: ler o botão e atualizar a rotina (0,2 ms), gerar o próximo trecho do som de alerta (1,2 ms), atualizar os LEDs (0,1 ms) e tratar o rádio (0,5 ms). Som e rádio podem ir para o outro núcleo; o resto fica junto.</p>
+  <ul class="b">
+    <li>(a) Qual a fração F que dá para mover? O que Amdahl promete com 2 núcleos?</li>
+    <li>(b) As tarefas não se dividem ao meio. Qual a melhor distribuição e o speedup real?</li>
+    <li>(c) O botão é lido no núcleo 0 e o som roda no núcleo 1. Como o núcleo 0 manda parar o som? Vale usar o segundo núcleo?</li>
+  </ul>
+  <details class="treino"><summary><span class="q">Gabarito</span> Exercício 3</summary>
+   <ul class="b">
+    <li>(a) Total = 0,2 + 1,2 + 0,1 + 0,5 = 2,0 ms. F = (1,2 + 0,5) / 2,0 = 0,85. Amdahl: 1 / (0,15 + 0,85/2) = 1 / 0,575 ≈ 1,74.</li>
+    <li>(b) Som e rádio no núcleo 1 dão 1,7 ms contra 0,3 ms no núcleo 0: speedup 2,0 / 1,7 ≈ 1,18. Melhor: só o som no núcleo 1 (1,2 ms) e o resto no núcleo 0 (0,2 + 0,1 + 0,5 = 0,8 ms). O tempo é o do mais carregado, 1,2 ms: speedup 2,0 / 1,2 ≈ 1,67, abaixo dos 1,74 de Amdahl.</li>
+    <li>(c) Uma mensagem na FIFO do SIO ("pare o som"), que o núcleo 1 confere a cada trecho; ou uma variável compartilhada protegida por um spinlock de hardware.</li>
+   </ul>
+   <p>Leitura. Mesmo com um núcleo só, o trabalho ocupa 2 ms a cada 10 ms: a CPU fica 80% parada. O segundo núcleo não é necessário por velocidade. Ele pode valer pelo isolamento (o som nunca atrasa o botão) ou não valer pela conversa entre núcleos, que você vai precisar testar. É uma decisão do projeto, não uma conta.</p>
+  </details>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 15 ============ -->
+<section class="chap" id="projeto">
+ <div class="prose">
+  <span class="num">15</span>
+  <h2>Aplicação ao projeto: um núcleo ou dois?</h2>
+  <div class="src"><span class="base-tag">Treino · autoral</span><span class="bk">rotina de vestir e módulo de controle (TAPI)</span></div>
+  <p>A rotina de vestir da aula 02 roda num módulo de controle: a peça da vez pisca, a pessoa veste e aperta o botão, e aos 120 s sem botão o cuidador é avisado. Vocês são os arquitetos do módulo. Perguntas para o grupo:</p>
+  <ol class="caminho">
+    <li>Processador: um Cortex-M0+ com pipeline de 2 stages dá conta da rotina? Use o exercício 1.</li>
+    <li>Pior caso: do botão até a luz da próxima peça acender, o que entra na conta? Latência de interrupção (120 ns), um miss na cache XIP, a rotina que trata o botão e uma volta do interpretador.</li>
+    <li>Segundo núcleo: se usarem, o que vai para ele? Como os núcleos conversam?</li>
+    <li>Confiabilidade: o aviso ao cuidador pode depender de um núcleo que trava? O que um <a href="/m8/comp/02-fundamentos-memoria#fundamentos-presencial">watchdog</a> faria aqui?</li>
+    <li>Segurança: o Spectre ameaça o módulo? E o aplicativo do terapeuta, que roda num notebook?</li>
+  </ol>
+
+  <h3>Dois jeitos de responder</h3>
+ </div>
+  <div class="tbl prose" id="tbl-um-ou-dois">
+    <table>
+      <thead><tr><th></th><th>Um núcleo, um laço só</th><th>Dois núcleos com papéis fixos</th></tr></thead>
+      <tbody>
+        <tr><td>Como fica</td><td>um laço lê o botão, avança a rotina, gera o som e trata o rádio</td><td>núcleo 0: botão, temporizadores e aviso ao cuidador, tudo na SRAM. Núcleo 1: som, rádio e interpretador</td></tr>
+        <tr><td>Número que pesa</td><td>2 ms de trabalho a cada 10 ms: sobra 80%</td><td>o aviso nunca espera o rádio nem uma gravação da flash</td></tr>
+        <tr><td>Do que abre mão</td><td>uma tarefa lenta atrasa todas as outras</td><td>simplicidade: FIFO, spinlocks e testes da conversa entre núcleos</td></tr>
+      </tbody>
+    </table>
+  </div>
+ <div class="prose">
+  <p>Exemplo de decisão no formato do encontro (um exemplo, não um gabarito):</p>
+  <ul class="b">
+    <li>Decisão: usamos os dois núcleos, com o núcleo 0 dedicado ao botão, aos temporizadores e ao aviso ao cuidador.</li>
+    <li>Do que abrimos mão: de um programa de laço único. Quem sente é a equipe, que precisa testar a comunicação entre núcleos.</li>
+    <li>Número que pesou: gravar uma rotina nova na flash para a busca de código nos dois núcleos. Com o núcleo 0 inteiro na SRAM, o aviso aos 120 s continua rodando.</li>
+    <li>O que nos faria mudar: se medirmos o pior caso num núcleo só, gravação incluída, bem abaixo do que a terapeuta aceita entre o botão e a próxima peça.</li>
+  </ul>
+  <div class="def"><span class="lab">Pergunta para o parceiro</span><p>Quanto tempo a pessoa tolera entre apertar o botão e a próxima peça acender? A resposta diz se o pior caso de um núcleo só já basta.</p></div>
  </div>
 </section>

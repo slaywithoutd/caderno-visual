@@ -492,6 +492,18 @@ details.base > summary{cursor:pointer;padding:10px 0;font-weight:600;color:var(-
 details.base > summary::marker{color:var(--muted)}
 details.base[open] > summary{margin-bottom:4px;border-bottom:1px dashed var(--line)}
 details.base .def{background:var(--surface2)}
+/* Guia do encontro (seção "encontro" e treino): caminho curto, cinco ideias e perguntas que abrem */
+ol.caminho,ol.ideias{margin:0 0 1.1em;padding-left:1.5em;color:var(--fg2)}
+ol.caminho li,ol.ideias li{margin:.35em 0;padding-left:.2em}
+ol.caminho li::marker,ol.ideias li::marker{color:var(--accent);font-family:var(--f-mono);font-size:.85em}
+p.depois{font-size:.92rem;color:var(--muted)}
+details.treino{margin:.6rem 0;padding:2px 16px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+details.treino>summary{cursor:pointer;padding:9px 0;color:var(--fg);font-weight:500}
+details.treino>summary::marker{color:var(--muted)}
+details.treino .q{font-family:var(--f-mono);font-size:.74rem;letter-spacing:.03em;text-transform:uppercase;color:var(--accent);margin-right:8px;font-weight:600}
+details.treino[open]{padding-bottom:10px}
+details.treino[open]>summary{border-bottom:1px dashed var(--line);margin-bottom:8px}
+details.treino p,details.treino ul.b{margin:.5em 0}
 
 /* definição em duas camadas: primeiro em palavras simples, depois a formal */
 .def p.simples,.def p.formal{position:relative}

@@ -17,6 +17,14 @@ export const cartoes = [
   ['Para que serve o ROB?', 'Guarda os resultados das instruções especulativas, na ordem do programa, até o commit. Só na cabeça da fila o valor vai para registradores ou memória. Isso permite desfazer branches mal previstos e ter exceções precisas.', 'rob'],
   ['O que é uma exceção precisa?', 'No desvio para o tratador, tudo antes da instrução culpada foi efetivado e nada depois dela mudou o estado. Com execução fora de ordem, exige commit em ordem.', 'excecao-precisa'],
   ['Superescalar × VLIW: quem decide quais instruções vão juntas?', 'Superescalar: o hardware, a cada ciclo. VLIW: o compilador, que monta pacotes com uma vaga por unidade (vagas vazias levam nop).', 'emissao-multipla'],
+  ['F = 0,8 do programa dá para dividir. Speedup com 4 núcleos? E o teto?', '1 / (0,2 + 0,8/4) = 2,5. Com infinitos núcleos, 1 / 0,2 = 5.', 'nucleos'],
+  ['Som (1,2 ms) e rádio (0,5 ms) podem ir ao núcleo 1; botão (0,2) e LEDs (0,1) ficam no 0. Speedup real com 2 núcleos?', 'Melhor divisão: só o som no núcleo 1 (1,2 ms), o resto no 0 (0,8 ms). Vale o mais carregado: 2,0 / 1,2 ≈ 1,67, abaixo dos 1,74 de Amdahl.', 'treino'],
+  ['Quantos stages têm o Cortex-M0+ e o AVR, e o que isso traz?', '2 cada, em ordem e sem especulação: tempo tabelado, pior caso perto da média, pouca perda por branch e nenhuma execução transitória.', 'reais'],
+  ['Latência de interrupção do Cortex-M0+ a 125 MHz?', '15 ciclos sem espera de memória: 15 × 8 ns = 120 ns. É o melhor caso; rotina na flash com miss na XIP soma a espera da flash.', 'reais'],
+  ['Por que o RP2040 tem spinlocks de hardware no SIO?', 'O Cortex-M0+ não tem instruções atômicas de ler e escrever para montar locks. O SIO oferece 32 spinlocks e duas FIFOs de 8 palavras entre os núcleos.', 'reais'],
+  ['Como o Spectre (variante 1) tira um segredo se a especulação é desfeita?', 'Treina o preditor, tira B da cache e chama com índice fora do limite. Na especulação, lê s = A[x] e toca B[s × 4096]. O ROB desfaz y, mas a linha fica na cache; cronometrando B, a leitura rápida revela s.', 'seguranca'],
+  ['O que o Meltdown explora e qual foi a correção nos SOs?', 'A exceção de permissão só sai no commit; antes disso, o valor do kernel passou para uma instrução que deixou rastro na cache. Correção: KPTI, kernel fora da tabela de páginas do programa.', 'seguranca'],
+  ['Stages de 200, 150, 250, 250 e 150 ps, 20 ps de registrador. Ciclo e speedup com 5 stages? E com 2?', '5 stages: 270 ps, speedup 3,7. 2 stages (600 | 400): 620 ps, speedup 1,6.', 'treino'],
 ];
 
 export const cola = [
@@ -32,4 +40,7 @@ export const cola = [
   ['Especulação + ROB', 'executa o caminho previsto; resultados no ROB; commit em ordem pela cabeça. Exceções precisas, desfaz erro de predição.', 'rob'],
   ['Emissão múltipla', 'superescalar (hardware decide; i7 especulativo, A8 estático) × VLIW (compilador monta pacotes com nops).', 'emissao-multipla'],
   ['Limites e TLP', 'ILP real é limitado (janela, predição, energia). Multithreading: fina, grossa, SMT (Hyper-Threading).', 'limites-ilp'],
+  ['Amdahl com N núcleos', 'Speedup = 1 / ((1 − F) + F/N); teto 1 / (1 − F). Tarefas indivisíveis: vale o núcleo mais carregado.', 'nucleos'],
+  ['Chips do projeto', 'AVR, Cortex-M0+, Ibex: 2 stages, em ordem, sem especulação. M0+: interrupção em 15 ciclos (120 ns a 125 MHz). RP2040: SIO com FIFOs e 32 spinlocks.', 'reais'],
+  ['Spectre e Meltdown', 'execução transitória deixa linha na cache; tempo de acesso revela o segredo. Spectre: preditor treinado. Meltdown: permissão checada só no commit; KPTI.', 'seguranca'],
 ];

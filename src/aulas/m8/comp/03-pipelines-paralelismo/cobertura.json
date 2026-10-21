@@ -1,0 +1,28 @@
+{
+  "aula": "m8/comp/03-pipelines-paralelismo",
+  "data": "2026-10-21",
+  "criterio": "Preparação para o encontro antes dos slides existirem. Registra o que foi conferido e o que continua pendente; não equivale a certificação de leitura integral dos livros.",
+  "fontes": [
+    {
+      "id": "luisi-s02-anuncios",
+      "url": "https://drive.google.com/file/d/1xZpjGw2EloQZEmDTIUcoHX6T7KCCNIij/view",
+      "escopo": "S02 - Arquitetura Fundamentos e Memoria.pdf, 19/10/2026: apenas os slides que anunciam este encontro (13: paralelismo entre núcleos; 17 e 20: Spectre e Meltdown, 'fica para quarta')",
+      "acesso": "parcial",
+      "limitacao": "As 37 páginas foram conferidas na matriz da aula 02. Aqui só se registra o que elas anunciam para este encontro."
+    },
+    {
+      "id": "luisi-encontro-03",
+      "url": "pendente: PDF ainda não recebido",
+      "escopo": "Slides do encontro de pipelines e paralelismo (21/10/2026)",
+      "acesso": "indisponivel",
+      "limitacao": "O PDF ainda não existe para o caderno. Integrar depois do encontro com a skill integrar-notas e preencher esta matriz página por página."
+    },
+    {
+      "id": "hennessy-cap3",
+      "url": "https://www.educate.elsevier.com/book/details/9780128119051",
+      "escopo": "Hennessy & Patterson, 6ª ed. (citada pelos slides), cap. 3 e apêndice C",
+      "acesso": "nao-verificado",
+      "limitacao": "O texto integral do livro não foi fornecido. As faixas de página do meta.json vêm da indicação do autoestudo."
+    }
+  ]
+}

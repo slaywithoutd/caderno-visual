@@ -550,3 +550,71 @@ SUB.D F12, F8, F14    ; não depende de ninguém, mas fica preso atrás do ADD.D
     </ul>
   </div>
 </section>
+
+<section class="cs" id="nucleos" data-grupo="Paralelismo entre núcleos" data-termos="" data-leitura="nucleos">
+  <h2>Multicore e Amdahl com N núcleos</h2>
+  <p class="cs-def">Com o ILP esgotado e o clock parado desde perto de 2005, o ganho vem de várias threads em núcleos diferentes. Quem divide o trabalho é o programador.</p>
+  <div data-ref-tbl="tbl-niveis-paralelismo"></div>
+  <ul class="b">
+    <li>Flynn (<a href="/m8/comp/02-fundamentos-memoria/consulta#paralelismo">aula 02</a>): pipeline e emissão múltipla são SISD; instruções vetoriais e GPU, SIMD; SMT e multicore, MIMD.</li>
+  </ul>
+  <div class="cs-formula"><div class="formula">Speedup(N) = 1 / ((1 − F) + F/N)</div><p>F é a fração do tempo original que dá para dividir; N, o número de núcleos. Teto com N infinito: 1 / (1 − F). É a <a href="/m8/comp/02-fundamentos-memoria/consulta#amdahl">Lei de Amdahl</a> com S = N.</p></div>
+  <div class="cs-uso"><p>Programa de 10 s, 8 s divisíveis (F = 0,8): 2 núcleos → 2 + 4 = 6 s (1,67); 4 → 4 s (2,5); 8 → 3 s (3,3); infinitos → 2 s (5).</p></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>4 núcleos não dão 4 vezes: só com F = 1. E a fórmula supõe a parte paralela em pedaços iguais; com tarefas indivisíveis, vale o núcleo mais carregado.</li>
+    <li>O que a fórmula não conta: conversa entre núcleos (<a href="/m8/comp/05-sincronizacao-deadlocks/consulta">aula 05</a>) e coerência de cache (MESI da aula 02), inclusive duas variáveis na mesma linha.</li>
+    <li>Se o problema cresce com os núcleos, o ganho cresce junto (lei de Gustafson).</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="reais" data-grupo="Chips reais e segurança" data-termos="latencia-interrupcao,sio,spinlock-hw" data-leitura="reais">
+  <h2>Pipelines reais e os dois núcleos do RP2040</h2>
+  <p class="cs-def">Os chips do projeto (AVR, Cortex-M0+, Ibex) têm pipeline de 2 stages, em ordem e sem especulação. O Core i7 do livro tem 14, fora de ordem e especulativo.</p>
+  <div data-ref-tbl="tbl-pipelines-reais"></div>
+  <ul class="b">
+    <li>Pipeline curto: tempo tabelado, pior caso perto da média, branch perde pouco, nenhuma execução transitória.</li>
+    <li>Latência de interrupção no Cortex-M0+: 15 ciclos sem espera de memória. A 125 MHz, 120 ns. Rotina na flash com miss na XIP soma a espera da flash.</li>
+    <li>RP2040: dois Cortex-M0+ que dividem 264 KB de SRAM. <code>multicore_launch_core1(funcao)</code> liga o núcleo 1.</li>
+    <li>SIO: duas FIFOs de 8 palavras de 32 bits (uma por sentido) e 32 spinlocks de hardware. Existem porque o Cortex-M0+ não tem instruções atômicas de ler e escrever.</li>
+  </ul>
+  <div class="cs-uso"><p>15 ciclos / 125 MHz = 15 × 8 ns = 120 ns.</p></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Gravar a flash bloqueia a busca de código nos dois núcleos. Ou pausa o outro núcleo, ou tudo o que ele usa mora na SRAM.</li>
+    <li>15 ciclos é o melhor caso do hardware, não o tempo até a rotina terminar.</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="seguranca" data-grupo="Chips reais e segurança" data-termos="estado-microarquitetural,execucao-transitoria,kpti" data-leitura="seguranca">
+  <h2>Spectre e Meltdown</h2>
+  <p class="cs-def">Ataques de execução transitória: o ROB desfaz registradores e memória, mas a linha que a especulação trouxe para a cache fica, e o tempo de acesso revela o segredo.</p>
+  <ul class="b">
+    <li>Estado microarquitetural: cache, preditor, TLB. O programa não vê, mas dá para medir pelo tempo (Flush+Reload, aula 02).</li>
+    <li>Spectre: treina o preditor com x válido, tira B da cache, chama com x fora do limite. Na especulação, lê s = A[x] e toca B[s × 4096]. A aposta é desfeita; cronometrando B[k × 4096], a leitura rápida dá s.</li>
+    <li>Meltdown: lê um endereço do kernel. A exceção só sai no commit (exceção precisa); nos processadores vulneráveis, o valor já passou para a instrução seguinte. Correção no SO: KPTI, que tira o kernel da tabela de páginas do programa (custa desempenho a cada syscall).</li>
+    <li>Defesas contra o Spectre: barreira que espera o branch, mascarar o índice, isolar sites em processos no navegador.</li>
+    <li>Afeta processadores especulativos (notebook, servidor, Cortex-A do Raspberry Pi 4). Cortex-M0+ e AVR não especulam.</li>
+  </ul>
+  <div class="cs-uso"><pre><code>if (x &lt; tamanho_A) {        // o preditor aposta "sim"
+    y = B[A[x] * 4096];     // lê A[x] e toca uma linha de B
+}</code></pre></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>"O ROB desfaz tudo": desfaz o estado da arquitetura. Cache, preditor e TLB guardam rastros.</li>
+    <li>Nenhuma instrução lê o segredo de forma visível: o vazamento está no tempo.</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="treino" data-grupo="Treino para o encontro" data-termos="" data-leitura="encontro,exercicios,projeto">
+  <h2>Treino para o encontro</h2>
+  <p class="cs-def">Quiz, exercícios e uma decisão de projeto no formato do encontro, autorais, com valores de exemplo.</p>
+  <div class="cs-uso">
+    <details class="treino"><summary><span class="q">Q1</span> Pipeline diminui o tempo de cada instrução?</summary><p>Não. Aumenta o throughput; cada instrução ganha o overhead dos registradores.</p></details>
+    <details class="treino"><summary><span class="q">Q2</span> Stages de 200, 150, 250, 250, 150 ps + 20 ps de registrador. Speedup sobre 1000 ps?</summary><p>Ciclo 270 ps; 1000 / 270 ≈ 3,7.</p></details>
+    <details class="treino"><summary><span class="q">Q3</span> 20% branches, 10% de erro, 3 ciclos por erro. Quanto soma ao CPI?</summary><p>0,20 × 0,10 × 3 = 0,06.</p></details>
+    <details class="treino"><summary><span class="q">Q4</span> F = 0,8 com 4 núcleos? Com infinitos?</summary><p>1 / (0,2 + 0,2) = 2,5; teto 5.</p></details>
+    <details class="treino"><summary><span class="q">Ex. 1</span> Interpretador: 150 instruções de máquina por instrução da rotina, 20% branches. M0+ a 125 MHz (branch tomado +1, 60% tomados) × notebook a 3 GHz (CPI base 0,5, 8% de erro, 17 ciclos).</summary><p>M0+: CPI 1,12; 150 × 1,12 × 8 ns = 1,344 µs. Notebook: CPI 0,5 + 0,272 = 0,772; ≈ 38,6 ns, com 35% do CPI em erros de predição. Contra 160 s de pessoa, nenhum dos dois importa: decidem energia, custo e pior caso.</p></details>
+    <details class="treino"><summary><span class="q">Ex. 2</span> As mesmas etapas em 2 stages, como no M0+. E com 15% de load-use no de 5?</summary><p>Melhor divisão 600 | 400: ciclo 620 ps, speedup 1,6. Com stalls, o de 5 faz 1,15 × 270 ≈ 310 ps por instrução, contra 620. O de 2 ganha em área, energia, branch e previsibilidade.</p></details>
+    <details class="treino"><summary><span class="q">Ex. 3</span> A cada 10 ms: botão 0,2 ms, som 1,2, LEDs 0,1, rádio 0,5. Som e rádio podem ir ao núcleo 1.</summary><p>F = 1,7 / 2,0 = 0,85; Amdahl promete 1,74. Real: som no núcleo 1 (1,2 ms), resto no núcleo 0 (0,8 ms), speedup 2,0 / 1,2 ≈ 1,67. Avisar "pare o som" pela FIFO do SIO ou por variável com spinlock. A CPU já fica 80% parada com um núcleo: o segundo vale por isolamento, não por velocidade.</p></details>
+    <div data-ref-tbl="tbl-um-ou-dois"></div>
+    <p>Decisão no formato do encontro: decisão na primeira frase, do que abre mão e quem sente, um número que pesou, o que faria mudar de ideia. Exemplo na <a href="/m8/comp/03-pipelines-paralelismo#projeto">aplicação ao projeto</a>.</p>
+  </div>
+</section>

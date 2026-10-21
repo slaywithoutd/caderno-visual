@@ -1,0 +1,35 @@
+{
+  "aula": "m8/comp/05-sincronizacao-deadlocks",
+  "data": "2026-10-21",
+  "criterio": "Rastreabilidade das fontes desta aula. O livro não foi lido integralmente nesta revisão e os slides do encontro ainda não existem; nada aqui equivale a conferência de leitura integral.",
+  "fontes": [
+    {
+      "id": "luisi-encontro",
+      "url": "src/aulas/m8/comp/05-sincronizacao-deadlocks/notas/",
+      "escopo": "Slides do encontro presencial de João Luisi sobre sincronização e deadlocks (Machado & Maia, cap. 7)",
+      "acesso": "indisponivel",
+      "limitacao": "O PDF do encontro ainda não existe. Será integrado depois do encontro com a skill integrar-notas, e esta matriz ganhará as unidades por página. O guia, o quiz, os exercícios e a aplicação ao projeto da aula são autorais, no formato do encontro de 19/10, e não reproduzem questões do professor."
+    },
+    {
+      "id": "machado-cap7",
+      "url": "https://drive.google.com/file/d/1xZpjGw2EloQZEmDTIUcoHX6T7KCCNIij/view",
+      "escopo": "Machado & Maia, Arquitetura de sistemas operacionais, 5ª ed., LTC, 2013, cap. 7 (p. 93–125 segundo a indicação do autoestudo); edição confirmada na bibliografia dos slides de 19/10, p. 37",
+      "acesso": "nao-verificado",
+      "limitacao": "Capítulo não fornecido nem lido integralmente nesta revisão. As faixas de página por seção são indicação do autoestudo, não leitura conferida. Conceitos e exercícios do capítulo não foram inventariados contra o texto do livro."
+    },
+    {
+      "id": "docs-chips",
+      "url": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf",
+      "escopo": "RP2040 datasheet (build 2025-02-20), seções 2.1.2, 2.3.1.3, 2.3.1.4, 2.4.3.3 e 4.6.2; Pico SDK (hardware_sync, pico_sync, pico_multicore); avr-libc util/atomic.h; ArduinoCore-avr wiring.c; FreeRTOS mutexes",
+      "acesso": "parcial",
+      "limitacao": "Lidos só os trechos citados na seção reais. Números usados: 32 spinlocks, FIFOs de 8 × 32 bits, CPSID i em 1 ciclo, ausência de LDREX/STREX na tabela de instruções do Cortex-M0+, trava da parte alta do timer de 64 bits."
+    },
+    {
+      "id": "seguranca-casos",
+      "url": "https://access.redhat.com/security/cve/cve-2016-5195",
+      "escopo": "Mars Pathfinder (relato de Glenn Reeves, JPL), TOCTOU (man access(2)), Dirty COW (Red Hat, commit 19be0eaf do Linux, código de demonstração dirtyc0w.c)",
+      "acesso": "parcial",
+      "limitacao": "Lidos os relatos e descrições primárias citados; o mecanismo interno do Dirty COW está simplificado (sem o detalhe de FOLL_WRITE em __get_user_pages)."
+    }
+  ]
+}

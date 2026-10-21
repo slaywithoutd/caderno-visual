@@ -15,7 +15,17 @@ export const cartoes = [
   ['Quais as 4 condições de Coffman?', 'Exclusão mútua, posse e espera, não preempção e espera circular. Precisam valer todas ao mesmo tempo.', 'coffman'],
   ['Ciclo no grafo de alocação sempre é deadlock?', 'Só se cada recurso tiver uma instância. Com várias, o ciclo é necessário mas não suficiente.', 'grafo-alocacao'],
   ['Estado inseguro é deadlock?', 'Não. Só perde a garantia de que todos terminam. Pode nunca virar deadlock se os processos pedirem menos que o máximo.', 'estado-seguro'],
-  ['Banqueiro: total 10, Alocado (3, 2, 2), Máximo (9, 4, 7). O estado é seguro?', 'Disponível = 3; Precisa = (6, 2, 5). P2 (2 ≤ 3) → livre 5; P3 (5 ≤ 5) → livre 7; P1 (6 ≤ 7) → livre 10. Seguro: ⟨P2, P3, P1⟩.', 'banqueiro']
+  ['Banqueiro: total 10, Alocado (3, 2, 2), Máximo (9, 4, 7). O estado é seguro?', 'Disponível = 3; Precisa = (6, 2, 5). P2 (2 ≤ 3) → livre 5; P3 (5 ≤ 5) → livre 7; P1 (6 ≤ 7) → livre 10. Seguro: ⟨P2, P3, P1⟩.', 'banqueiro'],
+  ['Mars Pathfinder: o que reiniciava a sonda e como foi corrigido?', 'Inversão de prioridade no VxWorks: a tarefa alta esperava um mutex da baixa, e tarefas médias tomavam a CPU da baixa. Uma tarefa de prioridade maior via que a alta não terminou o ciclo e reiniciava o sistema. Um patch enviado da Terra ligou a herança de prioridade naquele mutex.', 'inversao-prioridade'],
+  ['<code>volatile</code> torna a variável atômica?', 'Não. Só obriga o compilador a ler e gravar na memória a cada acesso. Ler, somar e gravar continuam separados, e a interrupção pode entrar no meio.', 'isr-compartilhada'],
+  ['AVR de 8 bits: contador de 16 bits vai de 255 (0x00FF) para 256 (0x0100) entre a leitura do byte baixo e a do alto. O que o laço lê?', '0x01FF = 511, um valor que a variável nunca teve: leitura rasgada. Proteção: desligar as interrupções durante a cópia (cli, ATOMIC_BLOCK).', 'isr-compartilhada'],
+  ['Por que o RP2040 tem spinlocks de hardware no SIO?', 'O Cortex-M0+ (ARMv6-M) não tem LDREX/STREX nem Test-and-Set, e desligar interrupções num núcleo não para o outro. Ler o spinlock tenta pegar (≠ 0: conseguiu), escrever solta; no mesmo ciclo, o núcleo 0 ganha.', 'rp2040-locks'],
+  ['O que <code>spin_lock_blocking</code> faz além de girar?', 'Desliga as interrupções do núcleo que chama; <code>spin_unlock</code> restaura. Assim nenhuma rotina de interrupção estica a região crítica nem tenta pegar a mesma trava.', 'rp2040-locks'],
+  ['FIFOs entre os núcleos do RP2040: quantas e de que tamanho?', 'Duas, uma em cada sentido, 8 posições de 32 bits cada. Com a FIFO cheia, <code>multicore_fifo_push_blocking</code> espera.', 'rp2040-locks'],
+  ['O que é TOCTOU? Dê o exemplo do Unix.', 'Race entre conferir e usar. <code>access(arq)</code> diz que pode; antes do <code>open(arq)</code> o atacante troca o arquivo por um link para /etc/passwd, e o programa com privilégio de root abre o arquivo errado.', 'toctou'],
+  ['Dirty COW (CVE-2016-5195) explora o quê?', 'Uma race no copy-on-write do kernel Linux: uma thread escreve na cópia privada de um arquivo só de leitura e outra manda descartar a página (madvise). Na janela, a escrita cai no arquivo original: escalada de privilégio.', 'toctou'],
+  ['Região crítica de 30 ciclos a 125 MHz. E se alguém pôr dentro dela um envio de rádio de 15 ms?', '30 / 125 MHz = 0,24 µs. Com o rádio: até 15 ms girando no outro núcleo, 1 875 000 ciclos perdidos, 62 500 vezes mais. Dentro da trava, só copiar.', 'treino'],
+  ['FIFO de 8 posições, 2 eventos/s, consumidor parado 6 s. O que acontece?', 'N ≥ r × T = 12 > 8: a FIFO enche em 4 s e o push bloqueia o produtor por mais 2 s. Se os dois lados bloqueiam no push, há deadlock.', 'treino']
 ];
 
 export const cola = [
@@ -30,5 +40,8 @@ export const cola = [
   ['Monitor', 'exclusão mútua automática; wait solta o monitor; signal sem espera se perde.', 'monitor'],
   ['Mensagens', 'send/receive; direto × indireto (mailbox); síncrona (rendezvous) × assíncrona (buffer).', 'troca-mensagens'],
   ['Deadlock', 'Coffman: exclusão mútua + posse e espera + não preempção + espera circular. Grafo: P → R pedido, R → P posse.', 'coffman'],
-  ['Tratamento', 'avestruz; prevenir (ordem global); evitar (banqueiro, estado seguro); detectar (ciclo) e recuperar (matar, preempção, rollback).', 'estrategias']
+  ['Tratamento', 'avestruz; prevenir (ordem global); evitar (banqueiro, estado seguro); detectar (ciclo) e recuperar (matar, preempção, rollback).', 'estrategias'],
+  ['Interrupção e laço', 'são dois fluxos; volatile não é lock; AVR lê long em 4 bytes (leitura rasgada); proteção: desligar interrupções por poucas instruções.', 'isr-compartilhada'],
+  ['RP2040', 'M0+ sem LDREX/STREX; 32 spinlocks no SIO (ler pega, escrever solta); spin_lock_blocking desliga interrupções; 2 FIFOs de 8 × 32 bits.', 'rp2040-locks'],
+  ['Segurança', 'TOCTOU: conferir e usar separados (access/open); Dirty COW: race no copy-on-write do Linux, 2016.', 'toctou']
 ];

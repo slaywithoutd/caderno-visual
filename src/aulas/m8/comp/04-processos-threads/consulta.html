@@ -20,7 +20,7 @@
   <ul class="b">
     <li>Máquina estendida: o SO esconde os detalhes do hardware atrás de serviços simples. Seu código diz "abra o arquivo notas.txt", e o SO cuida de achar os blocos certos no disco.</li>
     <li>Gerente de recursos: o SO divide CPU, memória e dispositivos entre vários programas que disputam ao mesmo tempo, sem que um atrapalhe ou espione o outro.</li>
-    <li>O kernel gerencia processos, memória, arquivos e dispositivos. O resto do SO (janelas, utilitários, o interpretador de comandos) são programas comuns.</li>
+    <li>O kernel gerencia processos, memória, arquivos e dispositivos. No Linux, o resto do SO (janelas, utilitários, o interpretador de comandos) são programas comuns. Quanto fica dentro do kernel muda de um SO para outro (<a href="#arquiteturas">arquiteturas do kernel</a>).</li>
   </ul>
   <div class="cs-pegadinhas">
     <ul class="b">
@@ -48,7 +48,7 @@
   <ul class="b">
     <li>Exemplos do Linux: <code>read</code> (ler), <code>write</code> (escrever), <code>open</code> (abrir arquivo), <code>fork</code> (criar processo), <code>exit</code> (terminar).</li>
     <li>Em geral você não chama direto: <code>print</code> do Python e <code>printf</code> do C são funções de biblioteca que, por baixo, fazem a syscall <code>write</code>.</li>
-    <li>Custa caro perto de uma função comum: trocar de modo e conferir tudo leva de centenas de ns a alguns µs.</li>
+    <li>Custa caro perto de uma função comum: trocar de modo e conferir tudo leva de dezenas de ns a alguns µs, conforme o processador e as proteções ligadas.</li>
   </ul>
   <div class="cs-uso">
     <ul class="b">
@@ -58,6 +58,19 @@
       <li>Volta para o modo usuário, na instrução seguinte.</li>
     </ul>
   </div>
+</section>
+
+<section class="cs" id="arquiteturas" data-grupo="Base: o que o SO faz" data-termos="kernel-monolitico,kernel-camadas,microkernel" data-leitura="antes">
+  <h2>Como o kernel é organizado</h2>
+  <p class="cs-def">Machado &amp; Maia (cap. 4) comparam quatro arquiteturas de kernel: monolítica, em camadas, máquina virtual e microkernel. A diferença é o que roda em modo kernel.</p>
+  <ul class="b">
+    <li>Kernel monolítico: escalonador, memória, sistema de arquivos, rede e drivers num programa só, em modo kernel. Chamada interna é chamada de função: rápido. Um bug num driver compromete o sistema inteiro. Exemplos: Unix tradicional e Linux (módulos carregáveis também rodam dentro do kernel).</li>
+    <li>Arquitetura em camadas: cada nível só usa serviços do nível de baixo. Mais fácil de testar e proteger; cada pedido atravessa várias camadas. Exemplo: o sistema THE, de Dijkstra.</li>
+    <li>Máquina virtual: o hipervisor cria cópias do hardware, cada uma com um SO inteiro e isolado (<a href="/m8/comp/02-fundamentos-memoria">aula 02</a>).</li>
+    <li>Microkernel: só o mínimo em modo kernel (mensagens, escalonamento básico, memória); drivers e sistema de arquivos são servidores em modo usuário. Um driver que trava não derruba o kernel; cada pedido custa mais trocas de modo e de contexto. Exemplos: Mach, QNX, MINIX 3.</li>
+    <li>Windows e macOS costumam ser chamados de híbridos: partiram de ideias de microkernel, mas deixam muitos serviços em modo kernel por desempenho.</li>
+  </ul>
+  <div data-ref-mn="mn-kernels"></div>
 </section>
 
 <section class="cs" id="interrupcao" data-grupo="Base: o que o SO faz" data-termos="entrada-saida,interrupcao,tratador-interrupcao,temporizador,excecao" data-leitura="antes">
@@ -181,7 +194,7 @@ int soma(int n) {                    // as instruções de soma ficam no código
   <ul class="b">
     <li>Segue a regra da pilha como estrutura de dados (<a href="/m8/comp/01-conceitos">aula 01</a>): o último bloco que entra é o primeiro que sai.</li>
     <li>O <a href="#contexto-hardware">SP</a> guarda o endereço do topo.</li>
-    <li>Entre o heap e a pilha de execução sobra um espaço livre. Uma recursão sem fim gasta esse espaço até o fim e causa o famoso stack overflow: o SO encerra o processo.</li>
+    <li>Entre o heap e a pilha de execução sobra um espaço livre, mas a pilha tem limite (no Linux, <code>ulimit -s</code>; 8 MB é o padrão comum). Uma recursão sem fim chega ao limite, encosta numa página proibida e o SO encerra o processo: é o stack overflow. Num microcontrolador sem essa proteção, a pilha estoura em silêncio por cima de outros dados (<a href="#seguranca">segurança</a>).</li>
   </ul>
   <div class="cs-uso">
     <ul class="b">
@@ -270,28 +283,28 @@ int soma(int n) {                    // as instruções de soma ficam no código
   <h2>Quanto custa a troca de contexto: overhead e quantum</h2>
   <p class="cs-def">Overhead é o tempo e os recursos gastos com gerenciamento, que não são trabalho útil de nenhum processo. Durante a troca de contexto, a CPU só executa código do kernel: nenhum processo avança.</p>
   <ul class="b">
-    <li>Custo direto: salvar e carregar registradores, rodar o scheduler, trocar o mapa de memória. Em máquinas atuais fica na faixa de 1 a 10 µs.</li>
+    <li>Custo direto: salvar e carregar registradores, rodar o scheduler, trocar o mapa de memória. Num PC ou servidor, alguns µs; no Linux, meça com <code>perf bench sched pipe</code>. No Cortex-M0+ com FreeRTOS é bem mais curto (<a href="#rtos">RTOS</a>).</li>
     <li>Custo indireto: a cache e a TLB (<a href="/m8/comp/02-fundamentos-memoria">aula 02</a>) estão cheias de dados do processo antigo. Os primeiros acessos do novo processo dão miss, e isso pode custar mais do que a troca em si.</li>
   </ul>
   <div class="cs-formula">
     <div class="formula">fração útil = q / (q + s)          overhead = s / (q + s)</div>
-    <div class="formula">espera até voltar a executar (pior caso) = (n − 1) × (q + s)</div>
+    <div class="formula">espera até voltar a executar (pior caso) = (n − 1) × q + n × s</div>
     <ul class="b">
       <li>q: o quantum, o tempo que cada processo usa antes de ser trocado. s: o tempo de uma troca. A cada ciclo, a CPU trabalha q e perde s.</li>
-      <li>n: processos revezando. Cada um espera os outros n − 1 terminarem a vez deles.</li>
+      <li>n: processos revezando. Cada um espera os outros n − 1 quanta e n trocas: de A para o 2º, …, do último de volta para A.</li>
     </ul>
   </div>
   <div class="cs-uso">
     <ul class="b">
       <li>q = 4 ms e s = 20 µs = 0,02 ms. Fração útil = 4 / (4 + 0,02) = 4 / 4,02 ≈ 0,995. A CPU trabalha 99,5 % do tempo; o overhead é 0,5 %.</li>
       <li>Mesma troca com q = 0,1 ms: 0,1 / (0,1 + 0,02) = 0,1 / 0,12 ≈ 0,833. Agora 16,7 % do tempo vai embora em trocas.</li>
-      <li>5 processos, q = 4 ms e s = 0,02 ms: 4 × 4,02 = 16,08 ms até voltar a executar.</li>
+      <li>5 processos, q = 4 ms e s = 0,02 ms: 4 × 4 + 5 × 0,02 = 16,1 ms até voltar a executar.</li>
       <li>Quantum curto: resposta rápida, overhead alto. Quantum longo: overhead baixo, resposta lenta. Mexa nos números na figura abaixo.</li>
     </ul>
   </div>
   <p class="prova">A troca de contexto é overhead: enquanto ela acontece, nenhum processo avança. Fração útil = q / (q + s). Quantum menor dá resposta mais rápida e mais overhead.</p>
   <div class="cs-ponderada">
-    <p>Exemplo fora do cenário: um monitor cardíaco precisa tratar cada batida em até 20 ms e divide a CPU com outras 3 tarefas, com q = 4 ms e s = 15 µs. No pior caso, a tarefa dele espera (n − 1) × (q + s) = 3 × 4,015 = 12,045 ms antes de começar, e sobram menos de 8 ms para o cálculo. Pergunta: <em>com os números da pulseira, o prazo de 5 ms por amostra aguenta?</em> Monte essa conta.</p>
+    <p>Exemplo fora do cenário: um monitor cardíaco precisa tratar cada batida em até 20 ms e divide a CPU com outras 3 tarefas, com q = 4 ms e s = 15 µs. No pior caso, a tarefa dele espera (n − 1) × q + n × s = 3 × 4 + 4 × 0,015 = 12,06 ms antes de começar, e sobram menos de 8 ms para o cálculo. Pergunta: <em>com os números da pulseira, o prazo de 5 ms por amostra aguenta?</em> Monte essa conta.</p>
   </div>
   <div data-ref="fig-custo"></div>
 </section>
@@ -307,6 +320,7 @@ int soma(int n) {                    // as instruções de soma ficam no código
     <li>Pais e filhos formam uma árvore de processos (veja com <code>pstree</code> no Linux). O filho herda parte do contexto do pai, como o dono e os arquivos abertos.</li>
     <li>Processo independente: criado sem vínculo com quem o criou. Se o criador termina, ele continua.</li>
     <li><code>fork</code>: no Unix, cria uma cópia quase idêntica do processo que chamou. Mesmo código, cópia da memória, PID novo. A chamada "retorna duas vezes": no filho devolve 0, no pai devolve o PID do filho.</li>
+    <li>No Linux, a cópia da memória é preguiçosa (copy-on-write): pai e filho dividem as páginas físicas, marcadas como só leitura, e uma página só é copiada quando um dos dois escreve nela.</li>
     <li><code>exec</code>: troca o programa que o processo está executando por outro, mantendo o mesmo PID. O shell roda cada comando com <code>fork</code> seguido de <code>exec</code> no filho.</li>
     <li>O lado ruim de dividir uma aplicação em subprocessos: cada criação aloca PCB e espaço de endereçamento novos, o que custa tempo; e como as memórias são separadas, conversar entre processos exige mecanismos do SO (arquivos, pipes, mensagens), que são lentos. Esse problema é o ponto de partida das <a href="#threads">threads</a>.</li>
   </ul>
@@ -493,4 +507,155 @@ for t in ts: t.join()                # a thread principal espera as três</code>
   </div>
   <div data-ref-mn="mn-mapeamentos"></div>
   <div data-ref="fig-modelos"></div>
+</section>
+
+<!-- ================= Em chips reais ================= -->
+<section class="cs" id="superloop" data-grupo="Em chips reais" data-termos="superloop,isr" data-leitura="reais,exercicios">
+  <h2>Superloop e ISR: o Arduino Uno sem SO</h2>
+  <p class="cs-def">Superloop é firmware sem SO: um laço infinito que faz tudo, uma coisa depois da outra. No Arduino, o <code>main()</code> chama <code>setup()</code> uma vez e <code>loop()</code> para sempre. ISR (interrupt service routine) é o nome do tratador de interrupção num microcontrolador.</p>
+  <ul class="b">
+    <li>Não há processo, thread, PCB nem scheduler: um programa, uma pilha de execução e o hardware inteiro.</li>
+    <li>A única concorrência vem das interrupções: a ISR interrompe o laço a qualquer momento.</li>
+    <li>Arduino Uno: ATmega328P, AVR de 8 bits a 16 MHz, 32 KB de flash, 2 KB de SRAM, 1 KB de EEPROM.</li>
+    <li>O pior caso de qualquer coisa no laço é uma volta inteira. Por isso o laço nunca espera parado: confere <code>millis()</code> e segue.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Resposta mínima do ATmega328P a uma interrupção: 4 ciclos (datasheet, 6.7.1). A 16 MHz: 4 / 16 000 000 = 0,25 µs.</li>
+      <li>Polling: uma volta com 8 bytes gravados na EEPROM (3,3 ms cada) dura ≈ 26,4 ms, e esse é o pior atraso para ver o botão (<a href="#treino">exercício 1</a>).</li>
+    </ul>
+<pre><code>unsigned long inicio;                 // millis() de quando a peça atual começou
+void loop() {
+  if (botaoApertado()) proximaPeca();  // só confere; não espera
+  unsigned long t = millis() - inicio; // ms desde o início da peça
+  if (t &gt;= 120000) avisaCuidador();
+  else if (t &gt;= 60000) reforco();     // luz forte e som
+  // nada de delay(60000): ele pararia o laço inteiro por 60 s
+}</code></pre>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Errado: "sem SO não há concorrência". Certo: ISR e laço dividem variáveis, com os riscos da <a href="/m8/comp/05-sincronizacao-deadlocks">aula 05</a>.</li>
+      <li>Um <code>delay()</code> no laço vira atraso de todas as outras tarefas.</li>
+    </ul>
+  </div>
+  <div data-ref-mn="mn-espectro"></div>
+</section>
+
+<section class="cs" id="rtos" data-grupo="Em chips reais" data-termos="rtos" data-leitura="reais">
+  <h2>RTOS no RP2040 e Linux no Raspberry Pi</h2>
+  <p class="cs-def">RTOS (sistema operacional de tempo real) é um kernel pequeno, compilado junto com a aplicação, com tarefas, prioridades, filas e temporizadores; promete resposta previsível. No RP2040, o FreeRTOS roda tarefas que são threads: todas dividem a mesma memória.</p>
+  <ul class="b">
+    <li>Cada tarefa tem pilha de execução e TCB próprios (SP salvo, prioridade, estado: pronta, executando, bloqueada ou suspensa).</li>
+    <li>O RP2040 não tem MMU: o firmware inteiro é um processo só, e cada tarefa é uma thread de kernel.</li>
+    <li>Scheduler preemptivo por prioridade; as empatadas revezam a cada tick do SysTick (critérios na <a href="/m8/comp/06-gerencia-recursos">aula 06</a>).</li>
+    <li>O port do RP2040 suporta SMP: tarefas nos dois cores ao mesmo tempo, e dado compartilhado exige os cuidados da <a href="/m8/comp/05-sincronizacao-deadlocks">aula 05</a>.</li>
+    <li>Linux: no Raspberry Pi 4 (4 cores Cortex-A72, MMU, 1 a 8 GB de RAM) há processos com espaços de endereçamento separados, threads 1:1, modos usuário e kernel. O Linux comum depende da MMU; o RP2040 não tem MMU e tem 264 KB de SRAM, então fica com superloop ou RTOS.</li>
+    <li>Preço do Linux: boot de segundos e nenhum prazo prometido pelo scheduler padrão. Com requisito de tempo real crítico, a parte urgente costuma ir para um microcontrolador ao lado.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>A troca no Cortex-M0+ roda na exceção PendSV: o hardware empilha 8 registradores (R0–R3, R12, LR, PC, xPSR) e o port salva mais 8 (R4–R11). 16 × 4 = 64 bytes na pilha da tarefa, sem mapa de memória para trocar.</li>
+      <li>Entrar numa interrupção leva 15 ciclos no Cortex-M0+ (Arm). A 125 MHz, 100 ciclos = 0,8 µs. Meça a sua troca antes de usá-la numa decisão.</li>
+      <li>Exemplo: troca de 250 ciclos a 125 MHz → s = 2 µs; com tick de 1 ms, overhead = 0,002 / 1,002 ≈ 0,2 %.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Errado: "tarefa do FreeRTOS é um processo". Certo: é uma thread; todas dividem a mesma memória.</li>
+      <li>Errado: "RTOS é um SO mais rápido". Certo: é um SO previsível; o que ele promete é cumprir prazos.</li>
+    </ul>
+  </div>
+  <div data-ref-tbl="tbl-reais"></div>
+</section>
+
+<section class="cs" id="mpu" data-grupo="Em chips reais" data-termos="mpu" data-leitura="reais">
+  <h2>Modos e MPU: Cortex-M0+ × AVR</h2>
+  <p class="cs-def">MPU (memory protection unit) é o circuito que confere cada acesso contra regiões configuradas (endereço, tamanho, permissões, se pode executar) e gera falha se o acesso não for permitido. No RP2040 são 8 regiões por core; o ATmega328P não tem MPU nem modos.</p>
+  <ul class="b">
+    <li>AVR: qualquer código escreve em qualquer endereço da SRAM. A única proteção são os lock bits, que impedem regravar a área do bootloader.</li>
+    <li>Cortex-M0+: ISRs rodam em modo Handler, sempre privilegiado. O código comum roda em modo Thread, privilegiado ou não (bit nPRIV do registrador CONTROL). O não privilegiado pede serviços com <code>svc</code>, a syscall do ARM.</li>
+    <li>A MPU não traduz endereços; só permite ou nega. Acesso negado vira HardFault.</li>
+    <li>O port do FreeRTOS para o RP2040 roda todas as tarefas em modo privilegiado e não usa a MPU (há versões com MPU para outros Cortex-M, como M3, M4 e M33).</li>
+    <li>O Pico SDK tem guarda de pilha opcional (<code>PICO_USE_STACK_GUARDS</code>): 32 bytes da MPU no fundo da pilha de cada core.</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Errado: "MPU é uma MMU pequena". Certo: a MPU só permite ou nega; a MMU traduz endereço virtual em físico, e é isso que dá a cada processo a sua memória.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= Segurança ================= -->
+<section class="cs" id="seguranca" data-grupo="Segurança" data-termos="escalada-privilegio" data-leitura="seguranca">
+  <h2>Segurança: escalada de privilégio e isolamento</h2>
+  <p class="cs-def">Escalada de privilégio é um programa sem permissão passar a agir com o poder do kernel ou do administrador. Ela ataca a fronteira entre modos; o isolamento entre processos é a defesa seguinte, e entre threads essa defesa não existe.</p>
+  <ul class="b">
+    <li>Decisão explorada: o modo kernel confia em todo código que roda nele, inclusive drivers de terceiros.</li>
+    <li>Mitigações: o kernel confere todo ponteiro vindo do modo usuário (<code>copy_from_user</code> no Linux); o Windows bloqueia drivers vulneráveis conhecidos (ligado por padrão desde a atualização 2022 do Windows 11); microkernels tiram drivers do modo kernel.</li>
+    <li>Processo isola: o Chrome roda as páginas em processos de renderização separados. Um bug derruba só aquela aba ("aba triste"), e o processo roda com permissões cortadas (sandbox). Preço: mais memória.</li>
+    <li>Thread não isola: num RTOS sem MPU, a pilha estourada de uma tarefa cai sobre estruturas de outra, que falha longe da causa. No Linux, a mesma recursão mata só aquele processo.</li>
+    <li>No FreeRTOS: <code>configCHECK_FOR_STACK_OVERFLOW</code> confere a pilha a cada troca (percebe depois, não impede); uma região da MPU no fundo da pilha dispara HardFault na hora; <code>uxTaskGetStackHighWaterMark</code> mostra a sobra de pilha.</li>
+  </ul>
+  <div class="cs-uso">
+    <p>CVE-2018-19320, driver GDrv (utilitários GIGABYTE, Windows):</p>
+    <ul class="b">
+      <li>O driver roda em modo kernel e atende programas comuns por syscall (<code>DeviceIoControl</code>).</li>
+      <li>Um dos pedidos copiava bytes para um endereço escolhido pelo programa, sem conferir.</li>
+      <li>O programa manda copiar para dentro do kernel e altera os privilégios do próprio processo: controle total.</li>
+      <li>O driver tinha assinatura válida; a falha está no catálogo da CISA de vulnerabilidades exploradas desde 2022.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= Treino ================= -->
+<section class="cs" id="treino" data-grupo="Treino para o encontro" data-termos="" data-leitura="encontro,exercicios,projeto">
+  <h2>Treino para o encontro</h2>
+  <p class="cs-def">Quiz, exercícios e decisão de projeto no formato dos encontros de João Luisi. Perguntas autorais; dados marcados como exemplo não são medidas.</p>
+  <div class="cs-uso">
+    <details class="treino"><summary><span class="q">Q1 · Definição</span> Tarefa do FreeRTOS no RP2040: processo ou thread?</summary><p>Thread: pilha, registradores e estado próprios, memória comum (sem MMU).</p></details>
+    <details class="treino"><summary><span class="q">Q2 · Notação</span> q = 1 ms e s = 2 µs: overhead?</summary><p>s / (q + s) = 0,002 / 1,002 ≈ 0,2 %.</p></details>
+    <details class="treino"><summary><span class="q">Q3 · Limite</span> 4 processos, q = 10 ms, s = 0,1 ms: pior espera para voltar? A) 30 B) 30,3 C) 30,4 ms</summary><p>C. 3 × 10 + 4 × 0,1 = 30,4 ms.</p></details>
+    <details class="treino"><summary><span class="q">Q4 · Armadilha</span> Qual não existe: espera → pronto, espera → executando, executando → pronto?</summary><p>Espera → executando.</p></details>
+    <details class="treino"><summary><span class="q">Q5 · Definição</span> Em que arquitetura os drivers rodam em modo usuário?</summary><p>Microkernel.</p></details>
+    <details class="treino"><summary><span class="q">Q6 · Conta</span> ATmega328P, 4 ciclos a 16 MHz?</summary><p>0,25 µs; com o salto do vetor (7 ciclos), ≈ 0,44 µs.</p></details>
+    <details class="treino"><summary><span class="q">Q7 · Armadilha</span> "A memória virtual protege uma thread da outra no mesmo processo."</summary><p>Errado: threads do processo usam a mesma tabela de páginas.</p></details>
+    <details class="treino"><summary><span class="q">Exercício 1</span> Superloop no Uno: botão 5 µs, LEDs 40 µs, 8 bytes de EEPROM a 3,3 ms</summary>
+      <ul class="b">
+        <li>(a) 0,005 + 0,040 + 26,4 = 26,445 ms por volta; ≈ 37,8 voltas/s.</li>
+        <li>(b) Polling: até ≈ 26,4 ms. Interrupção: desvio em 0,25 µs; a ISR anota, o laço reage na volta.</li>
+        <li>(c) <code>delay(60000)</code> para o laço 60 s: botão sem resposta e aviso dos 120 s atrasado. Use <code>millis()</code>.</li>
+      </ul>
+      <p>Leitura. No superloop, o pior caso é a soma de tudo o que está no laço.</p>
+    </details>
+    <details class="treino"><summary><span class="q">Exercício 2</span> RP2040 a 125 MHz, troca de 250 ciclos, tick de 1 ms, 4 tarefas</summary>
+      <ul class="b">
+        <li>(a) s = 2 µs; overhead ≈ 0,2 %.</li>
+        <li>(b) Mesma prioridade: 3 × 1 + 4 × 0,002 = 3,008 ms. Maior prioridade: 15 + 250 = 265 ciclos ≈ 2,1 µs, mais a ISR.</li>
+        <li>(c) 3,008 ms diante de 120 s é 0,0025 %. O risco é starvation ou bloqueio: alerta na maior prioridade e watchdog.</li>
+      </ul>
+      <p>Leitura. O que derruba um requisito de 120 s é a tarefa nunca rodar; 2 µs a mais não mudam nada.</p>
+    </details>
+    <details class="treino"><summary><span class="q">Exercício 3</span> Heap de 64 KB, tarefas de 512 + 96 bytes, recursão de 40 bytes</summary>
+      <ul class="b">
+        <li>(a) 65 536 / 608 ≈ 107,8 → 107 tarefas.</li>
+        <li>(b) (512 − 64) / 40 = 11,2 → 11 níveis; o 12º usa 544 bytes, 32 além do fim.</li>
+        <li>(c) Sem MPU: os 32 bytes caem sobre outra tarefa. Guarda de 32 bytes na MPU: HardFault na hora e o watchdog reinicia. Linux: SIGSEGV só naquele processo.</li>
+      </ul>
+      <p>Leitura. Sem MPU, uma tarefa é tão isolada quanto uma thread.</p>
+    </details>
+    <details class="treino"><summary><span class="q">Projeto</span> O módulo de controle precisa de SO? O aviso dos 120 s nunca pode falhar.</summary>
+      <ul class="b">
+        <li>Perguntas: superloop, RTOS ou Linux; que atividades viram tarefa ou ISR e com que prioridade; overhead e pior espera do alerta; o que garante o aviso se uma rotina corrompida estourar a pilha; o que roda privilegiado e o que a MPU protege.</li>
+        <li>Decisão de exemplo: FreeRTOS no RP2040, alerta na maior prioridade, ISR do botão só acorda tarefas, watchdog como rede de segurança.</li>
+        <li>Abre mão da simplicidade do superloop e do isolamento do Linux; quem sente é a equipe de firmware.</li>
+        <li>Número: 26,4 ms por volta no superloop (e um <code>delay</code> basta para atrasar o aviso) contra ≈ 2,1 µs para o alerta com prioridade.</li>
+        <li>Mudaria se: o módulo precisar de tela, Wi-Fi ou atualização remota (Linux para a interface, microcontrolador para o alerta), ou se a rotina for só botão e relógio (superloop com <code>millis()</code>).</li>
+      </ul>
+    </details>
+  </div>
+  <div class="cs-ponderada">
+    <p>Na pulseira, o prazo é 5 ms por amostra, e não 120 s. Pergunta: <em>um superloop dá conta de ler o sensor a cada 10 ms enquanto o log sai por BLE, ou o trabalho precisa de tarefas com prioridade?</em></p>
+  </div>
+  <div data-ref-tbl="tbl-projeto"></div>
 </section>

@@ -1,0 +1,63 @@
+{
+  "aula": "m8/comp/04-processos-threads",
+  "data": "2026-10-21",
+  "criterio": "Rastreabilidade das fontes desta aula. Nenhuma fonte principal foi conferida integralmente: os slides do encontro ainda não existem e o livro não foi lido página a página. Não equivale a certificação de cobertura.",
+  "fontes": [
+    {
+      "id": "luisi-encontro",
+      "url": "https://drive.google.com/file/d/1xZpjGw2EloQZEmDTIUcoHX6T7KCCNIij/view",
+      "escopo": "Slides do encontro de processos e threads de João Luisi. A URL é a do encontro anterior (S02, 19/10/2026), usado como molde de formato.",
+      "acesso": "indisponivel",
+      "limitacao": "O PDF deste encontro ainda não existe. As seções encontro, exercicios e projeto são autorais, no formato do S02 (quiz, revisão com chips reais e segurança, exercícios, aplicação ao projeto). Depois do encontro, integrar o PDF com a skill integrar-notas e refazer esta matriz com as páginas."
+    },
+    {
+      "id": "luisi-s02-formato",
+      "url": "https://drive.google.com/file/d/1xZpjGw2EloQZEmDTIUcoHX6T7KCCNIij/view",
+      "escopo": "S02 - Arquitetura Fundamentos e Memoria.pdf, 37 páginas, lido inteiro como referência de formato e da rotina de vestir (slides 30–34)",
+      "acesso": "referencia-de-formato",
+      "limitacao": "O conteúdo do S02 pertence à aula 02 e está rastreado em 02-fundamentos-memoria/cobertura.json. Aqui só se reaproveitam o formato do encontro, o hardware do projeto (Cortex-M0+ a 125 MHz, ATmega328P) e a rotina de vestir com os tempos de 60 s e 120 s."
+    },
+    {
+      "id": "machado-cap5-6",
+      "url": "https://drive.google.com/file/d/1xZpjGw2EloQZEmDTIUcoHX6T7KCCNIij/view",
+      "escopo": "Machado & Maia, Arquitetura de sistemas operacionais, 5ª ed., LTC, 2013 (edição confirmada na bibliografia do slide 37 do S02). Cap. 5 Processo (p. 59–78) e cap. 6 Thread (p. 79–92), conforme a indicação do autoestudo.",
+      "acesso": "nao-verificado",
+      "limitacao": "Capítulos não fornecidos nem lidos integralmente nesta sessão. As faixas de página são indicação do autoestudo. Os termos TMU e TMK e os conceitos de contexto de hardware, contexto de software, espaço de endereçamento, estados e scheduler activations seguem a terminologia conhecida do livro, sem conferência página a página."
+    },
+    {
+      "id": "machado-cap4",
+      "url": "https://drive.google.com/file/d/1xZpjGw2EloQZEmDTIUcoHX6T7KCCNIij/view",
+      "escopo": "Machado & Maia, 5ª ed., cap. 4 · Estrutura do sistema operacional: arquiteturas monolítica, em camadas, máquina virtual e microkernel (pré-requisito assumido pelos caps. 5 e 6)",
+      "acesso": "nao-verificado",
+      "limitacao": "Entrou como caixa Base na seção antes. Conteúdo escrito a partir de conhecimento geral de SO, sem leitura do capítulo; exemplos (THE, Mach, QNX, MINIX 3, Linux) não são atribuídos ao livro."
+    },
+    {
+      "id": "rp2040-datasheet",
+      "url": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf",
+      "escopo": "Seções 1 (visão geral: 2 × Cortex-M0+, 264 kB de SRAM), 2.3.1 (SIO) e 2.4 (Cortex-M0+: configuração, 8 regiões de MPU, registradores do MPU)",
+      "acesso": "parcial",
+      "limitacao": "Conferidas só as seções citadas, no texto extraído do PDF. O datasheet não declara a latência de interrupção nem o suporte a modo não privilegiado em frase própria; a latência de 15 ciclos vem da Arm e o modo Thread não privilegiado vem do registrador CONTROL do ARMv6-M."
+    },
+    {
+      "id": "atmega328p-datasheet",
+      "url": "https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf",
+      "escopo": "Capa (32 KB flash, 2 KB SRAM, 1 KB EEPROM), 6.7.1 (resposta a interrupção: 4 ciclos no mínimo) e tabela 7-2 (gravação da EEPROM: 3,3 ms típicos). Documento 7810D, a versão automotiva do datasheet, com o mesmo núcleo AVR",
+      "acesso": "parcial",
+      "limitacao": "Conferidas só as seções citadas. A ausência de MPU e de modo privilegiado é inferida da arquitetura descrita (não há seção sobre isso); a única proteção citada são os lock bits do bootloader."
+    },
+    {
+      "id": "freertos-rp2040-port",
+      "url": "https://github.com/FreeRTOS/FreeRTOS-Kernel/tree/main/portable/ThirdParty/GCC/RP2040",
+      "escopo": "README (port SMP, um ou dois cores) e port.c (PendSV salva R4–R11; vPortStartFirstTask escreve CONTROL = 2, PSP privilegiado)",
+      "acesso": "parcial",
+      "limitacao": "Lido o código do ramo main em 21/10/2026; versões futuras podem mudar. Não há número oficial de ciclos de troca de contexto para o Cortex-M0+: os 250 ciclos dos exercícios são valor de exemplo."
+    },
+    {
+      "id": "seguranca-casos",
+      "url": "https://nvd.nist.gov/vuln/detail/CVE-2018-19320",
+      "escopo": "NVD CVE-2018-19320 (descrição e entrada no catálogo KEV da CISA em 24/10/2022); Microsoft recommended driver block rules; Chromium Multi-process Architecture; documentação de estouro de pilha do FreeRTOS",
+      "acesso": "parcial",
+      "limitacao": "Conferidos descrição e trechos principais. O passo de alterar os privilégios do processo é a técnica típica de exploração de escrita arbitrária no kernel, não um relato detalhado deste CVE. O texto completo da página do FreeRTOS não carregou na ferramenta; os nomes configCHECK_FOR_STACK_OVERFLOW e uxTaskGetStackHighWaterMark são da API documentada."
+    }
+  ]
+}

@@ -2,7 +2,7 @@
   "numero": "05",
   "titulo": "Semáforos, sincronização e deadlocks",
   "tema": "Do silício ao sistema operacional",
-  "resumo": "Race condition (condição de corrida), região crítica e exclusão mútua; soluções por hardware e por software; semáforos, monitores e troca de mensagens; produtor/consumidor, leitores e escritores, filósofos; deadlock, condições de Coffman, grafo de alocação, prevenção, algoritmo do banqueiro, detecção e recuperação.",
+  "resumo": "Race condition (condição de corrida), região crítica e exclusão mútua; soluções por hardware e por software; semáforos, monitores e troca de mensagens; produtor/consumidor, leitores e escritores, filósofos; interrupção e laço principal, spinlocks e FIFOs do RP2040; TOCTOU e Dirty COW; deadlock, condições de Coffman, grafo de alocação, prevenção, algoritmo do banqueiro, detecção e recuperação.",
   "topicos": [
     "Race condition",
     "Exclusão mútua",
@@ -10,10 +10,14 @@
     "Semáforos P/V",
     "Produtor/consumidor",
     "Monitores",
+    "Interrupção e volatile",
+    "Spinlocks do RP2040",
+    "TOCTOU e Dirty COW",
     "Deadlock e Coffman",
     "Banqueiro"
   ],
   "secoes": [
+    ["encontro", "O encontro em 15 minutos"],
     ["antes", "Antes de começar"],
     ["corrida", "Race condition"],
     ["exclusao", "Região crítica e hardware"],
@@ -21,8 +25,12 @@
     ["semaforos", "Semáforos"],
     ["classicos", "Problemas clássicos"],
     ["monitores", "Monitores e mensagens"],
+    ["reais", "Nos chips do projeto"],
+    ["seguranca", "TOCTOU e Dirty COW"],
     ["deadlock", "Deadlock"],
-    ["tratamento", "Tratar deadlock"]
+    ["tratamento", "Tratar deadlock"],
+    ["exercicios", "Exercícios do encontro"],
+    ["projeto", "Aplicação ao projeto"]
   ],
   "fontes": [
     { "tipo": "Livro", "titulo": "Machado & Maia, Arquitetura de sistemas operacionais, cap. 7 · Aplicações concorrentes e especificação de concorrência (p. 93–96)", "secao": "antes" },
@@ -33,7 +41,16 @@
     { "tipo": "Livro", "titulo": "Machado & Maia, cap. 7 · Sincronização condicional e problemas clássicos (p. 106–113)", "secao": "classicos" },
     { "tipo": "Livro", "titulo": "Machado & Maia, cap. 7 · Monitores e troca de mensagens (p. 113–120)", "secao": "monitores" },
     { "tipo": "Livro", "titulo": "Machado & Maia, cap. 7 · Deadlock (p. 120–125)", "secao": "deadlock" },
-    { "tipo": "Livro", "titulo": "Machado & Maia, cap. 7 · Prevenção, detecção e correção de deadlock (p. 120–125)", "secao": "tratamento" }
+    { "tipo": "Livro", "titulo": "Machado & Maia, cap. 7 · Prevenção, detecção e correção de deadlock (p. 120–125)", "secao": "tratamento" },
+    { "tipo": "Relato", "titulo": "Reeves (JPL) · What really happened on Mars? (relato da inversão de prioridade na Pathfinder, VxWorks)", "url": "https://www.cs.unc.edu/~anderson/teach/comp790/papers/mars_pathfinder_long_version.html", "secao": "semaforos" },
+    { "tipo": "Documentação", "titulo": "FreeRTOS · Mutexes (herança de prioridade; mutex × semáforo binário)", "url": "https://www.freertos.org/Real-time-embedded-RTOS-mutexes.html", "secao": "semaforos" },
+    { "tipo": "Documentação", "titulo": "avr-libc · util/atomic.h (ATOMIC_BLOCK, volatile não garante acesso atômico)", "url": "https://avrdudes.github.io/avr-libc/avr-libc-user-manual/group__util__atomic.html", "secao": "reais" },
+    { "tipo": "Código", "titulo": "ArduinoCore-avr · wiring.c (millis() desliga as interrupções para ler timer0_millis)", "url": "https://github.com/arduino/ArduinoCore-avr/blob/master/cores/arduino/wiring.c", "secao": "reais" },
+    { "tipo": "Datasheet", "titulo": "Raspberry Pi · RP2040 datasheet, seções 2.3.1.3 (spinlocks), 2.3.1.4 (FIFOs), 2.4.3.3 (instruções do Cortex-M0+) e 4.6.2 (leitura do timer de 64 bits)", "url": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf", "secao": "reais" },
+    { "tipo": "Documentação", "titulo": "Pico SDK · hardware_sync, pico_sync (critical_section) e pico_multicore (FIFOs)", "url": "https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#group_hardware_sync", "secao": "reais" },
+    { "tipo": "Documentação", "titulo": "Linux man-pages · access(2), nota sobre conferir antes do open", "url": "https://man7.org/linux/man-pages/man2/access.2.html", "secao": "seguranca" },
+    { "tipo": "Documentação", "titulo": "Red Hat · CVE-2016-5195 (Dirty COW)", "url": "https://access.redhat.com/security/cve/cve-2016-5195", "secao": "seguranca" },
+    { "tipo": "Código", "titulo": "Linux · commit 19be0eaf, correção do Dirty COW", "url": "https://github.com/torvalds/linux/commit/19be0eaffa3ac7d8eb6784ad9bdbc7d67ed8e619", "secao": "seguranca" }
   ],
-  "observacao": "Fonte: Machado & Maia, Arquitetura de sistemas operacionais (5ª ed., LTC), Parte II, p. 93–125. As faixas de página por seção são aproximadas. O livro chama P e V de DOWN e UP; aqui as três duplas de nomes aparecem juntas. O passo a passo do algoritmo do banqueiro segue a forma usual dos livros de SO (Tanenbaum, Silberschatz), mais detalhada que a do Machado & Maia."
+  "observacao": "Autoestudo: Machado & Maia, Arquitetura de sistemas operacionais, cap. 7; os slides de Luisi (19/10/2026, p. 37) confirmam a 5ª edição (LTC, 2013). As faixas de página por seção vêm da indicação do autoestudo e não foram conferidas contra o livro. O livro chama P e V de DOWN e UP; aqui as três duplas de nomes aparecem juntas. O passo a passo do algoritmo do banqueiro segue a forma usual dos livros de SO (Tanenbaum, Silberschatz), mais detalhada que a do Machado & Maia. As seções 8 e 9 vão além do capítulo: aplicam a sincronização aos chips do projeto e a ataques reais, com números das fontes listadas. O guia do encontro, o quiz, os exercícios e a decisão de projeto são autorais, com valores de exemplo; não são questões do professor. Os slides do encontro desta aula ainda não existem e serão integrados depois."
 }

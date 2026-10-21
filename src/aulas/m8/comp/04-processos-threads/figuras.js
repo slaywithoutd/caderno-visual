@@ -280,13 +280,13 @@ const num = (x, d = 3) => x.toLocaleString('pt-BR', { maximumFractionDigits: d }
       caixa(svg, X0 + esc(t), 30, Math.max(ws, 1.6), 40, 'rd', 1);
       t += s;
     }
-    const util = q / (q + s), espera = (n - 1) * (q + s);
+    const util = q / (q + s), espera = (n - 1) * q + n * s;
     txt(svg, X0, 92, `${i} fatias e ${Math.max(0, i - 1)} trocas nesta janela`, { tam: 11, cor: '--muted', anc: 'start' });
     const rows = [
       ['fração útil', `q / (q + s) = ${num(q)} / (${num(q)} + ${num(s, 3)}) = ${num(util * 100, 2)} %`],
       ['overhead', `s / (q + s) = ${num((1 - util) * 100, 2)} %`],
       ['trocas por segundo', `1000 / (q + s) ≈ ${num(1000 / (q + s), 0)}`],
-      ['espera até a vez voltar', `(n − 1) × (q + s) = ${n - 1} × ${num(q + s, 3)} = ${num(espera, 3)} ms`],
+      ['espera até a vez voltar', `(n − 1) × q + n × s = ${n - 1} × ${num(q)} + ${n} × ${num(s, 3)} = ${num(espera, 3)} ms`],
     ];
     out.innerHTML = rows.map((r) => `<span>${r[0]}</span><span>${esc0(r[1])}</span>`).join('');
   }

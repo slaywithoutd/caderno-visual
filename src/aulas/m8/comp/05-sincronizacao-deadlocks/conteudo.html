@@ -4,6 +4,51 @@
   <div class="hero-sym"><span>saldo = <b>101</b> ≠ 102</span><span>P(s) <b>·</b> V(s)</span><span>vazio <b>·</b> cheio <b>·</b> mutex</span><span>P1 <b>→</b> R2 <b>→</b> P2 <b>→</b> R1 <b>→</b> P1</span><span>Precisa <b>≤</b> Disponível</span></div>
 </header>
 
+<!-- ============ 0 ============ -->
+<section class="chap" id="encontro">
+ <div class="prose">
+  <span class="num">00</span>
+  <h2>O encontro em 15 minutos</h2>
+  <div class="src"><span class="base-tag">Guia de estudo · autoral</span><span class="bk">no formato dos encontros de João Luisi</span></div>
+  <p>O encontro começa com um quiz rápido do autoestudo, revisa os conceitos em chips reais com uma caixa de segurança, faz exercícios no hardware do projeto e termina numa decisão de projeto. Nesta aula, o "chip real" é o laço principal disputando variáveis com a interrupção do botão, e os dois núcleos do RP2040.</p>
+  <p>Esta seção é o caminho curto. O resto da página serve para consultar quando travar.</p>
+
+  <h3>Caminho curto</h3>
+  <p>Se o tempo é pouco, leia nesta ordem:</p>
+  <ol class="caminho">
+   <li><a href="#corrida">Race condition</a>: por que <code>x = x + 1</code> em dois fluxos perde atualizações. Todo o resto existe por causa disso.</li>
+   <li><a href="#exclusao">Região crítica e hardware</a>: os quatro requisitos, desabilitar interrupções, Test-and-Set e o custo do busy waiting.</li>
+   <li><a href="#semaforos">Semáforos</a>: P e V, mutex e contador, e a inversão de prioridade da Mars Pathfinder.</li>
+   <li><a href="#classicos">Produtor/consumidor</a>: os três semáforos, a ordem dos P e a conta N ≥ r × T.</li>
+   <li><a href="#reais">Nos chips do projeto</a>: interrupção e laço principal, a leitura rasgada do AVR e os spinlocks do RP2040.</li>
+   <li><a href="#deadlock">Deadlock</a>: as quatro condições de Coffman e o grafo de alocação.</li>
+   <li><a href="#tratamento">Tratar deadlock</a>: ordem global e o algoritmo do banqueiro, a conta mais cobrada.</li>
+  </ol>
+  <p class="depois">Pode deixar para depois: <a href="#software">Peterson e as tentativas</a> (mostram de onde vêm os quatro requisitos; na prática se usam instruções atômicas) · <a href="#monitores">monitores e mensagens</a> (monitor é semáforo que o compilador escreve por você; mensagem assíncrona é produtor/consumidor com o SO cuidando do buffer) · <a href="#seguranca">TOCTOU e Dirty COW</a> (race condition provocada de propósito: conferir e usar não podem ter uma janela entre si).</p>
+
+  <h3>Cinco ideias para levar</h3>
+  <ol class="ideias">
+   <li>Uma linha de C pode virar várias instruções. Se outro fluxo entra no meio, o resultado depende da sorte.</li>
+   <li>Região crítica curta: dentro dela só se copiam dados; o trabalho lento fica fora.</li>
+   <li>Desabilitar interrupções protege do próprio núcleo. Contra o outro núcleo, só um lock que os dois respeitam (no RP2040, o spinlock do SIO).</li>
+   <li>Semáforo dorme, spinlock gira. Girar só compensa com vários núcleos e espera curtíssima.</li>
+   <li>Deadlock precisa das quatro condições de Coffman. Pedir os locks sempre na mesma ordem quebra a espera circular, e é a prevenção mais barata.</li>
+  </ol>
+
+  <h3>Quiz de treino</h3>
+  <p>Perguntas no formato do quiz do encontro, escritas para treino. Responda de cabeça e abra para conferir.</p>
+  <details class="treino"><summary><span class="q">Q1 · Definição</span> Race condition exige o quê? A) duas threads lendo a mesma variável B) um dado compartilhado, pelo menos uma escrita e resultado que depende da ordem C) dois núcleos</summary><p>B. Só ler junto não estraga nada, e um núcleo basta: a interrupção ou o escalonador entram no meio do LOAD, ADD, STORE.</p></details>
+  <details class="treino"><summary><span class="q">Q2 · Notação</span> Semáforo com s = 1, na versão em que s pode ficar negativo. Três threads fazem P(s) e ninguém faz V. Quanto vale s e quantas estão na fila?</summary><p>s = 1 − 3 = −2. Uma passou; |−2| = 2 dormem na fila.</p></details>
+  <details class="treino"><summary><span class="q">Q3 · Limite</span> No RP2040, desabilitar as interrupções garante exclusão mútua? A) sim B) só entre a interrupção e o laço do mesmo núcleo C) nunca</summary><p>B. O outro núcleo roda o próprio código sem precisar de interrupção nenhuma. Entre núcleos, use um spinlock do SIO ou mensagens pela FIFO.</p></details>
+  <details class="treino"><summary><span class="q">Q4 · Conta</span> Banqueiro com 8 instâncias. Alocado (2, 3, 1), Máximo (6, 4, 5). O estado é seguro?</summary><p>Disponível = 8 − (2 + 3 + 1) = 2. Precisa = (4, 1, 4). P2: 1 ≤ 2, livre = 2 + 3 = 5. P1: 4 ≤ 5, livre = 5 + 2 = 7. P3: 4 ≤ 7, livre = 8. Seguro, sequência ⟨P2, P1, P3⟩.</p></details>
+  <details class="treino"><summary><span class="q">Q5 · Armadilha</span> Ciclo no grafo de alocação é sempre deadlock?</summary><p>Só se cada recurso tiver uma instância. Com várias, um processo de fora do ciclo pode devolver uma instância e desfazer a espera.</p></details>
+  <details class="treino"><summary><span class="q">Q6 · Armadilha</span> Declarar a variável como <code>volatile</code> resolve a race entre a interrupção e o laço?</summary><p>Não. volatile obriga o compilador a ler da memória toda vez. Ele não junta LOAD, ADD e STORE numa instrução, nem os 4 bytes de um <code>long</code> no AVR. Falta a região crítica.</p></details>
+  <details class="treino"><summary><span class="q">Q7 · Segurança</span> O que é TOCTOU, e por que repetir o ataque milhões de vezes ajuda o atacante?</summary><p>Time-of-check to time-of-use: o programa confere uma coisa e só depois a usa; se ela muda entre os dois passos, a conferência valeu para outra. A janela é curta, então o atacante repete até o escalonador intercalar do jeito que ele quer.</p></details>
+ </div>
+</section>
+
+<hr class="sep">
+
 <!-- ============ 1 ============ -->
 <section class="chap" id="antes">
  <div class="prose">
@@ -117,7 +162,7 @@ def soma(n):
 ts = [threading.Thread(target=soma, args=(1_000_000,)) for _ in range(2)]
 for t in ts: t.start()
 for t in ts: t.join()
-print(contador)                # esperado 2000000; em muitas versões sai menos
+print(contador)                # esperado 2000000; pode sair menos
 
 trava = threading.Lock()
 def soma_segura(n):
@@ -126,6 +171,7 @@ def soma_segura(n):
         with trava:            # só uma thread por vez dentro deste bloco
             contador += 1</code></pre>
   <ul class="b">
+    <li>Quanto sai depende da versão do Python e da sorte: há versões em que quase sempre dá 2000000. Um resultado certo não prova que o código está certo; a race continua lá.</li>
     <li>Com o lock (<code>Lock</code>), o resultado é sempre 2000000. O custo: as duas threads passam a se revezar nesse trecho, e o programa fica mais lento.</li>
     <li>A terceira aba da Figura 1 ("Com mutex") mostra o que o lock faz por dentro.</li>
   </ul>
@@ -170,7 +216,8 @@ def soma_segura(n):
   <ul class="b">
     <li>O escalonador só tira uma thread da CPU porque chega uma interrupção (o relógio, o fim de uma E/S). Se a thread <b>desabilitar as interrupções</b> ao entrar e habilitar ao sair, ninguém a interrompe no meio.</li>
     <li>Problema 1: só funciona com uma CPU. Com dois cores, a outra thread roda no outro core sem precisar de interrupção nenhuma.</li>
-    <li>Problema 2: é perigoso. Se o programa esquecer de reabilitar (ou entrar num laço infinito), o sistema inteiro para. Por isso só o kernel pode usar essa instrução, e só por poucas instruções.</li>
+    <li>Problema 2: é perigoso. Se o programa esquecer de reabilitar (ou entrar num laço infinito), o sistema inteiro para. Por isso, num SO com modo usuário, só o kernel pode usar essa instrução, e só por poucas instruções.</li>
+    <li>Num microcontrolador sem SO, o firmware roda com todos os privilégios e usa esse truque o tempo todo, pelo mesmo motivo e com a mesma regra de ser curto. A seção <a href="#reais">Nos chips do projeto</a> mostra como.</li>
   </ul>
 
   <h3>Solução 2 de hardware: instruções atômicas</h3>
@@ -276,7 +323,7 @@ void sair_rc(int i) {
  <div class="prose">
   <span class="num">05</span>
   <h2>Semáforos</h2>
-  <div class="src"><span class="bk">Machado &amp; Maia · cap. 7 · p. 108–113</span></div>
+  <div class="src"><span class="bk">Machado &amp; Maia · cap. 7 · p. 108–113</span><a class="vd" href="https://www.cs.unc.edu/~anderson/teach/comp790/papers/mars_pathfinder_long_version.html" target="_blank" rel="noopener">Reeves (JPL) · Pathfinder ↗</a><a class="vd" href="https://www.freertos.org/Real-time-embedded-RTOS-mutexes.html" target="_blank" rel="noopener">FreeRTOS · mutexes ↗</a></div>
 <aside class="mn loop" data-loop="estacionamento" data-ms="11000" data-still="0.42" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Placar de vagas: cada carro que entra faz P, cada um que sai faz V. Com 0 vagas, o próximo espera na cancela.</aside>
   <p>Exemplo antes da regra: um estacionamento com 3 vagas e um placar na entrada. Cada carro que entra diminui o placar; cada um que sai aumenta. Com o placar em 0, o próximo carro espera na cancela, parado, sem dar voltas no quarteirão. Quando alguém sai, a cancela libera um da fila.</p>
   <div class="def key">
@@ -287,7 +334,7 @@ void sair_rc(int i) {
       <li><code>P(s)</code>: se <code>s &gt; 0</code>, faz <code>s ← s − 1</code> e segue; senão, o processo bloqueia e entra na fila de s.</li>
       <li><code>V(s)</code>: se há processo na fila, acorda um deles (que segue em frente); senão, faz <code>s ← s + 1</code>.</li>
     </ul>
-    <p class="nota-formal">P vem do holandês <i>proberen</i> (testar) e V de <i>verhogen</i> (incrementar). O Machado &amp; Maia chama de DOWN e UP; outros livros, de <code>wait</code> e <code>signal</code>. São as mesmas duas operações.</p>
+    <p class="nota-formal">P e V são iniciais de palavras holandesas. A leitura mais comum é <i>proberen</i> (testar) para P e <i>verhogen</i> (aumentar) para V; o próprio Dijkstra explicou o P de mais de um jeito. O Machado &amp; Maia chama de DOWN e UP; outros livros, de <code>wait</code> e <code>signal</code>. São as mesmas duas operações.</p>
   </div>
   <ul class="b">
     <li>A dupla <b>P e V</b> é atômica: o SO garante que dois P no mesmo semáforo não se intercalam. Para isso ele usa, por pouquíssimas instruções, as soluções da seção 3 (desabilita interrupções ou usa Test-and-Set).</li>
@@ -352,19 +399,21 @@ sem_post(&amp;m);          /* V */</code></pre>
       <li>Esquecer o V: o lock nunca é devolvido e todo mundo que vier depois bloqueia para sempre.</li>
       <li>Trocar a ordem (V antes de P): a exclusão mútua some.</li>
       <li>Fazer P duas vezes no mesmo mutex na mesma thread: ela bloqueia esperando a si mesma.</li>
-      <li>Pegar dois semáforos em ordens diferentes em threads diferentes: deadlock (seção 8).</li>
+      <li>Pegar dois semáforos em ordens diferentes em threads diferentes: deadlock (seção 10).</li>
     </ul>
   </div>
 
   <h3>Inversão de prioridade</h3>
 <aside class="mn" id="mn-inversao" aria-hidden="true"><svg viewBox="0 0 240 160"><text class="tm st" x="4" y="22">alta</text><text class="tm st" x="4" y="62">média</text><text class="tm st" x="4" y="102">baixa</text><line class="s" x1="44" y1="130" x2="236" y2="130" marker-end="url(#mnarrow)"/><text class="tm" x="210" y="146">tempo</text><rect class="bl" x="48" y="92" width="34" height="20" rx="3"/><text class="tm" x="65" y="102">P(m)</text><rect class="rd" x="84" y="12" width="20" height="20" rx="3"/><rect class="k" x="104" y="12" width="122" height="20" rx="3" stroke-dasharray="3 3"/><text class="tm" x="165" y="22">esperando m</text><rect class="am" x="106" y="52" width="94" height="20" rx="3"/><text class="tm" x="153" y="62">roda à vontade</text><rect class="bl" x="200" y="92" width="26" height="20" rx="3"/><text class="tm" x="213" y="102">V</text></svg>A alta espera a baixa, e a média, que nem usa m, passa na frente das duas.</aside>
-  <p>Um caso famoso de semáforo dando errado: a sonda Mars Pathfinder, em 1997, reiniciava sozinha em Marte. Era isto, com três threads de prioridades diferentes (o escalonador sempre roda a de maior prioridade pronta; a aula 06 detalha):</p>
+  <p>Um caso famoso de semáforo dando errado: a sonda Mars Pathfinder, em 1997, reiniciava o computador sozinha em Marte. Era isto, com três níveis de prioridade (o escalonador sempre roda a thread de maior prioridade pronta; a aula 06 detalha):</p>
   <ul class="b">
     <li>A thread de prioridade baixa pega o mutex m.</li>
     <li>A de prioridade alta acorda, pede m e bloqueia: precisa esperar a baixa fazer V.</li>
     <li>Uma de prioridade média, que nem usa m, acorda e toma a CPU da baixa. A baixa não roda, não solta m, e a alta fica esperando a média.</li>
     <li>Isso é a <b>inversão de prioridade</b>: na prática, a alta passa a ter prioridade menor que a média.</li>
-    <li>Correção usada (e ligada na Pathfinder por um comando enviado da Terra): <b>herança de prioridade</b>. Enquanto segura um mutex que alguém mais importante espera, a thread baixa herda a prioridade dele e termina logo.</li>
+    <li>Na sonda, o SO era o VxWorks. A baixa era a tarefa de dados meteorológicos; a alta, a que distribuía os dados no barramento; o mutex protegia um mecanismo de comunicação entre tarefas (pipes) do VxWorks. Uma tarefa de prioridade ainda maior conferia, a cada ciclo do barramento, se a alta tinha terminado. Não tinha: o sistema declarava erro e reiniciava.</li>
+    <li>A correção: <b>herança de prioridade</b>. Enquanto segura um mutex que alguém mais importante espera, a thread baixa herda a prioridade dele e termina logo. O VxWorks já oferecia a opção; a equipe enviou da Terra um patch que mudou o parâmetro de criação daquele mutex para ligá-la.</li>
+    <li>Hoje os RTOS trazem isso pronto: no FreeRTOS, o mutex tem herança de prioridade e o semáforo binário não. Por isso a documentação recomenda mutex para exclusão mútua e semáforo binário para sinalizar.</li>
   </ul>
   <div class="def"><span class="lab">Na ponderada · pulseira</span><p>Exemplo diferente: num drone, a thread de controle (alta) e a de telemetria (baixa) dividem um mutex; a câmera (média) não usa o mutex e processa imagens por 30 ms. Se a câmera acordar enquanto a telemetria segura o mutex, o controle espera até 30 ms a mais. Na pulseira, você vai ter de dizer se a thread do BLE pode segurar algo de que a do sensor precisa, e o que acontece com os 5 ms se outra thread ocupar a CPU nesse meio-tempo.</p></div>
  </div>
@@ -478,12 +527,12 @@ void consumidor(void) {
 <aside class="mn loop" data-loop="filosofos" data-ms="12000" data-still="0.3" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Primeiro todos pegam o garfo da esquerda e ninguém come. Depois, com uma regra de ordem, dois comem por vez.</aside>
   <ul class="b">
     <li>O <b>jantar dos filósofos</b> (Dijkstra): cinco filósofos numa mesa redonda alternam entre pensar e comer. Há um garfo entre cada par de vizinhos, cinco no total, e para comer é preciso pegar os dois garfos ao seu lado.</li>
-    <li>Solução ingênua: cada um pega o garfo da esquerda e depois o da direita. Se os cinco pegam o da esquerda no mesmo instante, todos esperam o da direita para sempre. É um deadlock (seção 8).</li>
+    <li>Solução ingênua: cada um pega o garfo da esquerda e depois o da direita. Se os cinco pegam o da esquerda no mesmo instante, todos esperam o da direita para sempre. É um deadlock (seção 10).</li>
     <li>Saídas que o livro discute:
       <ul class="b">
         <li>Deixar no máximo quatro sentados ao mesmo tempo (um semáforo contador começando em 4). Com um lugar vazio, pelo menos um consegue os dois garfos.</li>
         <li>Pegar os dois garfos de uma vez, dentro de uma região crítica: ou pega os dois, ou nenhum.</li>
-        <li>Quebrar a simetria: um dos filósofos pega primeiro o da direita. É a ordem global da seção 9.</li>
+        <li>Quebrar a simetria: um dos filósofos pega primeiro o da direita. É a ordem global da seção 11.</li>
       </ul>
     </li>
   </ul>
@@ -560,9 +609,173 @@ class BufferLimitado:                 # um monitor feito à mão
 <hr class="sep">
 
 <!-- ============ 8 ============ -->
-<section class="chap" id="deadlock">
+<section class="chap" id="reais">
  <div class="prose">
   <span class="num">08</span>
+  <h2>Nos chips do projeto: interrupção, AVR e os dois núcleos do RP2040</h2>
+  <div class="src"><span class="base-tag">Base · fora dos autoestudos</span><a class="vd" href="https://avrdudes.github.io/avr-libc/avr-libc-user-manual/group__util__atomic.html" target="_blank" rel="noopener">avr-libc · util/atomic.h ↗</a><a class="vd" href="https://github.com/arduino/ArduinoCore-avr/blob/master/cores/arduino/wiring.c" target="_blank" rel="noopener">Arduino · millis() ↗</a><a class="vd" href="https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf" target="_blank" rel="noopener">Datasheet RP2040 · 2.3.1, 2.4.3, 4.6 ↗</a><a class="vd" href="https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#group_hardware_sync" target="_blank" rel="noopener">Pico SDK · hardware_sync ↗</a></div>
+  <p>O livro fala de threads num SO. No módulo de controle do projeto não há SO: há um laço principal que roda para sempre e uma rotina de interrupção que o botão dispara. O problema é o mesmo da seção 2, com outro nome.</p>
+
+  <h3>O laço e a interrupção dividem uma variável</h3>
+<aside class="mn" id="mn-isr" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="bl" x="4" y="8" width="118" height="26" rx="5"/><text x="63" y="21">LOAD apertos</text><line class="s" x1="63" y1="34" x2="63" y2="72" stroke-dasharray="3 3"/><rect class="bl" x="4" y="74" width="118" height="26" rx="5"/><text x="63" y="87">STORE apertos, 0</text><rect class="am" x="150" y="40" width="86" height="28" rx="5"/><text x="193" y="54">botão: +1</text><line class="s" x1="148" y1="54" x2="70" y2="54" marker-end="url(#mnarrow)"/><text class="tm" x="193" y="80">interrupção</text><rect class="k" x="40" y="114" width="160" height="30" rx="6"/><text x="120" y="129">apertos = 0: o +1 sumiu</text></svg>A interrupção entra entre o LOAD e o STORE do laço. É a atualização perdida, sem thread nenhuma.</aside>
+  <ul class="b">
+    <li>A interrupção (aula 04) para o programa entre duas instruções, roda a rotina de interrupção e volta. Para o laço principal, é como se outra thread tivesse rodado no meio dele.</li>
+    <li>Uma <b>variável compartilhada com a interrupção</b> é escrita por um lado e lida pelo outro. Ex.: a rotina do botão faz <code>apertos = apertos + 1</code>; o laço lê <code>apertos</code>, trata e zera.</li>
+    <li>Se o laço lê <code>apertos</code>, a interrupção soma 1 e o laço grava o 0, o aperto sumiu. É a atualização perdida da seção 2.</li>
+    <li>A região crítica do laço é o trecho entre ler e zerar. A rotina de interrupção não precisa de proteção: enquanto ela roda, o laço está parado.</li>
+  </ul>
+<pre><code>volatile uint8_t apertos = 0;          /* escrito pela interrupção, lido pelo laço */
+
+void isr_botao(void) {                 /* roda a cada aperto */
+    apertos = apertos + 1;
+}
+
+int main(void) {
+    for (;;) {                         /* laço principal */
+        uint32_t ant = save_and_disable_interrupts();   /* entra: desliga as interrupções */
+        uint8_t n = apertos;                             /* só copia */
+        apertos = 0;
+        restore_interrupts(ant);                         /* sai: volta ao estado de antes */
+        if (n &gt; 0) avancar_rotina(n);                  /* o trabalho fica fora */
+    }
+}</code></pre>
+
+  <h3>volatile não é lock</h3>
+  <ul class="b">
+    <li><b>volatile</b> é uma palavra do C que avisa o compilador: "esta variável muda por fora do código que você está vendo". Ele passa a ler da memória toda vez, em vez de guardar uma cópia num registrador.</li>
+    <li>Sem volatile, o compilador pode ler <code>apertos</code> uma vez antes do laço e nunca mais: o laço não vê o botão. Com volatile, vê.</li>
+    <li>O que volatile não faz: juntar LOAD, ADD e STORE numa instrução só, nem impedir a interrupção de entrar no meio. A documentação da avr-libc diz exatamente isso: volatile impede o compilador de sumir com os acessos, mas não garante acesso atômico.</li>
+  </ul>
+
+  <h3>AVR: uma variável, várias leituras</h3>
+  <ul class="b">
+    <li>O ATmega328P do Arduino Uno é de 8 bits: cada instrução de leitura traz 1 byte. Um <code>int</code> (16 bits) pede 2 leituras; um <code>unsigned long</code> (32 bits), 4. O slide 11 de 19/10 mostrou o <code>int</code> ocupando dois registradores.</li>
+    <li>Se a interrupção muda a variável entre a primeira e a última leitura, o laço monta um número com bytes de antes e bytes de depois. Isso é uma <b>leitura rasgada</b> (torn read): um valor que a variável nunca teve.</li>
+    <li>Com números pequenos: um contador de 16 bits vale 255 = 0x00FF. O laço lê o byte baixo, 0xFF. A interrupção soma 1: agora vale 256 = 0x0100. O laço lê o byte alto, 0x01. Resultado: 0x01FF = 511. O certo era 255 ou 256.</li>
+    <li>O próprio Arduino se protege: <code>millis()</code> desliga as interrupções enquanto copia o contador de milissegundos (<code>timer0_millis</code>, um <code>volatile unsigned long</code>) e depois restaura o estado anterior. O comentário no código avisa que, sem isso, a leitura pode sair inconsistente.</li>
+    <li>Na avr-libc, a forma pronta é <code>ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { copia = contador; }</code>: desliga as interrupções, copia e devolve o estado que estava.</li>
+    <li>Um byte (<code>uint8_t</code>) se lê numa instrução só, então a leitura dele não rasga. Mas <code>apertos = apertos + 1</code> continua sendo ler, somar e gravar.</li>
+    <li>No RP2040 o mesmo problema aparece no relógio. O contador de microssegundos tem 64 bits e o barramento, 32: lê-se em duas partes. O hardware trava a parte alta quando você lê a baixa, mas o datasheet (seção 4.6.2) avisa que isso falha se os dois núcleos, ou a interrupção e o laço, lerem ao mesmo tempo. O <code>time_us_64()</code> do Pico SDK lê outro par de registradores, sem trava, e por isso pode ser chamado dos dois núcleos ao mesmo tempo.</li>
+  </ul>
+
+  <h3>Desabilitar interrupções num núcleo só</h3>
+  <ul class="b">
+    <li>Com um núcleo e sem SO, desligar as interrupções é a região crítica mais simples que existe: a rotina do botão não roda, então o laço não é interrompido. No Cortex-M0+ é a instrução <code>CPSID i</code>, de 1 ciclo (datasheet do RP2040, tabela 81); no AVR, <code>cli</code>.</li>
+    <li>Enquanto elas estão desligadas, o botão espera. Esse tempo soma no pior caso de resposta (a latência de interrupção da <a href="/m8/comp/03-pipelines-paralelismo#reais">aula 03</a>). Por isso a regra do código acima: dentro, só copiar; fora, trabalhar.</li>
+  </ul>
+
+  <h3>Dois núcleos: o RP2040</h3>
+  <ul class="b">
+    <li>O RP2040 tem dois Cortex-M0+ (<a href="/m8/comp/03-pipelines-paralelismo#reais">aula 03</a>). Desligar as interrupções no núcleo 0 não para o núcleo 1: ele roda o próprio código sem precisar de interrupção. É o problema 1 da seção 3, agora no chip do projeto.</li>
+    <li>A saída de sempre seria uma instrução atômica. Nos ARM maiores (ARMv7-M, como o Cortex-M3 e o M4), ela é o par <b>LDREX/STREX</b>: LDREX lê o endereço e o marca; STREX só grava se ninguém mexeu nele desde a marca, e devolve "falhei" para o programa tentar de novo.</li>
+    <li>O Cortex-M0+ segue a arquitetura ARMv6-M, que não tem LDREX/STREX nem Test-and-Set. A lista completa das instruções dele está na tabela 81 do datasheet do RP2040, e nenhuma lê e grava a memória numa operação só.</li>
+    <li>Por isso o RP2040 põe a trava fora da CPU: 32 <b>spinlocks de hardware</b> no <b>SIO</b>, o bloco ligado direto aos dois núcleos. Cada spinlock é 1 bit num endereço próprio (seção 2.3.1.3 do datasheet):
+      <ul class="b">
+        <li>ler o endereço tenta pegar a trava: volta diferente de zero se conseguiu, zero se já estava com alguém;</li>
+        <li>escrever qualquer valor solta a trava;</li>
+        <li>se os dois núcleos tentam no mesmo ciclo, o núcleo 0 ganha.</li>
+      </ul>
+    </li>
+    <li>É um Test-and-Set feito pelo SIO em vez da CPU. Quem espera gira, então o datasheet recomenda usá-los só em regiões críticas curtas, por dentro de mutex, semáforos e filas.</li>
+  </ul>
+<pre><code>#include "hardware/sync.h"
+
+spin_lock_t *trava = spin_lock_init(spin_lock_claim_unused(true));   /* reserva um dos 32 */
+
+uint32_t ant = spin_lock_blocking(trava);  /* desliga as interrupções DESTE núcleo e gira até pegar */
+estado.passo = proximo;                    /* região crítica: só copiar dados */
+spin_unlock(trava, ant);                   /* solta e restaura as interrupções */</code></pre>
+  <ul class="b">
+    <li>Repare que <code>spin_lock_blocking</code> desliga as interrupções do núcleo que pega a trava (a documentação do SDK diz isso). Sem isso, a rotina do botão poderia rodar no meio da região crítica e o outro núcleo giraria esse tempo todo. Se a própria rotina tentasse pegar a mesma trava, giraria para sempre esperando a si mesma.</li>
+    <li>O SDK junta as duas proteções em <code>critical_section_enter_blocking</code> e <code>critical_section_exit</code>, descritas como seguras contra interrupção e contra o outro núcleo.</li>
+  </ul>
+
+  <h3>Conversar sem dividir variável: as FIFOs</h3>
+  <ul class="b">
+    <li>O SIO também tem duas FIFOs, uma em cada sentido, cada uma com 8 posições de 32 bits (seção 2.3.1.4). O núcleo 0 só escreve numa e só lê da outra.</li>
+    <li>É a troca de mensagens da seção 7 dentro do chip: <code>multicore_fifo_push_blocking(x)</code> é o send e <code>multicore_fifo_pop_blocking()</code>, o receive. Com a FIFO cheia o push espera; vazia, o pop espera. Um produtor/consumidor com N = 8.</li>
+    <li>Pegadinha do SDK: ele mesmo usa as FIFOs para ligar o núcleo 1 e no <code>multicore_lockout</code>; quem usa lockout não pode usar as FIFOs para mais nada.</li>
+  </ul>
+ </div>
+  <div class="tbl prose" id="tbl-protecao">
+    <table>
+      <thead><tr><th>Onde</th><th>O que rasga ou se perde</th><th>Como proteger</th></tr></thead>
+      <tbody>
+        <tr><td>ATmega328P (8 bits, 1 núcleo), laço e interrupção</td><td>ler um <code>int</code> (2 bytes) ou <code>long</code> (4 bytes); qualquer <code>x = x + 1</code></td><td><code>cli</code> ou <code>ATOMIC_BLOCK</code> por poucas instruções</td></tr>
+        <tr><td>RP2040, laço e interrupção no mesmo núcleo</td><td><code>x = x + 1</code> (ler, somar, gravar); o relógio de 64 bits lido em duas partes</td><td><code>save_and_disable_interrupts</code> e <code>restore_interrupts</code></td></tr>
+        <tr><td>RP2040, os dois núcleos</td><td>qualquer dado que os dois escrevem; desligar interrupções num núcleo não para o outro</td><td>spinlock do SIO (<code>spin_lock_blocking</code>), <code>critical_section</code>, ou mensagens pela FIFO</td></tr>
+        <tr><td>FreeRTOS, entre tarefas</td><td>o mesmo, com o escalonador trocando de tarefa</td><td>mutex do FreeRTOS (tem herança de prioridade); numa interrupção, nunca mutex, só as funções terminadas em <code>FromISR</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+ <div class="prose">
+  <div class="def warn">
+    <span class="lab">Armadilhas frequentes</span>
+    <ul class="b">
+      <li>Errado: "<code>volatile</code> torna a variável atômica". Certo: volatile só faz o compilador ler e gravar na memória toda vez; a região crítica continua necessária.</li>
+      <li>Errado: "desligar interrupções protege o dado no RP2040". Certo: protege do próprio núcleo; o outro núcleo precisa respeitar um spinlock do SIO.</li>
+      <li>Errado: "variável de 32 bits é lida de uma vez em qualquer chip". Certo: no AVR de 8 bits são 4 leituras, e o meio delas pode ser interrompido.</li>
+    </ul>
+  </div>
+  <ul class="b">
+    <li>Recapitulando: interrupção e laço são dois fluxos; dentro de um núcleo, desligar as interrupções por poucas instruções resolve; entre núcleos, spinlock do SIO ou mensagens.</li>
+  </ul>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 9 ============ -->
+<section class="chap" id="seguranca">
+ <div class="prose">
+  <span class="num">09</span>
+  <h2>Segurança: race condition provocada de propósito</h2>
+  <div class="src"><span class="base-tag">Base · fora dos autoestudos</span><a class="vd" href="https://man7.org/linux/man-pages/man2/access.2.html" target="_blank" rel="noopener">man access(2) ↗</a><a class="vd" href="https://access.redhat.com/security/cve/cve-2016-5195" target="_blank" rel="noopener">Red Hat · CVE-2016-5195 ↗</a><a class="vd" href="https://github.com/torvalds/linux/commit/19be0eaffa3ac7d8eb6784ad9bdbc7d67ed8e619" target="_blank" rel="noopener">Linux · commit da correção ↗</a></div>
+  <p>Até aqui a race condition era azar. Um atacante pode provocá-la: ele não precisa acertar a janela de primeira, só repetir a operação até o escalonador intercalar do jeito que ele quer.</p>
+
+  <h3>TOCTOU: conferir e usar em dois passos</h3>
+<aside class="mn" id="mn-toctou" aria-hidden="true"><svg viewBox="0 0 240 130"><text class="tm st" x="2" y="30">programa</text><text class="tm st" x="2" y="88">atacante</text><rect class="gr" x="58" y="16" width="56" height="24" rx="4"/><text x="86" y="28">confere</text><rect class="k" x="114" y="10" width="62" height="36" rx="3" stroke-dasharray="3 3"/><text class="tm" x="145" y="28">janela</text><rect class="rd" x="176" y="16" width="56" height="24" rx="4"/><text x="204" y="28">usa</text><rect class="am" x="118" y="74" width="54" height="26" rx="4"/><text x="145" y="87">troca</text><line class="s" x1="145" y1="74" x2="145" y2="50" marker-end="url(#mnarrow)"/><line class="s" x1="2" y1="114" x2="234" y2="114" marker-end="url(#mnarrow)"/><text class="tm" x="212" y="126">tempo</text></svg>O atacante só precisa caber na janela entre conferir e usar.</aside>
+  <ul class="b">
+    <li><b>TOCTOU</b> (time-of-check to time-of-use) é a race entre conferir uma coisa e usá-la. Se ela pode mudar entre os dois passos, a conferência valeu para outra.</li>
+    <li>Exemplo clássico do Unix, descrito no manual da syscall <code>access</code>: um programa que roda com o privilégio do root quer abrir um arquivo em nome de um usuário comum. Ele confere com <code>access(arq)</code> se o usuário pode escrever ali e depois faz <code>open(arq)</code>.
+      <ul class="b">
+        <li>1. O usuário cria <code>/tmp/meu</code>, que é dele. O <code>access</code> diz que pode.</li>
+        <li>2. Antes do <code>open</code>, ele troca <code>/tmp/meu</code> por um atalho (link simbólico) para <code>/etc/passwd</code>.</li>
+        <li>3. O programa abre "<code>/tmp/meu</code>", que agora leva a <code>/etc/passwd</code>, com privilégio de root.</li>
+      </ul>
+    </li>
+    <li>A decisão explorada: conferir e usar são duas syscalls separadas, e o nome do arquivo é resolvido duas vezes. Entre elas, o escalonador pode rodar o atacante.</li>
+    <li>Mitigação: não separar os passos. O manual recomenda evitar esse uso do <code>access</code> e sugere abrir o arquivo já com a identidade do usuário, deixando o próprio <code>open</code> conferir. Depois de aberto, o descritor aponta sempre para o mesmo arquivo.</li>
+    <li>No módulo de controle, o mesmo padrão aparece se o firmware confere a rotina recebida (a regra da <a href="/m8/comp/02-fundamentos-memoria#fundamentos-presencial">aula 02</a>: nenhuma espera sem limite antes de AVISA) e depois a executa direto do buffer do rádio, que ainda pode ser reescrito. Copie para uma área que só o interpretador toca, confira a cópia e execute a cópia.</li>
+  </ul>
+
+  <h3>Dirty COW (CVE-2016-5195)</h3>
+  <ul class="b">
+    <li>Base: <b>copy-on-write</b> (COW). Quando um processo mapeia um arquivo só para si (mapeamento privado), o kernel não copia nada no começo: o processo enxerga as páginas do próprio arquivo. Só quando ele tenta escrever, o kernel faz uma cópia da página, e a escrita vai para a cópia. O arquivo não muda.</li>
+    <li>O ataque usa duas threads do mesmo processo sobre um arquivo que o usuário só pode ler (por exemplo, um arquivo do root):
+      <ul class="b">
+        <li>1. O processo mapeia o arquivo como privado e só de leitura.</li>
+        <li>2. A thread A escreve nesse endereço sem parar, por um caminho do kernel que permite escrever na cópia privada (<code>/proc/self/mem</code>).</li>
+        <li>3. A thread B, ao mesmo tempo, chama <code>madvise(MADV_DONTNEED)</code> sem parar: "kernel, pode jogar fora esta página".</li>
+        <li>4. Se a cópia é jogada fora entre o kernel decidir que já pode escrever e a escrita acontecer, o kernel busca a página de novo e, por um atalho no código, aceita a página original. A escrita cai no arquivo de verdade.</li>
+      </ul>
+    </li>
+    <li>O código de demonstração público repete cada laço 100 milhões de vezes: a janela é estreita, mas o atacante tem tempo.</li>
+    <li>Resultado, nas palavras da Red Hat: um usuário local sem privilégio ganha escrita em mapeamentos só de leitura e, com isso, sobe de privilégio.</li>
+    <li>É um TOCTOU dentro do kernel: conferir ("a cópia existe") e usar ("escrever nela") em dois momentos, com outra thread mexendo na página no meio. A correção, de outubro de 2016, mudou essa conferência; o commit conta que uma tentativa de corrigir a mesma race tinha sido feita onze anos antes. A mitigação para quem usa é atualizar o kernel.</li>
+  </ul>
+  <ul class="b">
+    <li>Recapitulando: race condition vira falha de segurança quando conferir e usar são passos separados e o atacante controla o tempo. A defesa é tornar os dois passos um só, ou conferir o que você vai de fato usar.</li>
+  </ul>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 10 ============ -->
+<section class="chap" id="deadlock">
+ <div class="prose">
+  <span class="num">10</span>
   <h2>Deadlock</h2>
   <div class="src"><span class="bk">Machado &amp; Maia · cap. 7 · p. 120–122</span></div>
 <aside class="mn loop" data-loop="cruzamento" data-ms="9000" data-still="0.75" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Quatro carros, cada um no quadrante que o próximo precisa. Ninguém volta de ré: travou.</aside>
@@ -654,10 +867,10 @@ P(rede);     /* espera B */ P(arquivo);   /* espera A */
 
 <hr class="sep">
 
-<!-- ============ 9 ============ -->
+<!-- ============ 11 ============ -->
 <section class="chap" id="tratamento">
  <div class="prose">
-  <span class="num">09</span>
+  <span class="num">11</span>
   <h2>Tratar deadlock: ignorar, prevenir, evitar, detectar</h2>
   <div class="src"><span class="bk">Machado &amp; Maia · cap. 7 · p. 122–125</span></div>
   <p>Há quatro atitudes possíveis, da mais barata à mais trabalhosa. Cada uma age num momento diferente: antes de escrever o sistema, a cada pedido, ou depois que o problema aconteceu.</p>
@@ -697,7 +910,7 @@ P(rede);     /* espera B */ P(arquivo);   /* espera A */
  <div class="prose">
   <ul class="b">
     <li>Na prática, a mais usada é a última: <b>ordenação de recursos</b>. Se todo mundo pede R1 antes de R2 antes de R3, nenhuma seta do grafo volta para trás e não há como fechar um ciclo. A terceira aba da Figura 4 mostra isso.</li>
-    <li>No exemplo de A e B da seção 8, basta as duas pegarem <code>arquivo</code> antes de <code>rede</code>.</li>
+    <li>No exemplo de A e B da seção 10, basta as duas pegarem <code>arquivo</code> antes de <code>rede</code>.</li>
   </ul>
 
   <h3>Evitar: estado seguro</h3>
@@ -791,5 +1004,117 @@ print(seguro(2, [4, 2, 2], [9, 4, 7]))   # (False, ['P2'])</code></pre>
     <li>Cuidado com starvation: se a mesma vítima for escolhida sempre, ela nunca termina. Conte quantas vezes cada um foi vítima.</li>
   </ul>
   <div class="def"><span class="lab">Na ponderada · pulseira</span><p>Cada estratégia age num momento diferente, e isso pesa quando o prazo é curto. Exemplo diferente: num marca-passo, "detectar e reiniciar" leva o tempo de detectar mais o de reiniciar, e o coração não espera. A ponderada pede que você escolha uma estratégia para a pulseira, com prazo de 5 ms por amostra, e justifique com o custo dela: quando ela age, quanto tempo pode custar, e o que a pessoa sente se falhar.</p></div>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 12 ============ -->
+<section class="chap" id="exercicios">
+ <div class="prose">
+  <span class="num">12</span>
+  <h2>Exercícios no estilo do encontro</h2>
+  <div class="src"><span class="base-tag">Treino · autoral</span><span class="bk">valores de exemplo no hardware do projeto</span></div>
+  <p>Três exercícios de treino, do mecânico ao aberto, com os chips do projeto. Os tempos do rádio são de exemplo; os números do hardware vêm das fontes da seção 8. Tente antes de abrir o gabarito.</p>
+
+  <h3>Exercício 1 · o relógio rasgado do Arduino</h3>
+  <p>No ATmega328P a 16 MHz, a interrupção do timer soma 1 a um contador de milissegundos de 32 bits a cada 1 ms. O laço copia o contador byte a byte, do menos para o mais significativo, com 4 instruções <code>LDS</code> de 2 ciclos cada, sem desligar as interrupções.</p>
+  <ul class="b">
+    <li>(a) Quantos ciclos e quanto tempo leva a cópia?</li>
+    <li>(b) O contador passa de 16 777 215 (0x00FFFFFF) para 16 777 216 (0x01000000) depois que o laço leu os 3 bytes baixos e antes de ler o alto. Que valor o laço obtém? Qual o erro, em horas?</li>
+    <li>(c) A rotina avisa o cuidador quando <code>agora − inicio ≥ 120 000</code>. O passo começou em <code>inicio = 16 700 000</code>. O que acontece com essa leitura? Quanto custa proteger a cópia com <code>ATOMIC_BLOCK</code>?</li>
+  </ul>
+  <details class="treino"><summary><span class="q">Gabarito</span> Exercício 1</summary>
+   <ul class="b">
+    <li>(a) 4 × 2 = 8 ciclos. 8 / (16 × 10⁶ Hz) = 0,5 µs.</li>
+    <li>(b) Bytes baixos de antes (FF FF FF) e byte alto de depois (01): 0x01FFFFFF = 33 554 431. Erro = 33 554 431 − 16 777 216 = 16 777 215 ms ≈ 16 777 s ≈ 4,66 h.</li>
+    <li>(c) O laço calcula 33 554 431 − 16 700 000 = 16 854 431 ≥ 120 000 e avisa o cuidador. Na verdade passaram 16 777 216 − 16 700 000 = 77 216 ms ≈ 77 s: aviso falso. Para proteger: salvar o estado (1 ciclo), <code>cli</code> (1), as 4 leituras (8) e restaurar (1) dão uns 11 ciclos, 11 / 16 MHz ≈ 0,7 µs com as interrupções desligadas.</li>
+   </ul>
+   <p>Leitura. O erro só aparece se a interrupção cair numa janela de 0,5 µs justo quando o "vai um" chega ao byte alto, o que acontece a cada 2²⁴ ms ≈ 4,66 h. Passa em qualquer teste de bancada e aparece na casa da pessoa. Proteger custa menos de 1 µs.</p>
+  </details>
+
+  <h3>Exercício 2 · uma trava entre os dois núcleos</h3>
+  <p>RP2040 a 125 MHz. Neste exemplo, o núcleo 0 roda o interpretador da rotina e o núcleo 1 cuida do rádio. O estado da rotina (passo atual, nível do alerta, instante do último botão: 3 palavras de 32 bits) é protegido por um spinlock do SIO, pego com <code>spin_lock_blocking</code>.</p>
+  <ul class="b">
+    <li>(a) A região crítica do núcleo 0 copia as 3 palavras em 30 ciclos. No pior caso, quanto tempo o núcleo 1 gira esperando?</li>
+    <li>(b) Um colega põe dentro da região crítica do núcleo 1 o envio do estado pelo rádio, que leva 15 ms (valor de exemplo). Quanto tempo o núcleo 0 pode girar? Quantos ciclos ele joga fora? O que acontece com as interrupções dos dois núcleos?</li>
+    <li>(c) Como reorganizar o código para voltar ao pior caso do item (a)?</li>
+  </ul>
+  <details class="treino"><summary><span class="q">Gabarito</span> Exercício 2</summary>
+   <ul class="b">
+    <li>(a) 30 / (125 × 10⁶ Hz) = 0,24 µs. Como <code>spin_lock_blocking</code> desliga as interrupções de quem segura a trava, nada estica esse tempo.</li>
+    <li>(b) Até 15 ms girando: 15 × 10⁻³ s × 125 × 10⁶ Hz = 1 875 000 ciclos jogados fora, 62 500 vezes o pior caso de (a) (15 ms / 0,24 µs). E <code>spin_lock_blocking</code> desliga as interrupções antes de girar: o núcleo 1 fica 15 ms sem atender interrupção (segurando) e o núcleo 0 também (esperando). Se o botão é atendido no núcleo 0, ele espera até 15 ms.</li>
+    <li>(c) Dentro da trava, o núcleo 1 só copia as 3 palavras para variáveis locais (0,24 µs); o envio pelo rádio vai para fora. Outra saída: nenhuma variável compartilhada, e o núcleo 0 manda cada mudança de estado pela FIFO.</li>
+   </ul>
+   <p>Leitura. Dentro da trava só se copiam dados; o trabalho lento fica fora. Tirando o rádio de dentro dela, o pior caso de espera do outro núcleo volta a ser o tempo de copiar 3 palavras.</p>
+  </details>
+
+  <h3>Exercício 3 · duas FIFOs e um deadlock</h3>
+  <p>O núcleo 0 manda eventos ao núcleo 1 ("botão", "passo concluído", "60 s", "120 s") com <code>multicore_fifo_push_blocking</code>, no máximo 2 por segundo. O núcleo 1 devolve confirmações ("aviso entregue") pela outra FIFO, também com push bloqueante. Cada FIFO tem 8 posições.</p>
+  <ul class="b">
+    <li>(a) O núcleo 1 pode ficar até 3 s sem ler a FIFO, reconectando o rádio (valor de exemplo). A FIFO de 8 posições basta?</li>
+    <li>(b) E se a reconexão levar 6 s? Em quanto tempo a FIFO enche, e o que acontece com a rotina?</li>
+    <li>(c) Num dia ruim, os dois núcleos param cada um no push para a FIFO cheia do outro. Mostre as quatro condições de Coffman e proponha uma saída.</li>
+  </ul>
+  <details class="treino"><summary><span class="q">Gabarito</span> Exercício 3</summary>
+   <ul class="b">
+    <li>(a) N ≥ r × T = 2 eventos/s × 3 s = 6 posições ≤ 8. Basta, com folga de 2.</li>
+    <li>(b) 2 × 6 = 12 &gt; 8. A FIFO enche em 8 / 2 = 4 s; daí em diante o push bloqueia o núcleo 0 até o rádio voltar, mais 2 s. Nesse tempo o laço da rotina para: o botão não avança a peça e, se os 120 s vencerem nesse intervalo, a decisão de avisar atrasa junto.</li>
+    <li>(c) Recursos: espaço em cada FIFO. Exclusão mútua: só o núcleo 1 esvazia a FIFO 0→1, e só o núcleo 0 esvazia a 1→0. Posse e espera: cada núcleo, parado no push, deixa de esvaziar a fila que só ele esvazia. Não preempção: ninguém tira itens no lugar dele. Espera circular: o 0 espera o 1, o 1 espera o 0. Saída: o núcleo da rotina nunca faz push bloqueante; antes confere <code>multicore_fifo_wready()</code> e, se a FIFO está cheia, guarda o evento numa fila própria. Isso quebra a posse e espera do lado que importa.</li>
+   </ul>
+   <p>Leitura. Num dispositivo de apoio, o lado que conta o tempo e decide avisar o cuidador nunca pode bloquear esperando o lado do rádio. O pior caso do aviso precisa sair de uma conta, com cada espera somada.</p>
+  </details>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 13 ============ -->
+<section class="chap" id="projeto">
+ <div class="prose">
+  <span class="num">13</span>
+  <h2>Aplicação ao projeto: quem espera quem no módulo de controle</h2>
+  <div class="src"><span class="base-tag">Treino · autoral</span><span class="bk">rotina de vestir e módulo de controle (TAPI)</span></div>
+  <p>A rotina de vestir da aula 02: a peça da vez pisca, a pessoa veste e aperta o botão; aos 60 s sem botão vêm luz forte e som, e aos 120 s o cuidador é avisado. Vocês são o firmware do módulo de controle. Perguntas para o grupo:</p>
+  <ol class="caminho">
+    <li>Botão: o que a rotina de interrupção faz, e o que fica para o laço principal? Que variáveis as duas dividem, e quem protege cada uma?</li>
+    <li>Tempo: quem conta os 60 s e os 120 s? Se o botão chega aos 119,999 s, quem ganha, o botão ou o aviso? A decisão tem de sair de uma cópia única e protegida do estado (botão e instante juntos).</li>
+    <li>Aviso ao cuidador: ele usa o rádio, que o log e a sincronização com o app também usam. Se o aviso precisa de um lock que o log segura, quanto tempo ele pode esperar? E se o log, segurando o rádio, pedir um lock que o aviso segura?</li>
+    <li>Núcleos: se usarem os dois (<a href="/m8/comp/03-pipelines-paralelismo#projeto">aula 03</a>), eles dividem variáveis com spinlock ou só conversam por mensagens na FIFO?</li>
+    <li>Segurança: a rotina nova chega pelo rádio num buffer. Em que momento o firmware confere a rotina, e em que momento a executa?</li>
+  </ol>
+  <p>Na pulseira da ponderada, as mesmas perguntas aparecem com 5 ms no lugar de 120 s.</p>
+
+  <div class="def warn">
+    <span class="lab">Se o aviso ao cuidador esperar um lock</span>
+    <ul class="b">
+      <li>Deadlock: o aviso segura o estado da rotina e pede o rádio; o log segura o rádio e pede o estado para registrar. Espera circular, e nada no módulo percebe: para o firmware, as duas partes estão só esperando. O cuidador nunca é chamado. Ordem global (sempre estado antes de rádio) previne.</li>
+      <li>Starvation: o log pega o rádio a cada 100 ms (valor de exemplo) e o aviso sempre perde a disputa. Não há deadlock, e mesmo assim o aviso pode atrasar sem limite. Prioridade para o aviso, ou uma fila com espera limitada, resolve.</li>
+      <li>Reiniciar pelo watchdog desfaz o travamento, mas também apaga o estado da rotina. Avisar depois de reiniciar precisa estar no projeto.</li>
+    </ul>
+  </div>
+
+  <h3>Dois jeitos de responder</h3>
+ </div>
+  <div class="tbl prose" id="tbl-projeto-sinc">
+    <table>
+      <thead><tr><th></th><th>Um núcleo: interrupção e laço, sem lock</th><th>Dois núcleos: só mensagens</th></tr></thead>
+      <tbody>
+        <tr><td>Como fica</td><td>a interrupção do botão só anota o instante e soma um contador; o laço copia os dois com as interrupções desligadas, decide e avança; o aviso entra numa fila que o laço esvazia</td><td>núcleo 0: botão, tempo e decisão do aviso. Núcleo 1: rádio e log. Nenhuma variável dividida; o núcleo 0 manda eventos pela FIFO e nunca faz push bloqueante</td></tr>
+        <tr><td>Número que pesa</td><td>interrupções desligadas por menos de 1 µs a cada volta, contra 120 s de prazo</td><td>FIFO de 8 posições com 2 eventos/s: 4 s de rádio parado antes de encher</td></tr>
+        <tr><td>Do que abre mão</td><td>o rádio roda no mesmo laço; uma função dele que bloqueia atrasa a rotina</td><td>simplicidade: dois programas, uma fila extra para quando a FIFO enche, testes da conversa</td></tr>
+        <tr><td>Onde pode travar</td><td>numa chamada do rádio que espera resposta sem prazo</td><td>num push bloqueante dos dois lados (exercício 3)</td></tr>
+      </tbody>
+    </table>
+  </div>
+ <div class="prose">
+  <p>Exemplo de decisão no formato do encontro (um exemplo, não um gabarito):</p>
+  <ul class="b">
+    <li>Decisão: dois núcleos que só conversam por mensagens, e o núcleo da rotina nunca chama nada que possa bloquear, nem lock longo nem push com a FIFO cheia.</li>
+    <li>Do que abrimos mão: de um estado único que os dois leem direto. O app do terapeuta recebe o estado com alguns eventos de atraso; quem sente é o terapeuta, não a pessoa nem o cuidador.</li>
+    <li>Número que pesou: 8 posições de FIFO contra 2 eventos/s dão 4 s de folga. Acima disso o núcleo 0 guarda os eventos numa fila própria, e a decisão dos 120 s não depende do rádio estar livre.</li>
+    <li>O que nos faria mudar: se o rádio couber no mesmo laço com pior caso medido bem abaixo do que a terapeuta aceita entre o botão e a próxima peça, um núcleo só basta e é mais simples.</li>
+  </ul>
+  <div class="def"><span class="lab">Pergunta para o parceiro</span><p>Se o aviso ao cuidador não for entregue (rádio fora do ar), o que a equipe de terapia espera do módulo: insistir, tocar um alarme no próprio dispositivo ou registrar para depois?</p></div>
  </div>
 </section>

@@ -142,6 +142,13 @@
 
 <section class="cs" id="paralelismo" data-grupo="Dentro do computador" data-termos="paralelismo-dados,flynn,gpu" data-leitura="computador">
   <h2>Paralelismo, Flynn e GPU</h2>
+  <aside class="mn" data-vis="paralelismo" aria-hidden="true"><svg viewBox="0 0 240 104">
+<text class="tm" x="115" y="10">um dado</text><text class="tm" x="193" y="10">vários dados</text>
+<text class="tm st" x="4" y="32">uma</text><text class="tm st" x="4" y="46">instrução</text><text class="tm st" x="4" y="72">várias</text><text class="tm st" x="4" y="86">instruções</text>
+<rect class="k" x="76" y="18" width="78" height="40" rx="3"/><text x="115" y="32">SISD</text><text class="tm" x="115" y="47">clássico</text>
+<rect class="acf" x="154" y="18" width="78" height="40" rx="3"/><text x="193" y="32">SIMD</text><text class="tm" x="193" y="47">vetores, GPU</text>
+<rect class="k" x="76" y="58" width="78" height="40" rx="3"/><text x="115" y="72">MISD</text><text class="tm" x="115" y="87">nenhuma</text>
+<rect class="am" x="154" y="58" width="78" height="40" rx="3"/><text x="193" y="72">MIMD</text><text class="tm" x="193" y="87">multicore</text></svg>Flynn cruza fluxos de instruções e de dados; a GPU mora no SIMD.</aside>
   <p class="cs-def">Paralelismo de dados: a mesma conta sobre muitos dados ao mesmo tempo. Paralelismo de tarefas: trabalhos independentes andando juntos.</p>
   <ul class="b">
     <li>Paralelismo de dados: clarear todos os pixels de uma foto. De tarefas: atender dois usuários.</li>
@@ -174,6 +181,10 @@
 
 <section class="cs" id="speedup" data-grupo="Desempenho" data-termos="speedup" data-leitura="desempenho">
   <h2>Comparar duas máquinas: speedup</h2>
+  <aside class="mn" data-vis="speedup" aria-hidden="true"><svg viewBox="0 0 240 80">
+<text class="tm st" x="4" y="15">Y</text><rect class="am" x="20" y="6" width="150" height="18" rx="2"/><text class="tm st" x="176" y="15">15 s</text>
+<text class="tm st" x="4" y="41">X</text><rect class="acf" x="20" y="32" width="100" height="18" rx="2"/><text class="tm st" x="126" y="41">10 s</text>
+<text class="ta" x="120" y="68">n = 15 / 10 = 1,5</text></svg>O tempo do lento vai em cima: X é 1,5 vez mais rápido.</aside>
   <p class="cs-def">X é n vezes mais rápido que Y quando n = tempo de Y / tempo de X. Esse n é o speedup de X em relação a Y.</p>
   <div class="cs-formula">
     <div class="formula">n = Tempo_Y / Tempo_X = Desempenho_X / Desempenho_Y</div>
@@ -191,6 +202,12 @@
 
 <section class="cs" id="benchmarks" data-grupo="Desempenho" data-termos="benchmark,spec,media-geometrica" data-leitura="desempenho">
   <h2>Benchmarks, SPEC e média geométrica</h2>
+  <aside class="mn" data-vis="benchmarks" aria-hidden="true"><svg viewBox="0 0 240 104">
+<line class="s" x1="30" y1="96" x2="176" y2="96"/>
+<rect class="k" x="40" y="76" width="26" height="20"/><text class="tm" x="53" y="68">2</text>
+<rect class="k" x="90" y="16" width="26" height="80"/><text class="tm" x="103" y="8">8</text>
+<rect class="k" x="140" y="56" width="26" height="40"/><text class="tm" x="153" y="48">4</text>
+<line class="ac" x1="30" y1="56" x2="176" y2="56" style="stroke-dasharray:4 3"/><text class="ta st" x="180" y="56" style="font-size:11px">média 4</text></svg>Três SPECRatios, 2, 8 e 4, resumidos em ∛64 = 4.</aside>
   <p class="cs-def">Um benchmark é um conjunto fixo de programas de teste para comparar máquinas de forma justa. O melhor benchmark é a aplicação real de quem vai usar a máquina.</p>
   <ul class="b">
     <li>Programas pequenos (kernels, "brinquedos", sintéticos como o Dhrystone) são fáceis de rodar e de trapacear: fabricantes otimizam o compilador só para eles.</li>
@@ -283,6 +300,11 @@
 <!-- ================= Energia, confiabilidade e custo ================= -->
 <section class="cs" id="energia" data-grupo="Energia, confiabilidade e custo" data-termos="energia-potencia,tensao,capacitancia,cmos" data-leitura="energia">
   <h2>Energia, potência, tensão e capacitância</h2>
+  <aside class="mn" data-vis="energia" aria-hidden="true"><svg viewBox="0 0 240 104">
+<line class="s" x1="4" y1="80" x2="236" y2="80"/>
+<rect class="am" x="10" y="56" width="90" height="24"/><text x="55" y="68">6 J</text>
+<rect class="acf" x="140" y="20" width="30" height="60"/><text x="155" y="50">5 J</text>
+<text class="tm" x="55" y="94">2 W × 3 s</text><text class="tm" x="155" y="94">5 W × 1 s</text></svg>A área é a energia: mais potência por menos tempo gastou menos.</aside>
   <p class="cs-def">Energia (J) é o total gasto numa tarefa, o que esvazia a bateria. Potência (W = J/s) é a energia por segundo, o que esquenta o chip e o que a fonte precisa fornecer.</p>
   <ul class="b">
     <li>Tensão (V): a "pressão" elétrica que alimenta os transistores. Chips modernos trabalham perto de 1 V.</li>
@@ -297,6 +319,10 @@
 
 <section class="cs" id="potencia-dinamica" data-grupo="Energia, confiabilidade e custo" data-termos="potencia-dinamica,dvfs,tdp" data-leitura="energia">
   <h2>Potência dinâmica, DVFS e TDP</h2>
+  <aside class="mn" data-vis="potencia-dinamica" aria-hidden="true"><svg viewBox="0 0 240 110">
+<text class="tm st" x="2" y="12">base</text><rect class="k" x="74" y="4" width="120" height="16" rx="2"/><text class="tm st" x="198" y="12">1,00</text>
+<text class="tm st" x="2" y="44">V −15%</text><rect class="am" x="74" y="36" width="86" height="16" rx="2"/><text class="tm st" x="74" y="62">energia × 0,85² = 0,72</text>
+<text class="tm st" x="2" y="86">V e f −15%</text><rect class="acf" x="74" y="78" width="73" height="16" rx="2"/><text class="tm st" x="74" y="104">potência × 0,85³ = 0,61</text></svg>Por causa do V², baixar a tensão rende mais que baixar só a frequência.</aside>
   <p class="cs-def">Potência dinâmica é a gasta trocando bits de valor. Cresce com o quadrado da tensão e junto com a frequência.</p>
   <div class="cs-formula">
     <div class="formula">Energia_dinâmica ∝ C × V²     Potência_dinâmica ∝ ½ × C × V² × f</div>
@@ -345,6 +371,13 @@
 
 <section class="cs" id="confiabilidade" data-grupo="Energia, confiabilidade e custo" data-termos="mttf,mttr,mtbf,fit,disponibilidade" data-leitura="custo">
   <h2>Confiabilidade: MTTF, MTTR, MTBF e disponibilidade</h2>
+  <aside class="mn" data-vis="confiabilidade" aria-hidden="true"><svg viewBox="0 0 240 104">
+<text class="tm" x="77" y="8">funciona</text><text class="tm" x="160" y="8">para</text>
+<rect class="gr" x="4" y="16" width="146" height="20"/><text x="77" y="26">MTTF = 1 000 h</text>
+<rect class="rd" x="150" y="16" width="20" height="20"/><rect class="gr" x="170" y="16" width="66" height="20"/>
+<text class="tm" x="160" y="46">2 h</text>
+<path class="s" d="M4 52 L4 58 L170 58 L170 52"/><text class="tm" x="87" y="70">MTBF = MTTF + MTTR</text>
+<text class="ta" x="120" y="94">1 000 / 1 002 = 99,8%</text></svg>Disponibilidade é a fatia verde: tempo no ar sobre o ciclo inteiro.</aside>
   <p class="cs-def">MTTF é o tempo médio funcionando até falhar; MTTR, o tempo médio para consertar. Disponibilidade é a fração do tempo em que o sistema está no ar.</p>
   <ul class="b">
     <li>MTTF mede a confiabilidade de um módulo. MTBF é o tempo médio entre duas falhas seguidas.</li>
@@ -508,6 +541,15 @@
 
 <section class="cs" id="substituicao" data-grupo="Memória" data-termos="substituicao-bloco" data-leitura="cache">
   <h2>Quem sai num miss: política de substituição</h2>
+  <aside class="mn" data-vis="substituicao" aria-hidden="true"><svg viewBox="0 0 240 116">
+<text class="tm" x="120" y="8">conjunto cheio, chega um bloco novo</text>
+<rect class="am" x="8" y="20" width="50" height="26" rx="3"/><text x="33" y="33">A</text>
+<rect class="k" x="64" y="20" width="50" height="26" rx="3"/><text x="89" y="33">B</text>
+<rect class="acf" x="120" y="20" width="50" height="26" rx="3"/><text x="145" y="33">C</text>
+<rect class="k" x="176" y="20" width="50" height="26" rx="3"/><text x="201" y="33">D</text>
+<text class="tam st" x="4" y="66" style="font-size:11px">FIFO: sai A, que entrou primeiro</text>
+<text class="ta st" x="4" y="86" style="font-size:11px">LRU: sai C, sem uso há mais tempo</text>
+<text class="tm st" x="4" y="106">aleatória: sai qualquer um</text></svg>Mesmo conjunto, vítimas diferentes conforme a política.</aside>
   <p class="cs-def">Numa cache associativa, a política de substituição escolhe qual bloco do conjunto sai para dar lugar ao novo.</p>
   <ul class="b">
     <li>LRU (least recently used): sai o usado há mais tempo. Melhor aposta pela localidade temporal.</li>
@@ -533,6 +575,12 @@
 
 <section class="cs" id="amat" data-grupo="Memória" data-termos="amat,tempo-hit,taxa-miss,penalidade-miss" data-leitura="cache">
   <h2>AMAT e CPI efetivo</h2>
+  <aside class="mn" data-vis="amat" aria-hidden="true"><svg viewBox="0 0 240 104">
+<text class="tm" x="35" y="14">hit time</text><text class="tm" x="125" y="14">miss rate × penalty</text>
+<rect class="acf" x="20" y="24" width="30" height="24"/><text x="35" y="36">1</text>
+<rect class="am" x="50" y="24" width="150" height="24"/><text x="125" y="36">0,05 × 100 = 5</text>
+<path class="s" d="M20 54 L20 60 L200 60 L200 54"/><text class="ta" x="110" y="74">AMAT = 6 ns</text>
+<text class="tm" x="120" y="96">todo acesso paga 1; 5% pagam +100</text></svg>O miss raro pesa cinco vezes mais que o hit de todo acesso.</aside>
   <p class="cs-def">Todo acesso paga o hit time de olhar a cache; os que dão miss pagam também a miss penalty. A média é o AMAT (average memory access time).</p>
   <div class="cs-formula">
     <div class="formula">AMAT = Hit time + Miss rate × Miss penalty</div>
@@ -564,6 +612,11 @@
 
 <section class="cs" id="tres-cs" data-grupo="Memória" data-termos="tres-cs" data-leitura="otimizacoes">
   <h2>Os três Cs: de onde vêm os misses</h2>
+  <aside class="mn" data-vis="tres-cs" aria-hidden="true"><svg viewBox="0 0 240 110">
+<text class="tm" x="49" y="10">causa</text><text class="tm" x="168" y="10">na totalmente assoc.</text>
+<rect class="k" x="4" y="22" width="90" height="24" rx="3"/><text x="49" y="34" style="font-size:11px">compulsório</text><text class="tm" x="168" y="34">miss (nenhuma evita)</text>
+<rect class="am" x="4" y="52" width="90" height="24" rx="3"/><text x="49" y="64" style="font-size:11px">capacidade</text><text class="tm" x="168" y="64">também miss</text>
+<rect class="acf" x="4" y="82" width="90" height="24" rx="3"/><text x="49" y="94" style="font-size:11px">conflito</text><text class="ta" x="168" y="94">hit</text></svg>Só o miss de conflito some numa totalmente associativa do mesmo tamanho.</aside>
   <p class="cs-def">Todo miss tem uma de três causas: o bloco nunca tinha sido usado (compulsório), não cabia tudo (capacidade), ou cabia mas dois blocos brigaram pela mesma linha (conflito).</p>
   <ul class="b">
     <li>Compulsório (partida a frio): primeiro acesso a um bloco. Nenhuma cache evita.</li>
@@ -668,6 +721,12 @@ for (i = 0; i &lt; 5000; i++)
 
 <section class="cs" id="maquina-virtual" data-grupo="Memória" data-termos="maquina-virtual" data-leitura="virtual">
   <h2>Máquinas virtuais</h2>
+  <aside class="mn" data-vis="maquina-virtual" aria-hidden="true"><svg viewBox="0 0 240 106">
+<text class="tm" x="60" y="10">máquina virtual 1</text><text class="tm" x="180" y="10">máquina virtual 2</text>
+<rect class="bl" x="4" y="18" width="112" height="24" rx="3"/><text x="60" y="30">SO convidado</text>
+<rect class="bl" x="124" y="18" width="112" height="24" rx="3"/><text x="180" y="30">SO convidado</text>
+<rect class="am" x="4" y="48" width="232" height="24" rx="3"/><text x="120" y="60">hipervisor (VMM)</text>
+<rect class="k" x="4" y="78" width="232" height="24" rx="3"/><text x="120" y="90">hardware</text></svg>Cada SO acha que é dono da máquina; o hipervisor divide o hardware.</aside>
   <p class="cs-def">Uma máquina virtual é a ilusão de um computador inteiro, criada por software. Um hipervisor (VMM) roda vários sistemas operacionais completos no mesmo hardware, cada um achando que é dono da máquina.</p>
   <ul class="b">
     <li>Base da nuvem: isola clientes no mesmo servidor e permite mover uma máquina virtual entre servidores.</li>
@@ -697,6 +756,13 @@ for (i = 0; i &lt; 5000; i++)
 
 <section class="cs" id="chip-real" data-grupo="Aula presencial · fundamentos" data-termos="gpio,interfaces-seriais,lockstep,memoria-rom,rram-otp,aes-hmac" data-leitura="fundamentos-presencial">
   <h2>Do diagrama ao chip: OpenTitan</h2>
+  <aside class="mn" data-vis="chip-real" aria-hidden="true"><svg viewBox="0 0 240 132">
+<rect class="acf" x="8" y="6" width="104" height="40" rx="3"/><text x="60" y="20">Ibex</text><text class="tm" x="60" y="36">RISC-V, lockstep</text>
+<rect class="am" x="124" y="6" width="108" height="40" rx="3"/><text x="178" y="20">segurança</text><text class="tm" x="178" y="36">AES HMAC chaves</text>
+<line class="s" x1="60" y1="46" x2="60" y2="74"/><line class="s" x1="178" y1="46" x2="178" y2="74"/>
+<line class="ac" x1="8" y1="60" x2="232" y2="60" style="stroke-width:3"/>
+<rect class="bl" x="8" y="74" width="104" height="54" rx="3"/><text x="60" y="88">memória</text><text class="tm" x="60" y="104">ROM SRAM</text><text class="tm" x="60" y="120">RRAM OTP</text>
+<rect class="gr" x="124" y="74" width="108" height="54" rx="3"/><text x="178" y="88">E/S</text><text class="tm" x="178" y="104">GPIO UART I²C</text><text class="tm" x="178" y="120">SPI USB</text></svg>Processador, memória, E/S e segurança presos ao mesmo barramento.</aside>
   <p class="cs-def">O OpenTitan Earl Grey põe um computador inteiro num chip: processador (núcleo Ibex, RISC-V), memória, barramento, E/S e blocos de segurança.</p>
   <ul class="b">
     <li>Memória: ROM com o código de partida, SRAM de trabalho, RRAM (não perde ao desligar) e OTP (gravada uma vez só).</li>
@@ -708,6 +774,16 @@ for (i = 0; i &lt; 5000; i++)
 
 <section class="cs" id="toolchain" data-grupo="Aula presencial · fundamentos" data-termos="assembler,linker,loader,firmware,bootloader,bytecode,interpretador,risc-cisc,opcode-operando" data-leitura="fundamentos-presencial">
   <h2>Toolchain, bytecode e código nativo</h2>
+  <aside class="mn" data-vis="toolchain" aria-hidden="true"><svg viewBox="0 0 240 160">
+<rect class="k" x="8" y="2" width="110" height="20" rx="3"/><text x="63" y="12" style="font-size:11px">código-fonte</text>
+<path class="s" d="M63 22 L63 34" marker-end="url(#mnarrow)"/><text class="tm st" x="78" y="29">compilador</text>
+<rect class="k" x="8" y="36" width="110" height="20" rx="3"/><text x="63" y="46" style="font-size:11px">assembly</text>
+<path class="s" d="M63 56 L63 68" marker-end="url(#mnarrow)"/><text class="tm st" x="78" y="63">montador</text>
+<rect class="k" x="8" y="70" width="110" height="20" rx="3"/><text x="63" y="80" style="font-size:11px">código-objeto</text>
+<path class="s" d="M63 90 L63 102" marker-end="url(#mnarrow)"/><text class="tm st" x="78" y="97">linker</text>
+<rect class="k" x="8" y="104" width="110" height="20" rx="3"/><text x="63" y="114" style="font-size:11px">executável</text>
+<path class="s" d="M63 124 L63 136" marker-end="url(#mnarrow)"/><text class="tm st" x="78" y="131">loader ou gravador</text>
+<rect class="acf" x="8" y="138" width="110" height="20" rx="3"/><text x="63" y="148" style="font-size:11px">memória</text></svg>Cada ferramenta transforma o que a anterior entregou.</aside>
   <p class="cs-def">Toolchain é a cadeia que leva o código-fonte até a memória do chip. Bytecode é um código intermediário que um interpretador executa; código nativo é o que a CPU executa direto.</p>
   <div class="cs-formula"><div class="formula">código-fonte → compilador → assembly → montador → código-objeto → linker → executável → loader ou gravador → memória</div></div>
   <ul class="b">
@@ -722,6 +798,13 @@ for (i = 0; i &lt; 5000; i++)
 
 <section class="cs" id="coerencia-luisi" data-grupo="Aula presencial · memória e segurança" data-termos="coerencia-cache,mesi" data-leitura="fundamentos-presencial">
   <h2>Coerência e estados MESI</h2>
+  <aside class="mn" data-vis="coerencia-luisi" aria-hidden="true"><svg viewBox="0 0 240 150">
+<text class="tm" x="20" y="10">passo</text><text class="tm" x="80" y="10">núcleo 0</text><text class="tm" x="150" y="10">núcleo 1</text><text class="tm" x="212" y="10">memória</text>
+<text class="tm" x="20" y="34">início</text><rect class="k" x="50" y="23" width="60" height="22" rx="3"/><text x="80" y="34">x=7</text><rect class="k" x="120" y="23" width="60" height="22" rx="3"/><text x="150" y="34">x=7</text><text x="212" y="34">7</text>
+<text class="tm" x="20" y="62">1</text><rect class="k" x="50" y="51" width="60" height="22" rx="3"/><text x="80" y="62">x=7</text><rect class="rd" x="120" y="51" width="60" height="22" rx="3"/><text x="150" y="62">I</text><text x="212" y="62">7</text>
+<text class="tm" x="20" y="90">2</text><rect class="acf" x="50" y="79" width="60" height="22" rx="3"/><text x="80" y="90">x=9 M</text><rect class="rd" x="120" y="79" width="60" height="22" rx="3"/><text x="150" y="90">I</text><text class="tam" x="212" y="90">7</text>
+<text class="tm" x="20" y="118">3</text><rect class="k" x="50" y="107" width="60" height="22" rx="3"/><text x="80" y="118">x=9</text><rect class="gr" x="120" y="107" width="60" height="22" rx="3"/><text x="150" y="118">x=9</text><text class="tam" x="212" y="118">7</text>
+<text class="tm" x="120" y="144">núcleo 1 dá miss e recebe 9</text></svg>A cópia velha vira I; quem lê depois recebe 9 da cache, não da memória.</aside>
   <p class="cs-def">Coerência mantém iguais as cópias de um dado em caches diferentes. No MESI, cada linha está em Modified, Exclusive, Shared ou Invalid.</p>
   <div class="cs-uso"><ol><li>As L1 dos núcleos 0 e 1 têm x = 7. Para escrever, o núcleo 0 pede exclusividade e a cópia do núcleo 1 vira I.</li><li>O núcleo 0 escreve 9; a linha dele vira M.</li><li>O núcleo 1 lê x, dá miss e recebe 9 de quem tem a versão nova.</li></ol><p>Com write-back, a memória fica com 7 por um tempo, e ninguém lê dela enquanto a versão nova está numa cache.</p></div>
   <div class="cs-pegadinhas"><ul class="b"><li>Coerência não substitui lock: duas threads somando no mesmo x ainda precisam de sincronização (aula 05).</li></ul></div>
@@ -729,6 +812,15 @@ for (i = 0; i &lt; 5000; i++)
 
 <section class="cs" id="xip-firmware" data-grupo="Aula presencial · memória e segurança" data-termos="xip,eeprom,interrupcao-firmware" data-leitura="fundamentos-presencial">
   <h2>XIP, EEPROM e código na SRAM</h2>
+  <aside class="mn" data-vis="xip-firmware" aria-hidden="true"><svg viewBox="0 0 240 120">
+<rect class="gr" x="8" y="4" width="60" height="28" rx="3"/><text x="38" y="18">SRAM</text><text class="tm st" x="76" y="18">rotina do botão</text>
+<path class="s" d="M38 50 L38 34" marker-end="url(#mnarrow)"/>
+<rect class="acf" x="8" y="52" width="60" height="34" rx="3"/><text x="38" y="69">CPU</text>
+<path class="s" d="M68 69 L94 69" marker-end="url(#mnarrow)"/>
+<rect class="am" x="96" y="52" width="70" height="34" rx="3"/><text x="131" y="63" style="font-size:11px">cache XIP</text><text class="tm" x="131" y="77">16 KiB</text>
+<path class="s" d="M166 69 L184 69" marker-end="url(#mnarrow)"/>
+<rect class="k" x="186" y="52" width="50" height="34" rx="3"/><text x="211" y="69">flash</text><text class="tm" x="211" y="96">externa</text>
+<text class="tm" x="120" y="112">gravando a flash: nada sai dela</text></svg>O código vem da flash pela cache XIP; a rotina do botão fica na SRAM.</aside>
   <p class="cs-def">XIP (execute in place) executa o programa direto da flash, através de uma cache. EEPROM guarda dados que sobrevivem ao desligar. Uma interrupção desvia a execução para tratar um evento, como o botão.</p>
   <ul class="b">
     <li>RP2040: flash externa, atendida por uma cache XIP de 16 KiB.</li>

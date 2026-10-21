@@ -59,6 +59,15 @@
 
 <section class="cs" id="syscall" data-grupo="Base: o que o SO faz" data-termos="chamada-sistema" data-leitura="antes">
   <h2>Syscall: pedir ao kernel</h2>
+  <aside class="mn" data-vis="syscall" aria-hidden="true"><svg viewBox="0 0 240 160">
+<text class="tm st" x="2" y="30">usuário</text><text class="tm st" x="2" y="118">kernel</text>
+<rect class="k" x="46" y="12" width="90" height="40" rx="6"/><text x="91" y="23">programa</text><text class="tm" x="91" y="42">põe nº + args</text>
+<rect class="k" x="158" y="18" width="76" height="24" rx="6"/><text x="196" y="30">continua</text>
+<line class="s" x1="0" y1="66" x2="240" y2="66" style="stroke-dasharray:3 3"/>
+<path class="s" d="M91 52 L101 98" marker-end="url(#mnarrow)"/><text class="tm st" x="4" y="82">syscall / svc</text>
+<rect class="acf" x="78" y="100" width="84" height="26" rx="6"/><text x="120" y="113">kernel</text>
+<path class="s" d="M162 106 L186 46" marker-end="url(#mnarrow)"/><text class="tm st" x="180" y="84">volta</text>
+<text class="tm" x="120" y="138">confere, faz o serviço</text><text class="tm" x="120" y="152">resultado num reg.</text></svg>O programa só entra no kernel pelo trap, num endereço fixo, e volta na instrução seguinte.</aside>
   <p class="cs-def">Syscall (system call, chamada de sistema) é o pedido formal de um programa ao kernel. É assim que um programa que não pode falar com o disco lê um arquivo.</p>
   <ul class="b">
     <li>Exemplos do Linux: <code>read</code> (ler), <code>write</code> (escrever), <code>open</code> (abrir arquivo), <code>fork</code> (criar processo), <code>exit</code> (terminar).</li>
@@ -147,6 +156,12 @@
 
 <section class="cs" id="contexto-hardware" data-grupo="Processo" data-termos="contexto,contexto-hardware,contador-programa,apontador-pilha,registrador-status" data-leitura="estrutura,processo">
   <h2>Contexto do processo e contexto de hardware</h2>
+  <aside class="mn" data-vis="contexto-hardware" aria-hidden="true"><svg viewBox="0 0 240 130">
+<text class="tm" x="52" y="10">CPU (A rodando)</text><text class="tm" x="188" y="10">PCB de A</text>
+<rect class="k" x="4" y="20" width="96" height="100" rx="6"/><rect class="acf" x="140" y="20" width="96" height="100" rx="6"/>
+<text class="st" x="12" y="40" style="font-size:11px">PC</text><text class="st" x="12" y="62" style="font-size:11px">SP</text><text class="st" x="12" y="84" style="font-size:11px">PSW</text><text class="st" x="12" y="106" style="font-size:11px">regs (i=731)</text>
+<text class="st" x="148" y="40" style="font-size:11px">PC</text><text class="st" x="148" y="62" style="font-size:11px">SP</text><text class="st" x="148" y="84" style="font-size:11px">PSW</text><text class="st" x="148" y="106" style="font-size:11px">regs (i=731)</text>
+<path class="s" d="M104 74 L136 74" marker-end="url(#mnarrow)"/><text class="tm" x="119" y="64">salva</text></svg>Na troca, o SO copia os registradores de A para o PCB, inclusive o i = 731.</aside>
   <p class="cs-def">Contexto do processo = contexto de hardware + <a href="#contexto-software">contexto de software</a>; a memória é o <a href="#espaco-enderecamento">espaço de endereçamento</a>. O contexto de hardware é o conteúdo dos registradores da CPU no momento em que o processo para: o que ele "tinha na cabeça".</p>
   <ul class="b">
     <li>Registradores gerais: guardam os valores intermediários das contas.</li>
@@ -168,6 +183,11 @@
 
 <section class="cs" id="contexto-software" data-grupo="Processo" data-termos="contexto-software,pid,dono,quotas,privilegios,buffer" data-leitura="estrutura">
   <h2>Contexto de software</h2>
+  <aside class="mn" data-vis="contexto-software" aria-hidden="true"><svg viewBox="0 0 240 110">
+<rect class="k" x="2" y="4" width="236" height="30" rx="4"/><rect class="k" x="2" y="40" width="236" height="30" rx="4"/><rect class="k" x="2" y="76" width="236" height="30" rx="4"/>
+<text class="st" x="8" y="19" style="font-size:12px">identificação</text><text class="tm st" x="112" y="19">PID 4182, dono, pai</text>
+<text class="st" x="8" y="55" style="font-size:12px">quotas</text><text class="tm st" x="112" y="55">arquivos ≤ 1024</text>
+<text class="st" x="8" y="91" style="font-size:12px">privilégios</text><text class="tm st" x="112" y="91">root tem todos</text></svg>Os três grupos do livro, com um exemplo de cada.</aside>
   <p class="cs-def">As características e os limites do processo, mantidos pelo SO. O livro separa em três grupos: identificação, quotas e privilégios.</p>
   <ul class="b">
     <li>Identificação: o PID (process identifier, um número único para cada processo vivo, como 4182), o dono (o usuário que criou o processo, identificado pelo UID, que define o que ele pode acessar), o PID do processo pai e o nome do programa.</li>
@@ -205,6 +225,15 @@ int soma(int n) {                    // as instruções de soma ficam no código
 
 <section class="cs" id="pilha-execucao" data-grupo="Processo" data-termos="pilha-execucao,variavel-local" data-leitura="estrutura">
   <h2>Pilha de execução</h2>
+  <aside class="mn" data-vis="pilha-execucao" aria-hidden="true"><svg viewBox="0 0 240 150">
+<text class="tm" x="95" y="10">pilha de execução</text>
+<rect class="k" x="40" y="20" width="110" height="26" rx="4"/><text x="95" y="33">main</text>
+<rect class="k" x="40" y="48" width="110" height="26" rx="4"/><text x="95" y="61">soma</text>
+<rect class="acf" x="40" y="76" width="110" height="26" rx="4"/><text x="95" y="89">malloc</text>
+<text class="tm st" x="160" y="40">cresce ↓</text>
+<path class="s" d="M182 89 L154 89" marker-end="url(#mnarrow)"/><text class="tm st" x="186" y="89">SP</text>
+<rect class="k" x="40" y="108" width="110" height="18" rx="4" style="stroke-dasharray:3 3"/><text class="tm" x="95" y="117">livre</text>
+<rect class="k" x="40" y="128" width="110" height="18" rx="4"/><text class="tm" x="95" y="137">heap</text></svg>main chama soma, que chama malloc: o bloco de malloc fica no topo e sai primeiro.</aside>
   <p class="cs-def">A pilha de execução (stack) guarda um bloco para cada chamada de função em andamento, com as variáveis locais, os parâmetros e o endereço para onde voltar. Cada chamada empilha um bloco; cada <code>return</code> tira o bloco do topo.</p>
   <ul class="b">
     <li>Segue a regra da pilha como estrutura de dados (<a href="/m8/comp/01-conceitos">aula 01</a>): o último bloco que entra é o primeiro que sai.</li>
@@ -354,6 +383,15 @@ else:
 
 <section class="cs" id="termino" data-grupo="Criação, término e tipos" data-termos="zumbi" data-leitura="tipos">
   <h2>Como um processo termina</h2>
+  <aside class="mn" data-vis="termino" aria-hidden="true"><svg viewBox="0 0 240 104">
+<rect class="k" x="4" y="8" width="80" height="22" rx="4"/><text x="44" y="19">exit</text>
+<rect class="k" x="4" y="40" width="80" height="22" rx="4"/><text x="44" y="51">erro</text>
+<rect class="k" x="4" y="72" width="80" height="22" rx="4"/><text x="44" y="83">kill</text>
+<path class="s" d="M84 19 L98 46" marker-end="url(#mnarrow)"/><path class="s" d="M84 51 L96 51" marker-end="url(#mnarrow)"/><path class="s" d="M84 83 L98 56" marker-end="url(#mnarrow)"/>
+<rect class="acf" x="98" y="38" width="64" height="26" rx="6"/><text class="tm" x="130" y="51">SO libera</text>
+<path class="s" d="M162 51 L176 51" marker-end="url(#mnarrow)"/>
+<rect class="am" x="178" y="38" width="58" height="26" rx="6"/><text x="207" y="51">zumbi</text>
+<text class="tm" x="200" y="78">até o pai</text><text class="tm" x="200" y="92">ler a saída</text></svg>Três jeitos de terminar; no Unix, o PCB fica como zumbi até o pai ler o código de saída.</aside>
   <p class="cs-def">Um processo termina por fim normal, por erro ou porque foi morto. O SO fecha os arquivos, libera a memória e apaga o PCB.</p>
   <ul class="b">
     <li>Fim normal: o programa chama <code>exit</code> (o <code>return</code> do <code>main</code> faz isso).</li>
@@ -365,6 +403,11 @@ else:
 
 <section class="cs" id="sinais" data-grupo="Criação, término e tipos" data-termos="sinal" data-leitura="tipos">
   <h2>Sinais</h2>
+  <aside class="mn" data-vis="sinais" aria-hidden="true"><svg viewBox="0 0 240 120">
+<text class="tm st" x="2" y="18">Ctrl+C</text><path class="s" d="M100 18 L122 18" marker-end="url(#mnarrow)"/><rect class="k" x="124" y="7" width="72" height="22" rx="4"/><text x="160" y="18">SIGINT</text>
+<text class="tm st" x="2" y="54">kill -9</text><path class="s" d="M100 54 L122 54" marker-end="url(#mnarrow)"/><rect class="rd" x="124" y="43" width="72" height="22" rx="4"/><text x="160" y="54">SIGKILL</text>
+<text class="tm" x="160" y="78">não pode ser ignorado</text>
+<text class="tm st" x="2" y="102">acesso proibido</text><path class="s" d="M100 102 L122 102" marker-end="url(#mnarrow)"/><rect class="k" x="124" y="91" width="72" height="22" rx="4"/><text x="160" y="102">SIGSEGV</text></svg>Três jeitos de um sinal chegar ao processo; o SIGKILL não pode ser ignorado.</aside>
   <p class="cs-def">Sinal é um aviso que o SO entrega a um processo de forma assíncrona, como uma interrupção, só que para processos. Cada sinal tem um número e um nome.</p>
   <ul class="b">
     <li>O processo pode registrar uma função do próprio programa para tratar a maioria dos sinais. Se não registrar, vale a ação padrão, em geral terminar.</li>
@@ -380,6 +423,14 @@ else:
 
 <section class="cs" id="tipos" data-grupo="Criação, término e tipos" data-termos="foreground-background,processo-sistema,pipe" data-leitura="tipos">
   <h2>Tipos de processo: foreground, background e processos do sistema</h2>
+  <aside class="mn" data-vis="tipos" aria-hidden="true"><svg viewBox="0 0 240 100">
+<rect class="k" x="4" y="14" width="50" height="26" rx="4"/><text x="29" y="27">ls</text>
+<path class="s" d="M56 27 L122 27" marker-end="url(#mnarrow)"/><text class="tm" x="89" y="18">pipe</text>
+<rect class="k" x="124" y="14" width="60" height="26" rx="4"/><text x="154" y="27">sort</text>
+<path class="s" d="M186 27 L206 27" marker-end="url(#mnarrow)"/><text class="tm st" x="210" y="27">tela</text>
+<line class="s" x1="0" y1="50" x2="240" y2="50" style="stroke-dasharray:3 3"/>
+<text class="st" x="4" y="66">comando &amp;</text><text class="tm st" x="100" y="66">segundo plano</text>
+<text class="st" x="4" y="88">cron</text><text class="tm st" x="100" y="88">daemon do sistema</text></svg>O pipe liga a saída de ls à entrada de sort; &amp; e daemons ficam em background.</aside>
   <p class="cs-def">Foreground (primeiro plano): processo ligado ao console do usuário, que lê do teclado e escreve na tela enquanto roda. Background (segundo plano): roda sem conversar direto com o usuário.</p>
   <ul class="b">
     <li>No Linux, <code>comando &amp;</code> manda para o segundo plano.</li>
@@ -439,6 +490,20 @@ for t in ts: t.join()                # a thread principal espera as três</code>
 
 <section class="cs" id="por-que-threads" data-grupo="Threads" data-termos="" data-leitura="threads">
   <h2>Por que usar threads, e o preço de compartilhar</h2>
+  <aside class="mn" data-vis="por-que-threads" aria-hidden="true"><svg viewBox="0 0 240 146">
+<line class="s" x1="120" y1="2" x2="120" y2="142" style="stroke-dasharray:3 3"/>
+<text class="tm" x="60" y="10">subprocessos</text><text class="tm" x="180" y="10">threads</text>
+<rect class="k" x="8" y="22" width="32" height="40" rx="4"/><text class="tm" x="24" y="42">mem</text>
+<rect class="k" x="44" y="22" width="32" height="40" rx="4"/><text class="tm" x="60" y="42">mem</text>
+<rect class="k" x="80" y="22" width="32" height="40" rx="4"/><text class="tm" x="96" y="42">mem</text>
+<path class="s" d="M24 62 L44 94" marker-end="url(#mnarrow)"/><path class="s" d="M60 62 L60 94" marker-end="url(#mnarrow)"/><path class="s" d="M96 62 L76 94" marker-end="url(#mnarrow)"/>
+<rect class="am" x="34" y="96" width="52" height="22" rx="4"/><text x="60" y="107">SO</text>
+<text class="tm" x="60" y="134">conversa lenta</text>
+<rect class="bl" x="132" y="22" width="100" height="96" rx="6"/><text class="tm" x="182" y="34">memória comum</text>
+<path class="ac" d="M150 46 q6 10 0 20 q-6 10 0 20 q6 10 0 20" style="fill:none"/>
+<path class="ac" d="M182 46 q6 10 0 20 q-6 10 0 20 q6 10 0 20" style="fill:none"/>
+<path class="ac" d="M214 46 q6 10 0 20 q-6 10 0 20 q6 10 0 20" style="fill:none"/>
+<text class="tm" x="182" y="134">acesso direto</text></svg>Subprocessos conversam pelo SO; threads usam a mesma memória, sem proteção entre elas.</aside>
   <p class="cs-def">Threads saem mais baratas que subprocessos para criar, trocar e conversar. O preço: nada protege uma thread da outra dentro do mesmo processo.</p>
   <ul class="b">
     <li>O problema de partida: um servidor web atende mil clientes ao mesmo tempo. Com um subprocesso por cliente, são mil PCBs, mil espaços de endereçamento e, para compartilhar a mesma cache de páginas, mil processos conversando por mecanismos lentos do SO.</li>
@@ -478,6 +543,18 @@ for t in ts: t.join()                # a thread principal espera as três</code>
 <!-- ================= ULT, KLT e modelos ================= -->
 <section class="cs" id="ult" data-grupo="ULT, KLT e modelos" data-termos="ult,biblioteca-threads,chamada-bloqueante" data-leitura="modelos">
   <h2>Threads de usuário (ULT)</h2>
+  <aside class="mn" data-vis="ult" aria-hidden="true"><svg viewBox="0 0 240 150">
+<rect class="k" x="20" y="4" width="200" height="76" rx="6"/><text class="tm st" x="26" y="15">processo</text>
+<rect class="am" x="36" y="24" width="48" height="22" rx="4"/><text class="tm" x="60" y="35">T1</text>
+<rect class="rd" x="96" y="24" width="48" height="22" rx="4"/><text class="tm" x="120" y="35">T2 read</text>
+<rect class="am" x="156" y="24" width="48" height="22" rx="4"/><text class="tm" x="180" y="35">T3</text>
+<rect class="acf" x="36" y="54" width="168" height="18" rx="4"/><text class="tm" x="120" y="63">biblioteca de threads</text>
+<line class="s" x1="0" y1="92" x2="240" y2="92" style="stroke-dasharray:3 3"/>
+<text class="tm st" x="2" y="86">usuário</text><text class="tm st" x="2" y="102">kernel</text>
+<path class="s" d="M120 72 L120 106" marker-end="url(#mnarrow)"/>
+<rect class="k" x="84" y="108" width="72" height="22" rx="4"/><text class="tm" x="120" y="119">1 entidade</text>
+<text class="tm st" x="162" y="119">em espera</text>
+<text class="tm" x="120" y="142">read bloqueia T1, T2 e T3</text></svg>O kernel só vê o processo: quando uma thread chama read, ele põe todas em espera.</aside>
   <p class="cs-def">ULT (user-level thread, a TMU do livro): thread criada e escalonada por uma biblioteca de threads que roda dentro do processo, em modo usuário. O kernel nem sabe que ela existe: para ele, o processo é monothread.</p>
   <ul class="b">
     <li>Quem cria as threads e decide qual delas roda? Uma biblioteca dentro do próprio processo (ULT) ou o kernel (<a href="#klt">KLT</a>). O livro ainda descreve uma <a href="#modelos">mistura das duas</a>.</li>
@@ -493,6 +570,16 @@ for t in ts: t.join()                # a thread principal espera as três</code>
 
 <section class="cs" id="klt" data-grupo="ULT, KLT e modelos" data-termos="klt" data-leitura="modelos">
   <h2>Threads de kernel (KLT)</h2>
+  <aside class="mn" data-vis="klt" aria-hidden="true"><svg viewBox="0 0 240 140">
+<text class="tm st" x="4" y="10">processo</text>
+<rect class="k" x="2" y="16" width="236" height="36" rx="6"/>
+<rect class="bl" x="8" y="22" width="50" height="24" rx="4"/><text class="tm" x="33" y="34">T1</text>
+<rect class="am" x="66" y="22" width="50" height="24" rx="4"/><text class="tm" x="91" y="34">T2 E/S</text>
+<rect class="bl" x="124" y="22" width="50" height="24" rx="4"/><text class="tm" x="149" y="34">T3</text>
+<rect class="bl" x="182" y="22" width="50" height="24" rx="4"/><text class="tm" x="207" y="34">T4</text>
+<path class="s" d="M33 52 L33 88" marker-end="url(#mnarrow)"/><path class="s" d="M91 52 L91 88" marker-end="url(#mnarrow)"/><path class="s" d="M149 52 L149 88" marker-end="url(#mnarrow)"/><path class="s" d="M207 52 L207 88" marker-end="url(#mnarrow)"/>
+<rect class="acf" x="8" y="90" width="224" height="22" rx="4"/><text class="tm" x="120" y="101">kernel escalona cada thread</text>
+<text class="tm" x="120" y="130">T2 em E/S; T1, T3, T4 seguem</text></svg>O kernel vê cada thread: a que espera E/S não segura as outras.</aside>
   <p class="cs-def">KLT (kernel-level thread, a TMK do livro): o kernel cria, conhece e escalona cada thread, por syscalls. Cada uma tem estado no kernel.</p>
   <ul class="b">
     <li>Vantagem: uma thread bloqueada em E/S não trava as outras; o kernel escalona outra thread do mesmo processo.</li>
@@ -586,6 +673,15 @@ void loop() {
 
 <section class="cs" id="mpu" data-grupo="Em chips reais" data-termos="mpu" data-leitura="reais">
   <h2>Modos e MPU: Cortex-M0+ × AVR</h2>
+  <aside class="mn" data-vis="mpu" aria-hidden="true"><svg viewBox="0 0 240 158">
+<line class="s" x1="120" y1="2" x2="120" y2="150" style="stroke-dasharray:3 3"/>
+<text class="tm" x="60" y="10">ATmega328P (AVR)</text><text class="tm" x="180" y="10">RP2040 (M0+)</text>
+<rect class="k" x="14" y="20" width="92" height="96" rx="6"/><text x="60" y="62">SRAM</text><text class="tm" x="60" y="80">2 KB</text>
+<text class="tm" x="60" y="132">sem MPU</text><text class="tm" x="60" y="146">tudo liberado</text>
+<rect class="bl" x="134" y="20" width="96" height="30" rx="4"/><text class="tm" x="182" y="35">lê, executa</text>
+<rect class="gr" x="134" y="54" width="96" height="30" rx="4"/><text class="tm" x="182" y="69">lê, escreve</text>
+<rect class="rd" x="134" y="88" width="96" height="28" rx="4"/><text class="tm" x="182" y="102">guarda 32 B</text>
+<text class="tm" x="182" y="132">acesso negado</text><text class="tm" x="182" y="146">→ HardFault</text></svg>No AVR, qualquer código escreve em qualquer endereço; no RP2040, a MPU confere cada acesso contra as regiões.</aside>
   <p class="cs-def">MPU (memory protection unit) é o circuito que confere cada acesso contra regiões configuradas (endereço, tamanho, permissões, se pode executar) e gera falha se o acesso não for permitido. No RP2040 são 8 regiões por core; o ATmega328P não tem MPU nem modos.</p>
   <ul class="b">
     <li>AVR: qualquer código escreve em qualquer endereço da SRAM. A única proteção são os lock bits, que impedem regravar a área do bootloader.</li>
@@ -604,6 +700,17 @@ void loop() {
 <!-- ================= Segurança ================= -->
 <section class="cs" id="seguranca" data-grupo="Segurança" data-termos="escalada-privilegio" data-leitura="seguranca">
   <h2>Segurança: escalada de privilégio e isolamento</h2>
+  <aside class="mn" data-vis="seguranca" aria-hidden="true"><svg viewBox="0 0 240 140">
+<text class="tm st" x="2" y="10">modo usuário</text>
+<rect class="k" x="60" y="16" width="176" height="24" rx="6"/><text class="tm" x="148" y="28">programa comum</text>
+<path class="s" d="M110 40 L110 90" marker-end="url(#mnarrow)"/><text class="tm st" x="8" y="52">DeviceIoControl</text>
+<line class="s" x1="0" y1="62" x2="240" y2="62" style="stroke-dasharray:3 3"/>
+<text class="tm st" x="2" y="76">modo kernel</text>
+<rect class="acf" x="60" y="92" width="84" height="24" rx="6"/><text class="tm" x="102" y="104">driver GDrv</text>
+<path class="s" d="M146 104 L158 104" marker-end="url(#mnarrow)"/>
+<rect class="rd" x="160" y="92" width="78" height="24" rx="6"/><text class="tm" x="199" y="104">privilégios</text>
+<path class="s" d="M224 90 L224 42" marker-end="url(#mnarrow)"/><text class="tm" x="172" y="52">controle total</text>
+<text class="tm" x="120" y="132">copia sem conferir o endereço</text></svg>CVE-2018-19320: um pedido por syscall faz o driver escrever no kernel, e o programa ganha controle total.</aside>
   <p class="cs-def">Escalada de privilégio é um programa sem permissão passar a agir com o poder do kernel ou do administrador. Ela ataca a fronteira entre modos; o isolamento entre processos é a defesa seguinte, e entre threads essa defesa não existe.</p>
   <ul class="b">
     <li>Decisão explorada: o modo kernel confia em todo código que roda nele, inclusive drivers de terceiros.</li>

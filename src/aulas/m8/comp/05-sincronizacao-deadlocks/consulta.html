@@ -40,6 +40,15 @@
 
 <section class="cs" id="tres-passos" data-grupo="Base" data-leitura="antes">
   <h2>Por que saldo = saldo + 1 são três passos</h2>
+  <aside class="mn" data-vis="tres-passos" aria-hidden="true"><svg viewBox="0 0 240 130"><rect class="k" x="45" y="6" width="150" height="26" rx="4"/><text x="120" y="19">saldo na memória</text>
+<path class="s" d="M60 32 L44 62" marker-end="url(#mnarrow)"/><path class="s" d="M200 62 L184 34" marker-end="url(#mnarrow)"/>
+<rect class="bl" x="8" y="64" width="64" height="26" rx="4"/><text x="40" y="77">LOAD</text>
+<rect class="bl" x="88" y="64" width="64" height="26" rx="4"/><text x="120" y="77">ADD</text>
+<rect class="bl" x="168" y="64" width="64" height="26" rx="4"/><text x="200" y="77">STORE</text>
+<path class="s" d="M72 77 L86 77" marker-end="url(#mnarrow)"/><path class="s" d="M152 77 L166 77" marker-end="url(#mnarrow)"/>
+<circle class="rd" cx="80" cy="58" r="4"/><circle class="rd" cx="160" cy="58" r="4"/>
+<text class="tm" x="40" y="102">R1 ← saldo</text><text class="tm" x="120" y="102">R1 + 1</text><text class="tm" x="200" y="102">saldo ← R1</text>
+<text class="tm" x="120" y="122">a troca pode cair em cada ponto</text></svg>Uma linha vira LOAD, ADD e STORE; entre dois passos o escalonador pode trocar de thread.</aside>
   <p class="cs-def">A CPU só faz contas em registradores (<a href="/m8/comp/02-fundamentos-memoria">aula 02</a>). Por isso uma linha simples de alto nível vira três instruções de máquina: LOAD, ADD e STORE.</p>
 <pre><code>saldo = saldo + 1        # uma linha em Python ou C
 
@@ -145,6 +154,13 @@ def soma_segura(n):
 
 <section class="cs" id="requisitos" data-grupo="Race condition e exclusão mútua" data-termos="espera-limitada,starvation" data-leitura="exclusao">
   <h2>O que uma boa solução precisa garantir: os quatro requisitos</h2>
+  <aside class="mn" data-vis="requisitos" aria-hidden="true"><svg viewBox="0 0 240 132"><rect class="k" x="130" y="16" width="104" height="64" rx="6"/><text class="tm" x="182" y="28">região crítica</text>
+<circle class="acf" cx="182" cy="50" r="12"/><text x="182" y="50" style="font-size:12px">A</text><text class="tm" x="182" y="72">1 · só um</text>
+<circle class="am" cx="30" cy="48" r="12"/><text x="30" y="48" style="font-size:12px">B</text>
+<circle class="am" cx="64" cy="48" r="12"/><text x="64" y="48" style="font-size:12px">C</text>
+<path class="s" d="M78 48 L128 48" marker-end="url(#mnarrow)"/><text class="tm" x="64" y="22">4 · espera limitada</text>
+<circle class="k" cx="22" cy="96" r="12"/><text x="22" y="96" style="font-size:12px">D</text><text class="tm st" x="40" y="96">3 · fora, não bloqueia</text>
+<text class="tm" x="120" y="122">2 · sem supor velocidade</text></svg>Um dentro, os outros esperando por tempo limitado, e quem está fora não atrapalha.</aside>
   <p class="cs-def">Dijkstra listou quatro exigências para uma solução de exclusão mútua, e o livro cobra as quatro.</p>
   <ul class="b">
     <li>1. Exclusão mútua: dois processos nunca estão juntos dentro da região crítica.</li>
@@ -159,6 +175,11 @@ def soma_segura(n):
 <!-- ================= Soluções de hardware ================= -->
 <section class="cs" id="desabilitar-interrupcoes" data-grupo="Soluções de hardware" data-termos="desabilitar-interrupcoes" data-leitura="exclusao">
   <h2>Solução de hardware 1: desabilitar interrupções</h2>
+  <aside class="mn" data-vis="desabilitar-interrupcoes" aria-hidden="true"><svg viewBox="0 0 240 132"><text class="tm" x="60" y="8">núcleo 0</text><text class="tm" x="180" y="8">núcleo 1</text>
+<rect class="gr" x="8" y="16" width="104" height="40" rx="5"/><text x="60" y="30">A na RC</text><text class="tm" x="60" y="46">interrupções off</text>
+<rect class="rd" x="128" y="16" width="104" height="40" rx="5"/><text x="180" y="30">B roda</text><text class="tm" x="180" y="46">ao mesmo tempo</text>
+<path class="s" d="M60 58 L96 96" marker-end="url(#mnarrow)"/><path class="s" d="M180 58 L144 96" marker-end="url(#mnarrow)"/>
+<rect class="k" x="60" y="98" width="120" height="26" rx="5"/><text x="120" y="111">dado comum</text></svg>Nada interrompe A no núcleo 0; B, no núcleo 1, mexe no mesmo dado ao mesmo tempo.</aside>
   <p class="cs-def">O escalonador só tira uma thread da CPU porque chega uma interrupção (o relógio, o fim de uma E/S). Se a thread desabilitar as interrupções ao entrar na região crítica e habilitar ao sair, ninguém a interrompe no meio.</p>
   <ul class="b">
     <li>É perigoso: se o programa esquecer de reabilitar (ou entrar num laço infinito), o sistema inteiro para. Por isso, num SO com modo usuário, só o kernel pode usar essa instrução, e só por poucas instruções.</li>
@@ -171,6 +192,15 @@ def soma_segura(n):
 
 <section class="cs" id="operacao-atomica" data-grupo="Soluções de hardware" data-termos="operacao-atomica,test-and-set,swap-instr" data-leitura="exclusao">
   <h2>Solução de hardware 2: instruções atômicas (Test-and-Set e Swap)</h2>
+  <aside class="mn" data-vis="operacao-atomica" aria-hidden="true"><svg viewBox="0 0 240 132"><rect class="k" x="4" y="8" width="60" height="26" rx="4"/><text x="34" y="21">lock 0</text>
+<path class="s" d="M66 21 L86 21" marker-end="url(#mnarrow)"/><rect class="acf" x="88" y="8" width="64" height="26" rx="4"/><text x="120" y="21">TSL</text>
+<path class="s" d="M154 21 L174 21" marker-end="url(#mnarrow)"/><rect class="k" x="176" y="8" width="60" height="26" rx="4"/><text x="206" y="21">lock 1</text>
+<text class="tm" x="120" y="46">volta 0: o lock é seu</text>
+<rect class="k" x="4" y="64" width="60" height="26" rx="4"/><text x="34" y="77">lock 1</text>
+<path class="s" d="M66 77 L86 77" marker-end="url(#mnarrow)"/><rect class="acf" x="88" y="64" width="64" height="26" rx="4"/><text x="120" y="77">TSL</text>
+<path class="s" d="M154 77 L174 77" marker-end="url(#mnarrow)"/><rect class="k" x="176" y="64" width="60" height="26" rx="4"/><text x="206" y="77">lock 1</text>
+<text class="tm" x="120" y="102">volta 1: alguém dentro</text>
+<text class="tm" x="120" y="124">lê e grava 1 num passo só</text></svg>Test-and-Set lê o valor antigo e grava 1 de uma vez; o que voltou diz se o lock estava livre.</aside>
   <p class="cs-def">Uma operação atômica acontece "de uma vez só": o hardware garante que nenhuma outra instrução, de nenhuma CPU, acessa a mesma posição de memória entre o início e o fim dela. Ou ninguém viu começar, ou já terminou.</p>
   <ul class="b">
     <li>Test-and-Set (TSL, "test and set lock"): numa única instrução atômica, lê o valor de uma variável e grava 1 (verdadeiro) nela. Devolve o valor antigo. Voltou 0: o lock estava livre e agora é seu. Voltou 1: alguém já estava dentro.</li>
@@ -346,6 +376,12 @@ sem_post(&amp;m);          /* V */</code></pre>
 <!-- ================= Problemas clássicos ================= -->
 <section class="cs" id="sincronizacao-condicional" data-grupo="Problemas clássicos" data-termos="sincronizacao-condicional" data-leitura="classicos">
   <h2>Sincronização condicional</h2>
+  <aside class="mn" data-vis="sincronizacao-condicional" aria-hidden="true"><svg viewBox="0 0 240 118"><line class="s" x1="120" y1="4" x2="120" y2="112" stroke-dasharray="3 3"/>
+<text class="tm" x="60" y="10">buffer vazio</text><text class="tm" x="180" y="10">chegou um item</text>
+<rect class="k" x="14" y="22" width="20" height="20"/><rect class="k" x="38" y="22" width="20" height="20"/><rect class="k" x="62" y="22" width="20" height="20"/><rect class="k" x="86" y="22" width="20" height="20"/>
+<rect class="acf" x="134" y="22" width="20" height="20"/><rect class="k" x="158" y="22" width="20" height="20"/><rect class="k" x="182" y="22" width="20" height="20"/><rect class="k" x="206" y="22" width="20" height="20"/>
+<circle class="am" cx="60" cy="72" r="14"/><text x="60" y="72" style="font-size:12px">C</text><text class="tm" x="60" y="102">espera</text>
+<path class="s" d="M146 44 L168 62" marker-end="url(#mnarrow)"/><circle class="gr" cx="180" cy="72" r="14"/><text x="180" y="72" style="font-size:12px">C</text><text class="tm" x="180" y="102">tira e segue</text></svg>O consumidor só passa quando há item; com o buffer vazio, ele espera.</aside>
   <p class="cs-def">Sincronização condicional é fazer uma thread esperar até que algo aconteça. O consumidor só pode tirar um item do buffer se houver item.</p>
   <ul class="b">
     <li>Exclusão mútua impede duas threads de mexerem juntas; a sincronização condicional vai além e decide quando uma pode continuar.</li>
@@ -406,6 +442,12 @@ void consumidor(void) {
 
 <section class="cs" id="tamanho-buffer" data-grupo="Problemas clássicos" data-leitura="classicos">
   <h2>Quantas posições o buffer precisa ter?</h2>
+  <aside class="mn" data-vis="tamanho-buffer" aria-hidden="true"><svg viewBox="0 0 240 120"><text class="tm st" x="10" y="12">r × T = 40 × 0,25 = 10</text>
+<rect class="acf" x="10" y="20" width="18" height="16" rx="2"/><rect class="acf" x="30" y="20" width="18" height="16" rx="2"/><rect class="acf" x="50" y="20" width="18" height="16" rx="2"/><rect class="acf" x="70" y="20" width="18" height="16" rx="2"/><rect class="acf" x="90" y="20" width="18" height="16" rx="2"/><rect class="acf" x="110" y="20" width="18" height="16" rx="2"/><rect class="acf" x="130" y="20" width="18" height="16" rx="2"/><rect class="acf" x="150" y="20" width="18" height="16" rx="2"/><rect class="acf" x="170" y="20" width="18" height="16" rx="2"/><rect class="acf" x="190" y="20" width="18" height="16" rx="2"/>
+<text class="tm st" x="10" y="54">folga 2T: 40 × 0,5 = 20</text>
+<rect class="acf" x="10" y="62" width="9" height="16" rx="1"/><rect class="acf" x="20" y="62" width="9" height="16" rx="1"/><rect class="acf" x="30" y="62" width="9" height="16" rx="1"/><rect class="acf" x="40" y="62" width="9" height="16" rx="1"/><rect class="acf" x="50" y="62" width="9" height="16" rx="1"/><rect class="acf" x="60" y="62" width="9" height="16" rx="1"/><rect class="acf" x="70" y="62" width="9" height="16" rx="1"/><rect class="acf" x="80" y="62" width="9" height="16" rx="1"/><rect class="acf" x="90" y="62" width="9" height="16" rx="1"/><rect class="acf" x="100" y="62" width="9" height="16" rx="1"/><rect class="k" x="110" y="62" width="9" height="16" rx="1"/><rect class="k" x="120" y="62" width="9" height="16" rx="1"/><rect class="k" x="130" y="62" width="9" height="16" rx="1"/><rect class="k" x="140" y="62" width="9" height="16" rx="1"/><rect class="k" x="150" y="62" width="9" height="16" rx="1"/><rect class="k" x="160" y="62" width="9" height="16" rx="1"/><rect class="k" x="170" y="62" width="9" height="16" rx="1"/><rect class="k" x="180" y="62" width="9" height="16" rx="1"/><rect class="k" x="190" y="62" width="9" height="16" rx="1"/><rect class="k" x="200" y="62" width="9" height="16" rx="1"/>
+<text class="tm" x="60" y="90">T</text><text class="tm" x="160" y="90">folga</text>
+<text class="tm" x="120" y="112">20 × 8 bytes = 160 bytes</text></svg>Cada caixa é uma leitura: 10 posições cobrem um envio; 20 cobrem um envio atrasado.</aside>
   <p class="cs-def">Entre duas idas do consumidor chegam r × T itens, e o buffer precisa caber pelo menos isso.</p>
   <div class="cs-formula">
     <div class="formula">N ≥ r × T</div>
@@ -454,6 +496,13 @@ void consumidor(void) {
 
 <section class="cs" id="barbeiro" data-grupo="Problemas clássicos" data-termos="barbeiro" data-leitura="classicos">
   <h2>O barbeiro dorminhoco</h2>
+  <aside class="mn" data-vis="barbeiro" aria-hidden="true"><svg viewBox="0 0 240 124"><circle class="bl" cx="34" cy="46" r="16"/><text x="34" y="46" style="font-size:12px">B</text>
+<text class="tm" x="34" y="76">barbeiro</text><text class="tm" x="34" y="88">consome</text>
+<path class="s" d="M74 46 L52 46" marker-end="url(#mnarrow)"/>
+<rect class="k" x="76" y="34" width="26" height="24" rx="3"/><circle class="am" cx="89" cy="46" r="8"/><rect class="k" x="110" y="34" width="26" height="24" rx="3"/><circle class="am" cx="123" cy="46" r="8"/><rect class="k" x="144" y="34" width="26" height="24" rx="3"/><circle class="am" cx="157" cy="46" r="8"/>
+<text class="tm" x="123" y="76">n cadeiras = buffer</text>
+<text class="tm" x="206" y="26">chega</text><circle class="am" cx="206" cy="46" r="9"/>
+<path class="s" d="M206 57 L206 92" marker-end="url(#mnarrow)"/><text class="tm" x="180" y="106">cheio: vai embora</text></svg>Cadeiras cheias: o cliente novo vai embora, como um produtor que descarta quando o buffer enche.</aside>
   <p class="cs-def">Um barbeiro, uma cadeira de corte e n cadeiras de espera. Sem cliente, o barbeiro dorme; o cliente que chega acorda o barbeiro ou senta para esperar, e vai embora se as cadeiras estão todas ocupadas.</p>
   <ul class="b">
     <li>É um <a href="#produtor-consumidor">produtor/consumidor</a> com buffer de n lugares que descarta quando enche.</li>
@@ -523,6 +572,11 @@ class BufferLimitado:                 # um monitor feito à mão
 <!-- ================= Nos chips do projeto ================= -->
 <section class="cs" id="isr-compartilhada" data-grupo="Nos chips do projeto" data-termos="secao-critica-isr,volatile,leitura-rasgada" data-leitura="reais">
   <h2>Interrupção e laço principal: volatile e leitura rasgada</h2>
+  <aside class="mn" data-vis="isr-compartilhada" aria-hidden="true"><svg viewBox="0 0 240 134"><text class="tm st" x="2" y="16">1 lê o baixo</text><rect class="k" x="110" y="4" width="34" height="24" rx="3"/><text x="127" y="16">00</text><rect class="acf" x="148" y="4" width="34" height="24" rx="3"/><text x="165" y="16">FF</text>
+<text class="tm st" x="2" y="50">2 irq soma 1</text><rect class="am" x="110" y="38" width="34" height="24" rx="3"/><text x="127" y="50">01</text><rect class="am" x="148" y="38" width="34" height="24" rx="3"/><text x="165" y="50">00</text>
+<text class="tm st" x="2" y="84">3 lê o alto</text><rect class="acf" x="110" y="72" width="34" height="24" rx="3"/><text x="127" y="84">01</text><rect class="k" x="148" y="72" width="34" height="24" rx="3"/><text x="165" y="84">00</text>
+<text class="tm st" x="2" y="118">monta</text><rect class="rd" x="110" y="106" width="34" height="24" rx="3"/><text x="127" y="118">01</text><rect class="rd" x="148" y="106" width="34" height="24" rx="3"/><text x="165" y="118">FF</text>
+<text class="tm st" x="190" y="118">= 511</text></svg>O laço lê FF antes da interrupção e 01 depois, e monta 0x01FF = 511, um valor que nunca existiu.</aside>
   <p class="cs-def">Uma variável compartilhada com a interrupção é escrita pela rotina de interrupção e lida pelo laço principal (ou o contrário). A interrupção entra entre duas instruções do laço, então o trecho do laço que lê e altera a variável é uma <a href="#regiao-critica">região crítica</a>.</p>
   <ul class="b">
     <li>Não há SO nem thread: o laço roda para sempre e a interrupção do botão roda quando ele é apertado. Para o laço, é como se outra thread rodasse no meio dele.</li>
@@ -562,6 +616,15 @@ int main(void) {
 
 <section class="cs" id="rp2040-locks" data-grupo="Nos chips do projeto" data-termos="ldrex-strex" data-leitura="reais">
   <h2>Dois núcleos no RP2040: spinlocks do SIO e FIFOs</h2>
+  <aside class="mn" data-vis="rp2040-locks" aria-hidden="true"><svg viewBox="0 0 240 146"><text class="tm" x="120" y="8">SIO</text>
+<rect class="bl" x="4" y="16" width="64" height="28" rx="4"/><text x="36" y="30" style="font-size:11px">núcleo 0</text>
+<rect class="am" x="92" y="16" width="56" height="28" rx="4"/><text x="120" y="30">trava</text>
+<rect class="bl" x="172" y="16" width="64" height="28" rx="4"/><text x="204" y="30" style="font-size:11px">núcleo 1</text>
+<path class="s" d="M70 30 L90 30" marker-end="url(#mnarrow)"/><path class="s" d="M170 30 L150 30" marker-end="url(#mnarrow)"/>
+<text class="tm" x="44" y="58">lê: ≠0, pegou</text><text class="tm" x="200" y="58">lê: 0, gira</text>
+<text class="tm st" x="2" y="85">0 → 1</text><rect class="k" x="40" y="78" width="12" height="14" rx="1"/><rect class="k" x="54" y="78" width="12" height="14" rx="1"/><rect class="k" x="68" y="78" width="12" height="14" rx="1"/><rect class="k" x="82" y="78" width="12" height="14" rx="1"/><rect class="k" x="96" y="78" width="12" height="14" rx="1"/><rect class="k" x="110" y="78" width="12" height="14" rx="1"/><rect class="k" x="124" y="78" width="12" height="14" rx="1"/><rect class="k" x="138" y="78" width="12" height="14" rx="1"/><path class="s" d="M154 85 L178 85" marker-end="url(#mnarrow)"/>
+<text class="tm st" x="2" y="111">1 → 0</text><rect class="k" x="40" y="104" width="12" height="14" rx="1"/><rect class="k" x="54" y="104" width="12" height="14" rx="1"/><rect class="k" x="68" y="104" width="12" height="14" rx="1"/><rect class="k" x="82" y="104" width="12" height="14" rx="1"/><rect class="k" x="96" y="104" width="12" height="14" rx="1"/><rect class="k" x="110" y="104" width="12" height="14" rx="1"/><rect class="k" x="124" y="104" width="12" height="14" rx="1"/><rect class="k" x="138" y="104" width="12" height="14" rx="1"/><path class="s" d="M178 111 L154 111" marker-end="url(#mnarrow)"/>
+<text class="tm" x="120" y="136">FIFOs: 8 posições de 32 bits</text></svg>Quem lê a trava primeiro pega; o outro núcleo gira. As FIFOs levam mensagens de um núcleo ao outro.</aside>
   <p class="cs-def">Desligar as interrupções num núcleo não para o outro. Como o Cortex-M0+ não tem instrução atômica de ler e gravar, o RP2040 põe a trava no SIO: 32 spinlocks de hardware, mais duas FIFOs para os núcleos trocarem mensagens.</p>
   <ul class="b">
     <li>LDREX/STREX: o par atômico dos ARM maiores (ARMv7-M, como Cortex-M3 e M4). LDREX lê e marca o endereço; STREX só grava se ninguém mexeu nele desde a marca, e avisa se falhou.</li>
@@ -593,6 +656,14 @@ spin_unlock(trava, ant);                   /* solta e restaura as interrupções
 <!-- ================= Segurança ================= -->
 <section class="cs" id="toctou" data-grupo="Segurança" data-termos="toctou,copy-on-write" data-leitura="seguranca">
   <h2>TOCTOU e Dirty COW</h2>
+  <aside class="mn" data-vis="toctou" aria-hidden="true"><svg viewBox="0 0 240 124"><rect class="bl" x="4" y="10" width="70" height="26" rx="4"/><text x="39" y="23">access</text>
+<path class="s" d="M76 23 L130 23" marker-end="url(#mnarrow)"/><text class="tm" x="103" y="12">1 · pode</text>
+<rect class="gr" x="132" y="10" width="104" height="26" rx="4"/><text x="184" y="23">/tmp/meu</text>
+<path class="s" d="M184 38 L184 70" stroke-dasharray="4 3" marker-end="url(#mnarrow)"/><text class="tm" x="150" y="54">2 · troca</text>
+<rect class="bl" x="4" y="72" width="70" height="26" rx="4"/><text x="39" y="85">open</text>
+<path class="s" d="M76 85 L130 85" marker-end="url(#mnarrow)"/><text class="tm" x="103" y="74">3 · root</text>
+<rect class="rd" x="132" y="72" width="104" height="26" rx="4"/><text x="184" y="85">/etc/passwd</text>
+<text class="tm" x="120" y="116">duas syscalls, dois alvos</text></svg>Entre o access e o open, /tmp/meu vira link para /etc/passwd, e o open abre o alvo novo.</aside>
   <p class="cs-def">TOCTOU (time-of-check to time-of-use) é a race condition entre conferir uma coisa e usá-la: se ela muda entre os dois passos, a conferência valeu para outra. O atacante não precisa acertar de primeira; ele repete até o escalonador intercalar do jeito que ele quer.</p>
   <ul class="b">
     <li>A decisão explorada: conferir e usar são passos separados (duas syscalls, ou dois momentos dentro do kernel), com outro fluxo podendo mexer no meio.</li>
@@ -641,6 +712,15 @@ P(rede);     /* espera B */ P(arquivo);   /* espera A */
 
 <section class="cs" id="recurso-preemptivel" data-grupo="Deadlock" data-termos="recurso-preemptivel,instancia" data-leitura="deadlock">
   <h2>Recurso preemptível e instâncias</h2>
+  <aside class="mn" data-vis="recurso-preemptivel" aria-hidden="true"><svg viewBox="0 0 240 130"><line class="s" x1="120" y1="4" x2="120" y2="88" stroke-dasharray="3 3"/>
+<text class="tm" x="60" y="8">preemptível</text><text class="tm" x="180" y="8">não preemptível</text>
+<rect class="gr" x="20" y="18" width="80" height="24" rx="4"/><text x="60" y="30">CPU</text>
+<rect class="gr" x="20" y="48" width="80" height="24" rx="4"/><text x="60" y="60">memória</text>
+<rect class="rd" x="134" y="18" width="92" height="24" rx="4"/><text x="180" y="30">impressora</text>
+<rect class="rd" x="134" y="48" width="92" height="24" rx="4"/><text x="180" y="60">mutex</text>
+<text class="tm" x="60" y="84">tirar não estraga</text><text class="tm" x="180" y="84">tirar estraga</text>
+<rect class="am" x="60" y="98" width="44" height="26" rx="4"/><circle cx="74" cy="111" r="4" style="fill:var(--amber)"/><circle cx="90" cy="111" r="4" style="fill:var(--amber)"/>
+<text class="tm st" x="112" y="111">2 instâncias iguais</text></svg>Tirar a CPU não estraga nada; tirar a impressora no meio da página estraga. Cada ponto é uma instância.</aside>
   <p class="cs-def">Um recurso preemptível pode ser tirado de quem está usando sem estrago; um não preemptível não pode. Deadlock envolve recursos não preemptíveis.</p>
   <ul class="b">
     <li>Preemptível: a CPU (o escalonador faz isso) e, com cuidado, a memória. Não preemptível: uma impressora no meio da página, um mutex no meio da região crítica.</li>
@@ -779,6 +859,15 @@ print(seguro(2, [4, 2, 2], [9, 4, 7]))   # (False, ['P2'])</code></pre>
 
 <section class="cs" id="deteccao" data-grupo="Tratar deadlock" data-termos="deteccao-recuperacao,rollback" data-leitura="tratamento">
   <h2>Detectar e recuperar</h2>
+  <aside class="mn" data-vis="deteccao" aria-hidden="true"><svg viewBox="0 0 240 122"><circle class="bl" cx="24" cy="28" r="14"/><text x="24" y="28" style="font-size:12px">P1</text>
+<rect class="am" x="74" y="16" width="28" height="24" rx="3"/><text x="88" y="28" style="font-size:12px">R1</text>
+<circle class="bl" cx="88" cy="100" r="14"/><text x="88" y="100" style="font-size:12px">P2</text>
+<rect class="am" x="10" y="88" width="28" height="24" rx="3"/><text x="24" y="100" style="font-size:12px">R2</text>
+<path class="s" d="M38 28 L72 28" marker-end="url(#mnarrow)"/><path class="s" d="M88 40 L88 84" marker-end="url(#mnarrow)"/><path class="s" d="M74 100 L40 100" marker-end="url(#mnarrow)"/><path class="s" d="M24 88 L24 44" marker-end="url(#mnarrow)"/>
+<text class="tm" x="56" y="64">ciclo</text>
+<path class="s" d="M104 50 L134 30" marker-end="url(#mnarrow)"/><path class="s" d="M104 78 L134 86" marker-end="url(#mnarrow)"/>
+<rect class="k" x="136" y="14" width="100" height="26" rx="4"/><text x="186" y="27" style="font-size:11px">matar vítima</text><text class="tm" x="186" y="52">menor prejuízo</text>
+<rect class="k" x="136" y="74" width="100" height="26" rx="4"/><text x="186" y="87" style="font-size:11px">rollback</text><text class="tm" x="186" y="112">até o checkpoint</text></svg>Achou um ciclo: o SO elimina uma vítima ou tira um recurso e volta o processo a um checkpoint.</aside>
   <p class="cs-def">Na detecção e recuperação, o SO deixa os pedidos correrem livres, procura deadlocks de tempos em tempos e desfaz os que achar.</p>
   <ul class="b">
     <li>Detectar com uma instância por recurso: procurar ciclo no grafo de alocação (<a href="#grafo-alocacao">figura do grafo</a>). Com várias: um algoritmo parecido com o teste do <a href="#banqueiro">banqueiro</a>, usando os pedidos atuais no lugar do máximo. Quem não consegue terminar em nenhuma ordem está em deadlock.</li>

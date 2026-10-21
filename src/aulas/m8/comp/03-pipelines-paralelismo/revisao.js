@@ -25,6 +25,9 @@ export const cartoes = [
   ['Como o Spectre (variante 1) tira um segredo se a especulação é desfeita?', 'Treina o preditor, tira B da cache e chama com índice fora do limite. Na especulação, lê s = A[x] e toca B[s × 4096]. O ROB desfaz y, mas a linha fica na cache; cronometrando B, a leitura rápida revela s.', 'seguranca'],
   ['O que o Meltdown explora e qual foi a correção nos SOs?', 'A exceção de permissão só sai no commit; antes disso, o valor do kernel passou para uma instrução que deixou rastro na cache. Correção: KPTI, kernel fora da tabela de páginas do programa.', 'seguranca'],
   ['Stages de 200, 150, 250, 250 e 150 ps, 20 ps de registrador. Ciclo e speedup com 5 stages? E com 2?', '5 stages: 270 ps, speedup 3,7. 2 stages (600 | 400): 620 ps, speedup 1,6.', 'treino'],
+  ['Predicação × predição de desvio: qual a diferença?', 'Predição aposta no caminho do branch e pode errar. Predicação elimina o branch com uma instrução condicional (cmov): sem aposta, mas executa os dois lados.', 'predicacao'],
+  ['Quais são as duas paredes que pararam o "mais clock, mais ILP"?', 'Potência: +20% de clock pode custar +50% de potência (P ∝ f × V²), teto de 150 a 200 W. ILP: programas comuns têm só 2 a 3 instruções independentes por ciclo.', 'limites-ilp'],
+  ['Por que não fazer um núcleo de 16 instruções por ciclo em vez de vários núcleos?', 'A lógica de despacho cresce com o quadrado da largura (8 por ciclo já é mais de 4 vezes maior que 4), e os programas não têm tanto ILP. Mais núcleos rendem mais por transistor.', 'nucleos'],
 ];
 
 export const cola = [

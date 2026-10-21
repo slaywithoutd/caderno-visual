@@ -71,6 +71,48 @@ export function initDefinicoes() {
   });
 
   /* destaca a seção ao chegar por link (#secao) */
-  const destacar = () => { const s = location.hash && document.querySelector(`section.cs${CSS.escape(location.hash)}`); if (s) s.classList.add('cs-flash'); };
+  const destacar = () => { const s = location.hash && document.querySelector(`section.cs#${CSS.escape(location.hash.slice(1))}`); if (s) s.classList.add('cs-flash'); };
   addEventListener('hashchange', destacar); destacar();
+}
+
+/* Modo compacto do Consulta: cada seção mostra só o essencial (título, definição, "Em resumo", fórmula e
+   "cai na prova"); o resto (como usar, pegadinhas, figuras, tabelas, desenhos) vai para um "Detalhes" que
+   abre com um clique. As seções do encontro e do treino ficam abertas. Chegar a uma seção por link abre os
+   detalhes dela. O botão do topo abre ou recolhe todos, e a escolha fica no navegador. */
+const SEMPRE_ABERTAS = new Set(['encontro', 'treino']);
+const VISIVEL = '.cs-def, .cs-resumo, .cs-formula, p.prova';
+const PARTES = [
+  ['.cs-uso', 'como usar'], ['.cs-pegadinhas', 'pegadinhas'], ['.cs-ponderada', 'ponderada'],
+  ['figure.fig', 'figura'], ['aside.loop', 'animação'], ['aside.mn:not(.loop)', 'desenho'], ['.tbl', 'tabela'],
+];
+export function initCompacto() {
+  const secoes = [...document.querySelectorAll('#aula-root section.cs')].filter((s) => !SEMPRE_ABERTAS.has(s.id));
+  const todos = [];
+  for (const sec of secoes) {
+    const resto = [...sec.children].filter((el) => el.tagName !== 'H2' && !el.matches(VISIVEL));
+    if (!resto.length) continue;
+    const det = H('details', { class: 'cs-detalhes' });
+    const tem = PARTES.filter(([sel]) => resto.some((el) => el.matches(sel) || el.querySelector(sel))).map(([, nome]) => nome);
+    det.innerHTML = `<summary>Detalhes${tem.length ? ` <span>${tem.join(' · ')}</span>` : ''}</summary>`;
+    sec.appendChild(det);
+    resto.forEach((el) => det.appendChild(el));
+    todos.push(det);
+  }
+  const botao = document.getElementById('cs-tudo');
+  let abertos = false;
+  try { abertos = localStorage.getItem('caderno-detalhes-abertos') === 'true'; } catch {}
+  const aplicar = (sim, salvar) => {
+    abertos = sim;
+    todos.forEach((d) => { d.open = sim; });
+    if (botao) { botao.textContent = sim ? 'Recolher os detalhes' : 'Abrir todos os detalhes'; botao.setAttribute('aria-pressed', String(sim)); }
+    if (salvar) { try { localStorage.setItem('caderno-detalhes-abertos', String(sim)); } catch {} }
+  };
+  aplicar(abertos, false);
+  botao?.addEventListener('click', () => aplicar(!abertos, true));
+  const abrirAlvo = () => {
+    const s = location.hash && document.querySelector(`section.cs#${CSS.escape(location.hash.slice(1))}`);
+    const d = s && s.querySelector(':scope > details.cs-detalhes');
+    if (d) d.open = true;
+  };
+  addEventListener('hashchange', abrirAlvo); abrirAlvo();
 }

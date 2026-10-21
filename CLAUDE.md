@@ -265,6 +265,12 @@ Regras do modo Consulta:
      em exatamente uma seção (a barra de Definições usa isso para o "ver seção").
    - `data-leitura`: ids das seções do `conteudo.html` de onde o conteúdo veio (para o switch).
    - Blocos vazios são omitidos; a ordem não muda.
+   - `<div class="cs-resumo">` (rótulo "Em resumo", logo depois do `cs-def`): versão curta vinda de um
+     complemento do professor (vídeo, artigo), em paráfrase e com a fonte num `<p class="cs-fonte">`.
+     Serve para ler o essencial sem abrir o resto; não pode trazer conceito que a seção não explique.
+   - Modo compacto (`initCompacto` em `src/lib/consulta.js`): ficam à vista o título, `cs-def`, `cs-resumo`,
+     `cs-formula` e `p.prova`; o resto vai para um "Detalhes" fechado. As seções `encontro` e `treino` ficam
+     abertas. Chegar por link abre os detalhes da seção; um botão no topo abre ou recolhe todos.
    - A leitura dos símbolos de uma fórmula ("f é…, s é…") fica dentro do `.cs-formula`, logo abaixo dela.
    - Tabelas (`data-ref-tbl`) e `h3` podem entrar onde o conteúdo pede (uma seção longa como "Otimizações"
      usa h3); o resto da ordem vale.

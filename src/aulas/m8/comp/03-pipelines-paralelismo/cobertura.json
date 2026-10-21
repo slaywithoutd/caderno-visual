@@ -23,6 +23,20 @@
       "escopo": "Hennessy & Patterson, 6ª ed. (citada pelos slides), cap. 3 e apêndice C",
       "acesso": "nao-verificado",
       "limitacao": "O texto integral do livro não foi fornecido. As faixas de página do meta.json vêm da indicação do autoestudo."
+    },
+    {
+      "id": "lighterra",
+      "url": "https://www.lighterra.com/papers/modernmicroprocessors/",
+      "escopo": "Modern Microprocessors: A 90-Minute Guide!, seções 1 a 19 (sem agradecimentos e leituras extras)",
+      "acesso": "parcial",
+      "limitacao": "Lido por extração automática da página em 21/10/2026, seção por seção; números conferidos no texto extraído. Resumos em cs-resumo nas seções pipeline, stages, forwarding, hazard-controle, predicacao, escalonamento-dinamico, emissao-multipla, vliw, processadores, limites-ilp, multithreading e nucleos (aula 02: hierarquia, mapeamento, tecnologias)."
+    },
+    {
+      "id": "video-descomplica",
+      "url": "https://www.youtube.com/watch?v=QnpDwbLHOfY",
+      "escopo": "Vídeo de 14 min: estágios, hazards de dados e de controle e forwarding",
+      "acesso": "indisponivel",
+      "limitacao": "A transcrição não carregou; só título, duração e descrição foram lidos. O caderno aponta o vídeo nas seções que o título cobre, sem resumir falas que não foram conferidas."
     }
   ]
 }

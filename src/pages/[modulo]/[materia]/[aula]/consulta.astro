@@ -53,7 +53,7 @@ const tempo = tempoLeitura({ html: C.html, extras: [...aula.cartoes.flat(), ...a
       <div class="kicker">{aula.tema} · {rotuloAula(aula)}</div>
       <h1>{aula.titulo}</h1>
       <Fragment set:html={htmlTempo(tempo)} />
-      <p class="cs-ajuda">Um conceito por seção. Procure um termo em <b>Definições</b>; cada termo leva à única seção que fala dele.</p>
+      <p class="cs-ajuda">Um conceito por seção, só o essencial à vista; o resto abre em <b>Detalhes</b>. Procure um termo em <b>Definições</b>. <button type="button" class="cs-tudo" id="cs-tudo" aria-pressed="false">Abrir todos os detalhes</button></p>
     </header>
     <Fragment set:html={html} />
   </div>
@@ -111,10 +111,11 @@ const tempo = tempoLeitura({ html: C.html, extras: [...aula.cartoes.flat(), ...a
   import { initGlossarioDaPagina } from '../../../../lib/glossary.js';
   import { initCartoes } from '../../../../lib/cartoes.js';
   import { initOculos } from '../../../../lib/oculos.js';
-  import { initDefinicoes } from '../../../../lib/consulta.js';
+  import { initDefinicoes, initCompacto } from '../../../../lib/consulta.js';
   const entradas = import.meta.glob('../../../../aulas/*/*/*/index.js');
   const id = document.getElementById('aula-root').dataset.aula;
   const carregar = entradas[`../../../../aulas/${id}/index.js`];
+  initCompacto();
   (carregar ? carregar() : Promise.resolve()).finally(() => {
     initGlossarioDaPagina();
     initDefinicoes();

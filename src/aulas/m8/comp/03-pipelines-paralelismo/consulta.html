@@ -18,6 +18,7 @@
    <li><a href="#nucleos">Mais núcleos</a>: Amdahl com N núcleos e por que 4 núcleos não dão 4 vezes.</li>
    <li><a href="#reais">Pipelines de verdade</a> e <a href="#seguranca">Spectre e Meltdown</a>: o pipeline dos chips do projeto e o ataque anunciado para este encontro.</li>
   </ol>
+  <p class="depois">Complementos do professor para este encontro: o <a href="https://www.youtube.com/watch?v=QnpDwbLHOfY" target="_blank" rel="noopener">vídeo do DesCOMPlica</a> (14 min) cobre pipeline, hazards de dados e de controle e forwarding; o <a href="https://www.lighterra.com/papers/modernmicroprocessors/" target="_blank" rel="noopener">guia da Lighterra</a> passa por todo o caminho curto em 90 minutos. A versão curta deles aparece nas seções, no bloco "Em resumo".</p>
   <p class="depois">Pode deixar para depois: <a href="#ilp">ILP e loop unrolling</a> (dependência verdadeira × de nome; desenrolar amortiza o controle do laço) · <a href="#tomasulo">Tomasulo</a> (renomear elimina WAR e WAW) · <a href="#emissao-multipla">superescalar e VLIW</a> (quem escolhe o que emite junto: o hardware ou o compilador) · <a href="#limites-ilp">limites do ILP</a> (na prática, menos de 10 por ciclo; daí os núcleos).</p>
 
   <h3>Cinco ideias para levar</h3>
@@ -87,6 +88,7 @@
 <section class="cs" id="pipeline" data-grupo="Pipeline" data-termos="pipeline" data-leitura="pipeline">
   <h2>A ideia do pipeline: sobrepor instruções</h2>
   <p class="cs-def">Pipeline (ou pipelining) é dividir a execução de uma instrução em etapas e deixar várias instruções em andamento ao mesmo tempo, cada uma numa etapa, como uma linha de montagem.</p>
+  <div class="cs-resumo"><p>Sem pipeline, cada instrução passa por buscar, decodificar, executar e escrever antes de a próxima começar: 4 ciclos por instrução. Sobrepondo as quatro etapas, termina uma por ciclo, 4 vezes mais com o mesmo clock. Por isso um SPARC de 20 MHz com pipeline ganhava de um 386 de 33 MHz sem.</p><p class="cs-fonte"><a href="https://www.lighterra.com/papers/modernmicroprocessors/" target="_blank" rel="noopener">Lighterra · seção 2 ↗</a> · <a href="https://www.youtube.com/watch?v=QnpDwbLHOfY" target="_blank" rel="noopener">vídeo DesCOMPlica, 14 min ↗</a></p></div>
   <ul class="b">
     <li>A execução de várias instruções é sobreposta; cada stage completa uma parte da instrução e todos avançam juntos a cada ciclo de clock.</li>
     <li>O tempo de ciclo é o tempo do stage mais lento.</li>
@@ -104,6 +106,7 @@
 <section class="cs" id="stages" data-grupo="Pipeline" data-termos="estagio,est-if,est-id,est-ex,est-mem,est-wb,registrador-pipeline,profundidade" data-leitura="pipeline">
   <h2>Os 5 stages do pipeline clássico</h2>
   <p class="cs-def">Cada etapa do pipeline é um stage. O pipeline de 5 stages dos processadores RISC é a base de todo o resto do capítulo.</p>
+  <div class="cs-resumo"><p>Quebrar estágios longos em mais curtos (superpipelining) sobe o clock: cada instrução leva mais ciclos, mas continua saindo uma por ciclo. Profundidades reais: Cortex-A9, 8; Cortex-A72, 15; Skylake, 14 a 19; Zen, 17 a 19; Pentium 4, 20; Pentium 4 Prescott, 31. O x86 tende a ser mais fundo por causa da decodificação.</p><p class="cs-fonte"><a href="https://www.lighterra.com/papers/modernmicroprocessors/" target="_blank" rel="noopener">Lighterra · seção 3 ↗</a></p></div>
   <ul class="b">
     <li>IF (instruction fetch, busca): lê a instrução da memória no endereço do PC e soma 4 ao PC (cada instrução MIPS tem 4 bytes).</li>
     <li>ID (instruction decode, decodificação): descobre qual é a instrução e lê os registradores de entrada no banco de registradores.</li>
@@ -231,6 +234,7 @@ XOR  R10, R1, R11    ; lê R1</code></pre>
 <section class="cs" id="forwarding" data-grupo="Hazards de dados" data-termos="forwarding,load-use" data-leitura="dados">
   <h2>Forwarding e o hazard load-use</h2>
   <p class="cs-def">Forwarding (adiantamento, ou bypass) são fios extras que levam um resultado direto dos registradores de pipeline EX/MEM e MEM/WB para a entrada da ULA, sem esperar a escrita no banco de registradores.</p>
+  <div class="cs-resumo"><p>O bypass leva o resultado direto à instrução seguinte, sem esperar a escrita. O que ainda trava é a latência de cada operação: soma inteira, 1 ciclo; soma de ponto flutuante, 3 a 6; divisão inteira, mais de uma dúzia. O pior são os loads: aparecem cedo no código e a latência muda com hit ou miss.</p><p class="cs-fonte"><a href="https://www.lighterra.com/papers/modernmicroprocessors/" target="_blank" rel="noopener">Lighterra · seções 2 e 6 ↗</a> · <a href="https://www.youtube.com/watch?v=QnpDwbLHOfY" target="_blank" rel="noopener">vídeo DesCOMPlica, 14 min ↗</a></p></div>
   <ul class="b">
     <li>O DADD do exemplo calcula R1 no fim do EX (ciclo 3). O valor já existe, só ainda não foi gravado: está no registrador de pipeline EX/MEM.</li>
     <li>Um seletor escolhe: se a instrução em EX precisa de um registrador que uma instrução da frente está para escrever, usa o valor adiantado. Com forwarding, o exemplo roda sem nenhum stall.</li>
@@ -253,6 +257,7 @@ XOR  R10, R1, R11    ; lê R1</code></pre>
 <section class="cs" id="hazard-controle" data-grupo="Branches" data-termos="hazard-controle,penalidade-desvio" data-leitura="controle">
   <h2>Hazards de controle e branch penalty</h2>
   <p class="cs-def">Hazard de controle: depois de um <a href="#branch">branch</a>, o processador ainda não sabe qual instrução buscar, porque a decisão só sai em ID ou depois. Os ciclos perdidos por branch são o branch penalty.</p>
+  <div class="cs-resumo"><p>Há um branch a cada 6 instruções, mais ou menos. O processador aposta e continua buscando; se errou, joga fora o que buscou. No Pentium Pro, com 12 estágios, um erro custava 10 a 15 ciclos, e acertando 90% ele perdia uns 30% do desempenho. Preditores atuais acertam 95% a 97%.</p><p class="cs-fonte"><a href="https://www.lighterra.com/papers/modernmicroprocessors/" target="_blank" rel="noopener">Lighterra · seção 7 ↗</a> · <a href="https://www.youtube.com/watch?v=QnpDwbLHOfY" target="_blank" rel="noopener">vídeo DesCOMPlica, 14 min ↗</a></p></div>
   <ul class="b">
     <li>No pipeline de 5 stages do livro, a comparação e o cálculo do alvo foram antecipados para ID. Mesmo assim, a instrução buscada logo depois do branch pode ser a errada: perde-se 1 ciclo.</li>
     <li>Em pipelines profundos, a decisão sai muitos stages depois do IF, e o branch penalty chega a 10–20 ciclos.</li>
@@ -333,6 +338,16 @@ if (aa != bb) { … }       // branch b3: se b1 e b2 zeraram os dois, aa == bb</
   </div>
 </section>
 
+<section class="cs" id="predicacao" data-grupo="Branches" data-termos="predicacao" data-leitura="controle">
+  <h2>Predicação: trocar o branch por uma instrução condicional</h2>
+  <p class="cs-def">Em vez de pular para um lado ou para o outro, o processador executa uma instrução que só tem efeito se a condição for verdadeira, como o <code>cmov</code> (move condicional) do x86. Sem branch, não há aposta para errar.</p>
+  <div class="cs-resumo"><p>Ganha em blocos pequenos: no exemplo do guia, o trecho cai de 3 para 2 ciclos e some o risco de erro de predição. Perde em blocos grandes, porque os dois lados passam a ser executados. O ARM antigo tinha quase toda instrução condicional; o Itanium também.</p><p class="cs-fonte"><a href="https://www.lighterra.com/papers/modernmicroprocessors/" target="_blank" rel="noopener">Lighterra · seção 8 ↗</a></p></div>
+  <div class="cs-uso"><pre><code>// com branch                 // com predicação
+if (a &gt; b) x = a;             x = b;
+else       x = b;             x = (a &gt; b) ? a : x;   // cmov</code></pre></div>
+  <div class="cs-pegadinhas"><ul class="b"><li>Predicação não é predição: uma aposta no caminho (predição) contra executar sem apostar (predicação).</li></ul></div>
+</section>
+
 <section class="cs" id="btb" data-grupo="Branches" data-termos="btb,preditor-retorno" data-leitura="controle">
   <h2>Para onde desviar: BTB e preditor de endereço de retorno</h2>
   <p class="cs-def">Saber que o branch é tomado não basta: é preciso o endereço alvo já no IF. O BTB (branch-target buffer, buffer de destino de desvio) é uma cache que, dado o endereço da instrução que está sendo buscada, devolve o endereço alvo previsto.</p>
@@ -401,6 +416,7 @@ if (aa != bb) { … }       // branch b3: se b1 e b2 zeraram os dois, aa == bb</
 <section class="cs" id="escalonamento-dinamico" data-grupo="Escalonamento dinâmico" data-termos="escalonamento-dinamico,fora-de-ordem" data-leitura="tomasulo">
   <h2>Escalonamento dinâmico e execução fora de ordem</h2>
   <p class="cs-def">No escalonamento dinâmico, o hardware reordena as instruções enquanto o programa roda. Ele busca e decodifica em ordem, mas deixa cada instrução executar assim que os operandos dela estiverem prontos.</p>
+  <div class="cs-resumo"><p>A execução fora de ordem reordena no hardware, e a renomeação tira as falsas dependências. O preço é área e energia gastas o tempo todo. O ganho sobre um núcleo em ordem ficou em 20% a 40%, menos do que se prometia; núcleos de baixo consumo, como o Cortex-A53, continuam em ordem.</p><p class="cs-fonte"><a href="https://www.lighterra.com/papers/modernmicroprocessors/" target="_blank" rel="noopener">Lighterra · seções 9 e 10 ↗</a></p></div>
   <ul class="b">
     <li>Execução fora de ordem: uma instrução de trás executa antes de uma da frente. O programa continua dando o mesmo resultado, porque só se adiantam instruções sem dependência.</li>
     <li>Vantagens sobre o <a href="#loop-unrolling">escalonamento do compilador</a>: lida com esperas que o compilador não prevê (um miss na cache, <a href="/m8/comp/02-fundamentos-memoria">aula 02</a>) e roda bem o mesmo binário em processadores diferentes.</li>
@@ -509,6 +525,7 @@ SUB.D F12, F8, F14    ; não depende de ninguém, mas fica preso atrás do ADD.D
 <section class="cs" id="emissao-multipla" data-grupo="Emissão múltipla" data-termos="emissao-multipla,superescalar" data-leitura="multipla">
   <h2>Emissão múltipla e superescalar</h2>
   <p class="cs-def">Na emissão múltipla, o processador emite e executa várias instruções no mesmo ciclo, com várias unidades funcionais. É o jeito de passar de CPI = 1, que é o limite de um pipeline que emite uma por ciclo, mesmo sem nenhum stall.</p>
+  <div class="cs-resumo"><p>Largura é quantas instruções o núcleo emite por ciclo: Cortex-A9, 2; Pentium Pro, 3; Core 2, 6; Skylake e Zen 5, 8; Golden Cove, 12. Mesmo assim, programas comuns sustentam só 2 a 3 por ciclo (veja <a href="#limites-ilp">limites do ILP</a>).</p><p class="cs-fonte"><a href="https://www.lighterra.com/papers/modernmicroprocessors/" target="_blank" rel="noopener">Lighterra · seção 4 ↗</a></p></div>
   <ul class="b">
     <li>O CPI fica abaixo de 1: um processador que emite 4 por ciclo tem IPC máximo 4.</li>
     <li>Dois jeitos de decidir quais instruções vão juntas: o hardware decide enquanto o programa roda (superescalar) ou o compilador decide antes (<a href="#vliw">VLIW</a>).</li>
@@ -523,6 +540,7 @@ SUB.D F12, F8, F14    ; não depende de ninguém, mas fica preso atrás do ADD.D
 <section class="cs" id="vliw" data-grupo="Emissão múltipla" data-termos="vliw,epic" data-leitura="multipla">
   <h2>VLIW na prática e EPIC</h2>
   <p class="cs-def">No VLIW (very long instruction word, palavra de instrução muito longa), o compilador junta operações independentes num pacote grande, com uma vaga para cada unidade funcional. O hardware só executa o pacote, sem checar dependências, e vaga sem operação útil leva uma nop.</p>
+  <div class="cs-resumo"><p>Nenhum VLIW vingou como processador de uso geral; o Itanium (IA-64, que a Intel chamou de EPIC) foi a tentativa mais famosa. A ideia sobrevive em DSPs e em GPUs.</p><p class="cs-fonte"><a href="https://www.lighterra.com/papers/modernmicroprocessors/" target="_blank" rel="noopener">Lighterra · seção 5 ↗</a></p></div>
   <ul class="b">
     <li>Problemas: código maior (desenrolamento e nops), um stall numa unidade para todas (elas andam juntas), e o binário depende do número de vagas: um VLIW novo, com outras unidades, pede recompilação.</li>
     <li>EPIC (Itanium, Intel e HP) foi a tentativa de corrigir isso com mais ajuda do hardware. Não pegou no mercado.</li>
@@ -541,6 +559,7 @@ SUB.D F12, F8, F14    ; não depende de ninguém, mas fica preso atrás do ADD.D
 <section class="cs" id="processadores" data-grupo="Emissão múltipla" data-termos="cortex-a8,core-i7,micro-op" data-leitura="multipla">
   <h2>Dois processadores reais: Cortex-A8 e Core i7</h2>
   <p class="cs-def">Os dois exemplos do livro que juntam tudo: o ARM Cortex-A8, de celulares da época, superescalar estático focado em energia baixa; e o Intel Core i7, superescalar especulativo.</p>
+  <div class="cs-resumo"><p>O x86 é traduzido em micro-operações no estilo RISC (de 1 a 3 por instrução, na maioria) e roda num núcleo fora de ordem com renomeação. Uma cache de micro-operações evita decodificar o mesmo laço de novo: no Sandy Bridge, o pipeline tem 14 estágios saindo dela e 19 saindo da L1.</p><p class="cs-fonte"><a href="https://www.lighterra.com/papers/modernmicroprocessors/" target="_blank" rel="noopener">Lighterra · seção 12 ↗</a></p></div>
   <ul class="b">
     <li>ARM Cortex-A8: 2 emissões, em ordem, pipeline de 13 stages, branch prediction dinâmica com BTB. Branch mal previsto custa 13 ciclos.</li>
     <li>Intel Core i7 (920): decodifica até 4 instruções x86 por ciclo, quebrando-as em micro-operações simples no estilo RISC, que passam por renomeação, estações de reserva e um ROB de 128 entradas. Pipeline de 14 stages; erro de predição custa cerca de 17 ciclos.</li>
@@ -554,6 +573,7 @@ SUB.D F12, F8, F14    ; não depende de ninguém, mas fica preso atrás do ADD.D
 <section class="cs" id="limites-ilp" data-grupo="Limites e multithreading" data-termos="janela-instrucoes" data-leitura="limites">
   <h2>Os limites do ILP: quanto ILP existe?</h2>
   <p class="cs-def">Mesmo num processador perfeito o paralelismo dos programas é limitado, e com limites realistas o número despenca. Espremer mais ILP custa área e energia demais para o ganho.</p>
+  <div class="cs-resumo"><ul class="b"><li>Parede da potência: subir o clock em 20% pode pedir 50% mais potência, porque a tensão sobe junto (potência ∝ f × V²). O teto prático fica em 150 a 200 W num desktop e abaixo de 5 W num celular.</li><li>Parede do ILP: programas comuns têm 2 a 3 instruções independentes por ciclo, no máximo; a média do SPECint fica abaixo de 2.</li></ul><p class="cs-fonte"><a href="https://www.lighterra.com/papers/modernmicroprocessors/" target="_blank" rel="noopener">Lighterra · seção 11 ↗</a></p></div>
   <ul class="b">
     <li>O processador perfeito que o livro simula: renomeação com infinitos registradores, branch prediction perfeita, sabe sempre se dois acessos à memória colidem, emite quantas instruções quiser por ciclo e olha o programa inteiro de uma vez.</li>
     <li>Mesmo assim, o paralelismo nos programas de teste varia de algumas dezenas a pouco mais de cem instruções por ciclo, e os programas de inteiros ficam no lado baixo.</li>
@@ -566,6 +586,7 @@ SUB.D F12, F8, F14    ; não depende de ninguém, mas fica preso atrás do ADD.D
 <section class="cs" id="multithreading" data-grupo="Limites e multithreading" data-termos="multithreading,mt-fina,mt-grossa,smt" data-leitura="limites">
   <h2>Multithreading em hardware: granularidade fina, grossa e SMT</h2>
   <p class="cs-def">No multithreading em hardware, o processador guarda o estado de várias threads ao mesmo tempo (um PC e um banco de registradores para cada uma) e compartilha as unidades funcionais entre elas. Se um programa sozinho não tem ILP para encher as unidades, outro empresta instruções.</p>
+  <div class="cs-resumo"><p>O SMT duplica só o estado de cada thread (PC, registradores) e divide o resto, com uns 10% a mais de lógica. O ganho varia muito: no Pentium 4, de −10% a +30%. Ajuda mais quando as threads passam tempo esperando a memória.</p><p class="cs-fonte"><a href="https://www.lighterra.com/papers/modernmicroprocessors/" target="_blank" rel="noopener">Lighterra · seção 13 ↗</a></p></div>
   <ul class="b">
     <li>Uma thread é um fluxo de execução independente, com PC e registradores próprios (<a href="/m8/comp/04-processos-threads">aula 04</a>). Para o hardware, basta saber que instruções de threads diferentes não dependem umas das outras.</li>
     <li>Trocar de thread custa quase nada.</li>
@@ -591,6 +612,7 @@ SUB.D F12, F8, F14    ; não depende de ninguém, mas fica preso atrás do ADD.D
 <section class="cs" id="nucleos" data-grupo="Paralelismo entre núcleos" data-termos="" data-leitura="nucleos">
   <h2>Multicore e Amdahl com N núcleos</h2>
   <p class="cs-def">Com o ILP esgotado e o clock parado desde perto de 2005, o ganho vem de várias threads em núcleos diferentes. Quem divide o trabalho é o programador.</p>
+  <div class="cs-resumo"><ul class="b"><li>Núcleo mais largo ou mais núcleos? A lógica que despacha instruções cresce com o quadrado da largura: um núcleo de 8 por ciclo é mais de 4 vezes maior que um de 4.</li><li>Em 2011, com cerca de 1 bilhão de transistores cada, a Intel fez 4 núcleos largos (Sandy Bridge) e a Sun, 16 núcleos simples com 8 threads cada (Niagara 3). Celulares misturam núcleos grandes e pequenos (big.LITTLE).</li><li>SIMD é o outro caminho: uma instrução para vários dados (SSE, AVX, NEON). Rende muito em imagem, vídeo e áudio e quase nada em compiladores e bancos de dados.</li></ul><p class="cs-fonte"><a href="https://www.lighterra.com/papers/modernmicroprocessors/" target="_blank" rel="noopener">Lighterra · seções 14 e 15 ↗</a></p></div>
   <div data-ref-tbl="tbl-niveis-paralelismo"></div>
   <ul class="b">
     <li>Flynn (<a href="/m8/comp/02-fundamentos-memoria/consulta#paralelismo">aula 02</a>): pipeline e emissão múltipla são SISD; instruções vetoriais e GPU, SIMD; SMT e multicore, MIMD.</li>

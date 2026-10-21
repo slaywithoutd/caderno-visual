@@ -179,6 +179,19 @@
       "titulo": "Lipp et al. · Meltdown: reading kernel memory from user space · USENIX Security 2018",
       "url": "https://meltdownattack.com/meltdown.pdf",
       "secao": "seguranca"
+    },
+    {
+      "tipo": "Complemento",
+      "titulo": "Jason Robert Carey Patterson · Modern Microprocessors: A 90-Minute Guide! (Lighterra, atualizado em 2026) · complemento indicado pelo professor para o encontro de 21/10",
+      "url": "https://www.lighterra.com/papers/modernmicroprocessors/",
+      "secao": "limites"
+    },
+    {
+      "tipo": "Vídeo",
+      "titulo": "DesCOMPlica, Oliba! · Pipeline de instruções: estágios, hazard de dados e de controle e bypassing (forwarding)",
+      "url": "https://www.youtube.com/watch?v=QnpDwbLHOfY",
+      "duracao": "14 min",
+      "secao": "pipeline"
     }
   ],
   "observacao": "Autoestudo: Hennessy & Patterson, cap. 3 e apêndice C. Os slides de Luisi (19/10/2026, p. 37) citam a 6ª edição (Elsevier, 2019); as faixas de página por seção vêm da indicação do autoestudo e não foram conferidas contra uma edição identificada. O pipeline básico de 5 stages, que o capítulo 3 assume, está no apêndice C. Os exemplos usam as instruções MIPS64 do livro (DADD, LD, L.D, ADD.D…). As seções 11 a 15 vão além do capítulo 3: cobrem o que os slides de 19/10 anunciaram para este encontro (paralelismo entre núcleos e Meltdown) e os chips do projeto. O guia do encontro, o quiz, os exercícios e a decisão de projeto são autorais, com valores de exemplo; não são questões do professor. Os slides deste encontro ainda não foram integrados."

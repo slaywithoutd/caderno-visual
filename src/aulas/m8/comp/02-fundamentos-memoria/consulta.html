@@ -429,6 +429,7 @@
 <section class="cs" id="hierarquia" data-grupo="Memória" data-termos="hierarquia-memoria" data-leitura="hierarquia">
   <h2>Hierarquia de memória</h2>
   <p class="cs-def">A hierarquia de memória empilha níveis (registradores, L1, L2, L3, RAM, SSD/disco). Cada um é maior, mais lento e mais barato por byte que o de cima, e guarda cópia de parte do nível de baixo.</p>
+  <div class="cs-resumo"><p>Hierarquia num Zen 4: L1 de 32 KB em 4 ciclos, L2 de 1 MB em 14, L3 de 32 MB em uns 49, RAM em mais de 140 e swap em mais de 10 000. A 5 GHz, uma ida à DDR5 custa uns 127 ciclos. As caches acertam uns 90% dos acessos graças à localidade.</p><p class="cs-fonte"><a href="https://www.lighterra.com/papers/modernmicroprocessors/" target="_blank" rel="noopener">Lighterra · seções 16 e 17 ↗</a></p></div>
   <ul class="b">
     <li>Memória rápida é pequena e cara; memória grande é lenta e barata. Nenhuma tecnologia é as duas coisas ao mesmo tempo.</li>
     <li>A memória principal (RAM) é o nível onde ficam programa e dados enquanto ele roda (detalhes em <a href="#tecnologias">tecnologias de memória</a>).</li>
@@ -459,6 +460,7 @@
 <section class="cs" id="tecnologias" data-grupo="Memória" data-termos="sram,dram,flash,memoria-principal" data-leitura="hierarquia,computador">
   <h2>Tecnologias de memória: SRAM, DRAM, flash e a memória principal</h2>
   <p class="cs-def">SRAM é rápida e cara (caches). DRAM é densa e barata (memória principal). Flash guarda sem energia (SSD).</p>
+  <div class="cs-resumo"><p>Banda é fácil de aumentar (mais bancos, barramento mais largo); latência quase não cai. É como uma estrada: mais faixas levam mais carros por hora, mas cada carro não chega antes. Código que segue ponteiros sofre com latência; código que percorre vetores em ordem aproveita a banda.</p><p class="cs-fonte"><a href="https://www.lighterra.com/papers/modernmicroprocessors/" target="_blank" rel="noopener">Lighterra · seção 19 ↗</a></p></div>
   <div data-ref-tbl="tbl-tecnologias"></div>
   <ul class="b">
     <li>Memória principal (RAM): onde ficam programa e dados enquanto roda. Gigabytes, fora da CPU, dezenas de ns (centenas de ciclos). Perde tudo sem energia.</li>
@@ -485,6 +487,7 @@
 <section class="cs" id="mapeamento" data-grupo="Memória" data-termos="mapeamento-direto,associativo-conjunto,totalmente-associativo" data-leitura="cache">
   <h2>Onde o bloco fica: direto, em conjunto, totalmente associativa</h2>
   <p class="cs-def">A organização da cache diz em quais linhas um bloco pode ficar: uma só (mapeamento direto), qualquer uma de um conjunto de n (associativa em conjunto, n vias) ou qualquer uma (totalmente associativa).</p>
+  <div class="cs-resumo"><p>Mapeamento direto sofre com conflitos: dois endereços que caem na mesma linha se expulsam o tempo todo (thrashing). Associativa por conjunto confere 2, 4 ou 8 lugares em paralelo. L1 de dados costuma ter 4 ou 8 vias; a última cache, 12 ou 16.</p><p class="cs-fonte"><a href="https://www.lighterra.com/papers/modernmicroprocessors/" target="_blank" rel="noopener">Lighterra · seção 18 ↗</a></p></div>
   <div class="cs-formula">
     <div class="formula">linha = bloco mod (nº de linhas)     ·     conjunto = bloco mod (nº de conjuntos)</div>
     <ul class="b"><li>"mod" é o resto da divisão: 12 mod 8 = 4.</li></ul>

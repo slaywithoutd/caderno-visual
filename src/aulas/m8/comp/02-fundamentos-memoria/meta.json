@@ -151,6 +151,12 @@
       "tipo": "Livro",
       "titulo": "Hennessy & Patterson, cap. 2 · Proteção: memória virtual e máquinas virtuais, seção 2.4",
       "secao": "virtual"
+    },
+    {
+      "tipo": "Complemento",
+      "titulo": "Jason Robert Carey Patterson · Modern Microprocessors: A 90-Minute Guide! (Lighterra, atualizado em 2026) · complemento indicado pelo professor para o encontro de 21/10",
+      "url": "https://www.lighterra.com/papers/modernmicroprocessors/",
+      "secao": "hierarquia"
     }
   ],
   "observacao": "A leitura originalmente indicada é Hennessy & Patterson, p. 1–148. O PDF de Luisi cita a 6ª edição (tradução de 2019), capítulos 1 e 2, e acrescenta Machado & Maia, 5ª edição, capítulo 2. A afirmação anterior de que a fonte era a 5ª edição de Hennessy foi retirada: não havia comprovação. As referências de seções e páginas do livro são indicações, não registro de extração integral verificada; não se garante equivalência à leitura de todas essas páginas. A aula presencial foi conferida nas 37 páginas do PDF. Exercícios são reexplicados com suas hipóteses; medições do professor são específicas daquele sistema. O enunciado completo do Desafio 01 não está no PDF."

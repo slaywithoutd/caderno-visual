@@ -15,7 +15,7 @@ import { pathToFileURL } from 'node:url';
 
 const RAIZ = join(process.cwd(), 'src', 'aulas');
 const filtro = process.argv[2] || '';
-const ORDEM = ['cs-def', 'cs-formula', 'cs-uso', 'cs-pegadinhas', 'cs-ponderada'];
+const ORDEM = ['cs-def', 'cs-resumo', 'cs-formula', 'cs-uso', 'cs-pegadinhas', 'cs-ponderada'];
 const limpa = (s) => s.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/\s+/g, ' ').trim();
 const attr = (tag, nome) => (tag.match(new RegExp(`${nome}="([^"]*)"`)) || [])[1] || '';
 

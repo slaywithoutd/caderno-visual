@@ -18,6 +18,17 @@ passo a passo, animações em loop e glossário. Serve para estudar no lugar dos
 | `revisao-prova` | Fim do módulo: auditar as aulas de uma matéria e deixar a revisão pronta para a prova. |
 | `ajustar-visual` | Mudar o visual ou o comportamento de todas as aulas de uma vez. |
 | `publicar` | Build, commit, push e conferir o deploy no Pages. |
+| `auditar-cobertura` | Inventariar fontes, comparar conceitos e exercícios e corrigir lacunas com rastreabilidade. |
+
+## Confiabilidade das fontes e cobertura
+
+Antes de criar ou integrar aula, siga `.claude/skills/auditar-cobertura/SKILL.md`. A matriz
+`cobertura.json` registra acesso, edição, páginas/seções, diagnóstico inicial e destinos nos modos.
+Resumo de terceiros, título e sumário não são leitura integral. Nunca invente edição, página ou
+transcrição. Sem fonte integral conferida, declare a limitação em `meta.observacao` e não prometa
+equivalência ao livro. Conceitos, pré-requisitos, fórmulas, hipóteses, diagramas e exercícios precisam
+ser inventariados antes da síntese; `checar-termos` sozinho não detecta omissões. Execute
+`npm run checar-cobertura` e revise semanticamente a matriz: o script só verifica rastreabilidade.
 
 ## Estrutura
 
@@ -166,7 +177,22 @@ Veja os exemplos da aula `m8/comp/01-conceitos`.
 
 ## Modo Consulta (consulta.html)
 
-Toda aula tem dois modos, trocados por um switch global no topo (a escolha fica no navegador e vale para
+Definições ficam numa sidebar direita aberta por padrão, com espaço reservado ao lado do artigo.
+O controle de recolher/expandir salva a preferência no navegador. Não usar painel sobre o texto:
+em telas de até 760px, a lista entra no fluxo antes do artigo. O atalho `/` abre e foca a busca.
+
+### Aula somente Consulta
+
+Quando a pessoa pedir apenas Consulta (por exemplo em Design/UX), declare `"modos": ["consulta"]`
+no `meta.json`. Não crie um `conteudo.html` vazio nem uma versão Leitura artificial. O catálogo aponta
+para `/consulta`, a rota curta redireciona e o botão Leitura fica indisponível só nessa aula.
+Escreva visuais diretamente no `consulta.html`; sem segundo modo, não há figuras para importar.
+Omita `data-leitura`, mantenha dono único por termo (`data-termos`), revisão agrupada e fontes no fim.
+Use a primeira aula de `m8/ux` como referência. Não force fórmulas, ponderada ou animações quando não
+ajudarem o assunto. Exercícios autorais devem ser identificados, com justificativas e limites,
+sem atribuir perguntas ou respostas ao professor. Os dois validadores também cobrem esse formato.
+
+Por padrão, toda aula tem dois modos, trocados por um switch global no topo (a escolha fica no navegador e vale para
 todas as aulas; ao trocar, a página cai no mesmo assunto do outro modo):
 
 - **Leitura** (`conteudo.html`): a aula na ordem das fontes, para aprender da primeira vez.
@@ -319,7 +345,7 @@ banqueiro" porque o livro brasileiro usa assim).
 - Figuras sem caixa. Barra de controles (play, ‹, ›, reiniciar, progresso) **acima** da figura.
 - Figura passo a passo anima só com o mouse em cima e avança na hora em que ele entra.
 - Dois modos por aula, Leitura e Consulta, com switch global no topo (`src/lib/modo.js`). No Consulta, a
-  barra de Definições fica à direita, sempre visível (no celular, botão), com busca que filtra enquanto digita.
+  barra de Definições fica à direita, com opção de recolher e busca que filtra enquanto digita. Em telas pequenas, entra no fluxo sem cobrir o artigo.
 - Nenhuma animação roda (nem com o mouse em cima, nem loop) sem que **pelo menos 80%** dela esteja na
   tela (`fracaoVisivel` em `src/lib/dom.js`). Loops começam do início quando aparecem e congelam ao sair.
 - Toda página de leitura (aula, revisão, glossário) mostra o **tempo de leitura** logo abaixo do título,

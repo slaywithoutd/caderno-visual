@@ -110,7 +110,7 @@
     <li>Tipos e tamanhos de operandos: inteiros de 8 a 64 bits, ponto flutuante de 32 e 64.</li>
     <li>Operações: transferência de dados, aritmética e lógica, controle de fluxo, ponto flutuante.</li>
     <li>Controle de fluxo: branches condicionais, saltos, chamadas e retornos.</li>
-    <li>Codificação: tamanho fixo (32 bits em ARM e RISC-V, fácil de decodificar) ou variável (1 a 18 bytes no x86, programas menores).</li>
+    <li>Codificação: A64 e a base RV32I usam 32 bits; Thumb e a extensão C do RISC-V admitem 16 bits. x86 usa tamanho variável, até 15 bytes. O nome da família sozinho não determina o tamanho da instrução.</li>
   </ul>
   <div data-ref-mn="mn-isa"></div>
 </section>
@@ -554,7 +554,7 @@
     <li>Compulsório (partida a frio): primeiro acesso a um bloco. Nenhuma cache evita.</li>
     <li>Capacidade: o programa usa mais blocos do que cabem. Uma totalmente associativa do mesmo tamanho também daria miss.</li>
     <li>Conflito: havia espaço, mas outros blocos caíram no mesmo conjunto. Uma totalmente associativa do mesmo tamanho daria hit.</li>
-    <li>Com vários processadores existe um quarto C, coerência: um processador invalida a cópia na cache de outro.</li>
+    <li>Misses por <a href="#coerencia-luisi">coerência</a> são uma categoria adicional em sistemas com caches de múltiplos núcleos.</li>
   </ul>
   <div class="cs-uso">
     <ul class="b"><li>Na <a href="#mapeamento">figura da cache de 4 linhas</a>, troque a aba: os misses de conflito somem na totalmente associativa; os compulsórios ficam nas três.</li></ul>
@@ -658,4 +658,98 @@ for (i = 0; i &lt; 5000; i++)
     <li>Base da nuvem: isola clientes no mesmo servidor e permite mover uma máquina virtual entre servidores.</li>
     <li>A memória ganha mais um nível de tradução (endereço do convidado → "físico" do convidado → físico real), feito em hardware nos processadores atuais para não ficar lento.</li>
   </ul>
+</section>
+
+<section class="cs" id="portas-logicas" data-grupo="Aula presencial · fundamentos" data-termos="porta-logica,nand,nor,tabela-verdade" data-leitura="fundamentos-presencial">
+  <h2>Portas lógicas: construir com NAND</h2>
+  <p class="cs-def">Uma porta lógica calcula um bit a partir das entradas. AND exige ambas em 1; OR exige pelo menos uma; NOT inverte. NAND nega AND, e NOR nega OR.</p>
+  <div class="cs-formula"><div class="formula">NOT A = NAND(A,A)<br>AND(A,B) = NAND(NAND(A,B),NAND(A,B))<br>OR(A,B) = NAND(NAND(A,A),NAND(B,B))</div></div>
+  <div class="cs-uso"><p>Para A = 1 e B = 0: NAND(1,0) = 1. Inverta esse resultado com outra NAND de entradas iguais: NAND(1,1) = 0. Você construiu AND usando duas NAND.</p><p>A tabela-verdade enumera todas as combinações. NAND e NOR são universais: cada tipo, combinado consigo mesmo, permite construir qualquer função booleana finita.</p></div>
+  <div class="cs-pegadinhas">Universalidade lógica não significa memória ou um computador completo numa única porta. A flash NAND é uma tecnologia de armazenamento; não confunda seu nome com a porta lógica isolada.</div>
+  <div data-ref-tbl="tbl-nand-luisi"></div>
+</section>
+
+<section class="cs" id="harvard-von-neumann" data-grupo="Aula presencial · fundamentos" data-termos="von-neumann,harvard,harvard-modificada" data-leitura="fundamentos-presencial">
+  <h2>Von Neumann, Harvard e a mistura dos dois</h2>
+  <p class="cs-def">Von Neumann compartilha memória e caminho entre instruções e dados no modelo básico. Harvard os separa. Harvard modificada combina separação em alguns níveis com unificação em outros.</p>
+  <div class="cs-uso"><ul><li>Compartilhar o caminho pode criar disputa entre busca de instrução e acesso a dados. Separar permite acessos simultâneos, se o hardware os suportar.</li><li>L1 de instruções e dados separadas com L2/L3/RAM unificadas é um exemplo da mistura. Isso não exige dois espaços de endereçamento para o programa.</li><li>No Uno clássico (ATmega328P), instruções nativas executam da flash; a EEPROM não executa código nativo diretamente.</li></ul></div>
+  <div class="cs-pegadinhas">Harvard não significa proteção absoluta contra injeção; veja <a href="#seguranca-arquitetura">segurança de arquitetura</a>. Os modelos não determinam sozinhos o desempenho de um chip real.</div>
+  <div data-ref="fig-caminhos-luisi"></div>
+</section>
+
+<section class="cs" id="chip-real" data-grupo="Aula presencial · fundamentos" data-termos="gpio,interfaces-seriais,lockstep,memoria-rom,rram-otp,aes-hmac" data-leitura="fundamentos-presencial">
+  <h2>Do diagrama ao chip: OpenTitan</h2>
+  <p class="cs-def">Um sistema no chip conecta CPU, memórias, periféricos e blocos de controle. No exemplo Earl Grey, Ibex executa RISC-V, e os outros blocos oferecem armazenamento, comunicação e segurança.</p>
+  <div class="cs-uso"><ul><li>ROM: código de partida. <a href="#tecnologias">SRAM</a>: memória de trabalho. Na versão dos slides, RRAM: memória não volátil; OTP: programável uma única vez.</li><li>GPIO: pinos de entrada/saída. UART, I²C, SPI e USB: interfaces de comunicação; não são instruções da CPU. Uma interconexão/barramento leva dados, endereços e comandos entre componentes.</li><li>AES apoia criptografia; HMAC, autenticação de mensagens com chave. Há também gestão de chaves.</li><li>Lockstep: duas execuções se conferem para detectar divergência, em vez de executar dois trabalhos independentes.</li></ul></div>
+  <div class="cs-pegadinhas">Não trate versões de um chip como idênticas: a lista de memórias aqui corresponde ao diagrama apresentado em aula. Lockstep não dobra throughput.</div>
+</section>
+
+<section class="cs" id="toolchain" data-grupo="Aula presencial · fundamentos" data-termos="assembler,linker,loader,firmware,bootloader,bytecode,interpretador,risc-cisc,opcode-operando" data-leitura="fundamentos-presencial">
+  <h2>Toolchain, bytecode e código nativo</h2>
+  <p class="cs-def">Toolchain é a cadeia de ferramentas que transforma e prepara um programa. Bytecode é uma representação intermediária executada por um interpretador ou máquina virtual; código nativo é entendido pela CPU-alvo.</p>
+  <div class="cs-uso"><ol><li>O <a href="/m8/comp/01-conceitos/consulta#compilador">compilador da aula de linguagens</a> pode gerar assembly. O assembler (montador) transforma esse texto em código-objeto.</li><li>O linker combina partes e resolve referências para formar o executável. Loader prepara a execução; gravador escreve o dispositivo. Ferramentas podem fundir essas etapas.</li><li>Firmware é o software do dispositivo. Bootloader é um programa de partida que pode intermediar atualização de firmware.</li><li>Uma rotina em bytecode pode chegar como dado sem substituir o firmware que a interpreta. Interpretar adiciona trabalho; compilação JIT e outras estratégias impedem uma regra universal de desempenho.</li></ol><p>Na compilação mostrada no slide 11: x86-64 deu 5 instruções/14 B; Thumb, 6/12 B; RV32IM, 5/20 B; AVR, 7/14 B. São resultados daquela função e configuração do clang 18 (-O2). Em AVR de 8 bits, um inteiro de 16 bits usa pares de registradores.</p><p>RISC favorece operações simples e frequentemente load/store separados; CISC oferece operações mais complexas. Opcode identifica a operação; operandos informam valores, registradores ou destinos usados por ela.</p></div>
+  <div class="cs-pegadinhas">Menos instruções ou menos bytes não prova menos tempo. Compare IC, CPI e frequência em <a href="#equacao-cpu">desempenho</a>; comprimentos por ISA ficam em <a href="#isa">ISA</a>. Um interpretador não é seguro só por interpretar.</div>
+</section>
+
+<section class="cs" id="coerencia-luisi" data-grupo="Aula presencial · memória e segurança" data-termos="coerencia-cache,mesi" data-leitura="fundamentos-presencial">
+  <h2>Coerência e estados MESI</h2>
+  <p class="cs-def">Coerência coordena cópias de um mesmo endereço em caches diferentes. MESI nomeia estados da linha: Modified, Exclusive, Shared e Invalid.</p>
+  <div class="cs-uso"><ol><li>Duas L1 têm x = 7. O núcleo 0 pede posse para escrever e a cópia do núcleo 1 é invalidada (I).</li><li>O núcleo 0 grava x = 9; sua linha fica modificada (M). A RAM pode manter 7 temporariamente em write-back.</li><li>Ao ler x, o núcleo 1 sofre miss e recebe a versão atual por meio do protocolo. A RAM desatualizada não pode ser usada como se fosse a versão vigente.</li></ol><p>E é uma cópia exclusiva limpa; S é limpa e possivelmente compartilhada. M ainda difere da memória; I não pode atender a leitura.</p></div>
+  <div class="cs-pegadinhas">Coerência de um endereço não substitui sincronização nem estabelece toda a ordem entre endereços distintos. Locks são outro problema.</div>
+</section>
+
+<section class="cs" id="xip-firmware" data-grupo="Aula presencial · memória e segurança" data-termos="xip,eeprom,interrupcao-firmware" data-leitura="fundamentos-presencial">
+  <h2>XIP, EEPROM e código na SRAM</h2>
+  <p class="cs-def">XIP (execute in place) busca código diretamente no armazenamento mapeado. EEPROM mantém dados sem alimentação e permite regravação com limites de desgaste. Uma interrupção desvia a execução para tratar um evento.</p>
+  <div class="cs-uso"><ul><li>No RP2040, a flash pode ser externa, atendida por uma cache XIP de 16 KiB. Não pressuponha flash interna porque o dispositivo é um microcontrolador.</li><li>Gravar flash pode impedir buscas nela. Uma rotina crítica pode ficar em SRAM; chamadas, constantes e dados de que depende também precisam continuar acessíveis.</li><li><code>__not_in_flash_func</code>, no Pico SDK, posiciona código fora da flash. O slide cita <code>IRAM_ATTR</code> no ESP32 como paralelo, não como API intercambiável.</li></ul></div>
+  <div class="cs-pegadinhas">SRAM é volátil. Remover a dependência de flash ajuda a limitar atrasos, mas não prova um deadline: ainda há interrupções concorrentes, contenção e outros custos.</div>
+</section>
+
+<section class="cs" id="seguranca-arquitetura" data-grupo="Aula presencial · memória e segurança" data-termos="nx,side-channel,rowhammer,meltdown-spectre" data-leitura="fundamentos-presencial">
+  <h2>Quando decisões de arquitetura viram risco</h2>
+  <p class="cs-def">A organização do hardware influencia isolamento, execução e vazamentos. NX marca páginas como não executáveis; side channels inferem informação por efeitos observáveis, como tempo de acesso.</p>
+  <div class="cs-uso"><ul><li>Flush+Reload usa diferenças de tempo de cache. A leitura direta do segredo não é a única forma de vazar informação.</li><li>Meltdown explorou execução transitória em processadores vulneráveis para contornar isolamento; Spectre explora especulação induzida. Não são sinônimos nem afetam qualquer processador.</li><li>Rowhammer é perturbação de células de DRAM por ativações repetidas de linhas. O mecanismo difere do timing de cache, e sua ocorrência depende da memória e das mitigações.</li><li>O caso de Ken Thompson mostra risco na própria cadeia de compilação: um compilador comprometido pode alterar programas. Atualização e origem confiável do software também fazem parte do problema.</li><li>As permissões de memória e o isolamento discutidos em <a href="#memoria-virtual">memória virtual</a> são proteções reais, mas não justificam prometer invulnerabilidade.</li></ul></div>
+  <div class="cs-pegadinhas">Separar instruções e dados não imuniza contra injeção; NX também não resolve todos os ataques. Esta é a ligação introdutória da aula, não um tutorial de exploração.</div>
+</section>
+
+<section class="cs" id="exercicios-luisi" data-grupo="Aula presencial · aplicar" data-termos="" data-leitura="fundamentos-presencial">
+  <h2>Exercícios: cálculo, gargalo e memória disponível</h2>
+  <p class="cs-def">Os exercícios dos slides 23–28 comparam execução, média de acesso e capacidade. As contas abaixo usam os dados didáticos da aula, não especificações de toda placa.</p>
+  <div class="cs-formula"><div class="formula">T = IC × CPI / f<br>AMAT = hit time + miss rate × miss penalty<br>rotinas que cabem = ⌊bytes disponíveis / bytes por rotina⌋</div></div>
+  <div class="cs-uso">
+    <details><summary>1 · CPU 125 MHz, CPI 1,2: interpretar ou compilar?</summary>
+      <p>Por instrução da rotina: interpretado = 150 × 1,2 / (125 × 10⁶) s = 1,44 µs; nativo = 15 × 1,2 / (125 × 10⁶) s = 0,144 µs. Para 40 instruções: 57,6 µs versus 5,76 µs. CPU: speedup 10.</p>
+      <p>Com 4 × 40 = 160 s de espera humana, F = 57,6 µs / (160 s + 57,6 µs) ≈ 3,6 × 10⁻⁷. Amdahl: aproximadamente 1,000000324. Economia de CPU não equivale à mesma melhora percebida.</p>
+    </details>
+    <details><summary>2 · Hit 1 ciclo; miss custa 50 ciclos adicionais</summary>
+      <p>4%: 1 + 0,04 × 50 = 3 ciclos. Aquecido, 0,2%: 1 + 0,002 × 50 = 1,1 ciclo. Razão 3/1,1 ≈ 2,73 apenas para esta média. Um acesso que falta custa 51 ciclos no total.</p>
+      <p>O laço de 6 KiB se repete na cache de 16 KiB: localidade temporal. Caber não elimina interferência ou conflitos. Para interrupção durante gravação, aplique os cuidados de <a href="#xip-firmware">XIP</a>.</p>
+    </details>
+    <details><summary>3 · Bytecode de 150 B; nativo de 750 B</summary>
+      <p>EEPROM: ⌊1024/150⌋ = 6 rotinas. Flash livre: 32768 − 512 de bootloader − 12288 de firmware = 19968 B; ⌊19968/750⌋ = 26 rotinas.</p>
+      <p>Suposição: sem metadados e outras reservas. Bytecode é enviado como dado e validado; nativo exige atualizar código executável. Segurança, desgaste, atualização e uso de memória entram na escolha.</p>
+    </details>
+    <p>No quiz, miss rate é faltas/acessos; 5 misses em 100 acessos dão 5%. Amdahl com F = 0,5 e aceleração 10 dá 1/0,55 ≈ 1,818, com teto 2. O compilador afeta principalmente IC e também pode alterar CPI pelo mix de instruções.</p>
+    <p>O Xeon medido pelo professor tinha, na escala L1 = 1 s, L2 = 3,5 s, L3 = 32 s e DRAM ≈ 100 s. Não são constantes do hardware. O gráfico da memory wall compara ritmos de crescimento de cálculo e banda, não um speedup aplicável a qualquer programa.</p>
+  </div>
+  <div class="cs-pegadinhas">AMAT é média, não pior caso. Explicite penalidade adicional versus tempo total, e nestas capacidades interprete “KB” dos slides como KiB. Contas sem desenvolvimento não atendem à orientação do slide 36.</div>
+</section>
+
+<section class="cs" id="projeto-isa" data-grupo="Aula presencial · aplicar" data-termos="isa-rotina,watchdog" data-leitura="fundamentos-presencial">
+  <h2>Projeto: a ISA da rotina de vestir</h2>
+  <p class="cs-def">A ISA da rotina é o contrato que o compilador de domínio gera e o módulo de controle executa. Pode ser bytecode próprio, diferente da ISA física do processador.</p>
+  <div class="cs-formula"><div class="formula">5 × 4 B = 20 B → ⌊1024/20⌋ = 51 rotinas<br>37 × 4 B = 148 B → ⌊1024/148⌋ = 6 rotinas</div></div>
+  <div class="cs-uso"><ul><li>Fluxo: terapeuta → IDE → linguagem da rotina → compilador → código de baixo nível → módulo com CPU, memória e E/S. Não é a ponderada da pulseira.</li><li>Caso: meia, calça, camisa e blusa. Sinalizar → esperar botão → apagar → próximo passo. Reforço em 60 s e cuidador em 120 s são tempos de exemplo.</li><li>Estilo compacto: quatro <code>PASSO dispositivo,60,120</code> e FIM. O comportamento do passo fica no firmware; mudá-lo pode exigir regravação.</li><li>Estilo de primitivas: SINAL, ESPERA, VAI, AVISA, APAGA e FIM. O exemplo soma 37 instruções. Novas combinações mudam a rotina; uma operação inexistente ainda exige novo firmware.</li><li>Defina até 8 operações, operandos, unidade de tempo, efeitos e codificação. Até 8 opcodes cabem em 3 bits; os operandos e alvos de salto continuam precisando de espaço.</li><li>Cheque dispositivos, operandos, saltos e caminhos sem aviso. Um watchdog é um mecanismo independente que monitora falta de progresso ou de resposta.</li></ul><p>Para defender a decisão: comece pela escolha, declare trade-off e pessoa afetada, mostre um número e diga o que mudaria sua escolha. Investigue com o parceiro quantas rotinas são usadas por dia e quem pode alterá-las.</p></div>
+  <p>Um passo no estilo de primitivas (slide 33). ESPERA continua quando o botão é acionado ou desvia ao rótulo quando acaba o tempo; 0 significa espera sem limite neste exemplo.</p>
+  <pre><code>SINAL meia, 1
+ESPERA meia, 60, R1
+VAI OK1
+R1: SINAL meia, 2
+ESPERA meia, 60, C1
+VAI OK1
+C1: AVISA cuidador
+ESPERA meia, 0
+OK1: APAGA meia</code></pre>
+  <p>Rótulos nomeiam posições e não contam como instruções. São 9 instruções por peça: 4 × 9 + FIM = 37. A codificação transforma operações, dispositivos, tempos e destinos em bytes; quatro bytes por instrução é uma escolha do exemplo.</p>
+  <div class="cs-pegadinhas">Os estilos são analogias didáticas a RISC/CISC. Barrar uma espera infinita não garante aviso: um loop pode evitá-lo. Analise os caminhos e o tempo, ou imponha supervisão independente; entrega do alerta também depende da comunicação. O Desafio 01 completo estava em folha separada, ausente do PDF; não há gabarito verificável para inventar.</div>
 </section>

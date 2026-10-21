@@ -1,0 +1,22 @@
+export default {
+  'ux-barreira': { t: 'Barreira', m: ['barreira', 'barreiras'], d: 'Condição que dificulta ou impede realizar uma atividade, na relação entre pessoa, tarefa e ambiente.' },
+  'ux-participacao': { t: 'Participação', m: ['participação'], d: 'Envolvimento efetivo numa situação de vida; não apenas presença física.' },
+  'ux-acessibilidade': { t: 'Acessibilidade', m: ['acessibilidade'], d: 'Condições de acesso e uso para pessoas com deficiência, incluindo perceber, compreender e operar produtos, ambientes e serviços.' },
+  'ux-autonomia': { t: 'Autonomia', m: ['autonomia'], d: 'Poder escolher e conduzir as próprias ações, inclusive decidir receber apoio.' },
+  'ux-design-inclusivo': { t: 'Inclusive design', m: ['inclusive design', 'design inclusivo'], d: 'Abordagem de projeto que incorpora diversidade e pessoas excluídas às decisões. Em português: design inclusivo.' },
+  'ux-desenho-universal': { t: 'Desenho universal', m: ['desenho universal', 'universal design'], d: 'Projeto voltado ao maior número possível de pessoas, sem depender de adaptação especializada para o uso previsto.' },
+  'ux-uso-equitativo': { t: 'Uso equitativo', m: ['uso equitativo'], d: 'Uso útil a diferentes capacidades sem segregação ou estigma; meios diferentes podem oferecer acesso equivalente.' },
+  'ux-flexibilidade': { t: 'Flexibilidade no uso', m: ['flexibilidade no uso'], d: 'Acomodar preferências, ritmos e formas diferentes de realizar uma ação.' },
+  'ux-uso-simples': { t: 'Uso simples e intuitivo', m: ['uso simples e intuitivo'], d: 'Tornar o funcionamento compreensível considerando diferenças de experiência, linguagem e concentração.' },
+  'ux-informacao-perceptivel': { t: 'Informação perceptível', m: ['informação perceptível'], d: 'Comunicar o necessário em diferentes condições sensoriais e ambientais, sem depender de um único sinal inacessível.' },
+  'ux-leitor-tela': { t: 'Leitor de tela', m: ['leitor de tela', 'leitores de tela', 'screen reader'], d: 'Software que apresenta conteúdo digital por voz ou braille, apoiado na estrutura e nos nomes dos elementos.' },
+  'texto-alternativo-ux': { t: 'Texto alternativo', m: ['texto alternativo', 'alt text'], d: 'Equivalente textual da informação ou função relevante de uma imagem, conforme seu contexto de uso.' },
+  'ux-tolerancia-erro': { t: 'Tolerância ao erro', m: ['tolerância ao erro'], d: 'Reduzir riscos e consequências de ações acidentais, com prevenção e recuperação apropriadas.' },
+  'ux-baixo-esforco': { t: 'Baixo esforço físico', m: ['baixo esforço físico'], d: 'Permitir uso confortável sem força, repetição ou posturas cansativas desnecessárias.' },
+  'ux-espaco-alcance': { t: 'Tamanho e espaço para aproximação e uso', m: ['tamanho e espaço para aproximação e uso'], d: 'Considerar aproximação, alcance, postura e espaço para corpos e recursos de apoio diferentes.' },
+  'ux-ta': { t: 'Tecnologia assistiva', m: ['tecnologia assistiva', 'assistive technology'], d: 'Área interdisciplinar de recursos e serviços que favorecem funcionalidade, participação e independência.' },
+  'ux-recurso': { t: 'Recurso assistivo', m: ['recurso assistivo'], d: 'Produto, equipamento ou outro meio utilizado para apoiar uma atividade.' },
+  'ux-servico': { t: 'Serviço assistivo', m: ['serviço assistivo'], d: 'Apoio à avaliação, escolha, adaptação e aprendizagem de uso dos recursos assistivos.' },
+  'ux-caa': { t: 'Comunicação aumentativa e alternativa', m: ['comunicação aumentativa e alternativa', 'CAA'], d: 'Meios que complementam ou substituem a fala conforme a necessidade, como pranchas de símbolos.' },
+  'ux-evidencia': { t: 'Evidência', m: ['evidência', 'evidências'], d: 'Observação ou dado que sustenta uma afirmação. Diferencie resultados observados de hipóteses ainda não testadas.' }
+};

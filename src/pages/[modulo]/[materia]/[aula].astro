@@ -10,6 +10,7 @@ export function getStaticPaths() {
   return aulas.map((a) => ({ params: { modulo: a.modulo, materia: a.materia, aula: a.slug }, props: { aula: a } }));
 }
 const { aula } = Astro.props;
+if (!aula.hrefLeitura) return Astro.redirect(aula.hrefConsulta);
 const mat = materia(aula.modulo, aula.materia);
 const mod = modulo(aula.modulo);
 /* links entre aulas no conteudo.html são escritos a partir da raiz (href="/m8/comp/02-…"); aqui ganham o base do site */

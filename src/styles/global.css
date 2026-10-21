@@ -518,8 +518,10 @@ html.lendo .modo-switch{display:none}
    Uma <section class="cs"> por conceito, sempre na mesma ordem de blocos:
    p.cs-def → div.cs-formula → div.cs-uso → div.cs-pegadinhas → div.cs-ponderada → figuras/loops.
    Os rótulos dos blocos vêm daqui (::before); ninguém digita "Como usar" no HTML. */
-html.modo-consulta{--mw:100%;--defs-w:300px}
-.layout-consulta .content{max-width:880px;margin-right:calc(var(--defs-w) + 24px);margin-left:max(32px, calc((100% - var(--defs-w) - 880px) / 2))}
+html.modo-consulta{--mw:100%;--defs-w:280px}
+html.defs-recolhidas{--defs-w:0px}
+.layout-consulta{padding-right:var(--defs-w)}
+.layout-consulta .content{max-width:880px;margin-inline:auto}
 .cs-hero{margin-bottom:2.4rem}
 .cs-ajuda{color:var(--muted);font-size:.92rem;margin:.4rem 0 0}
 section.cs{padding:2.2rem 0 1.4rem;border-top:1px solid var(--line);scroll-margin-top:16px}
@@ -557,14 +559,16 @@ a.gterm.glink:hover{color:var(--accent)}
 @media (min-width:1101px){.modo-consulta .fig-body{grid-template-columns:minmax(0,1.8fr) minmax(0,1fr)}.modo-consulta .fig-head,.modo-consulta .fig-ctrl{width:100%}}
 @media (max-width:640px){section.cs .mn{float:none;width:100%;margin:.4rem 0 1rem}}
 
-/* barra de Definições (direita, sempre visível; no celular vira botão + painel) */
-.defs{position:fixed;top:58px;right:0;bottom:0;width:var(--defs-w);padding:8px 20px 24px 16px;display:flex;flex-direction:column;gap:10px;border-left:1px solid var(--line);background:var(--bg);z-index:30}
+/* barra de Definições (direita, recolhível; no celular fica no fluxo da página) */
+.defs{position:fixed;top:58px;right:0;bottom:0;width:var(--defs-w);padding:8px 20px 24px 16px;display:flex;flex-direction:column;gap:10px;background:transparent;z-index:30}
+.defs[hidden]{display:none}
 .defs-head{display:flex;align-items:center;justify-content:space-between}
 .defs-tit{font-size:.72rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
-.defs-fechar{display:none;border:0;background:none;font-size:1.4rem;line-height:1;color:var(--muted);cursor:pointer}
+.defs-fechar{display:block;border:0;background:none;font-size:1.2rem;line-height:1;color:var(--muted);cursor:pointer;padding:8px}
 #defs-q{width:100%;font:inherit;font-size:.9rem;padding:8px 12px;border:1px solid var(--line2);border-radius:8px;background:var(--surface);color:var(--fg)}
 #defs-q:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
-.defs-lista{overflow-y:auto;scrollbar-width:thin;flex:1;margin-right:-8px;padding-right:8px}
+.defs-lista{overflow-y:auto;scrollbar-width:none;flex:1;min-height:0;margin-right:-8px;padding-right:8px}
+.defs-lista::-webkit-scrollbar{display:none}
 .def-item{border-bottom:1px solid var(--line)}
 .def-item > summary{cursor:pointer;list-style:none;padding:7px 2px;font-size:.88rem;color:var(--fg2)}
 .def-item > summary::-webkit-details-marker{display:none}
@@ -576,12 +580,14 @@ a.gterm.glink:hover{color:var(--accent)}
 .def-f{font-family:var(--f-mono);font-size:.8rem;background:var(--surface2);border:1px solid var(--line);border-radius:6px;padding:6px 8px;margin:0 0 .5rem;overflow-x:auto}
 .def-ir{font-size:.8rem;text-decoration:none}
 .defs-vazio{font-size:.85rem;color:var(--muted)}
-.defs-btn{display:none}
-@media (max-width:1280px){
-  .layout-consulta .content{margin-right:auto;margin-left:auto;max-width:880px}
-  .defs{top:0;width:min(360px,92vw);transform:translateX(100%);transition:transform .25s ease;box-shadow:-8px 0 30px rgba(0,0,0,.08);padding-top:18px}
-  .defs.aberto{transform:none}
-  .defs-fechar{display:block}
-  .defs-btn{display:block;position:fixed;right:18px;bottom:86px;z-index:31;font:600 .85rem var(--f-body);padding:10px 16px;border-radius:999px;border:1px solid var(--line);background:var(--fg);color:var(--bg);box-shadow:0 4px 14px rgba(0,0,0,.12);cursor:pointer}
+.defs-btn{display:none;position:fixed;right:12px;top:68px;z-index:31;font:500 .82rem var(--f-body);padding:8px;border-radius:4px;border:0;background:var(--bg);color:var(--muted);cursor:pointer}
+html.defs-recolhidas .defs-btn{display:block}
+@media (max-width:760px){
+  .layout-consulta{padding-right:0;display:flex;flex-direction:column}
+  .layout-consulta .side{order:0}
+  .layout-consulta .content{order:3;width:100%}
+  .defs{position:static;order:2;width:auto;max-height:50vh;margin:0 16px 20px;padding:12px 0;border-block:1px solid var(--line)}
+  .defs-btn{position:static;order:1;align-self:flex-end;margin:8px 16px}
 }
 html.lendo .defs,html.lendo .defs-btn{display:none}
+html.lendo .layout-consulta{padding-right:0}

@@ -33,7 +33,8 @@ export const aulas = Object.entries(metas)
       ...meta,
       modulo, materia, slug,
       id: `${modulo}/${materia}/${slug}`,
-      href: url(`/${modulo}/${materia}/${slug}`),
+      href: url(`/${modulo}/${materia}/${slug}${meta.modos?.length === 1 && meta.modos[0] === 'consulta' ? '/consulta' : ''}`),
+      hrefLeitura: meta.modos?.length === 1 && meta.modos[0] === 'consulta' ? null : url(`/${modulo}/${materia}/${slug}`),
       conteudo: conteudos[`${dir}/conteudo.html`] || '',
       consulta: consultas[`${dir}/consulta.html`] || '',
       hrefConsulta: consultas[`${dir}/consulta.html`] ? url(`/${modulo}/${materia}/${slug}/consulta`) : null,
@@ -77,8 +78,16 @@ export const glossarioGlobal = (() => {
   const G = {};
   for (const a of aulas) {
     const mat = materia(a.modulo, a.materia);
+    const destinosConsulta = {};
+    if (!a.hrefLeitura) {
+      for (const secao of a.consulta.matchAll(/<section\b[^>]*>/g)) {
+        const destino = secao[0].match(/\bid="([^"]+)"/)?.[1];
+        const termos = secao[0].match(/data-termos="([^"]*)"/)?.[1] || '';
+        termos.split(',').map((termo) => termo.trim()).filter(Boolean).forEach((termo) => { destinosConsulta[termo] = destino; });
+      }
+    }
     for (const [k, v] of Object.entries(a.glossario)) {
-      if (!G[k]) G[k] = { ...v, origem: { rotulo: `Aula ${a.numero} · ${mat ? mat.titulo : a.materia}`, href: `${a.href}#gl-${k}`, aula: a.id, tema: a.tema || '' } };
+      if (!G[k]) G[k] = { ...v, origem: { rotulo: `Aula ${a.numero} · ${mat ? mat.titulo : a.materia}`, href: `${a.href}#${destinosConsulta[k] || `gl-${k}`}`, aula: a.id, tema: a.tema || '' } };
     }
   }
   return G;
@@ -98,7 +107,7 @@ const inline = (t) => t
   .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/`(.+?)`/g, '<code>$1</code>').replace(/\*(.+?)\*/g, '<i>$1</i>');
 
 export function destaquesProva(aula) {
-  const doConteudo = [...aula.conteudo.matchAll(/<p class="prova">([\s\S]*?)<\/p>/g)].map((m) => ({ html: m[1].trim(), origem: 'autoestudo' }));
+  const doConteudo = [...(aula.conteudo || aula.consulta).matchAll(/<p class="prova">([\s\S]*?)<\/p>/g)].map((m) => ({ html: m[1].trim(), origem: 'autoestudo' }));
   const dasNotas = [];
   for (const n of aula.notas) {
     const linhas = n.raw.split(/\r?\n/);
@@ -134,7 +143,7 @@ export function tempoLeitura({ html = '', extras = '', figuras = null, loops = n
 }
 
 export const tempoAula = (a) => tempoLeitura({
-  html: a.conteudo,
+  html: a.conteudo || a.consulta,
   extras: [...a.notas.map((n) => n.raw), ...a.cartoes.flat(), ...a.cola.flat()].join(' '),
   cartoes: a.cartoes.length,
 });

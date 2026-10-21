@@ -20,7 +20,7 @@ export const modulos = [
       },
       { slug: 'mat', titulo: 'Matemática', descricao: '' },
       { slug: 'negocios', titulo: 'Negócios', descricao: '' },
-      { slug: 'ux', titulo: 'UX', descricao: '' },
+      { slug: 'ux', titulo: 'Design / UX', descricao: 'Conceitos conectados, decisões de projeto e exercícios para discutir e aplicar.' },
       { slug: 'lideranca', titulo: 'Liderança', descricao: '' },
     ],
   },

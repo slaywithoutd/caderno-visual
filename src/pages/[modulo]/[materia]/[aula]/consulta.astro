@@ -35,6 +35,8 @@ const gruposCartoes = agrupar(aula.cartoes);
 const gruposCola = agrupar(aula.cola);
 if (aula.cartoes.length) secoes.push(['revisao', 'Revisão rápida']);
 if (aula.cola.length) secoes.push(['cola', 'Cola de uma página']);
+const temFontes = !!aula.fontes?.length;
+if (temFontes) secoes.push(['fontes', 'Fontes e escopo']);
 
 /* definições da barra lateral: os termos desta aula, com a seção onde cada um mora */
 const defs = Object.entries(aula.glossario)
@@ -42,7 +44,7 @@ const defs = Object.entries(aula.glossario)
   .sort((a, b) => a.t.localeCompare(b.t, 'pt-BR', { sensitivity: 'base' }));
 const jsonDefs = JSON.stringify(defs).replace(/</g, '\\u003c');
 const jsonGl = JSON.stringify({ termos: glossarioDaAula(aula), listar: Object.keys(aula.glossario), global: hrefGlossario, secaoDe: C.secaoDe }).replace(/</g, '\\u003c');
-const modo = { atual: 'consulta', leitura: aula.href, consulta: aula.hrefConsulta, secaoDe: C.secaoDe, leituraDe: C.leituraDe, chaves: C.chaves };
+const modo = { atual: 'consulta', leitura: aula.hrefLeitura, consulta: aula.hrefConsulta, secaoDe: C.secaoDe, leituraDe: C.leituraDe, chaves: C.chaves };
 const tempo = tempoLeitura({ html: C.html, extras: [...aula.cartoes.flat(), ...aula.cola.flat()].join(' '), cartoes: aula.cartoes.length });
 ---
 <Aula titulo={aula.titulo} rotulo={`Aula ${aula.numero} · Consulta`} materia={mat} modulo={mod} secoes={secoes} descricao={aula.resumo} modo={modo}>
@@ -81,17 +83,25 @@ const tempo = tempoLeitura({ html: C.html, extras: [...aula.cartoes.flat(), ...a
     </section>
   )}
 
+  {temFontes && (
+    <section class="fontes" id="fontes">
+      <h2>Fontes e escopo</h2>
+      <ul>{aula.fontes.map((fonte) => <li>{fonte.url ? <a href={fonte.url} target="_blank" rel="noopener">{fonte.titulo}</a> : <span>{fonte.titulo}</span>}{fonte.nota && <span> · {fonte.nota}</span>}</li>)}</ul>
+      {aula.observacao && <p class="muted">{aula.observacao}</p>}
+    </section>
+  )}
+
   <aside class="defs" id="defs" slot="direita" aria-label="Definições">
     <div class="defs-head">
       <span class="defs-tit">Definições</span>
-      <button class="defs-fechar" id="defs-fechar" type="button" aria-label="Fechar definições">×</button>
+      <button class="defs-fechar" id="defs-fechar" type="button" aria-label="Recolher definições" title="Recolher definições" aria-controls="defs">›</button>
     </div>
     <input type="search" id="defs-q" placeholder={`Buscar entre ${defs.length} termos…`} aria-label="Buscar definição" autocomplete="off" />
     <div class="defs-lista" id="defs-lista"></div>
     <p class="defs-vazio" id="defs-vazio" hidden>Nenhum termo encontrado.</p>
     <script type="application/json" id="defs-data" set:html={jsonDefs}></script>
   </aside>
-  <button class="defs-btn" id="defs-btn" type="button" slot="direita" aria-controls="defs" aria-expanded="false">Definições</button>
+  <button class="defs-btn" id="defs-btn" type="button" slot="direita" aria-controls="defs" aria-expanded="true">‹ Definições</button>
   <script type="application/json" id="gl-data" set:html={jsonGl}></script>
 </Aula>
 

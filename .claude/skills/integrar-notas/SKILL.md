@@ -5,6 +5,10 @@ description: Leva o que aconteceu na aula presencial para dentro da página da a
 
 # Integrar notas da aula
 
+Ao comparar material presencial, siga `.claude/skills/auditar-cobertura/SKILL.md` e atualize
+`cobertura.json`. Uma aula pode acrescentar tópicos que o autoestudo não continha. Integre em
+Leitura e Consulta quando ambos existirem; só anexar o PDF não corrige uma omissão no texto.
+
 Há dois níveis. Faça o primeiro sempre; o segundo quando a pessoa pedir para integrar.
 
 ## Nível 1: guardar o material bruto (sem reescrever a aula)
@@ -32,7 +36,7 @@ Leia todo o `notas/` (markdown, o texto dos PDFs com a skill de PDF, e as fotos)
 2. **O que muda o que já está escrito** (notação diferente, outro exemplo, correção): ajuste o
    texto e avise a pessoa do que mudou. Se a notação do professor for diferente da dos vídeos,
    prefira a do professor (é a da prova) e cite a outra.
-3. **Ênfase do professor**: vire `<p class="prova">` no ponto certo do texto (além do callout).
+3. **Ênfase do professor**: identifique como aula presencial. Use `<p class="prova">` apenas se houver indicação explícita de cobrança, não por ser um tema mencionado.
 4. Termos novos → `glossario.js` (confira antes no glossário global se já existem; rode `npm run checar`). Perguntas que o professor fez ou exemplos de prova → `revisao.js`.
 5. Se o professor usou um conceito que o caderno ainda não explica, crie uma caixa **Base** (ver `CLAUDE.md`).
 6. Exemplo resolvido no quadro que ajuda a entender → considere uma figura passo a passo.

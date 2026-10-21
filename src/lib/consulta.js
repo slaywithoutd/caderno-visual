@@ -2,7 +2,7 @@ import { H } from './dom.js';
 
 /* Barra de Definições do modo Consulta: busca que filtra enquanto digita, todos os termos da aula,
    cada um abre (details) com a definição curta, a fórmula (campo `f` do glossario.js) e "ver seção".
-   No celular a barra vira um botão que abre a lista por cima da página. */
+   Em telas pequenas, a lista entra no fluxo da página sem sobrepor o artigo. */
 export function initDefinicoes() {
   const el = document.getElementById('defs-data');
   if (!el) return;
@@ -45,22 +45,29 @@ export function initDefinicoes() {
     if (ir) ir.click();
   });
 
-  /* "ver seção": rola até a seção e destaca; no celular fecha a barra */
-  const mq = matchMedia('(max-width:1280px)');
-  const abrir = (sim) => { painel.classList.toggle('aberto', sim); btn.setAttribute('aria-expanded', String(sim)); if (sim) setTimeout(() => q.focus(), 50); };
+  /* "ver seção": rola até a seção e destaca */
+  const abrir = (expandido, focar = false) => {
+    painel.hidden = !expandido;
+    document.documentElement.classList.toggle('defs-recolhidas', !expandido);
+    btn.setAttribute('aria-expanded', String(expandido));
+    try { localStorage.setItem('caderno-definicoes-recolhidas', String(!expandido)); } catch {}
+    if (focar) (expandido ? q : btn).focus();
+  };
+  let expandido = true;
+  try { expandido = localStorage.getItem('caderno-definicoes-recolhidas') !== 'true'; } catch {}
+  abrir(expandido);
   lista.addEventListener('click', (e) => {
     const a = e.target.closest('.def-ir');
     if (!a) return;
     const s = document.querySelector(a.getAttribute('href'));
     if (s) { s.classList.remove('cs-flash'); void s.offsetWidth; s.classList.add('cs-flash'); }
-    if (mq.matches) abrir(false);
   });
-  btn.addEventListener('click', () => abrir(!painel.classList.contains('aberto')));
-  fechar.addEventListener('click', () => abrir(false));
+  btn.addEventListener('click', () => abrir(true, true));
+  fechar.addEventListener('click', () => abrir(false, true));
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && painel.classList.contains('aberto')) abrir(false);
+    if (e.key === 'Escape' && painel.contains(document.activeElement)) abrir(false, true);
     /* "/" foca a busca, como em muitos sites de documentação */
-    if (e.key === '/' && !/input|textarea/i.test(document.activeElement.tagName)) { e.preventDefault(); if (mq.matches) abrir(true); else q.focus(); }
+    if (e.key === '/' && !/input|textarea|select/i.test(document.activeElement.tagName) && !document.activeElement.isContentEditable) { e.preventDefault(); abrir(true, true); }
   });
 
   /* destaca a seção ao chegar por link (#secao) */

@@ -30,7 +30,10 @@ for (const mod of readdirSync(RAIZ)) for (const mat of readdirSync(join(RAIZ, mo
     if (!id.startsWith(filtro) || !existsSync(join(d, 'consulta.html'))) continue;
     console.log(`\n${id}`);
     const cons = readFileSync(join(d, 'consulta.html'), 'utf8');
-    const leit = readFileSync(join(d, 'conteudo.html'), 'utf8');
+    const meta = JSON.parse(readFileSync(join(d, 'meta.json'), 'utf8'));
+    const apenasConsulta = meta.modos?.length === 1 && meta.modos[0] === 'consulta';
+    const leit = existsSync(join(d, 'conteudo.html')) ? readFileSync(join(d, 'conteudo.html'), 'utf8') : '';
+    if (!leit && !apenasConsulta) erro('falta conteudo.html; para aula só Consulta, declare modos: ["consulta"] no meta.json');
     const G = existsSync(join(d, 'glossario.js')) ? (await import(pathToFileURL(join(d, 'glossario.js')).href)).default : {};
     const R = existsSync(join(d, 'revisao.js')) ? await import(pathToFileURL(join(d, 'revisao.js')).href) : {};
 
@@ -51,7 +54,7 @@ for (const mod of readdirSync(RAIZ)) for (const mat of readdirSync(join(RAIZ, mo
         if (dono[k]) erro(`"${k}" mora em duas seções: ${dono[k]} e ${sid}`); else dono[k] = sid;
       });
       const lei = attr(tag, 'data-leitura').split(',').map((t) => t.trim()).filter(Boolean);
-      if (!lei.length) erro(`${sid}: falta data-leitura (para o switch cair no lugar certo)`);
+      if (!lei.length && !apenasConsulta) erro(`${sid}: falta data-leitura (para o switch cair no lugar certo)`);
       lei.forEach((l) => { if (!idsLeitura.has(l)) erro(`${sid}: data-leitura cita "${l}", que não é seção do conteudo.html`); });
     }
     const semDono = Object.keys(G).filter((k) => !dono[k]);
@@ -78,7 +81,7 @@ for (const mod of readdirSync(RAIZ)) for (const mat of readdirSync(join(RAIZ, mo
     const refTbl = [...cons.matchAll(/data-ref-tbl="([^"]+)"/g)].map((m) => m[1]);
     tbls.filter(Boolean).forEach((x) => { const n = refTbl.filter((r) => r === x).length; if (n !== 1) erro(`tabela ${x} aparece ${n} vez(es) no modo Consulta (deve ser 1)`); });
     refTbl.filter((r) => !tbls.includes(r)).forEach((r) => erro(`data-ref-tbl="${r}" não existe no conteudo.html`));
-    if (/<figure\b|data-loop="/.test(cons)) erro('consulta.html não copia figura nem loop: use <div data-ref="…"></div> / <div data-ref-loop="…"></div>');
+    if (!apenasConsulta && /<figure\b|data-loop="/.test(cons)) erro('consulta.html não copia figura nem loop: use <div data-ref="…"></div> / <div data-ref-loop="…"></div>');
 
     /* cai na prova */
     const provaC = new Set([...cons.matchAll(/<p class="prova">([\s\S]*?)<\/p>/g)].map((m) => limpa(m[1])));

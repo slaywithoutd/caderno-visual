@@ -1,6 +1,16 @@
 /* Revisão da aula: cartões (pergunta, resposta) e cola de uma página (tópico, resumo).
    Aparecem no fim da aula e na página de revisão da matéria. Pode usar HTML simples. */
 export const cartoes = [
+  ['Como construir NOT só com NAND?', 'Ligue A às duas entradas: NAND(A,A). AND e OR também podem ser construídas por combinações de NAND.', 'portas-logicas'],
+  ['L1 de instruções e dados separadas significa Harvard pura?', 'Não. Se níveis inferiores são unificados, é uma organização Harvard modificada; o espaço de endereçamento ainda pode ser unificado.', 'harvard-von-neumann'],
+  ['Menos instruções em assembly garante menor tempo?', 'Não. Compare IC, CPI e clock. A função apresentada em aula gerou contagens e tamanhos diferentes para cada alvo.', 'toolchain'],
+  ['Em write-back, RAM com x = 7 enquanto uma cache tem x = 9 é sempre erro?', 'Não. A linha modificada pode guardar a versão atual. O protocolo de coerência deve impedir usar a cópia velha como vigente.', 'coerencia-luisi'],
+  ['Mover apenas a função de interrupção para SRAM garante deadline?', 'Não. Chamadas, constantes e dados também precisam estar disponíveis, e ainda há custos de interrupções e contenção.', 'xip-firmware'],
+  ['RP2040: hit 1 ciclo, miss penalty adicional 50; 0,2% de miss. AMAT?', '1 + 0,002 × 50 = 1,1 ciclo. É média, não pior caso; uma falta custa 51 ciclos no total.', 'exercicios-luisi'],
+  ['Por que o speedup de CPU de 10 quase não muda a rotina de vestir?', 'A CPU consumia 57,6 µs diante de aproximadamente 160 s de espera humana. A fração acelerável é cerca de 3,6 × 10⁻⁷.', 'exercicios-luisi'],
+  ['Com 1 KiB, quantas rotinas de 20 B e de 148 B cabem?', 'Sem reservas extras, ⌊1024/20⌋ = 51 e ⌊1024/148⌋ = 6. Os comportamentos e a flexibilidade também diferem.', 'projeto-isa'],
+  ['Proibir ESPERA infinita antes de AVISA prova aviso em 120 s?', 'Não. Um loop ou outro caminho pode evitar o aviso. Analise todos os caminhos relevantes e o tempo, ou imponha supervisão independente.', 'projeto-isa'],
+  ['Rowhammer e side channel de cache são o mesmo mecanismo?', 'Não. Rowhammer perturba células de DRAM; um side channel infere informação por efeitos observáveis, como timing.', 'seguranca-arquitetura'],
   ['Qual a diferença entre latência e throughput?', 'Latência (tempo de execução) é quanto uma tarefa leva do começo ao fim. Throughput é quantas tarefas terminam por segundo. Mais processadores melhoram o throughput sem diminuir a latência de uma tarefa.', 'latencia'],
   ['Y leva 12 s e X leva 8 s. Quantas vezes X é mais rápido?', 'n = tempo_Y / tempo_X = 12 / 8 = 1,5.', 'speedup'],
   ['Escreva a equação de desempenho da CPU.', 'Tempo de CPU = IC × CPI × tempo de ciclo = IC × CPI / f.', 'equacao-cpu'],
@@ -20,6 +30,14 @@ export const cartoes = [
 ];
 
 export const cola = [
+  ['NAND', 'NAND(A,A) = NOT A; combinações de NAND constroem AND e OR.', 'portas-logicas'],
+  ['Caminhos de memória', 'Von Neumann compartilha; Harvard separa; Harvard modificada mistura níveis.', 'harvard-von-neumann'],
+  ['Toolchain', 'Fonte → assembly → assembler → objeto → linker → executável → loader/gravador.', 'toolchain'],
+  ['Coerência', 'MESI: Modified, Exclusive, Shared, Invalid; RAM pode estar temporariamente desatualizada.', 'coerencia-luisi'],
+  ['Flash indisponível', 'Código crítico, dependências e dados precisam continuar acessíveis; média não prova deadline.', 'xip-firmware'],
+  ['Segurança', 'NX, isolamento e validação ajudam; Harvard ou interpretador não são garantias absolutas.', 'seguranca-arquitetura'],
+  ['Exercícios Luisi', '57,6 µs vs. 160 s; AMAT 3 → 1,1 ciclos; EEPROM 6 rotinas vs. flash 26, sob as hipóteses da aula.', 'exercicios-luisi'],
+  ['Decisão de projeto', 'Escolha → trade-off/pessoa afetada → número → condição para mudar de ideia.', 'projeto-isa'],
   ['Desempenho', 'latência × throughput. n vezes mais rápido = tempo_lento / tempo_rápido. SPECRatio resumido por média geométrica.', 'latencia'],
   ['Equação da CPU', 'T = IC × CPI × Tc = IC × CPI / f. CPI = Σ (ICᵢ/IC) × CPIᵢ.', 'equacao-cpu'],
   ['Amdahl', 'S = 1 / ((1 − f) + f/s); teto 1/(1 − f). Torne rápido o caso comum.', 'amdahl'],

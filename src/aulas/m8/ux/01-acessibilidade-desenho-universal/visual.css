@@ -1,0 +1,62 @@
+[data-aula="m8/ux/01-acessibilidade-desenho-universal"] .ux-mapa {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 2rem 0;
+  padding: 1.5rem 0;
+  border-block: 1px solid var(--line, #8886);
+}
+[data-aula="m8/ux/01-acessibilidade-desenho-universal"] .ux-mapa small {
+  color: var(--muted);
+}
+[data-aula="m8/ux/01-acessibilidade-desenho-universal"] .ux-mapa figcaption {
+  flex-basis: 100%;
+  font-size: .9em;
+  color: var(--muted);
+}
+[data-aula="m8/ux/01-acessibilidade-desenho-universal"] details {
+  margin: 1rem 0;
+}
+[data-aula="m8/ux/01-acessibilidade-desenho-universal"] summary {
+  cursor: pointer;
+  padding: .5rem 0;
+}
+[data-aula="m8/ux/01-acessibilidade-desenho-universal"] .ux-lab {
+  margin: 2rem 0;
+  padding: 1.5rem 0;
+  border-block: 1px solid var(--line, #8886);
+}
+[data-aula="m8/ux/01-acessibilidade-desenho-universal"] .ux-lab select {
+  display: block;
+  width: 100%;
+  margin-top: .5rem;
+  padding: .75rem;
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--muted);
+  border-radius: 6px;
+  font: inherit;
+}
+[data-aula="m8/ux/01-acessibilidade-desenho-universal"] .ux-escolhas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+[data-aula="m8/ux/01-acessibilidade-desenho-universal"] .ux-escolhas button {
+  background: transparent;
+  color: var(--fg);
+  border: 1px solid var(--muted);
+  border-radius: 6px;
+  padding: .65rem .8rem;
+  font: inherit;
+  cursor: pointer;
+}
+[data-aula="m8/ux/01-acessibilidade-desenho-universal"] :is(button, select, summary):focus-visible {
+  outline: 3px solid var(--accent, #525fd0);
+  outline-offset: 4px;
+}
+[data-aula="m8/ux/01-acessibilidade-desenho-universal"] #ux-feedback {
+  min-height: 5em;
+}

@@ -9,7 +9,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "checar": "node scripts/checar-termos.mjs",
-    "checar-consulta": "node scripts/checar-consulta.mjs"
+    "checar-consulta": "node scripts/checar-consulta.mjs",
+    "checar-cobertura": "node scripts/checar-cobertura.mjs"
   },
   "dependencies": {
     "astro": "^5.13.0"

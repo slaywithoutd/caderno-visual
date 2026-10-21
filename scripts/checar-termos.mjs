@@ -45,7 +45,8 @@ const tem = (t) => {
 let faltando = 0;
 for (const a of aulas.filter((x) => x.id.startsWith(filtro))) {
   /* o cabeçalho decorativo (hero) não conta */
-  const html = readFileSync(join(a.dir, 'conteudo.html'), 'utf8').replace(/<header[\s\S]*?<\/header>/, '');
+  const arquivo = existsSync(join(a.dir, 'conteudo.html')) ? 'conteudo.html' : 'consulta.html';
+  const html = readFileSync(join(a.dir, arquivo), 'utf8').replace(/<header[\s\S]*?<\/header>/, '');
   const vistos = new Map();
   for (const m of html.matchAll(/<b(?:\s[^>]*)?>([\s\S]*?)<\/b>/g)) {
     const t = limpa(m[1]);

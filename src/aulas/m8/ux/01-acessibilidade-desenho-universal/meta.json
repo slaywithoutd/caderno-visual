@@ -1,0 +1,19 @@
+{
+  "numero": "01",
+  "titulo": "Princípios da acessibilidade e desenho universal",
+  "tema": "Design para participação",
+  "modos": ["consulta"],
+  "resumo": "Quem fica de fora, por qual barreira e o que mudar? Acessibilidade, design inclusivo, sete princípios do desenho universal e tecnologia assistiva, com casos para discutir e testar.",
+  "topicos": ["Barreiras e participação", "Acessibilidade e design inclusivo", "Sete princípios", "Tecnologia assistiva", "Aplicação e exercícios"],
+  "secoes": [],
+  "fontes": [
+    {"titulo": "UserWay · Princípios do desenho universal", "url": "https://userway.org/pt/blog/principios-do-desenho-universal/", "nota": "Autoestudo. O endereço redirecionou para a versão em inglês; exemplos abaixo são autorais."},
+    {"titulo": "Assistiva · O que é tecnologia assistiva?", "url": "https://www.assistiva.com.br/tassistiva.html", "nota": "Autoestudo, por Mara Lúcia Sartoretto e Rita Bersch. Definição, recursos, serviços e categorias."},
+    {"titulo": "NN/g · Accessibility vs. Inclusive Design", "url": "https://www.nngroup.com/videos/accessibility-vs-inclusive-design/", "nota": "Vídeo de Therese Fessenden. Foi possível consultar a descrição indexada, não a transcrição integral."},
+    {"titulo": "NN/g · Inclusive Design", "url": "https://www.nngroup.com/articles/inclusive-design/", "nota": "Leitura complementar usada para aprofundar a distinção apresentada pelo vídeo."},
+    {"titulo": "NC State · Center for Universal Design", "url": "https://design.ncsu.edu/research/center-for-universal-design/", "nota": "Referência original dos sete princípios, versão 2.0 (1997)."},
+    {"titulo": "W3C WAI · Introduction to Web Accessibility", "url": "https://www.w3.org/WAI/fundamentals/accessibility-intro/", "nota": "Complemento sobre acesso digital e avaliação humana."},
+    {"titulo": "Pasta das aulas anteriores de Design", "url": "https://drive.google.com/drive/folders/1krF4KxfWD12UPhqWyZEkNqqbOVJuD7Xu", "nota": "Material privado consultado apenas como referência de abordagem: escolher, justificar e validar. Não reproduzido."}
+  ],
+  "observacao": "Síntese dos autoestudos com complementos identificados nas fontes. Casos, testes e exercícios são autorais: não são questões nem respostas oficiais do professor. Os princípios orientam decisões; não constituem, sozinhos, certificação de acessibilidade ou conformidade legal."
+}

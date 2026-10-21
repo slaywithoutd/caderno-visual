@@ -1,10 +1,10 @@
 ---
 /* Switch global Leitura / Consulta (fica no topo de todas as páginas; a escolha vale para todas as aulas).
    `disponivel` = false numa aula que ainda não tem consulta.html. Comportamento em lib/modo.js. */
-const { disponivel = true } = Astro.props;
+const { disponivel = true, leituraDisponivel = true } = Astro.props;
 ---
 <div class="modo-switch" role="group" aria-label="Modo de apresentação das aulas">
-  <button type="button" data-modo="leitura" aria-pressed="true" title="Leitura: a aula na ordem do livro, para aprender da primeira vez">Leitura</button>
+  <button type="button" data-modo="leitura" aria-pressed="true" disabled={!leituraDisponivel} title={leituraDisponivel ? 'Leitura: a aula na ordem do livro, para aprender da primeira vez' : 'Esta aula foi criada apenas no modo Consulta'}>Leitura</button>
   <button type="button" data-modo="consulta" aria-pressed="false" disabled={!disponivel}
     title={disponivel ? 'Consulta: um conceito por seção, para revisar e procurar' : 'Esta aula ainda não tem o modo Consulta'}>Consulta</button>
 </div>

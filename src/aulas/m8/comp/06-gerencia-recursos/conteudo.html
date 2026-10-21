@@ -4,6 +4,46 @@
   <div class="hero-sym"><span>TA = <b>fim − chegada</b></span><span>q = <b>2</b></span><span>end = <b>(pág, desl)</b></span><span>FIFO 9 → 10</span><span>C-SCAN <b>↻</b></span></div>
 </header>
 
+<!-- ============ 0 · encontro ============ -->
+<section class="chap" id="encontro">
+ <div class="prose">
+  <span class="num">00</span>
+  <h2>O encontro em 15 minutos</h2>
+  <div class="src"><span class="base-tag">Guia de estudo · autoral</span><span class="bk">no formato dos encontros de João Luisi</span></div>
+  <p>O encontro começa por um quiz do autoestudo, revisa cada conceito num chip real com uma caixa de segurança, faz exercícios com o hardware do projeto e termina numa decisão de projeto. Esta seção é o caminho curto; o resto da página é para consultar quando travar.</p>
+  <h3>Caminho curto</h3>
+  <p>Se o tempo é pouco, leia nesta ordem:</p>
+  <ol class="caminho">
+    <li><a href="#algoritmos">Algoritmos de escalonamento</a>: a tabela de espera, turnaround e resposta é a conta mais provável do quiz.</li>
+    <li><a href="#tempo-real">Tempo real com números</a>: pior caso, teste de utilização e a linha do tempo de rate monotonic contra EDF.</li>
+    <li><a href="#paginacao">Memória virtual</a> e <a href="#substituicao">substituição de páginas</a>: tradução de endereço, o preço de um page fault e a anomalia de Belady.</li>
+    <li><a href="#memoria-mcu">Memória sem MMU</a>: o que muda no RP2040 e por que o heap não se compacta.</li>
+    <li><a href="#flash">Flash e EEPROM</a>: setor, desgaste e a conta de vida útil.</li>
+    <li><a href="#botao">O botão</a>: polling, interrupção e DMA com os números do RP2040.</li>
+    <li><a href="#seguranca">Segurança</a>: ataque por DMA, cold boot e negação de serviço por esgotamento.</li>
+  </ol>
+  <p class="depois">Pode deixar para depois: <a href="#memoria">partições</a> (fixas dão fragmentação interna, variáveis dão externa) · <a href="#filas">múltiplas filas</a> (MLFQ desce quem gasta o quantum inteiro) · <a href="#arquivos">arquivos</a> (o i-node com ponteiros diretos e indiretos) · <a href="#discos">discos</a> (SSTF pode causar starvation, C-SCAN deixa a espera uniforme) · <a href="#reais">sistemas reais</a> (a tabela Linux, FreeRTOS, Uno).</p>
+  <h3>Cinco ideias para levar</h3>
+  <ol class="ideias">
+    <li>Escalonar começa pelo critério: a média (espera, throughput) ou o pior caso (prazo).</li>
+    <li>Em tempo real, C é o pior caso, e o teste de utilização só vale com preempção: um trecho que bloqueia derruba a garantia.</li>
+    <li>Memória virtual troca previsibilidade por espaço; sem MMU, você ganha previsibilidade e perde a compactação.</li>
+    <li>Flash e EEPROM se gastam por gravação: vida útil = ciclos ÷ gravações por dia no mesmo lugar.</li>
+    <li>Polling, interrupção e DMA se escolhem pela conta: custo por evento × eventos por segundo, mais o pior caso de latência.</li>
+  </ol>
+  <h3>Quiz de treino</h3>
+  <p>Perguntas autorais no formato do quiz do encontro. Responda de cabeça e abra para conferir.</p>
+  <details class="treino"><summary><span class="q">Q1 · Definição</span> Um sistema de tempo real é aquele que: A) roda rápido; B) cumpre prazos, e resposta atrasada conta como errada; C) usa prioridade dinâmica?</summary><p>B. Rapidez ajuda, mas o que define é o prazo. Veja a <a href="#filas">seção 04</a>.</p></details>
+  <details class="treino"><summary><span class="q">Q2 · Notação</span> Em U = Σ Cᵢ/Tᵢ, o que são Cᵢ e Tᵢ? Por que Cᵢ não pode ser a média?</summary><p>Cᵢ é o tempo de CPU de uma execução da tarefa i no pior caso; Tᵢ é o período. Com a média, uma execução ruim estoura um prazo que o teste disse estar garantido.</p></details>
+  <details class="treino"><summary><span class="q">Q3 · Limite</span> Tarefas (C = 2, T = 5) e (C = 4, T = 7). Rate monotonic garante? E EDF?</summary><p>U = 0,40 + 0,57 = 0,97, acima de 0,828: rate monotonic não garante, e de fato a segunda tarefa perde o prazo em t = 7. EDF garante, porque U ≤ 1.</p></details>
+  <details class="treino"><summary><span class="q">Q4 · Conta</span> Um byte da EEPROM do ATmega328P (100 000 ciclos) é gravado uma vez por segundo. Quando sai da garantia? A) 27 horas; B) 27 dias; C) 27 anos.</summary><p>A. 100 000 s / 3 600 ≈ 27,8 horas.</p></details>
+  <details class="treino"><summary><span class="q">Q5 · Armadilha</span> Com FIFO, passar de 3 para 4 molduras sempre reduz os page faults?</summary><p>Não. Na string 1 2 3 4 1 2 5 1 2 3 4 5, o FIFO dá 9 page faults com 3 molduras e 10 com 4: a anomalia de Belady.</p></details>
+  <details class="treino"><summary><span class="q">Q6 · Conta</span> Polling do botão a cada 10 ms, 100 ciclos por leitura, a 125 MHz. Quanto da CPU? Qual o pior atraso?</summary><p>100 × 100 = 10 000 ciclos/s; 10 000 / 125 000 000 = 0,008%. Até 10 ms para ver o aperto (20 ms, se o debounce exige duas leituras iguais).</p></details>
+  <details class="treino"><summary><span class="q">Q7 · Limite</span> Por que o RP2040 não compacta o heap quando ele fragmenta?</summary><p>Compactar exige relocação dinâmica. Sem MMU, mover um bloco quebra todo ponteiro que aponta para ele.</p></details>
+ </div>
+</section>
+<hr class="sep">
+
 <!-- ============ 1 · antes ============ -->
 <section class="chap" id="antes">
  <div class="prose">
@@ -188,13 +228,13 @@
   <h3>Round-robin: todo mundo um pouco</h3>
   <ul class="b">
     <li><b>Round-robin</b> (escalonamento circular): fila FCFS, mas cada processo só pode usar a CPU por um <b>quantum</b> (fatia de tempo). Acabou o quantum e o processo não terminou: o relógio interrompe, ele vai para o fim da fila e o próximo entra.</li>
-    <li>Pensado para sistemas de tempo compartilhado: com n processos e quantum q, ninguém espera mais de <code>(n − 1) × q</code> para voltar à CPU. Com 5 processos e q = 20 ms, no máximo 80 ms.</li>
+    <li>Pensado para sistemas de tempo compartilhado: com n processos e quantum q, ninguém espera mais de <code>(n − 1) × q</code> para voltar à CPU, ignorando o tempo de troca de contexto. Contando as n trocas de s cada, como na <a href="/m8/comp/04-processos-threads">aula 04</a>, o pior caso é <code>(n − 1) × q + n × s</code>. Com 5 processos, q = 20 ms e s = 1 ms: 4 × 20 + 5 × 1 = 85 ms (80 ms ignorando as trocas).</li>
     <li>Quantum grande demais: quase ninguém é interrompido e o round-robin vira FCFS (no exemplo, q = 8 dá exatamente a escala do FCFS).</li>
     <li>Quantum pequeno demais: a CPU passa boa parte do tempo trocando de contexto.</li>
   </ul>
   <div class="def">
     <span class="lab">Conta · quanto custa o quantum</span>
-    <p>Uma troca de contexto leva 1 ms. Com q = 4 ms, de cada 5 ms só 4 são úteis: overhead = 1 / (4 + 1) = 20%. Com q = 20 ms: 1 / 21 ≈ 4,8%. Com q = 100 ms: 1 / 101 ≈ 1%, mas a resposta para 10 processos pode chegar a 9 × 100 = 900 ms. Regra prática: um quantum em que uns 80% dos surtos cabem inteiros.</p>
+    <p>Uma troca de contexto leva 1 ms. Com q = 4 ms, de cada 5 ms só 4 são úteis: overhead = 1 / (4 + 1) = 20%. Com q = 20 ms: 1 / 21 ≈ 4,8%. Com q = 100 ms: 1 / 101 ≈ 1%, mas a resposta para 10 processos pode chegar a 9 × 100 + 10 × 1 = 910 ms. Regra prática: um quantum em que uns 80% dos surtos cabem inteiros.</p>
   </div>
   <p>Agora rode os cinco algoritmos sobre o mesmo conjunto. Escolha a aba; no round-robin, mude o quantum e veja as médias mudarem:</p>
  </div>
@@ -285,12 +325,12 @@
   <p>Duas regras clássicas para tarefas periódicas (cada tarefa i repete a cada período Tᵢ e precisa de Cᵢ de CPU por vez):</p>
   <ul class="b">
     <li><b>Rate monotonic</b> (taxa monotônica): prioridade fixa, e quem tem o período menor tem prioridade maior. Garante todos os prazos se a utilização total ficar abaixo de um limite.</li>
-    <li><b>EDF</b> (earliest deadline first): prioridade dinâmica, e roda quem tem o prazo mais próximo. Funciona até 100% de utilização, mas é mais difícil de implementar e de prever quando sobrecarrega.</li>
+    <li><b>EDF</b> (earliest deadline first): prioridade dinâmica, e roda quem tem o prazo mais próximo. Funciona até 100% de utilização (com as hipóteses da <a href="#tempo-real">próxima seção</a>), mas é mais difícil de implementar e de prever quando sobrecarrega.</li>
   </ul>
   <div class="formula">U = Σ Cᵢ / Tᵢ &nbsp;&nbsp;·&nbsp;&nbsp; rate monotonic garante se U ≤ n·(2^(1/n) − 1)</div>
   <ul class="b">
     <li>U é a fração da CPU que as tarefas pedem. n é o número de tarefas. O limite vale 1 para n = 1, 0,828 para n = 2, 0,780 para n = 3 e tende a 0,69 com muitas tarefas.</li>
-    <li>Passar do limite não quer dizer que vai falhar; quer dizer que o teste simples não garante e é preciso analisar o pior caso tarefa por tarefa.</li>
+    <li>Passar do limite não quer dizer que vai falhar; quer dizer que o teste simples não garante e é preciso analisar o pior caso tarefa por tarefa. A <a href="#tempo-real">próxima seção</a> faz essa análise com números pequenos.</li>
   </ul>
   <div class="def">
     <span class="lab">Na ponderada · pulseira</span>
@@ -302,10 +342,65 @@
 
 <hr class="sep">
 
-<!-- ============ 5 · memoria ============ -->
-<section class="chap" id="memoria">
+<!-- ============ 5 · tempo-real ============ -->
+<section class="chap" id="tempo-real">
  <div class="prose">
   <span class="num">05</span>
+  <h2>Tempo real com números: pior caso, rate monotonic, EDF e FreeRTOS</h2>
+  <div class="src"><span class="base-tag">Base · além do autoestudo</span><a class="vd" href="https://doi.org/10.1145/321738.321743" target="_blank" rel="noopener">Artigo · Liu &amp; Layland, JACM, 1973 ↗</a><a class="vd" href="https://github.com/FreeRTOS/FreeRTOS-Kernel-Book/blob/main/ch04.md" target="_blank" rel="noopener">Livro do FreeRTOS · cap. 4 ↗</a></div>
+  <p>A seção anterior deu a regra; aqui você testa com números pequenos. Cada tarefa periódica i tem dois números: Cᵢ, o tempo de CPU de uma execução no pior caso, e Tᵢ, o período. O prazo de cada execução é o começo do período seguinte.</p>
+  <ul class="b">
+    <li>Use o pior caso para C, nunca a média. Se a tarefa costuma levar 1 ms e às vezes leva 3 ms (miss na cache, desvio mal previsto), C = 3 ms.</li>
+    <li>O teste de Liu &amp; Layland vale com quatro hipóteses: tarefas periódicas e independentes (nenhuma espera mutex de outra), prazo igual ao período, preempção instantânea e sem custo, uma CPU só. Fora delas, o teste não promete nada.</li>
+  </ul>
+
+  <h3>Exemplo 1: cabe no limite</h3>
+  <ul class="b">
+    <li>Tarefa 1: C = 1 ms, T = 4 ms. Tarefa 2: C = 2 ms, T = 6 ms.</li>
+    <li>U = 1/4 + 2/6 = 0,25 + 0,33 = 0,58. O limite para n = 2 é 0,828. Como 0,58 ≤ 0,828, rate monotonic garante os dois prazos, com a tarefa 1 (período 4) na prioridade maior.</li>
+  </ul>
+
+  <h3>Exemplo 2: passa do limite</h3>
+<aside class="mn" id="mn-rm-edf" aria-hidden="true"><svg viewBox="0 0 240 160"><text class="tm st" x="24" y="10">RM</text><rect class="bl" x="24" y="18" width="30" height="18"/><rect class="am" x="54" y="18" width="45" height="18"/><rect class="bl" x="99" y="18" width="30" height="18"/><line class="s" x1="129" y1="12" x2="129" y2="44" style="stroke:var(--red);stroke-width:2"/><text class="tm st" x="134" y="27">T2 perde em 7</text><text class="tm st" x="24" y="62">EDF</text><rect class="bl" x="24" y="70" width="30" height="18"/><rect class="am" x="54" y="70" width="60" height="18"/><rect class="bl" x="114" y="70" width="30" height="18"/><rect class="am" x="144" y="70" width="60" height="18"/><rect class="bl" x="204" y="70" width="30" height="18"/><line class="s" x1="24" y1="104" x2="234" y2="104"/><text class="tm" x="24" y="116">0</text><text class="tm" x="99" y="116">5</text><text class="tm" x="129" y="116">7</text><text class="tm" x="174" y="116">10</text><text class="tm" x="234" y="116">14</text><rect class="bl" x="24" y="136" width="12" height="12"/><text class="tm st" x="40" y="142">T1: C 2, T 5</text><rect class="am" x="130" y="136" width="12" height="12"/><text class="tm st" x="146" y="142">T2: C 4, T 7</text></svg>U = 0,97. Com prioridade fixa, T2 não termina até t = 7. Com EDF, nenhum prazo cai até t = 14.</aside>
+  <ul class="b">
+    <li>Tarefa 1: C = 2, T = 5. Tarefa 2: C = 4, T = 7 (em ms). U = 2/5 + 4/7 = 0,40 + 0,57 = 0,97. Passou de 0,828: o teste simples não garante. Hora de desenhar a linha do tempo.</li>
+    <li>Comece com as duas tarefas soltas juntas em t = 0. Esse é o pior momento para a tarefa de prioridade menor (o instante crítico de Liu &amp; Layland): se ela cumpre o primeiro prazo aí, cumpre sempre.</li>
+    <li>Rate monotonic: T1 roda de 0 a 2; T2 roda de 2 a 5 e faz 3 dos 4 ms. Em t = 5 T1 volta e, com prioridade maior, toma a CPU até 7. Em t = 7 T2 ainda deve 1 ms: perdeu o prazo.</li>
+    <li>EDF: em t = 5 o prazo de T2 (7) está mais perto que o da nova T1 (10), então T2 continua e termina em 6. T1 roda de 6 a 8. Repare no desenho: até t = 14 ninguém perde prazo. Com U ≤ 1, EDF sempre dá conta, nas mesmas hipóteses.</li>
+  </ul>
+  <div class="def warn">
+    <span class="lab">Armadilhas frequentes</span>
+    <ul class="b">
+      <li>Errado: "U ≤ 1, então rate monotonic dá conta". Certo: U ≤ 1 é o mínimo para qualquer algoritmo; rate monotonic só garante abaixo de n·(2^(1/n) − 1). Entre os dois valores, desenhe a linha do tempo.</li>
+      <li>Errado: "U = 0,6, sobram 40% de folga". Certo: o teste supõe preempção instantânea. Um trecho que ninguém interrompe (interrupções desligadas, mutex preso numa inversão de prioridade da <a href="/m8/comp/05-sincronizacao-deadlocks">aula 05</a>) entra como bloqueio e pode estourar o prazo com a CPU quase ociosa.</li>
+    </ul>
+  </div>
+
+  <h3>No microcontrolador: FreeRTOS no RP2040</h3>
+  <ul class="b">
+    <li>O FreeRTOS é um RTOS pequeno e aberto que roda no RP2040 e em dezenas de outras arquiteturas. O escalonador é de prioridade fixa e preemptivo: roda sempre a tarefa pronta de maior prioridade.</li>
+    <li>Entre tarefas da mesma prioridade, ele faz round-robin com quantum de um tick (o time slicing, ligado por padrão).</li>
+    <li>O <b>tick</b> é a interrupção periódica do temporizador (<a href="/m8/comp/04-processos-threads">aula 04</a>) que acorda o escalonador. A frequência vem de <code>configTICK_RATE_HZ</code>: com 100 Hz, valor que o livro do FreeRTOS chama de típico, um tick dura 10 ms; com 1 000 Hz, 1 ms.</li>
+    <li>O tempo do FreeRTOS anda de tick em tick. <code>vTaskDelay(10)</code> espera 10 ticks, e uma tarefa periódica pode acordar até um tick atrasada (jitter).</li>
+    <li>O FreeRTOS não aplica rate monotonic sozinho: quem dá as prioridades é você, pela regra do período menor. E no FreeRTOS número maior é prioridade maior (0 é a menor), o contrário da tabela da seção 03.</li>
+    <li>Mutex do FreeRTOS tem herança de prioridade, o remédio da inversão de prioridade; semáforo binário não tem.</li>
+    <li>Sem RTOS, como no <code>loop()</code> do Arduino Uno, você reveza as tarefas no próprio laço. Funciona com poucas tarefas curtas; o pior caso de cada uma inclui uma volta inteira das outras.</li>
+  </ul>
+  <p>Recapitulando:</p>
+  <ul class="b">
+    <li>C é o pior caso; o teste de U só vale com tarefas independentes e preemptivas.</li>
+    <li>Abaixo do limite, RM garante; entre o limite e 1, desenhe a linha do tempo a partir de t = 0; EDF vai até 1.</li>
+    <li>No FreeRTOS, você aplica a regra ao escolher as prioridades, e o tick dá a resolução do tempo.</li>
+  </ul>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 6 · memoria ============ -->
+<section class="chap" id="memoria">
+ <div class="prose">
+  <span class="num">06</span>
   <h2>Memória principal: endereços, partições e fragmentação</h2>
   <div class="src"><span class="bk">Machado &amp; Maia · cap. 9 · p. 147–160</span></div>
   <p>Um programa só roda se o código e os dados estiverem na memória principal. Com vários processos ao mesmo tempo, o SO precisa decidir onde cada um fica, impedir que um mexa na memória do outro e aproveitar o espaço. O capítulo 9 conta a evolução das soluções, da mais simples à que motivou a memória virtual.</p>
@@ -385,7 +480,7 @@
 <!-- ============ 6 · paginacao ============ -->
 <section class="chap" id="paginacao">
  <div class="prose">
-  <span class="num">06</span>
+  <span class="num">07</span>
   <h2>Memória virtual: paginação, page fault e segmentação</h2>
   <div class="src"><span class="bk">Machado &amp; Maia · cap. 10 · p. 161–178</span></div>
   <p>Partições exigem que o processo inteiro esteja na memória e num trecho contínuo. A memória virtual (aula 02) quebra as duas exigências: o processo é picado em pedaços, cada pedaço vai para qualquer lugar livre, e só os pedaços em uso precisam estar na memória. A aula 02 viu isso pelo lado do hardware; aqui, pelo lado do SO.</p>
@@ -482,7 +577,7 @@
 <!-- ============ 7 · substituicao ============ -->
 <section class="chap" id="substituicao">
  <div class="prose">
-  <span class="num">07</span>
+  <span class="num">08</span>
   <h2>Substituição de páginas, working set e thrashing</h2>
   <div class="src"><span class="bk">Machado &amp; Maia · cap. 10 · p. 178–190</span></div>
   <p>No page fault da Figura 3 havia uma moldura livre. Quando a memória está cheia, o SO precisa escolher uma página para tirar. Essa escolha é a <b>substituição de páginas</b>, e um erro custa outro page fault logo depois.</p>
@@ -558,13 +653,59 @@
 
 <hr class="sep">
 
-<!-- ============ 8 · arquivos ============ -->
+<!-- ============ 9 · memoria-mcu ============ -->
+<section class="chap" id="memoria-mcu">
+ <div class="prose">
+  <span class="num">09</span>
+  <h2>Memória num microcontrolador: sem MMU, estática ou heap</h2>
+  <div class="src"><span class="base-tag">Base · além do autoestudo</span><a class="vd" href="https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf" target="_blank" rel="noopener">Datasheet · RP2040, seções 2.4 e 2.6 ↗</a><a class="vd" href="https://github.com/FreeRTOS/FreeRTOS-Kernel-Book/blob/main/ch03.md" target="_blank" rel="noopener">Livro do FreeRTOS · cap. 3 ↗</a></div>
+  <p>Tudo o que você viu de memória virtual supõe uma MMU. O RP2040 não tem: os endereços que o programa usa são os endereços físicos dos 264 KB de SRAM. Veja o que muda.</p>
+  <ul class="b">
+    <li>Sem MMU não existe tabela de páginas nem TLB (<a href="/m8/comp/02-fundamentos-memoria">aula 02</a>), nem page fault, nem swap. O que a tarefa usa tem de caber nos 264 KB de SRAM (o código pode ficar na flash e ser lido por XIP).</li>
+    <li>O Cortex-M0+ do RP2040 tem uma MPU de 8 regiões. Ela proíbe acessos por região (ler, escrever, executar), mas não traduz endereço nenhum: protege e não virtualiza.</li>
+    <li>No Arduino Uno (ATmega328P) a SRAM tem 2 KB, e o heap e a pilha de execução crescem um em direção ao outro dentro deles.</li>
+  </ul>
+
+  <h3>Fragmentação sem compactação</h3>
+<aside class="mn" id="mn-heap" aria-hidden="true"><svg viewBox="0 0 240 130"><text class="tm" x="120" y="12">heap de 16 KB</text><rect class="k" x="20" y="26" width="50" height="30" stroke-dasharray="4 3"/><text class="tm" x="45" y="41">livre</text><rect class="bl" x="70" y="26" width="50" height="30"/><text x="95" y="41">B</text><rect class="k" x="120" y="26" width="50" height="30" stroke-dasharray="4 3"/><text class="tm" x="145" y="41">livre</text><rect class="bl" x="170" y="26" width="50" height="30"/><text x="195" y="41">D</text><text class="tm" x="45" y="68">4 KB</text><text class="tm" x="145" y="68">4 KB</text><rect class="am" x="20" y="88" width="75" height="28"/><text class="tm" x="57" y="102">pede 6 KB</text><text class="tm st" x="108" y="102" style="fill:var(--red)">não cabe em buraco nenhum</text></svg>8 KB livres em dois buracos de 4 KB. Sem MMU, ninguém pode mover B para juntar os buracos.</aside>
+  <ul class="b">
+    <li>Heap de 16 KB. O firmware recebe quatro rotinas de 4 KB (A, B, C, D) e ocupa tudo. O terapeuta apaga A e C: sobram 8 KB livres.</li>
+    <li>Chega uma rotina de 6 KB. Nenhum buraco tem 6 KB: é a fragmentação externa da <a href="#memoria">seção 06</a>, agora dentro do chip.</li>
+    <li>No PC, a saída seria a compactação. Aqui ela não existe: compactar exige relocação dinâmica, e sem MMU mover B quebraria todo ponteiro que aponta para ele. O buraco fica até reiniciar.</li>
+  </ul>
+
+  <h3>Estática ou heap</h3>
+  <ul class="b">
+    <li><b>Alocação estática</b>: o tamanho de cada coisa (filas, buffers, pilhas das tarefas) é fixado na compilação, em variáveis globais ou <code>static</code>. Se não cabe, o linker avisa na hora de compilar, e não com a pessoa no meio da calça.</li>
+    <li>Heap: memória pedida durante a execução (<code>malloc</code>, ou <code>pvPortMalloc</code> no FreeRTOS). Flexível, mas o pedido pode falhar, o heap pode fragmentar e o tempo de cada pedido varia.</li>
+    <li>O FreeRTOS traz cinco heaps. heap_1 só aloca e nunca libera: não fragmenta e tem tempo previsível. heap_2 libera sem juntar vizinhos, e fragmenta. heap_4 usa first-fit e junta buracos vizinhos (a coalescência da seção 06). heap_5 é o heap_4 espalhado por várias regiões. heap_3 chama o <code>malloc</code> da biblioteca C.</li>
+    <li>Tarefas, filas e semáforos do FreeRTOS também têm versão estática, como <code>xTaskCreateStatic</code>: você entrega o buffer e o kernel não toca no heap.</li>
+    <li>Cada tarefa do FreeRTOS tem sua pilha de execução, de tamanho fixo. Sem MMU (e sem programar a MPU), estourar a pilha escreve por cima da memória vizinha sem aviso do hardware; <code>configCHECK_FOR_STACK_OVERFLOW</code> ajuda a detectar, sem garantir.</li>
+  </ul>
+  <div class="def warn">
+    <span class="lab">Armadilhas frequentes</span>
+    <ul class="b">
+      <li>Errado: "sem MMU não há page fault, então todo acesso leva o mesmo tempo". Certo: some o page fault, mas a cache XIP da flash ainda erra (aula 02), e uma gravação na flash ainda para o que mora nela (<a href="#flash">seção 11</a>).</li>
+      <li>Errado: "liberei 8 KB, então cabe um pedido de 6 KB". Certo: cabe se existir um buraco contíguo de 6 KB. Conte buracos, não o total.</li>
+    </ul>
+  </div>
+  <p>Recapitulando:</p>
+  <ul class="b">
+    <li>Sem MMU: endereço lógico = físico, nada de paginação, e a fragmentação do heap não tem compactação para salvar.</li>
+    <li>Em firmware que não pode falhar, aloque tudo na inicialização (estática ou heap_1) e não libere.</li>
+  </ul>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 10 · arquivos ============ -->
 <section class="chap" id="arquivos">
  <div class="prose">
-  <span class="num">08</span>
+  <span class="num">10</span>
   <h2>Sistema de arquivos</h2>
   <div class="src"><span class="bk">Machado &amp; Maia · cap. 11 · p. 191–206</span></div>
-  <p>A memória principal perde tudo quando a energia acaba. O que precisa durar fica no disco, e o disco é só uma sequência enorme de blocos numerados. O <b>sistema de arquivos</b> é a parte do SO que transforma esses blocos em arquivos com nome, pastas e permissões.</p>
+  <p>A memória principal perde o conteúdo quando a energia acaba (não na hora: veja o <a href="#seguranca">cold boot</a>). O que precisa durar fica no disco, e o disco é só uma sequência enorme de blocos numerados. O <b>sistema de arquivos</b> é a parte do SO que transforma esses blocos em arquivos com nome, pastas e permissões.</p>
 
   <h3>Arquivos</h3>
   <ul class="b">
@@ -603,7 +744,8 @@
   <div class="def key">
     <span class="lab">Definição · i-node</span>
     <p class="simples">No Unix e no Linux cada arquivo tem uma ficha, o i-node, com todos os atributos e com os ponteiros para os blocos. O diretório só associa o nome ao número do i-node.</p>
-    <p class="formal">O <b>i-node</b> (index node) é a estrutura de alocação indexada do Unix. Guarda os atributos do arquivo e 15 ponteiros: 12 diretos (apontam blocos de dados), 1 indireto simples (aponta um bloco cheio de ponteiros), 1 indireto duplo (ponteiros para blocos de ponteiros) e 1 indireto triplo.</p>
+    <p class="formal">O <b>i-node</b> (index node) é a estrutura de alocação indexada do Unix. No modelo que os livros desenham (o do ext2 e ext3 do Linux), ele guarda os atributos do arquivo e 15 ponteiros: 12 diretos (apontam blocos de dados), 1 indireto simples (aponta um bloco cheio de ponteiros), 1 indireto duplo (ponteiros para blocos de ponteiros) e 1 indireto triplo.</p>
+    <p class="nota-formal">A quantidade de ponteiros diretos muda de sistema para sistema: o Unix V7 tinha 10 diretos e 3 indiretos; o ext4 troca a lista por extents (trechos de blocos seguidos).</p>
   </div>
   <div class="def">
     <span class="lab">Conta · o maior arquivo de um i-node</span>
@@ -613,7 +755,7 @@
       <li>Indireto simples: 1 024 × 4 KB = 4 MB.</li>
       <li>Indireto duplo: 1 024 × 1 024 × 4 KB = 2²⁰ × 2¹² = 2³² bytes = 4 GB.</li>
       <li>Indireto triplo: 1 024³ × 4 KB = 2⁴² bytes = 4 TB.</li>
-      <li>Total ≈ 4 TB. Arquivo pequeno com acesso rápido, arquivo enorme possível: é por isso que o desenho é assimétrico.</li>
+      <li>Total ≈ 4 TB pelos ponteiros (outros campos do sistema de arquivos podem limitar antes). Arquivo pequeno com acesso rápido, arquivo enorme possível: é por isso que o desenho é assimétrico.</li>
     </ul>
   </div>
   <p class="prova">Alocação de arquivos: contígua (rápida, acesso direto fácil, mas fragmentação externa e precisa saber o tamanho); encadeada (sem fragmentação externa, mas acesso direto lento e ponteiro corrompido perde o resto; a FAT põe a corrente numa tabela); indexada (bloco de índice, acesso direto rápido; i-node do Unix com ponteiros diretos e indiretos).</p>
@@ -635,10 +777,65 @@
 
 <hr class="sep">
 
-<!-- ============ 9 · es ============ -->
+<!-- ============ 11 · flash ============ -->
+<section class="chap" id="flash">
+ <div class="prose">
+  <span class="num">11</span>
+  <h2>Guardar sem disco: flash, EEPROM e desgaste</h2>
+  <div class="src"><span class="base-tag">Base · além do autoestudo</span><a class="vd" href="https://www.winbond.com/resource-files/w25q16jv%20spi%20revd%2008122016.pdf" target="_blank" rel="noopener">Datasheet · Winbond W25Q16JV ↗</a><a class="vd" href="https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/DataSheets/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061B.pdf" target="_blank" rel="noopener">Datasheet · ATmega328P ↗</a><a class="vd" href="https://github.com/littlefs-project/littlefs" target="_blank" rel="noopener">Doc · LittleFS ↗</a></div>
+  <p>O módulo da rotina não tem disco. O que precisa sobreviver ao desligar (as rotinas, o passo em que a pessoa parou) vai para a flash ou para a EEPROM. As duas têm uma regra que o disco não tem: cada gravação gasta o chip.</p>
+
+  <h3>Como a flash grava</h3>
+<aside class="mn" id="mn-setor" aria-hidden="true"><svg viewBox="0 0 240 150"><text class="tm" x="120" y="10">setor de 4 KB = 16 páginas de 256 B</text><rect class="gr" x="40" y="20" width="40" height="20"/><rect class="gr" x="80" y="20" width="40" height="20"/><rect class="gr" x="120" y="20" width="40" height="20"/><rect class="gr" x="160" y="20" width="40" height="20"/><rect class="gr" x="40" y="40" width="40" height="20"/><rect class="gr" x="80" y="40" width="40" height="20"/><rect class="gr" x="120" y="40" width="40" height="20"/><rect class="gr" x="160" y="40" width="40" height="20"/><rect class="gr" x="40" y="60" width="40" height="20"/><rect class="gr" x="80" y="60" width="40" height="20"/><rect class="am" x="120" y="60" width="40" height="20"/><text class="tm" x="140" y="70">próx.</text><rect class="k" x="160" y="60" width="40" height="20"/><rect class="k" x="40" y="80" width="40" height="20"/><rect class="k" x="80" y="80" width="40" height="20"/><rect class="k" x="120" y="80" width="40" height="20"/><rect class="k" x="160" y="80" width="40" height="20"/><text class="tm" x="120" y="120">gravar: uma página, bits 1 → 0</text><text class="tm" x="120" y="138">apagar: o setor inteiro volta a 1</text></svg>Verde: páginas já gravadas. O registro novo vai para a próxima página livre; o setor só é apagado quando enche.</aside>
+  <ul class="b">
+    <li>Gravar só consegue mudar bits de 1 para 0. Para voltar a 1 é preciso apagar, e só dá para apagar um setor inteiro.</li>
+    <li>Na flash do Raspberry Pi Pico (Winbond W25Q16JV, 2 MB), você grava em páginas de 256 bytes e apaga em setores de 4 KB. No Pico SDK, esses tamanhos são <code>FLASH_PAGE_SIZE</code> e <code>FLASH_SECTOR_SIZE</code>.</li>
+    <li>Apagar um setor leva 45 ms típicos e até 400 ms no pior caso, segundo o datasheet. Enquanto isso a flash não atende leitura: o código que roda nesse intervalo, inclusive interrupções e o outro core, precisa estar na SRAM ou parado (o <a href="/m8/comp/02-fundamentos-memoria">XIP da aula 02</a>). O Pico SDK tem <code>flash_safe_execute</code> para isso.</li>
+  </ul>
+
+  <h3>Desgaste</h3>
+  <ul class="b">
+    <li><b>Desgaste</b>: cada ciclo de apagar e gravar estraga um pouco as células. O datasheet garante um mínimo de ciclos por posição: 100 000 por setor na W25Q16JV; no ATmega328P, 100 000 na EEPROM e só 10 000 na flash.</li>
+    <li>A EEPROM do ATmega328P (1 KB) grava byte a byte, sem setor; cada gravação apaga e grava o byte em 3,3 ms.</li>
+    <li>A vida útil é uma divisão: ciclos garantidos ÷ gravações por dia na mesma posição.</li>
+  </ul>
+  <div class="def">
+    <span class="lab">Conta · quanto dura um byte da EEPROM</span>
+    <ul class="b">
+      <li>O firmware salva o passo atual a cada aperto do botão: 4 peças × 10 rotinas por dia = 40 gravações por dia. 100 000 / 40 = 2 500 dias ≈ 6,8 anos.</li>
+      <li>Outro firmware salva o tempo de espera a cada segundo: 100 000 s ≈ 27,8 horas. Em pouco mais de um dia de uso contínuo, o byte sai da garantia.</li>
+      <li>Um laço com defeito que grava sem parar: 100 000 × 3,3 ms = 330 s, cinco minutos e meio.</li>
+    </ul>
+  </div>
+
+  <h3>Wear leveling</h3>
+  <ul class="b">
+    <li><b>Wear leveling</b> (nivelamento de desgaste): espalhar as gravações por muitas posições, para nenhuma gastar antes das outras.</li>
+    <li>Na EEPROM: em vez de um endereço fixo, um anel de 256 registros de 4 bytes (o 1 KB inteiro). Cada gravação vai para a próxima posição e, na leitura, vale o registro mais novo. Cada posição recebe 1/256 das gravações: 256 × 100 000 = 25,6 milhões. A 1 por segundo, 296 dias; a 40 por dia, mais de mil anos.</li>
+    <li>Na flash, a mesma ideia com setores: registros de 16 bytes vão sendo acrescentados num setor de 4 KB (256 registros), e o setor só é apagado quando enche. Com dois setores se revezando, um apagamento nunca destrói o último registro bom.</li>
+    <li>O <b>LittleFS</b> faz isso como sistema de arquivos para microcontrolador. Ele nunca sobrescreve no lugar (grava a versão nova em outro bloco e só então troca o ponteiro, o copy-on-write), espalha o desgaste pelos blocos e, se a energia cair no meio, volta ao último estado bom. É a alocação e o espaço livre da <a href="#arquivos">seção 10</a> com a regra do desgaste por cima.</li>
+  </ul>
+  <div class="def warn">
+    <span class="lab">Armadilhas frequentes</span>
+    <ul class="b">
+      <li>Errado: "100 000 ciclos é muito, nunca vai acabar". Certo: é por posição, e o que decide é quantas vezes por dia você grava no mesmo lugar. A 1 por segundo, acaba em pouco mais de um dia.</li>
+      <li>Errado: "apaguei a rotina, os dados sumiram". Certo: o sistema de arquivos só marca os blocos como livres, e com wear leveling até sobrescrever grava em outro bloco, deixando o antigo intacto. Num estudo com SSDs, nenhuma técnica de apagar um arquivo individual removeu os dados do chip (Wei et al., FAST 2011).</li>
+    </ul>
+  </div>
+  <p>Recapitulando:</p>
+  <ul class="b">
+    <li>Flash: grava por página, apaga por setor (4 KB no Pico), e apagar trava a leitura por dezenas a centenas de ms.</li>
+    <li>Vida útil = ciclos ÷ gravações por dia na mesma posição; espalhar as gravações multiplica a vida.</li>
+  </ul>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 12 · es ============ -->
 <section class="chap" id="es">
  <div class="prose">
-  <span class="num">09</span>
+  <span class="num">12</span>
   <h2>Entrada e saída: drivers, controladores e DMA</h2>
   <div class="src"><span class="bk">Machado &amp; Maia · cap. 12 · p. 207–214</span></div>
   <p>Cada dispositivo é de um jeito: teclado manda um caractere de vez em quando, disco manda blocos de 4 KB, sensor manda uma leitura por período. O SO esconde essa variedade atrás de camadas, para o programa só chamar <code>read</code> e <code>write</code>.</p>
@@ -688,10 +885,56 @@
 
 <hr class="sep">
 
-<!-- ============ 10 · discos ============ -->
+<!-- ============ 13 · botao ============ -->
+<section class="chap" id="botao">
+ <div class="prose">
+  <span class="num">13</span>
+  <h2>O botão do módulo: polling, interrupção ou DMA</h2>
+  <div class="src"><span class="base-tag">Base · além do autoestudo</span><a class="vd" href="https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf" target="_blank" rel="noopener">Datasheet · RP2040, seções 2.3, 2.4 e 2.5 ↗</a></div>
+  <p>A <a href="#es">seção 12</a> fez a conta para um mouse e um dispositivo rápido. Agora o dispositivo é o botão que a pessoa aperta ao terminar cada peça, ligado a um RP2040 a 125 MHz. Um ciclo dura 1 / 125 000 000 s = 8 ns.</p>
+<aside class="mn" id="mn-botao" aria-hidden="true"><svg viewBox="0 0 240 140"><text class="tm st" x="4" y="10">pino do botão</text><path class="ac" d="M10 44 H70 V24 H74 V44 H78 V24 H82 V44 H86 V24 H232"/><text class="tm" x="78" y="54">bounce</text><text class="tm st" x="4" y="72">polling a cada 10 ms</text><line class="s" x1="40" y1="80" x2="40" y2="92"/><line class="s" x1="100" y1="80" x2="100" y2="92"/><line class="s" x1="160" y1="80" x2="160" y2="92"/><line class="s" x1="220" y1="80" x2="220" y2="92"/><circle class="gr" cx="100" cy="86" r="6"/><text class="tm st" x="110" y="86">vê aqui</text><text class="tm st" x="4" y="110">interrupção</text><path class="am" d="M70 118 v12 M74 118 v12 M78 118 v12 M82 118 v12 M86 118 v12" style="stroke-width:2"/><text class="tm st" x="96" y="124">uma por borda</text></svg>Um aperto. O polling vê o botão na primeira leitura depois do pulo; a interrupção dispara em cada borda do bounce.</aside>
+
+  <h3>Polling</h3>
+  <ul class="b">
+    <li>Polling contínuo: um laço que lê o pino sem parar. O RP2040 lê um GPIO em um ciclo (o bloco SIO), então o aperto é visto em dezenas de ns. O preço é a CPU 100% ocupada perguntando, sem dormir nem fazer outra coisa.</li>
+    <li>Polling periódico: uma tarefa ou um timer lê o pino a cada 10 ms. Com uma leitura de 100 ciclos (valor de exemplo): 100 ciclos × 100 leituras/s = 10 000 ciclos/s, ou 10 000 / 125 000 000 = 0,008% da CPU. Latência: até 10 ms no pior caso, 5 ms em média.</li>
+    <li>O contato mecânico pula por alguns milissegundos ao fechar. O <b>debounce</b> filtra esse pulo, e no polling periódico ele sai quase de graça: duas leituras iguais seguidas, com 10 ms entre elas, já bastam.</li>
+  </ul>
+
+  <h3>Interrupção</h3>
+  <ul class="b">
+    <li>O GPIO gera interrupção na borda, quando o pino muda. Pelo datasheet, o Cortex-M0+ leva no máximo 15 ciclos para começar o tratador, com memória sem espera: 15 × 8 ns = 120 ns.</li>
+    <li>Se o tratador está na flash e a cache XIP erra, soma-se a falta; durante um apagamento da flash, ele nem roda (<a href="#flash">seção 11</a>). Por isso o tratador do botão mora na SRAM.</li>
+    <li>Custo zero enquanto ninguém aperta: a CPU pode dormir (instrução <code>WFI</code>) e acordar no aperto. É isso que economiza bateria.</li>
+    <li>O problema é o bounce: um aperto gera várias bordas e várias interrupções. O tratador ignora novas bordas por uns 20 ms (com um timer), ou só registra o evento e deixa uma tarefa confirmar.</li>
+  </ul>
+
+  <h3>DMA</h3>
+  <ul class="b">
+    <li>DMA move blocos. O botão é um bit, poucas vezes por minuto: não serve.</li>
+    <li>Serve para o som, com amostras de áudio indo para o PWM do alto-falante. Com 8 000 amostras/s e uma interrupção de 100 ciclos por amostra: 800 000 ciclos/s = 0,64% da CPU. Com DMA em blocos de 256 amostras: 8 000 / 256 = 31,25 interrupções/s ≈ 3 125 ciclos/s = 0,0025%. O RP2040 tem 12 canais de DMA.</li>
+  </ul>
+  <div class="def warn">
+    <span class="lab">Armadilhas frequentes</span>
+    <ul class="b">
+      <li>Errado: "interrupção é sempre melhor que polling". Certo: para um botão sem pressa, polling a cada 10 ms custa 0,008% da CPU e já faz o debounce. A interrupção ganha quando a CPU precisa dormir ou quando 10 ms é tempo demais.</li>
+      <li>Errado: "15 ciclos de latência, então o botão responde em 120 ns". Certo: 120 ns é até o tratador começar, com memória sem espera. Flash ocupada, interrupções desligadas e tratadores de prioridade maior somam no pior caso.</li>
+    </ul>
+  </div>
+  <p>Recapitulando:</p>
+  <ul class="b">
+    <li>A conta é sempre a mesma: custo por evento × eventos por segundo, e o pior caso de latência.</li>
+    <li>Botão: polling periódico ou interrupção com debounce. Som: DMA.</li>
+  </ul>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 14 · discos ============ -->
 <section class="chap" id="discos">
  <div class="prose">
-  <span class="num">10</span>
+  <span class="num">14</span>
   <h2>Discos e escalonamento de disco</h2>
   <div class="src"><span class="bk">Machado &amp; Maia · cap. 12 · p. 214–220</span></div>
   <p>O disco magnético é o dispositivo em que a ordem dos pedidos mais pesa no desempenho, porque uma parte do custo é mecânica: mexer um braço.</p>
@@ -754,5 +997,173 @@
     <li>RAID 5: blocos espalhados mais um bloco de paridade (um resumo que permite recalcular um bloco perdido), também espalhada. Aguenta a perda de um disco e gasta só um disco de capacidade.</li>
     <li>Conta: 4 discos de 2 TB. RAID 0 = 8 TB úteis; RAID 1 = 4 TB; RAID 5 = (4 − 1) × 2 = 6 TB.</li>
   </ul>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 15 · reais ============ -->
+<section class="chap" id="reais">
+ <div class="prose">
+  <span class="num">15</span>
+  <h2>Os quatro recursos em três sistemas reais</h2>
+  <div class="src"><span class="base-tag">Base · além do autoestudo</span><a class="vd" href="https://man7.org/linux/man-pages/man7/sched.7.html" target="_blank" rel="noopener">Doc · Linux, sched(7) ↗</a><a class="vd" href="https://docs.kernel.org/scheduler/sched-eevdf.html" target="_blank" rel="noopener">Doc · Linux, EEVDF ↗</a><a class="vd" href="https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf" target="_blank" rel="noopener">Datasheet · RP2040 ↗</a><a class="vd" href="https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ProductDocuments/DataSheets/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061B.pdf" target="_blank" rel="noopener">Datasheet · ATmega328P ↗</a></div>
+  <p>A mesma gerência de recursos em três máquinas que aparecem nos encontros: um Linux, o RP2040 com FreeRTOS e o Arduino Uno sem sistema operacional. Leia por coluna.</p>
+ </div>
+  <div class="tbl prose" id="tbl-reais">
+    <table>
+      <thead><tr><th>Recurso</th><th>Linux (notebook, servidor)</th><th>FreeRTOS no RP2040</th><th>Arduino Uno, sem SO</th></tr></thead>
+      <tbody>
+        <tr><td>CPU</td><td>EEVDF para tarefas comuns (desde o kernel 6.6); SCHED_FIFO e SCHED_RR com prioridade fixa de 1 a 99 para tempo real</td><td>prioridade fixa preemptiva; round-robin por tick entre tarefas de mesma prioridade (<a href="#tempo-real">seção 05</a>)</td><td>sem escalonador: <code>loop()</code> repete tudo, e o revezamento é do programador</td></tr>
+        <tr><td>Memória</td><td>memória virtual paginada, páginas de 4 KB, swap; sem memória livre, o OOM killer mata um processo</td><td>264 KB de SRAM sem MMU; a MPU só protege; alocação estática ou heap_1 a heap_5 (<a href="#memoria-mcu">seção 09</a>)</td><td>2 KB de SRAM, divididos entre heap e pilha de execução</td></tr>
+        <tr><td>Armazenamento</td><td>ext4 em SSD ou disco (i-nodes com extents)</td><td>flash externa de 2 MB no Pico; LittleFS ou setores reservados (<a href="#flash">seção 11</a>)</td><td>1 KB de EEPROM, byte a byte; 32 KB de flash para o programa</td></tr>
+        <tr><td>Dispositivos</td><td>drivers no kernel; DMA dos periféricos atrás de uma IOMMU (<a href="#seguranca">seção 16</a>)</td><td>GPIO com interrupção, 12 canais de DMA, sem IOMMU (<a href="#botao">seção 13</a>)</td><td>interrupções externas (INT0, INT1) e por mudança de pino; sem DMA</td></tr>
+      </tbody>
+    </table>
+  </div>
+ <div class="prose">
+  <ul class="b">
+    <li>Da esquerda para a direita, cada decisão sai do SO e passa para você. No Linux o kernel escolhe quem roda, onde cada página mora e quando o disco é gravado; no Uno, o seu código escolhe tudo isso.</li>
+    <li>Menos SO também quer dizer menos coisa escondida no pior caso: sem paginação não há page fault, e sem escalonador não há troca de contexto. Em troca, garantir o pior caso passa a ser trabalho seu.</li>
+  </ul>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 16 · seguranca ============ -->
+<section class="chap" id="seguranca">
+ <div class="prose">
+  <span class="num">16</span>
+  <h2>Segurança: quando o recurso vira ataque</h2>
+  <div class="src"><span class="base-tag">Base · além do autoestudo</span><a class="vd" href="https://thunderclap.io/" target="_blank" rel="noopener">Artigo · Thunderclap, NDSS 2019 ↗</a><a class="vd" href="https://www.usenix.org/legacy/event/sec08/tech/full_papers/halderman/halderman.pdf" target="_blank" rel="noopener">Artigo · Halderman et al., USENIX Security 2008 ↗</a><a class="vd" href="https://docs.kernel.org/admin-guide/cgroup-v1/pids.html" target="_blank" rel="noopener">Doc · Linux, controlador pids ↗</a></div>
+  <p>Gerenciar recurso é decidir quem acessa o quê, e até quanto. Cada caso abaixo explora uma dessas decisões.</p>
+
+  <h3>Ataque por DMA e a IOMMU</h3>
+  <ul class="b">
+    <li>Mecanismo: o DMA (<a href="#es">seção 12</a>) copia sem a CPU e usa endereço físico. A MMU, que separa um processo do outro, fica fora desse caminho: um dispositivo com DMA lê e grava qualquer lugar da memória.</li>
+    <li>Ataque: a porta Thunderbolt leva PCI Express, e portanto DMA, no mesmo cabo da energia e do vídeo. Um carregador ou projetor malicioso funciona normalmente e, ao mesmo tempo, lê senhas e chaves ou grava código no kernel.</li>
+    <li>Decisão explorada: confiar no periférico.</li>
+    <li>Mitigação: a <b>IOMMU</b>, uma MMU para dispositivos, faz cada dispositivo enxergar só as páginas que o SO liberou para ele. O Thunderclap (Markettos et al., 2019) mostrou que nem isso bastava: muitos sistemas vinham com a IOMMU desligada por desempenho, e os SOs punham dados sensíveis nas mesmas páginas liberadas ao dispositivo.</li>
+    <li>No módulo: o RP2040 não tem IOMMU, e qualquer código que configure um canal de DMA alcança toda a memória. O interpretador da rotina nunca deixa uma rotina escolher endereço de DMA.</li>
+  </ul>
+
+  <h3>Cold boot</h3>
+  <ul class="b">
+    <li>Mecanismo: a DRAM guarda cada bit num capacitor que vaza devagar (<a href="/m8/comp/02-fundamentos-memoria">aula 02</a>). Sem energia, os bits duram segundos à temperatura ambiente. Resfriada a cerca de −50 °C com um spray de ar comprimido virado ao contrário, menos de 1% dos bits se perdeu em 10 minutos; em nitrogênio líquido, 0,17% em uma hora.</li>
+    <li>Ataque (<b>cold boot</b>, Halderman et al., 2008): com o disco criptografado montado, mesmo de tela bloqueada ou suspenso, o atacante corta a energia, religa com um programa mínimo que copia a memória e procura a chave do disco. Venceram BitLocker, FileVault e TrueCrypt.</li>
+    <li>Decisão explorada: o SO deixa a chave na memória enquanto o disco está montado e supõe que desligar apaga a DRAM.</li>
+    <li>Mitigação: firmware que zera a memória ao ligar, criptografia da própria memória pelo processador (AMD SME, Intel TME) e desligar, em vez de suspender, quando o disco criptografado importa.</li>
+    <li>No módulo: o mesmo raciocínio vale para a flash. Rotina apagada não é rotina destruída (<a href="#flash">seção 11</a>).</li>
+  </ul>
+
+  <h3>Negação de serviço por esgotamento</h3>
+  <ul class="b">
+    <li><b>Negação de serviço</b>: deixar o sistema sem atender quem tem direito, gastando um recurso finito até acabar.</li>
+    <li>Exemplo clássico, a fork bomb do bash: <code>:(){ :|:&amp; };:</code> define uma função que chama a si mesma duas vezes, em segundo plano. Cada processo cria dois; em 20 gerações são 2²⁰ ≈ 1 milhão. A tabela de processos (<a href="/m8/comp/04-processos-threads">aula 04</a>) enche, e o escalonador reparte a CPU com milhares de cópias inúteis.</li>
+    <li>A mesma ideia vale para memória (o Linux chama o OOM killer), para disco cheio e para molduras (thrashing, <a href="#substituicao">seção 08</a>).</li>
+    <li>Decisão explorada: o SO entrega recurso a quem pede, sem cota.</li>
+    <li>Mitigação: cota por usuário ou grupo. No Linux, <code>ulimit -u</code> limita os processos de um usuário, e o controlador pids dos cgroups barra novos <code>fork()</code> depois de um limite.</li>
+    <li>No módulo, o recurso finito pode ser a EEPROM: uma rotina com um laço que grava a cada volta gasta a vida garantida de um byte em 5,5 minutos (<a href="#flash">seção 11</a>). Mitigação: a ISA da rotina não tem instrução de gravação livre, o firmware limita gravações por hora, e um watchdog reinicia um laço que travou.</li>
+  </ul>
+  <p>Recapitulando:</p>
+  <ul class="b">
+    <li>DMA passa por fora da MMU: sem IOMMU, o periférico vê tudo.</li>
+    <li>Memória "volátil" demora para esquecer, e flash apagada não foi destruída.</li>
+    <li>Todo recurso sem cota vira alvo de negação de serviço, inclusive o desgaste da EEPROM.</li>
+  </ul>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 17 · exercicios ============ -->
+<section class="chap" id="exercicios">
+ <div class="prose">
+  <span class="num">17</span>
+  <h2>Exercícios no estilo do encontro</h2>
+  <div class="src"><span class="base-tag">Treino · autoral</span><span class="bk">dados de datasheet nas seções 05, 11 e 13; o resto são valores de exemplo</span></div>
+  <p>Três exercícios de treino, escritos para este caderno, do mecânico ao aberto. Faça as contas no papel antes de abrir o gabarito.</p>
+
+  <h3>Exercício 1 · Escalonar o módulo no FreeRTOS</h3>
+  <p>O módulo roda FreeRTOS num RP2040 a 125 MHz. Quatro tarefas periódicas, com C no pior caso: som (C = 1 ms, T = 5 ms), botão (C = 1 ms, T = 10 ms), piscar (C = 2 ms, T = 20 ms) e cuidador (C = 20 ms, T = 100 ms).</p>
+  <ul class="b">
+    <li>(a) Calcule U e compare com o limite de Liu &amp; Layland para n = 4.</li>
+    <li>(b) Dê as prioridades pelo rate monotonic, já nos números do FreeRTOS.</li>
+    <li>(c) A tarefa do cuidador passa a gravar um log na flash, apagando um setor com as interrupções desligadas (45 ms típicos, 400 ms no pior caso). O que acontece com o som e com o botão? O que você faria?</li>
+  </ul>
+  <details class="treino"><summary><span class="q">Gabarito</span> Exercício 1</summary>
+    <p>(a) U = 1/5 + 1/10 + 2/20 + 20/100 = 0,2 + 0,1 + 0,1 + 0,2 = 0,6. Limite: 4 × (2^(1/4) − 1) = 4 × 0,189 = 0,757. Como 0,6 ≤ 0,757, os prazos estão garantidos, nas hipóteses do teste.</p>
+    <p>(b) Período menor, prioridade maior: som, botão, piscar, cuidador. No FreeRTOS, número maior é prioridade maior: som 4, botão 3, piscar 2, cuidador 1 (o 0 fica para a tarefa ociosa).</p>
+    <p>(c) Com as interrupções desligadas, nem o tick roda. Em 400 ms o som perde até 400 / 5 = 80 prazos seguidos e o botão fica 400 ms sem ser lido. O teste de U não enxerga isso, porque supõe preempção a qualquer instante. Saídas: apagar só quando ninguém tem prazo (entre uma rotina e outra) e juntar o log na SRAM para gravar em lote nesse momento.</p>
+    <p>Leitura. 60% de utilização parece folga. O pior caso vem do bloqueio, não da utilização.</p>
+  </details>
+
+  <h3>Exercício 2 · Onde guardar o progresso</h3>
+  <p>Para retomar depois de uma queda de energia, o módulo guarda o passo atual (4 bytes) a cada aperto do botão. A rotina de vestir tem 4 peças, e a pessoa faz 10 rotinas por dia. Dados: EEPROM do ATmega328P com 1 KB e 100 000 ciclos; setor de 4 KB da W25Q16JV com 100 000 ciclos.</p>
+  <ul class="b">
+    <li>(a) Gravando sempre no mesmo endereço da EEPROM, quantos anos até sair da garantia?</li>
+    <li>(b) E num anel de 256 posições na EEPROM? E na flash, acrescentando registros de 16 bytes num setor que só é apagado quando enche?</li>
+    <li>(c) Uma versão nova salva também o tempo de espera a cada segundo, até 120 s por peça, no mesmo endereço. Quanto dura? Onde você guardaria cada dado?</li>
+  </ul>
+  <details class="treino"><summary><span class="q">Gabarito</span> Exercício 2</summary>
+    <p>(a) 4 × 10 = 40 gravações por dia. 100 000 / 40 = 2 500 dias ≈ 6,8 anos.</p>
+    <p>(b) Anel: 256 × 100 000 = 25,6 milhões de gravações; 25 600 000 / 40 = 640 000 dias, mais de 1 700 anos. Flash: 4 096 / 16 = 256 registros por setor, um apagamento a cada 256 / 40 = 6,4 dias; 100 000 × 6,4 = 640 000 dias, a mesma ordem.</p>
+    <p>(c) No pior caso, 4 × 120 = 480 gravações por rotina, 4 800 por dia (mais as 40 do botão): 100 000 / 4 840 ≈ 21 dias. Decisão: o passo vai para a EEPROM em anel; o tempo de espera fica só na SRAM, e numa queda de energia a peça recomeça a contagem.</p>
+    <p>Leitura. A vida útil depende de quantas vezes você grava no mesmo lugar, não de quanto você guarda.</p>
+  </details>
+
+  <h3>Exercício 3 · O botão e o som</h3>
+  <p>RP2040 a 125 MHz (8 ns por ciclo). Polling: uma leitura a cada 10 ms custa 100 ciclos. Interrupção: até 15 ciclos de latência mais um tratador de 200 ciclos; o bounce gera 10 bordas por aperto. Som: 8 000 amostras por segundo.</p>
+  <ul class="b">
+    <li>(a) Polling: quanto da CPU ele gasta? Qual o pior atraso, exigindo duas leituras iguais seguidas para confirmar o aperto?</li>
+    <li>(b) Interrupção: quanto tempo até o tratador começar? Quantos ciclos e µs um aperto custa, se nada filtrar o bounce?</li>
+    <li>(c) Som com uma interrupção de 100 ciclos por amostra, ou com DMA em blocos de 256 amostras: quanto da CPU cada um gasta? Que combinação você escolhe para um módulo a bateria?</li>
+  </ul>
+  <details class="treino"><summary><span class="q">Gabarito</span> Exercício 3</summary>
+    <p>(a) 100 leituras/s × 100 ciclos = 10 000 ciclos/s; 10 000 / 125 000 000 = 0,008%. Pior caso: o aperto acontece logo depois de uma leitura. São 10 ms até a primeira leitura que o vê e mais 10 ms até a segunda, que confirma: 20 ms.</p>
+    <p>(b) 15 × 8 ns = 120 ns. Sem filtro: 10 × (15 + 200) = 2 150 ciclos × 8 ns = 17,2 µs por aperto.</p>
+    <p>(c) Por amostra: 8 000 × 100 = 800 000 ciclos/s = 0,64%. DMA: 8 000 / 256 = 31,25 interrupções/s × 100 = 3 125 ciclos/s = 0,0025%. Escolha: botão por interrupção com debounce, para a CPU dormir entre apertos, e som por DMA.</p>
+    <p>Leitura. A pessoa leva dezenas de segundos para vestir uma peça: 120 ns ou 20 ms não fazem diferença para ela. O que decide é a energia e o pior caso com a flash ocupada.</p>
+  </details>
+ </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ 18 · projeto ============ -->
+<section class="chap" id="projeto">
+ <div class="prose">
+  <span class="num">18</span>
+  <h2>Aplicação ao projeto: vocês são o sistema operacional do módulo</h2>
+  <div class="src"><span class="base-tag">Exemplo autoral</span><span class="bk">no formato da aplicação ao projeto dos encontros</span></div>
+  <p>Na rotina de vestir, o módulo de controle faz várias coisas ao mesmo tempo: pisca e toca o dispositivo da peça, espera o botão, conta 60 s e 120 s e, no limite, avisa o cuidador. Vocês são o SO dele.</p>
+  <ul class="b">
+    <li>Escalonamento. Que tarefas existem, com que período e pior caso, e em que prioridade? RTOS ou um laço único?</li>
+    <li>Prazo. O aviso aos 120 s é tempo real crítico ou não crítico? Qual o pior caso entre o segundo 120 e o cuidador receber o aviso?</li>
+    <li>Memória. As rotinas recebidas ficam em alocação estática (n vagas de tamanho fixo) ou no heap?</li>
+    <li>Armazenamento. Rotinas e progresso vão para a flash ou para a EEPROM? Quantas gravações por dia, quantos anos?</li>
+    <li>E/S. Botão por polling ou por interrupção? Onde mora o tratador?</li>
+  </ul>
+  <div class="def">
+    <span class="lab">Na ponderada · pulseira</span>
+    <p>As mesmas cinco perguntas valem para a pulseira, com outro prazo: uma amostra a cada 10 ms, processada em até 5 ms. Lá, o log do BLE faz o papel do aviso ao cuidador: pode esperar, desde que não atrase a amostra.</p>
+  </div>
+
+  <h3>Um exemplo, com dois estilos</h3>
+  <ul class="b">
+    <li>Estilo A, laço único no Arduino Uno. O <code>loop()</code> roda a cada 10 ms: lê o botão por polling com debounce, atualiza luz e som e confere os contadores de 60 s e 120 s. A rotina fica em bytecode na EEPROM (até 6 de 150 B, como na <a href="/m8/comp/02-fundamentos-memoria">aula 02</a>) e o progresso, num anel na EEPROM. Números: botão confirmado em até 20 ms; cada volta do laço precisa caber em 10 ms; o anel dura mais de mil anos. Abre mão de som elaborado (sem DMA) e de dormir de verdade: a CPU acorda 100 vezes por segundo.</li>
+    <li>Estilo B, FreeRTOS no RP2040. Tarefas som (5 ms), botão (interrupção com tratador na SRAM e uma tarefa de debounce), piscar (20 ms) e alerta do cuidador (100 ms), por rate monotonic, com U = 0,6 (exercício 1). Rotinas no LittleFS da flash de 2 MB, buffers estáticos, som por DMA. Números: 120 ns até o tratador; apagar um setor leva até 400 ms, então só entre rotinas. Abre mão da simplicidade: são quatro tarefas e suas prioridades para depurar.</li>
+  </ul>
+  <div class="def key">
+    <span class="lab">Decisão · exemplo no formato do encontro</span>
+    <ul class="b">
+      <li>Decisão: FreeRTOS no RP2040, botão por interrupção com debounce e rotinas na flash com LittleFS, sem nenhuma gravação na flash durante uma rotina.</li>
+      <li>Do que abrimos mão: da simplicidade do laço único. Quem sente é a equipe, que depura tarefas e prioridades.</li>
+      <li>O número que pesou: um apagamento de setor de até 400 ms derrubaria 80 prazos do som se caísse no meio da rotina. Por isso a gravação fica para depois dela.</li>
+      <li>O que nos faria mudar: se o parceiro disser que cada paciente usa uma ou duas rotinas fixas, o Uno com EEPROM e laço único basta e custa menos.</li>
+    </ul>
+  </div>
+  <p>Use como exemplo: o grupo pode chegar a outra decisão, com outros números.</p>
  </div>
 </section>

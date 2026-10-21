@@ -1,0 +1,49 @@
+{
+  "aula": "m8/comp/06-gerencia-recursos",
+  "data": "2026-10-21",
+  "criterio": "Conferência de conceitos e contas com destinos verificáveis nos dois modos. O formato das seções novas (encontro, sistemas reais, segurança, exercícios, projeto) segue os slides do encontro de 19/10 (aula 02), lidos por inteiro; eles não são fonte de conteúdo desta aula. Não equivale a certificação de leitura integral do livro.",
+  "fontes": [
+    {
+      "id": "luisi-encontro",
+      "url": "src/aulas/m8/comp/06-gerencia-recursos/notas/ (destino do PDF quando for publicado)",
+      "escopo": "Slides do encontro de instrução de João Luisi sobre gerência de recursos (aula 06)",
+      "acesso": "indisponivel",
+      "limitacao": "Os slides deste encontro ainda não existiam quando a aula foi revisada. O PDF será integrado depois do encontro, com a skill integrar-notas; até lá, quiz, exercícios e decisão de projeto são autorais e não atribuem perguntas ou respostas ao professor."
+    },
+    {
+      "id": "machado-caps8-12",
+      "url": "https://search.worldcat.org/search?q=Machado+Maia+Arquitetura+de+sistemas+operacionais+5.+ed.",
+      "escopo": "Machado & Maia, Arquitetura de sistemas operacionais, 5ª ed., LTC, 2013, caps. 8 a 12 (p. 125–220 pela indicação do autoestudo)",
+      "acesso": "nao-verificado",
+      "limitacao": "O texto do livro não foi conferido página a página. As faixas de página por seção são a indicação do autoestudo, e a notação e a terminologia devem ser conferidas no exemplar. Edição confirmada pela bibliografia dos slides de 19/10 (p. 37)."
+    },
+    {
+      "id": "datasheets-hardware",
+      "url": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf",
+      "escopo": "RP2040 Datasheet (264 KB de SRAM, MPU de 8 regiões, latência de interrupção de 15 ciclos, 12 canais de DMA, cache XIP de 16 KB); W25Q16JV (páginas de 256 B, setores de 4 KB, tSE 45/400 ms, 100 000 ciclos); ATmega328P DS40002061B (EEPROM 100 000 ciclos e 3,3 ms; flash 10 000 ciclos)",
+      "acesso": "parcial",
+      "limitacao": "Conferidos só os trechos dos números citados, por busca no texto dos PDFs. Os demais capítulos dos datasheets não foram lidos."
+    },
+    {
+      "id": "freertos-pico-sdk",
+      "url": "https://github.com/FreeRTOS/FreeRTOS-Kernel-Book",
+      "escopo": "Livro do FreeRTOS, caps. 3, 4 e 8 (heaps, prioridades, tick, herança de prioridade); fontes heap_1/2/4 do FreeRTOS-Kernel; Pico SDK hardware_flash e pico_flash",
+      "acesso": "parcial",
+      "limitacao": "Conferidas as frases e os comentários de código citados. O valor de tick do exemplo (100 Hz típico) é o do livro; o RP2040 pode usar outro valor no projeto."
+    },
+    {
+      "id": "seguranca-artigos",
+      "url": "https://thunderclap.io/",
+      "escopo": "Markettos et al., Thunderclap, NDSS 2019; Halderman et al., USENIX Security 2008; Wei et al., FAST 2011; documentação do controlador pids do Linux",
+      "acesso": "parcial",
+      "limitacao": "Conferidos os resumos e os trechos com os números citados (temperaturas, taxas de perda de bits, sistemas atacados, conclusão sobre apagar arquivos em SSD). Os artigos não foram lidos por inteiro."
+    },
+    {
+      "id": "liu-layland-1973",
+      "url": "https://doi.org/10.1145/321738.321743",
+      "escopo": "Liu & Layland, JACM 20(1), 1973: limite n(2^(1/n) − 1) do rate monotonic, instante crítico e EDF com U ≤ 1",
+      "acesso": "nao-verificado",
+      "limitacao": "Resultado clássico reproduzido de memória e por conta própria; o artigo não foi aberto (acesso bloqueado ao robô). Limites recalculados: 0,828, 0,780, 0,757 e ln 2 ≈ 0,693."
+    }
+  ]
+}

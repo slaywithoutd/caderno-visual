@@ -40,7 +40,7 @@ export function initPaineis() {
   const medirLivre = () => {
     if (!conteudo || !largo.matches || raiz.classList.contains('lendo')) {
       raiz.style.setProperty('--esq-livre', '0px'); raiz.style.setProperty('--dir-livre', '0px');
-      raiz.classList.remove('margem-livre'); return;
+      raiz.classList.toggle('margem-livre', false); return;
     }
     const b = bordasTexto();
     const esq = Math.max(0, b.esq - largura('side') - FOLGA);
@@ -104,8 +104,14 @@ export function initPaineis() {
   fechar?.addEventListener('click', () => recolher(true));
   abrir?.addEventListener('click', () => recolher(false));
 
-  /* recolher as Definições (lib/consulta.js) ou ligar os óculos muda a classe do <html>: remede */
-  new MutationObserver(medirLivre).observe(raiz, { attributes: true, attributeFilter: ['class'] });
+  /* recolher as Definições (lib/consulta.js) ou ligar os óculos muda a classe do <html>: remede.
+     Só reage quando muda uma classe que importa; medirLivre também mexe na classe (margem-livre), e
+     reagir a isso faria um laço infinito. classList.remove reescreve o atributo mesmo sem mudança, por isso
+     medirLivre usa toggle(…, false). */
+  const importa = () => ['lendo', 'side-recolhida', 'defs-recolhidas'].map((c) => raiz.classList.contains(c)).join();
+  let antes = importa();
+  new MutationObserver(() => { const agora = importa(); if (agora !== antes) { antes = agora; medirLivre(); } })
+    .observe(raiz, { attributes: true, attributeFilter: ['class'] });
   addEventListener('resize', encaixar);
   largo.addEventListener('change', encaixar);
   encaixar();

@@ -1,5 +1,6 @@
 {
   "numero": "01",
+  "data": "2026-10-15",
   "titulo": "Conceitos de linguagens formais",
   "tema": "Linguagens Formais e Autômatos",
   "resumo": "Alfabeto, palavra e gramática; AFD, AFN e estado de erro; o limite das linguagens regulares; linguagens livres do contexto, autômatos com pilha e a Hierarquia de Chomsky.",

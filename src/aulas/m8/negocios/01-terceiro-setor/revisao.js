@@ -1,0 +1,32 @@
+export const cartoes = [
+  ['Qual é a lógica de meios e fins de cada setor?', 'Estado: meios públicos para fins públicos. Mercado: meios privados para fins privados. Terceiro setor: meios privados para fins públicos.', 'tres-setores'],
+  ['Quais são os cinco critérios para reconhecer uma OSC?', 'Organizada, privada, sem lucro distribuído, autogovernada e voluntária (Salamon e Anheier, 1992).', 'reconhecer-osc'],
+  ['Sem fins lucrativos quer dizer que a OSC não pode ter sobra de caixa?', 'Pode. O que ela não pode é distribuir o excedente a sócios, dirigentes ou doadores: a sobra volta para a missão.', 'reconhecer-osc'],
+  ['Que falha explica cada teoria do terceiro setor?', 'Mercado: bens públicos produzidos a menos. Governo (Weisbrod, 1975): o Estado atende o eleitor mediano. Contratual (Hansmann, 1980): não distribuir lucro sinaliza confiança. Interdependência (Salamon, 1987): OSC e Estado precisam cooperar.', 'por-que-existe'],
+  ['Como se calcula o valor adicionado?', 'Valor bruto da produção menos consumo intermediário. Saúde do terceiro setor em 2015: R$ 112 bi − R$ 44,9 bi = R$ 67,1 bi.', 'medir-economia'],
+  ['O que significa um multiplicador de produção de 1,41?', 'Cada R$ 1,00 de demanda final gera R$ 1,41 de produção no país: o R$ 1,00 inicial mais R$ 0,41 de efeito indireto.', 'medir-economia'],
+  ['Quanto pesa o terceiro setor no valor adicionado e nas ocupações?', '4,27% do valor adicionado (R$ 220,1 bi) e 5,88% das ocupações (cerca de 6 milhões), por extração hipotética, ano-base 2015.', 'pib-ts'],
+  ['Por que 4,27% não é a soma do valor adicionado das quatro atividades?', 'A soma direta é R$ 150,9 bi (cerca de 2,9%). Os R$ 220,1 bi incluem os efeitos nas outras atividades da cadeia.', 'pib-ts'],
+  ['Qual atividade lidera o valor e qual lidera as ocupações?', 'Saúde lidera o valor adicionado direto (R$ 67,1 bi). Organizações associativas lideram as ocupações (2,3 milhões).', 'por-atividade'],
+  ['O que a conta do PIB deixa de fora?', 'Trabalho voluntário, autonomia, inclusão e coesão social, serviços sem preço (medidos pelo custo) e o gasto público evitado no longo prazo.', 'limites-medida'],
+  ['Como são as OSCs brasileiras?', 'Cerca de 900 mil; 90% com até 2 empregados formais; 10% concentram 40% dos empregos formais (hospitais e escolas); cerca de 20% em São Paulo.', 'brasil'],
+  ['Qual é a diferença entre termo de colaboração e termo de fomento?', 'Nos dois há repasse de recursos e a escolha da OSC passa, como regra, por chamamento público. No de colaboração a proposta parte do Estado; no de fomento, da OSC.', 'marco-legal'],
+  ['Quais são as cinco tensões do setor?', 'Dependência, accountability, mercantilização, desigualdade e mensuração.', 'tensoes'],
+  ['Quais são os seis blocos do canvas da atividade?', 'Teoria da mudança, dois indicadores, quem paga e por quê, governança e dados, maior risco e mitigação.', 'atividade'],
+];
+
+export const cola = [
+  ['Três lógicas', 'Estado: público → público. Mercado: privado → privado. Terceiro setor: privado → público.', 'tres-setores'],
+  ['Cinco critérios', 'Organizada, privada, sem lucro distribuído, autogovernada, voluntária.', 'reconhecer-osc'],
+  ['Por que existe', 'Falha de mercado, falha de governo (Weisbrod), falha contratual (Hansmann), interdependência (Salamon).', 'por-que-existe'],
+  ['Valor adicionado', 'VBP − consumo intermediário. Multiplicador = produção total ÷ demanda final inicial.', 'medir-economia'],
+  ['Peso do setor (2015)', '4,27% do valor adicionado, R$ 220,1 bi, 5,88% das ocupações. Direto: R$ 150,9 bi (cerca de 2,9%).', 'pib-ts'],
+  ['Quatro atividades', 'Educação, Saúde, Atividades artísticas e Organizações associativas. Saúde lidera o valor; associativas, as ocupações.', 'por-atividade'],
+  ['Fora da conta', 'Voluntariado, autonomia, inclusão, serviços sem preço, gasto público evitado.', 'limites-medida'],
+  ['Brasil', 'Cerca de 900 mil OSCs; 90% com até 2 empregados; 10% concentram 40% dos empregos.', 'brasil'],
+  ['Mundo', 'Quatro regimes (Salamon e Anheier, 1998): social-democrata, corporativista, estatista e liberal.', 'mundo'],
+  ['Marco legal', 'CF/88 (1988), Lei 9.637 (1998), Lei 9.790 (1999), MROSC (2014), LBI (2015), Lei 13.800 (2019), LC 187 (2021).', 'marco-legal'],
+  ['Financiamento', 'Estado, doações, investimento social privado, receitas próprias, fundos patrimoniais. Uma fonte só expõe a missão.', 'financiamento'],
+  ['Tensões', 'Dependência, accountability, mercantilização, desigualdade, mensuração.', 'tensoes'],
+  ['Atividade', 'Rota sorteada (A a D) + canvas de seis blocos + pitch de 1 minuto. Entregável: rota e mitigação no repositório.', 'atividade'],
+];

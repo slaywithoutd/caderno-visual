@@ -1,0 +1,55 @@
+{
+  "numero": "01",
+  "data": "2026-10-22",
+  "titulo": "Terceiro setor: conceito, impacto e sustentabilidade",
+  "tema": "Terceiro setor e impacto",
+  "modos": [
+    "consulta"
+  ],
+  "resumo": "O que é o terceiro setor, por que ele existe, quanto pesa na economia brasileira, como a lei o organiza e quem vai sustentar o dispositivo do projeto parceiro.",
+  "topicos": [
+    "Três setores e OSCs",
+    "Por que o terceiro setor existe",
+    "Peso econômico: valor adicionado, multiplicador, extração",
+    "Brasil, mundo e marco legal",
+    "Tensões e sustentabilidade",
+    "Atividade em sala"
+  ],
+  "secoes": [],
+  "fontes": [
+    {
+      "tipo": "Livro",
+      "titulo": "Tachizawa, T. · Organizações não governamentais e terceiro setor: criação de ONGs e estratégias de atuação (p. 7 a 19)",
+      "nota": "Autoestudo indicado, mas o texto das páginas não foi acessado e a edição não foi identificada. Só o sumário da 7ª edição (Atlas, 2019) foi conferido em catálogo. Nada desta aula é atribuído ao livro."
+    },
+    {
+      "tipo": "Vídeo",
+      "titulo": "AGU Explica · Terceiro Setor",
+      "nota": "Autoestudo indicado sem link. O vídeo encontrado na busca estava privado e não há transcrição. Nada desta aula é atribuído a ele."
+    },
+    {
+      "tipo": "PDF",
+      "titulo": "A importância do Terceiro Setor para o PIB no Brasil e em suas Regiões · Movimento por uma Cultura de Doação, estudo da Fipe, divulgado pelo Mapa das OSCs/Ipea (2023)",
+      "url": "https://mapaosc.ipea.gov.br/arquivos/posts/9775-mioloterceirosetor-completo.pdf",
+      "nota": "107 páginas, ano-base 2015. Texto das páginas 1 a 63 e 70 a 74 lido por extração; tabelas regionais e apêndice (páginas 64 a 69 e 75 a 106) consultados por amostra; mapas das páginas 61 a 63 não inspecionados."
+    },
+    {
+      "tipo": "Slides",
+      "titulo": "Reflexões sobre o Terceiro Setor · Prof. Rafael Jacomossi (Inteli, 25 páginas)",
+      "nota": "Base da aula presencial de 22/10/2026. PDF conferido página por página; não é republicado aqui."
+    },
+    {
+      "tipo": "Drive",
+      "titulo": "Pasta da aula e da atividade",
+      "url": "https://drive.google.com/drive/folders/1mHVo4s_bOYlt2i-TiVeUfcbJGQYgSksG",
+      "nota": "Material privado. A pasta não abriu pela conta conectada; o guia da atividade ponderada (descritores por nível) não foi conferido."
+    },
+    {
+      "tipo": "Lei",
+      "titulo": "Lei 13.019/2014 (MROSC), com as alterações da Lei 13.204/2015",
+      "url": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2014/lei/l13019.htm",
+      "nota": "Definição de OSC e instrumentos de parceria conferidos em trechos de segunda mão; o texto do Planalto não abriu. As demais normas citadas seguem a descrição dos slides."
+    }
+  ],
+  "observacao": "Síntese construída a partir dos slides do encontro e do estudo do Ipea. O capítulo de Tachizawa e o vídeo da AGU não foram lidos, o guia da atividade não foi conferido e os trechos jurídicos descrevem as normas em linhas gerais: confira o texto da lei antes de citar um artigo. Valores são de 2015 salvo indicação. Contas marcadas como cálculo nosso, exemplos e exercícios são autorais e não são do professor."
+}

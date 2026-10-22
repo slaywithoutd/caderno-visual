@@ -1,0 +1,65 @@
+{
+  "aula": "m8/negocios/01-terceiro-setor",
+  "data": "2026-10-22",
+  "criterio": "Conferência humana de conceitos e exercícios contra o que foi efetivamente lido, com destinos verificáveis. Só os slides foram lidos por inteiro; o estudo do Ipea foi lido em parte; o capítulo do livro, o vídeo da AGU e o guia da atividade não foram acessados. Rastreabilidade não prova equivalência com essas fontes.",
+  "fontes": [
+    {
+      "id": "slides-jacomossi-t01",
+      "url": "https://drive.google.com/drive/folders/1mHVo4s_bOYlt2i-TiVeUfcbJGQYgSksG",
+      "escopo": "Reflexoes_Terceiro_Setor.pptx.pdf (Canva, Prof. Rafael Jacomossi), páginas do PDF 1–25. Arquivo conferido na pasta de downloads, com o mesmo nome da aula; a pasta do Drive em si não abriu.",
+      "acesso": "integral",
+      "metodo": "Extração de texto de todas as 25 páginas e inspeção visual das páginas com gráficos e matriz (6, 7, 14, 15, 16, 17). Não republicado.",
+      "totalUnidades": 25,
+      "unidades": [
+        { "paginas": [1, 2], "assunto": "Abertura, título e projeto parceiro", "antes": "conteudo-novo-da-aula", "justificativa": "Resumo da aula e ligação com o projeto parceiro.", "consulta": ["encontro"], "evidencias": ["projeto parceiro"] },
+        { "paginas": [3, 5, 9, 13, 20], "assunto": "Roteiro do encontro e divisórias de bloco", "antes": "conteudo-novo-da-aula", "justificativa": "Estrutural. O roteiro (horários) e as divisórias não viram conteúdo: a aula toma o conteúdo e a ênfase, não o formato do encontro. Os tempos da atividade ficaram na seção própria.", "consulta": ["encontro"] },
+        { "paginas": [4], "assunto": "Em que setor você está agora? (três setores e o Inteli)", "antes": "conteudo-novo-da-aula", "justificativa": "Três setores, exemplos do projeto e do Inteli.", "consulta": ["tres-setores"], "evidencias": ["R$ 200 milhões"] },
+        { "paginas": [6], "assunto": "Terceiro setor no PIB: 4,27%, R$ 220,1 bi, 4,7 mi de empregos, comparação", "antes": "conteudo-novo-da-aula", "justificativa": "Conferido contra o estudo do Ipea; explicada a diferença entre ocupações diretas (4,7 mi) e extração (cerca de 6 mi).", "consulta": ["pib-ts"], "evidencias": ["4,27%", "220,1"] },
+        { "paginas": [7], "assunto": "Valor por atividade e multiplicadores", "antes": "conteudo-novo-da-aula", "justificativa": "Os valores do gráfico são extrações individuais, que não somam o total. Explicado e conferido contra as Tabelas 6.1 e 6.2.", "consulta": ["por-atividade", "medir-economia"], "evidencias": ["93,5", "1,69"] },
+        { "paginas": [8], "assunto": "O que o PIB enxerga e o que escapa", "antes": "conteudo-novo-da-aula", "justificativa": "Tabela capta/fica fora e pergunta do projeto, com pistas autorais de indicador.", "consulta": ["limites-medida"], "evidencias": ["trabalho voluntário"] },
+        { "paginas": [10], "assunto": "Privado, porém público; zonas híbridas", "antes": "conteudo-novo-da-aula", "justificativa": "Lógica de cada setor e zonas híbridas.", "consulta": ["tres-setores"], "evidencias": ["Rubem César Fernandes", "PPPs"] },
+        { "paginas": [11], "assunto": "Cinco critérios para reconhecer uma OSC", "antes": "conteudo-novo-da-aula", "justificativa": "Critérios com exemplos autorais; forma jurídica (associação, fundação) acrescentada como base.", "consulta": ["reconhecer-osc"], "evidencias": ["autogovernada", "Salamon"] },
+        { "paginas": [12], "assunto": "Por que o terceiro setor existe: quatro teorias", "antes": "conteudo-novo-da-aula", "justificativa": "Quatro teorias com exemplos autorais; contexto brasileiro vindo do Ipea.", "consulta": ["por-que-existe"], "evidencias": ["Weisbrod", "Hansmann"] },
+        { "paginas": [14], "assunto": "Brasil: número de OSCs, concentração, São Paulo", "antes": "conteudo-novo-da-aula", "justificativa": "Os anos do gráfico não são rotulados; foram tomados da ordem das fontes citadas e declarados como tal.", "consulta": ["brasil"], "evidencias": ["815.676", "879.326"] },
+        { "paginas": [15], "assunto": "O marco legal em sete passos", "antes": "conteudo-novo-da-aula", "justificativa": "Linha do tempo e tabela. Descrições jurídicas em linhas gerais; texto das leis não relido.", "consulta": ["marco-legal"], "evidencias": ["13.800", "187"] },
+        { "paginas": [16], "assunto": "Quem paga a conta: fontes e transferências federais", "antes": "conteudo-novo-da-aula", "justificativa": "Os anos do gráfico não são rotulados no slide e foram deixados sem rótulo.", "consulta": ["financiamento"], "evidencias": ["18,0", "6,8", "9,6"] },
+        { "paginas": [17], "assunto": "Quatro regimes de terceiro setor e EUA", "antes": "conteudo-novo-da-aula", "justificativa": "Matriz desenhada; pergunta sobre o Brasil mantida como pergunta, com roteiro de argumento e sem posicionamento inventado.", "consulta": ["mundo"], "evidencias": ["5,6%", "Yamashita"] },
+        { "paginas": [18], "assunto": "Três dimensões de impacto", "antes": "conteudo-novo-da-aula", "justificativa": "Dimensões econômica, social e cultural.", "consulta": ["dimensoes"], "evidencias": ["capital social"] },
+        { "paginas": [19], "assunto": "Cinco tensões do setor", "antes": "conteudo-novo-da-aula", "justificativa": "Tensões e referências, com perguntas autorais para o projeto.", "consulta": ["tensoes"], "evidencias": ["Calegare", "PIPA"] },
+        { "paginas": [21], "assunto": "Ecossistema do projeto parceiro e barreiras do TAPI", "antes": "conteudo-novo-da-aula", "justificativa": "Estado, mercado, terceiro setor e pessoas; 2,5 bilhões de pessoas; barreiras.", "consulta": ["ecossistema"], "evidencias": ["2,5 bilhões", "profissionais capacitados"] },
+        { "paginas": [22], "assunto": "Atividade: quem sustenta o dispositivo? (rotas A a D e fases)", "antes": "conteudo-novo-da-aula", "justificativa": "Rotas e fases da atividade; leitura autoral de quem paga e da tensão de cada rota, marcada como autoral.", "consulta": ["rotas", "atividade"], "evidencias": ["sorteio", "votação"] },
+        { "paginas": [23], "assunto": "Canvas de seis blocos", "antes": "conteudo-novo-da-aula", "justificativa": "Seis blocos explicados, com exemplo autoral da rota C.", "consulta": ["atividade"], "evidencias": ["Teoria da mudança", "Mitigação"] },
+        { "paginas": [24], "assunto": "Critérios de avaliação (4 × 2,5 pontos)", "antes": "conteudo-novo-da-aula", "justificativa": "Critérios ligados às seções de estudo. Descritores por nível ausentes dos slides (no guia da atividade, não conferido).", "consulta": ["atividade"], "evidencias": ["2,5 pontos", "Fundamentação"] },
+        { "paginas": [25], "assunto": "Para levar para a sprint", "antes": "conteudo-novo-da-aula", "justificativa": "Três ideias no resumo; entregável da sprint na atividade.", "consulta": ["encontro", "atividade"], "evidencias": ["repositório"] }
+      ]
+    },
+    {
+      "id": "ipea-pib-terceiro-setor",
+      "url": "https://mapaosc.ipea.gov.br/arquivos/posts/9775-mioloterceirosetor-completo.pdf",
+      "escopo": "A importância do Terceiro Setor para o PIB no Brasil e em suas Regiões, 107 páginas do PDF (numeração impressa igual à do PDF a partir da página 3)",
+      "acesso": "parcial",
+      "limitacao": "Lidas por extração de texto as páginas 1–63 e 70–74 (resumo, introdução, revisão, metodologia, desagregação, estruturas produtivas, resultados nacionais e regionais em texto, considerações finais, referências e glossário). Páginas 64–69 (tabelas 7.1 a 7.5) e 75–106 (apêndice de dados) apenas por amostra e por título. Figuras 7.4 a 7.8 (mapas, páginas 61–63) não inspecionadas visualmente. Equações de insumo-produto (páginas 29–33) não conferidas além da descrição em texto."
+    },
+    {
+      "id": "tachizawa-ongs",
+      "url": "https://rp.grupogen.com.br/organizacoes-nao-governamentais-e-terceiro-setor-criacao-de-ongs-e-estrategias-de-atuacao",
+      "escopo": "Tachizawa, Organizações não governamentais e terceiro setor, páginas 7 a 19 (edição não identificada)",
+      "acesso": "indisponivel",
+      "limitacao": "Texto das páginas não acessado. Só o sumário da 7ª edição (Atlas/GEN, 2019) foi visto em catálogo: Parte I, capítulo 1 'Reflexões sobre as ONGs e o Terceiro Setor' e capítulo 2 'Criação de ONGs e seus Aspectos Jurídicos'. Nada da aula é atribuído ao livro. Pendente: enviar as páginas para integrar."
+    },
+    {
+      "id": "agu-explica-terceiro-setor",
+      "url": "https://www.youtube.com/watch?v=U5sWpSKoZdk",
+      "escopo": "AGU Explica, Terceiro Setor (vídeo)",
+      "acesso": "indisponivel",
+      "limitacao": "O vídeo foi indicado sem link. O endereço achado na busca está marcado como privado e não há transcrição. Nada da aula é atribuído a ele. Pendente: enviar o link correto ou a transcrição."
+    },
+    {
+      "id": "drive-pasta-t01",
+      "url": "https://drive.google.com/drive/folders/1mHVo4s_bOYlt2i-TiVeUfcbJGQYgSksG",
+      "escopo": "Pasta do Drive com a aula e a atividade ponderada",
+      "acesso": "indisponivel",
+      "limitacao": "A pasta não foi encontrada pela conta conectada ao Drive e a página pede login. O guia da atividade (descritores de cada nível de nota) não foi conferido. Pendente: enviar o arquivo da atividade."
+    }
+  ]
+}

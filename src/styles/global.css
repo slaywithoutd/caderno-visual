@@ -704,3 +704,51 @@ html.defs-recolhidas .defs-btn{display:block}
 }
 html.lendo .defs,html.lendo .defs-btn{display:none}
 html.lendo .layout-consulta{padding-right:0}
+/* código-fonte, lexemas e fluxo de tokens (análise léxica) */
+pre.code{font-family:var(--f-mono);font-size:.82rem;line-height:1.55;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:.4rem 0;white-space:pre;overflow-x:auto;color:var(--fg)}
+pre.code .ln{display:block;border-radius:4px;margin:0 -6px;padding:0 6px;transition:background .3s}
+pre.code .ln.cur{background:var(--amber-soft)}
+.lx{border-radius:3px;transition:background .3s,color .3s,outline-color .3s;outline:1.5px solid transparent;outline-offset:0}
+.lit .lx.kw,.lx.kw.lit{background:var(--blue-soft);color:var(--blue)}
+.lit .lx.id,.lx.id.lit{background:var(--green-soft);color:var(--green)}
+.lit .lx.nm,.lx.nm.lit{background:var(--amber-soft);color:var(--amber)}
+.lit .lx.op,.lx.op.lit{background:var(--surface2);outline-color:var(--line2)}
+.lx.skip{color:var(--muted)}
+.lx.err{background:var(--red-soft);color:var(--red);outline-color:var(--red)}
+.lx.sel{outline:2px solid var(--fg)}
+.tks{display:flex;flex-wrap:wrap;gap:5px;font-family:var(--f-mono);font-size:.76rem;min-height:26px;align-content:flex-start}
+.tk{padding:2px 7px;border-radius:6px;border:1px solid var(--line2);background:var(--surface);color:var(--fg2);white-space:nowrap;cursor:default;font:inherit;line-height:1.5}
+button.tk{cursor:pointer}
+.tk.kw{border-color:var(--blue);color:var(--blue)}
+.tk.id{border-color:var(--green);color:var(--green)}
+.tk.nm{border-color:var(--amber);color:var(--amber)}
+.tk.err{border-color:var(--red);background:var(--red-soft);color:var(--red)}
+.tk.eof{border-style:dashed;color:var(--muted)}
+.tk.sel{outline:2px solid var(--fg);outline-offset:1px}
+.tk.fresh{animation:pop .4s ease}
+.legend i.kw{background:var(--blue-soft);border:1px solid var(--blue)}
+.legend i.id{background:var(--green-soft);border:1px solid var(--green)}
+.legend i.nm{background:var(--amber-soft);border:1px solid var(--amber)}
+.legend i.op{background:var(--surface2);border:1px solid var(--line2)}
+.legend i.err{background:var(--red-soft);border:1px solid var(--red)}
+.widget textarea{font-family:var(--f-mono);font-size:.84rem;line-height:1.5;padding:8px 10px;border-radius:7px;border:1px solid var(--line2);background:var(--surface);color:var(--fg);resize:vertical;width:100%;box-sizing:border-box}
+.widget textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chips.fases .tk{font-family:var(--f-body);font-size:.76rem;transition:background .3s,color .3s,border-color .3s}
+.chips.fases .tk.on{background:var(--amber-soft);border-color:var(--amber);color:var(--fg);font-weight:600}
+.chips.fases .tk.past{color:var(--muted)}
+.chips .tk.ok{border-color:var(--green);background:var(--green-soft);color:var(--green);font-weight:600}
+.chips .tk.no{color:var(--muted);text-decoration:line-through}
+.chips .tk.try{border-color:var(--amber);background:var(--amber-soft);color:var(--fg);font-weight:600}
+.cell.ini::before{content:'^';position:absolute;top:-17px;font-size:.75rem;font-weight:700;color:var(--blue)}
+.cell.lido{background:var(--amber-soft);border-color:var(--amber)}
+.cell.conf{background:var(--green-soft);border-color:var(--green)}
+.cell.sp{color:var(--muted)}
+.tape.top{padding-top:16px}
+.bufc rect{fill:var(--surface);stroke:var(--line2);stroke-width:1.3;transition:fill .3s,stroke .3s}
+.bufc text{font-family:var(--f-mono);font-size:17px;fill:var(--fg);text-anchor:middle;dominant-baseline:central}
+.bufc.old text{fill:var(--muted)}
+.bufc.lex rect{fill:var(--blue-soft);stroke:var(--blue)}
+.bufc.gone rect{fill:var(--red-soft);stroke:var(--red)}
+.bufh.flash rect{fill:var(--amber-soft);stroke:var(--amber)}
+.bufh rect{fill:none;stroke:var(--line);stroke-width:1.2;stroke-dasharray:4 3;transition:fill .3s,stroke .3s}
+.ptr{transition:transform .45s ease}

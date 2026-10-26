@@ -1,0 +1,673 @@
+{
+  "aula": "m8/comp/07-analise-lexica",
+  "data": "2026-10-26",
+  "criterio": "Conferência das transcrições completas dos quatro vídeos, bloco a bloco, contra as seções do modo Consulta. Não equivale a leitura dos capítulos do livro, que não foram acessados.",
+  "fontes": [
+    {
+      "id": "lucredio-aula01",
+      "url": "https://www.youtube.com/watch?v=lJHQhfJwGp0",
+      "escopo": "Construção de Compiladores, Aula 01: Introdução, 54:41; unidades = blocos de 2 minutos da transcrição (1 = 0:00–2:00)",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube (youtube-transcript-api), lida inteira. Trechos com reconhecimento ruim foram interpretados pelo contexto, sem inventar conteúdo.",
+      "totalUnidades": 28,
+      "unidades": [
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "Apresentação do curso e referências (livro do dragão)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "traducao"
+          ],
+          "evidencias": [
+            "livro do dragao"
+          ]
+        },
+        {
+          "paginas": [
+            2,
+            3,
+            4
+          ],
+          "assunto": "Definição de compilador e analogia do treinador de cachorro",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "traducao"
+          ],
+          "evidencias": [
+            "treinador",
+            "linguagem objeto"
+          ]
+        },
+        {
+          "paginas": [
+            5
+          ],
+          "assunto": "Compilador aponta erros; introdução ao interpretador",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "traducao",
+            "interpretador"
+          ],
+          "evidencias": [
+            "falta um"
+          ]
+        },
+        {
+          "paginas": [
+            6
+          ],
+          "assunto": "Vantagens e desvantagens: compilador × interpretador",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "interpretador"
+          ],
+          "evidencias": [
+            "mensagens de erro"
+          ]
+        },
+        {
+          "paginas": [
+            7,
+            8
+          ],
+          "assunto": "Abordagem híbrida: bytecode, JVM e JIT",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "interpretador"
+          ],
+          "evidencias": [
+            "bytecode",
+            "jit"
+          ]
+        },
+        {
+          "paginas": [
+            9
+          ],
+          "assunto": "Linguagens além da programação: SQL, HTML, LaTeX",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "traducao"
+          ],
+          "evidencias": [
+            "sql",
+            "latex"
+          ]
+        },
+        {
+          "paginas": [
+            10,
+            11,
+            12,
+            13
+          ],
+          "assunto": "Linguagens formais, Turing, Chomsky; regulares e livres do contexto como base",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "sintaxe"
+          ],
+          "evidencias": [
+            "livres do contexto"
+          ]
+        },
+        {
+          "paginas": [
+            14,
+            15,
+            16,
+            17
+          ],
+          "assunto": "Declarar antes de usar não é livre do contexto; AP ignora nomes e fase posterior confere",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "sintaxe"
+          ],
+          "evidencias": [
+            "declarar antes de usar",
+            "tabela de simbolos"
+          ]
+        },
+        {
+          "paginas": [
+            18,
+            19
+          ],
+          "assunto": "Sintaxe × semântica: analogia da porta",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "sintaxe"
+          ],
+          "evidencias": [
+            "porta"
+          ]
+        },
+        {
+          "paginas": [
+            20,
+            21,
+            22,
+            23,
+            24
+          ],
+          "assunto": "Análise e síntese; fases; código de três endereços; otimização; tabela de símbolos",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "fases"
+          ],
+          "evidencias": [
+            "tres enderecos",
+            "coercao",
+            "tabela de simbolos"
+          ]
+        },
+        {
+          "paginas": [
+            25,
+            26
+          ],
+          "assunto": "Erros detectados por fase e erros em cascata",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "erros"
+          ],
+          "evidencias": [
+            "cascata"
+          ]
+        },
+        {
+          "paginas": [
+            27,
+            28
+          ],
+          "assunto": "Passadas (fita VHS) e combinação de front-ends e back-ends",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "erros",
+            "fases"
+          ],
+          "evidencias": [
+            "passada",
+            "front-end"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lucredio-lexica1",
+      "url": "https://www.youtube.com/watch?v=ZdtSFpJameE",
+      "escopo": "Construção de Compiladores, Aula 02: Análise Léxica, parte 1, 29:37; unidades = blocos de 2 minutos da transcrição (1 = 0:00–2:00)",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube (youtube-transcript-api), lida inteira. Trechos com reconhecimento ruim foram interpretados pelo contexto, sem inventar conteúdo.",
+      "totalUnidades": 15,
+      "unidades": [
+        {
+          "paginas": [
+            1,
+            2
+          ],
+          "assunto": "Vocabulário × gramática; separar léxico de sintático",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "lexico"
+          ],
+          "evidencias": [
+            "vocabulario"
+          ]
+        },
+        {
+          "paginas": [
+            3
+          ],
+          "assunto": "Léxico ↔ regulares; tokens, comentários e espaços ignorados",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "lexico"
+          ],
+          "evidencias": [
+            "comentarios"
+          ]
+        },
+        {
+          "paginas": [
+            4
+          ],
+          "assunto": "Linha e coluna para mensagens de erro; início de lexema",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "lexico",
+            "lexema-token"
+          ],
+          "evidencias": [
+            "linha e coluna"
+          ]
+        },
+        {
+          "paginas": [
+            5,
+            6,
+            7
+          ],
+          "assunto": "Lexema, padrão e classe; padrões não exclusivos",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "lexema-token"
+          ],
+          "evidencias": [
+            "padrao",
+            "while"
+          ]
+        },
+        {
+          "paginas": [
+            8
+          ],
+          "assunto": "Token como estrutura (tipo, valor)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "lexema-token"
+          ],
+          "evidencias": [
+            "tipo, valor"
+          ]
+        },
+        {
+          "paginas": [
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "assunto": "Exercício: tokens do fatorial em Alguma; token EOF",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "alguma"
+          ],
+          "evidencias": [
+            "eof",
+            "argumento"
+          ]
+        },
+        {
+          "paginas": [
+            14,
+            15
+          ],
+          "assunto": "Erros léxicos: @, whilee, ==, maiúscula",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "erro-lexico"
+          ],
+          "evidencias": [
+            "whilee",
+            "=="
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lucredio-lexica2",
+      "url": "https://www.youtube.com/watch?v=36MOhcBz7p0",
+      "escopo": "Construção de Compiladores, Aula 03: Análise Léxica, parte 2, 1:17:40; unidades = blocos de 2 minutos da transcrição (1 = 0:00–2:00)",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube (youtube-transcript-api), lida inteira. Trechos com reconhecimento ruim foram interpretados pelo contexto, sem inventar conteúdo.",
+      "totalUnidades": 39,
+      "unidades": [
+        {
+          "paginas": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "assunto": "Projeto Java: TipoToken, Token, leitor, proximoToken, tokens de um caractere",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "proximo-token"
+          ],
+          "evidencias": [
+            "tipotoken",
+            "proximotoken"
+          ]
+        },
+        {
+          "paginas": [
+            9,
+            10,
+            11,
+            12
+          ],
+          "assunto": "Operadores relacionais e o caractere perdido em argumento<1000",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "proximo-token"
+          ],
+          "evidencias": [
+            "1000"
+          ]
+        },
+        {
+          "paginas": [
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "assunto": "Buffer, buffer único × duplo, lógica circular, bug da recarga dupla",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "buffer-duplo"
+          ],
+          "evidencias": [
+            "bufferatual",
+            "circular"
+          ]
+        },
+        {
+          "paginas": [
+            21,
+            22,
+            23
+          ],
+          "assunto": "Diagramas de transição com asterisco: relacionais, números, variáveis, cadeias, comentários",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "diagramas"
+          ],
+          "evidencias": [
+            ".50",
+            "escape"
+          ]
+        },
+        {
+          "paginas": [
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34
+          ],
+          "assunto": "Um método por padrão, zerar e confirmar, cascata e ordem",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "cascata-padroes"
+          ],
+          "evidencias": [
+            "zerar",
+            "confirmar"
+          ]
+        },
+        {
+          "paginas": [
+            35,
+            36,
+            37,
+            38,
+            39
+          ],
+          "assunto": "Execução, erro léxico com @, espaços não separam palavras",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "cascata-padroes",
+            "erro-lexico"
+          ],
+          "evidencias": [
+            "nao usa espacos",
+            "@"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lucredio-lexica3",
+      "url": "https://www.youtube.com/watch?v=LDRA-VOy2Bs",
+      "escopo": "Construção de Compiladores, Aula 03: Análise Léxica, parte 3, 1:04:28; unidades = blocos de 2 minutos da transcrição (1 = 0:00–2:00)",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube (youtube-transcript-api), lida inteira. Trechos com reconhecimento ruim foram interpretados pelo contexto, sem inventar conteúdo.",
+      "totalUnidades": 33,
+      "unidades": [
+        {
+          "paginas": [
+            1,
+            2
+          ],
+          "assunto": "Diagrama como AFD; regulares não contam",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "diagramas"
+          ],
+          "evidencias": [
+            "afd"
+          ]
+        },
+        {
+          "paginas": [
+            3,
+            4,
+            5
+          ],
+          "assunto": "Linguagem como conjunto, expressão regular, conversões (Hopcroft)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "geradores"
+          ],
+          "evidencias": [
+            "hopcroft",
+            "conjunto"
+          ]
+        },
+        {
+          "paginas": [
+            6,
+            7,
+            8,
+            9
+          ],
+          "assunto": "Geradores, ANTLR, Terence Parr, setup Maven",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "antlr",
+            "geradores"
+          ],
+          "evidencias": [
+            "terence parr",
+            "maven"
+          ]
+        },
+        {
+          "paginas": [
+            10,
+            11,
+            12
+          ],
+          "assunto": "Arquivo .g4, regras, intervalos, ações com getText",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "antlr"
+          ],
+          "evidencias": [
+            "gettext",
+            ".g4"
+          ]
+        },
+        {
+          "paginas": [
+            13,
+            14,
+            15,
+            16,
+            17
+          ],
+          "assunto": "Classe principal: CharStream, nextToken, EOF, org.antlr.v4",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "antlr"
+          ],
+          "evidencias": [
+            "charstream",
+            "nexttoken"
+          ]
+        },
+        {
+          "paginas": [
+            18,
+            19,
+            20,
+            21
+          ],
+          "assunto": "Comportamento ganancioso e ordem das regras",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "desempate"
+          ],
+          "evidencias": [
+            "maior casamento",
+            "primeiro no arquivo"
+          ]
+        },
+        {
+          "paginas": [
+            22,
+            23,
+            24,
+            25,
+            26,
+            27
+          ],
+          "assunto": "Gramática completa da Alguma: fragment, skip, comentário, .tokens, vocabulário",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "antlr"
+          ],
+          "evidencias": [
+            "fragment",
+            "skip"
+          ]
+        },
+        {
+          "paginas": [
+            28,
+            29
+          ],
+          "assunto": "grammars-v4 e palavras-chave depois de VARIAVEL",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "antlr",
+            "desempate"
+          ],
+          "evidencias": [
+            "grammars-v4"
+          ]
+        },
+        {
+          "paginas": [
+            30,
+            31
+          ],
+          "assunto": "CADEIA gananciosa: .*, .*?, ~[\\n]* e versão determinística",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "desempate"
+          ],
+          "evidencias": [
+            "nao gananciosa",
+            "deterministica"
+          ]
+        },
+        {
+          "paginas": [
+            32,
+            33
+          ],
+          "assunto": "Comparação de geradores (Wikipédia) e exercícios sugeridos",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "geradores"
+          ],
+          "evidencias": [
+            "wikipedia"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "resina-slide-aula01",
+      "url": "src/aulas/m8/comp/01-conceitos/notas/slides-conceitos-m8.pdf",
+      "escopo": "Slides da aula 01: roteiro do módulo, ponderadas e Chomsky ligado às fases",
+      "acesso": "parcial",
+      "limitacao": "Usado só o roteiro do módulo, as ponderadas e a curiosidade de ww; o resto do slide pertence à aula 01. Não há slide do encontro de 27/10."
+    },
+    {
+      "id": "barbosa-impl-lexicos",
+      "url": "sem URL: livro indicado no roteiro de autoestudo",
+      "escopo": "Barbosa et al., Compiladores, capítulo Implementação de analisadores léxicos, p. 71–86",
+      "acesso": "indisponivel",
+      "limitacao": "O livro não estava acessível (nem localmente nem por biblioteca digital nesta sessão). Nada da aula vem dele; não declarar cobertura."
+    },
+    {
+      "id": "compiladores-varredura",
+      "url": "sem URL: livro indicado no roteiro de autoestudo",
+      "escopo": "Compiladores, capítulo 2 Varredura, p. 45–104",
+      "acesso": "indisponivel",
+      "limitacao": "O livro não estava acessível (nem localmente nem por biblioteca digital nesta sessão). Nada da aula vem dele; não declarar cobertura."
+    },
+    {
+      "id": "compiladores-analise-lexica",
+      "url": "sem URL: livro indicado no roteiro de autoestudo",
+      "escopo": "Compiladores, capítulo 2 Análise léxica, p. 16–32",
+      "acesso": "indisponivel",
+      "limitacao": "O livro não estava acessível (nem localmente nem por biblioteca digital nesta sessão). Nada da aula vem dele; não declarar cobertura."
+    }
+  ]
+}

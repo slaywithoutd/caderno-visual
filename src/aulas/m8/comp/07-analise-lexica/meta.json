@@ -1,0 +1,21 @@
+{
+  "numero": "07",
+  "data": "2026-10-27",
+  "titulo": "Análise léxica",
+  "tema": "Linguagens formais e autômatos",
+  "modos": ["consulta"],
+  "resumo": "O que um compilador faz e em que fases ele se divide; lexema, padrão e token; diagramas de transição; um analisador léxico feito à mão e o mesmo analisador gerado pelo ANTLR.",
+  "topicos": ["Compilador e fases", "Lexema e token", "Erro léxico", "Diagramas de transição", "Buffer duplo", "Expressões regulares", "ANTLR"],
+  "secoes": [],
+  "fontes": [
+    { "titulo": "Construção de Compiladores · Aula 01 · Introdução (D. Lucrédio, UFSCar)", "url": "https://www.youtube.com/watch?v=lJHQhfJwGp0", "nota": "Autoestudo, 55 min. Transcrição automática do YouTube lida inteira." },
+    { "titulo": "Construção de Compiladores · Aula 02 · Análise Léxica, parte 1", "url": "https://www.youtube.com/watch?v=ZdtSFpJameE", "nota": "Autoestudo, 30 min. Transcrição automática lida inteira." },
+    { "titulo": "Construção de Compiladores · Aula 03 · Análise Léxica, parte 2 (implementação em Java)", "url": "https://www.youtube.com/watch?v=36MOhcBz7p0", "nota": "Autoestudo, 78 min. Transcrição automática lida inteira." },
+    { "titulo": "Construção de Compiladores · Aula 03 · Análise Léxica, parte 3 (ANTLR)", "url": "https://www.youtube.com/watch?v=LDRA-VOy2Bs", "nota": "Autoestudo, 64 min. Transcrição automática lida inteira." },
+    { "titulo": "Barbosa et al., Compiladores · Implementação de analisadores léxicos (p. 71–86)", "nota": "Autoestudo. Não consultado: o livro não estava acessível." },
+    { "titulo": "Compiladores · cap. 2 · Varredura (p. 45–104)", "nota": "Autoestudo. Não consultado." },
+    { "titulo": "Compiladores · cap. 2 · Análise léxica (p. 16–32)", "nota": "Autoestudo. Não consultado." },
+    { "titulo": "Slides da aula 01 (prof. Resina)", "nota": "Roteiro do módulo e ponderadas, já em notas/ da aula 01." }
+  ],
+  "observacao": "Escrita a partir dos quatro vídeos e do slide da aula 01. Os três capítulos do livro não foram consultados: confira neles os algoritmos de conversão (ER → AFN → AFD) e a notação. O programa de exemplo em Alguma foi reconstruído a partir das descrições do vídeo."
+}

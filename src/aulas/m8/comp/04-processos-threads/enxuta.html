@@ -1,268 +1,452 @@
-<!-- Versão enxuta da aula 04 (rota /enxuta): recorte do consulta.html para preparar o encontro de 28/10.
-     Critério do recorte: o que os encontros de 19/10 e 21/10 cobraram (um conceito por slide, com fórmula, chip
-     real, Segurança e armadilha "errado / certo"; exercícios com conta no hardware do projeto; decisão em quatro partes).
-     Mesma estrutura de seção do consulta.html; figuras, loops, desenhos e tabelas vêm do conteudo.html. -->
+<!-- Versão enxuta da aula 04 (rota /enxuta), ajustada ao encontro de 28/10.
+     Segue a ordem do encontro: processo → estados → criação e sinais → threads → custos → modelos → condição de corrida
+     → processo como fronteira de segurança → projeto. Cada coisa que aparece no encontro (campo da task_struct, número
+     medido, termo, exemplo, armadilha, caso do projeto) tem aqui a explicação que permite falar sobre ela.
+     data-inclui: seções do consulta.html que esta seção junta (para trazer os cartões da revisão). -->
 
 <section class="cs" id="encontro" data-grupo="Resumo" data-termos="">
   <h2>Resumo</h2>
-  <p class="cs-def">Processos e threads em sete conceitos, sempre nos três chips do projeto: Arduino Uno, RP2040 e Raspberry Pi.</p>
-  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 132">
-<text class="tm" x="39" y="26">sem SO</text><text class="tm" x="120" y="26">tarefas</text><text class="tm" x="201" y="26">MMU</text>
-<rect class="k" x="4" y="36" width="70" height="44" rx="8"/><text x="39" y="52" style="font-size:12px">Uno</text><text class="tm" x="39" y="68">superloop</text>
-<rect class="bl" x="85" y="36" width="70" height="44" rx="8"/><text x="120" y="52" style="font-size:12px">RP2040</text><text class="tm" x="120" y="68">FreeRTOS</text>
-<rect class="acf" x="166" y="36" width="70" height="44" rx="8"/><text x="201" y="52" style="font-size:12px">Pi 4</text><text class="tm" x="201" y="68">Linux</text>
-<text class="tm" x="39" y="94">ISR</text><text class="tm" x="120" y="94">threads</text><text class="tm" x="201" y="94">processos</text>
-<path class="s" d="M10 110 L228 110" marker-end="url(#mnarrow)"/><text class="tm" x="120" y="126">mais isolamento, mais custo</text></svg>Do superloop ao Linux: cada passo isola mais e custa mais.</aside>
+  <p class="cs-def">Do programa no disco à condição de corrida: o que é um processo, como ele muda de estado, o que uma thread divide e o que dá errado quando threads dividem um dado.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150">
+<rect class="k" x="20" y="122" width="200" height="24" rx="6"/><text x="120" y="134">programa: um arquivo no disco</text>
+<rect class="bl" x="20" y="92" width="200" height="24" rx="6"/><text x="120" y="104">processo: o programa rodando</text>
+<rect class="bl" x="20" y="62" width="200" height="24" rx="6"/><text x="120" y="74">vários processos, um processador</text>
+<rect class="acf" x="20" y="32" width="200" height="24" rx="6"/><text x="120" y="44">várias threads, um processo</text>
+<rect class="rd" x="20" y="2" width="200" height="24" rx="6"/><text x="120" y="14">risco: condição de corrida</text></svg>Cada degrau usa o de baixo.</aside>
   <ul class="b">
-    <li>Programa comum só entra no kernel por três portas: syscall, interrupção e exceção. O temporizador garante que o SO sempre retoma a CPU.</li>
-    <li>Processo = contexto de hardware + contexto de software + espaço de endereçamento, tudo anotado no PCB.</li>
-    <li>Cinco estados. Quem sai da espera vai para a fila de prontos, nunca direto para a CPU.</li>
-    <li>Troca de contexto é overhead: fração útil = q / (q + s), e o pior caso de espera é (n − 1) × q + n × s.</li>
-    <li>Threads dividem memória e arquivos; cada uma tem PC, registradores, pilha e estado. Saem baratas e não isolam nada.</li>
-    <li>No RP2040, as tarefas do FreeRTOS são threads: sem MMU, só a MPU separa uma da outra.</li>
+    <li>Processo é o programa em execução mais o ambiente dele: contexto de hardware, contexto de software e espaço de endereçamento, descritos no PCB (no Linux, a <code>task_struct</code>).</li>
+    <li>O processo muda de estado por eventos. Sai do processador por conta própria (pediu E/S) ou porque o sistema o tirou (acabou a fatia de tempo).</li>
+    <li>Processo é a unidade de alocação de recursos; thread é a unidade de escalonamento. A thread divide memória e contexto de software, e tem os próprios registradores e pilha.</li>
+    <li>Criar processo custa uns 5 vezes criar thread; trocar quase empata, porque o que pesa é passar pelo kernel.</li>
+    <li>Threads de usuário são rápidas, mas uma chamada bloqueante trava todas e elas não usam dois cores. Threads de kernel não têm esses problemas e custam uma syscall por operação.</li>
+    <li>Dividir um dado sem controle dá condição de corrida. Processo separado é fronteira de segurança, e o Chrome usa isso contra páginas maliciosas e contra o Spectre.</li>
   </ul>
-  <div class="cs-pegadinhas"><ul class="b"><li>Espera → executando não existe.</li><li>Memória virtual separa processos, não threads do mesmo processo.</li><li>Com ULT (N:1), uma chamada bloqueante para todas as threads.</li><li>Tarefa do FreeRTOS não é processo: todas dividem a mesma memória.</li></ul></div>
+  <div class="cs-pegadinhas"><ul class="b"><li>Espera → execução não existe: o evento leva o processo para pronto.</li><li>Thread não é sempre melhor que processo: é mais barata e menos isolada.</li><li>Mais threads não é mais rápido se não houver espera ou core livre.</li><li>Teste que passou não prova que não há corrida.</li></ul></div>
 </section>
 
-<section class="cs" id="modos" data-inclui="syscall,interrupcao,arquiteturas,so" data-grupo="Base" data-termos="modo-usuario-nucleo,instrucao-privilegiada,chamada-sistema,interrupcao,temporizador,excecao,escalada-privilegio">
-  <h2>Entrar no kernel: modos, syscall e interrupção</h2>
-  <p class="cs-def">A CPU tem um bit de modo. Em modo kernel ela executa qualquer instrução; em modo usuário recusa as instruções privilegiadas, como falar com um dispositivo, mudar a tabela de páginas ou desligar interrupções.</p>
+<section class="cs" id="modos" data-inclui="syscall,interrupcao,arquiteturas,so" data-grupo="Base" data-termos="modo-usuario-nucleo,instrucao-privilegiada,chamada-sistema,interrupcao,temporizador,excecao">
+  <h2>Base: modo kernel, syscall e interrupção</h2>
+  <p class="cs-def">A CPU tem um bit de modo. Em modo kernel ela executa tudo; em modo usuário recusa as instruções privilegiadas, como falar com um dispositivo. Todo programa seu roda em modo usuário e pede serviços ao kernel por syscall.</p>
   <ul class="b">
-    <li>Syscall: o programa põe o número do serviço e os argumentos em registradores e executa <code>syscall</code> (x86-64) ou <code>svc</code> (ARM). A CPU passa para modo kernel e salta para um endereço fixo, escolhido pelo kernel. O seu <code>printf</code> vira a syscall <code>write</code>.</li>
-    <li>Interrupção: aviso de um dispositivo ("o disco terminou"), chega a qualquer momento (assíncrona). Exceção: causada pela própria instrução, como divisão por zero (síncrona).</li>
-    <li>Temporizador: interrompe a CPU a cada tick, por exemplo 1 ms. É ele que devolve a CPU ao SO mesmo quando um programa entra em loop infinito.</li>
-    <li>Onde ficam os drivers: no kernel monolítico (Linux), em modo kernel, rápidos e perigosos; no microkernel (QNX, MINIX 3), em modo usuário.</li>
-    <li>Nos chips: o AVR do Uno não tem modo nenhum. O Cortex-M0+ do RP2040 roda ISRs em modo Handler (sempre privilegiado) e o resto em modo Thread, privilegiado ou não.</li>
+    <li>Syscall (chamada ao sistema): o programa põe o número do serviço em registradores e executa uma instrução especial (<code>syscall</code> no x86-64, <code>svc</code> no ARM). A CPU muda para modo kernel e salta para um endereço fixo do kernel. É isso que "passar pelo kernel" quer dizer, e custa caro perto de uma chamada de função.</li>
+    <li>Interrupção: aviso de um dispositivo ("o botão foi apertado", "o disco terminou"). A CPU para, roda o tratador no kernel e volta. É o que acorda um processo que estava esperando E/S.</li>
+    <li>Temporizador: interrompe a CPU a cada tick (por exemplo, 1 ms). É assim que o sistema tira o processador de quem não larga: sem ele, não haveria fatia de tempo.</li>
+    <li>Exceção: a mesma entrada no kernel, causada pela própria instrução (divisão por zero, acesso proibido).</li>
   </ul>
-  <div class="def"><span class="lab">Segurança · escalada de privilégio</span>
-    <ul class="b">
-      <li>CVE-2018-19320: o driver GDrv (utilitários GIGABYTE, Windows) roda em modo kernel e aceita pedidos de programas comuns por syscall. Um pedido copiava bytes para um endereço escolhido pelo programa, sem conferir.</li>
-      <li>O programa manda copiar para dentro do kernel, muda os próprios privilégios e ganha controle total. O driver tinha assinatura válida.</li>
-      <li>Decisão explorada: o modo kernel confia em todo código que roda nele, inclusive drivers de terceiros. Defesas: conferir todo ponteiro vindo do usuário (<code>copy_from_user</code> no Linux), lista de bloqueio de drivers no Windows 11, drivers fora do kernel no microkernel.</li>
-    </ul>
-  </div>
-  <div class="cs-pegadinhas">
-    <ul class="b">
-      <li>Errado: "syscall é uma chamada de função". Certo: troca de modo e conferência pelo kernel; custa de dezenas de ns a alguns µs.</li>
-      <li>Errado: "sem SO não há interrupção". Certo: no Uno a ISR interrompe o laço a qualquer momento, mesmo sem kernel.</li>
-    </ul>
-  </div>
   <div data-ref-mn="mn-modos"></div>
 </section>
 
-<section class="cs" id="processo" data-inclui="contexto-hardware,contexto-software,espaco-enderecamento,pcb" data-grupo="Processo" data-termos="programa,processo,contexto,contexto-hardware,contexto-software,espaco-enderecamento,pcb,tabela-processos">
-  <h2>Processo e PCB</h2>
-  <p class="cs-def">Programa é o arquivo parado no disco. Processo é esse programa rodando, com tudo o que o SO precisa para pará-lo e retomá-lo sem perder nada. O SO anota tudo no PCB (process control block), uma ficha por processo guardada na memória do kernel.</p>
+<section class="cs" id="processo" data-inclui="contexto-hardware,espaco-enderecamento" data-grupo="Processo" data-termos="programa,processo,contexto,contexto-hardware,espaco-enderecamento,codigo-texto,dados-globais,heap,pilha-execucao">
+  <h2>Programa × processo</h2>
+  <p class="cs-def">O programa é o arquivo no disco. O processo é a execução desse programa, com tudo o que o sistema precisa para pausá-lo e retomá-lo depois sem que ele perceba.</p>
   <ul class="b">
-    <li>Contexto de hardware: registradores, PC (próxima instrução), SP (topo da pilha) e registrador de status, que inclui o bit de modo.</li>
-    <li>Contexto de software: PID, dono, prioridade, quotas, privilégios e arquivos abertos.</li>
-    <li>Espaço de endereçamento: código, dados globais, heap (cresce para cima) e pilha de execução (cresce para baixo). A memória virtual da <a href="/m8/comp/02-fundamentos-memoria">aula 02</a> isola um processo do outro.</li>
-    <li>Um programa pode virar vários processos: três janelas do bloco de notas, cada uma com o seu texto.</li>
-    <li>No Linux, o PCB é a <code>struct task_struct</code>, e <code>ps</code> lista a tabela de processos. No RP2040 com FreeRTOS, o firmware inteiro é um processo só.</li>
+    <li>Contexto de hardware: os registradores, inclusive o PC (próxima instrução) e o SP (topo da pilha) e o registrador de status. É o ponto exato onde a execução parou.</li>
+    <li>Contexto de software: identificação (PID, UID), quotas e privilégios. Diz quem o processo é e o que ele pode (<a href="#contexto-software">contexto de software</a>).</li>
+    <li>Espaço de endereçamento: código, dados, heap e pilha. É a memória só dele: a memória virtual da <a href="/m8/comp/02-fundamentos-memoria">aula 02</a> faz o endereço 0x4000 de um processo levar a um lugar físico diferente do 0x4000 de outro.</li>
+    <li>Um programa pode virar vários processos: abra o Python duas vezes e você tem dois processos <code>python3</code>, com PIDs diferentes e memórias separadas.</li>
+    <li>O xv6 é um sistema operacional pequeno, parecido com o Unix, que o MIT usa para ensinar. O espaço de endereçamento de um processo nele, de baixo para cima: código, dados, uma página de guarda (proibida, para pegar a pilha que estoura), a pilha e o heap, que cresce para cima. No topo ficam duas páginas que o kernel usa para entrar e sair do processo.</li>
   </ul>
   <div class="cs-uso">
-    <p>O processo A está num loop com <code>i = 731</code> quando o temporizador interrompe. Para A continuar depois sem perceber nada, o PCB de A precisa ter o PC, os registradores (inclusive o 731), o mapa da memória de A e a posição em cada arquivo aberto.</p>
+    <p>O processo A está num loop com <code>i = 731</code> num registrador quando é interrompido. Para A continuar sem perceber nada, o sistema guarda o PC e os registradores (inclusive o 731), deixa a memória de A intacta e lembra em que ponto de cada arquivo A estava lendo.</p>
   </div>
   <p class="prova">Programa é código parado no disco (passivo). Processo é o programa em execução, com contexto de hardware, contexto de software e espaço de endereçamento (ativo). Um programa pode dar origem a vários processos.</p>
-  <p class="prova">PCB = contexto de hardware (registradores, PC, SP, status) + contexto de software (PID, dono, prioridade, quotas, privilégios, arquivos abertos) + informações do espaço de endereçamento (código, dados, heap, pilha de execução) + estado.</p>
   <div class="cs-pegadinhas">
     <ul class="b">
-      <li>Errado: "o PCB fica na memória do processo". Certo: fica na memória do kernel, fora do alcance dele; assim o processo não aumenta a própria prioridade.</li>
+      <li>Errado: "o contexto de hardware guarda as quotas" ou "guarda o código". Certo: guarda os registradores; quotas são contexto de software, e código é espaço de endereçamento.</li>
     </ul>
   </div>
   <div data-ref-mn="mn-partes"></div>
-  <div data-ref-tbl="tbl-pcb"></div>
 </section>
 
-<section class="cs" id="estados" data-inclui="escalonador" data-grupo="Estados e troca de contexto" data-termos="estado-processo,fila-prontos,escalonador,despachante,preempcao">
-  <h2>Estados do processo</h2>
-  <p class="cs-def">Um processo passa por cinco estados: novo, pronto, executando, espera e terminado. O estado atual fica no PCB, e o SO decide o que fazer com cada processo olhando para ele.</p>
+<section class="cs" id="pcb" data-inclui="troca-contexto,custo-troca" data-grupo="Processo" data-termos="pcb,tabela-processos,troca-contexto,overhead">
+  <h2>O PCB de verdade e a troca de contexto</h2>
+  <p class="cs-def">O PCB (process control block) é a ficha do processo na memória do kernel. No Linux, ele é a <code>struct task_struct</code>, definida em <code>include/linux/sched.h</code>: uma struct de mais de 800 linhas, das quais uns 12 campos contam a história toda.</p>
+  <div class="tbl prose"><table>
+    <thead><tr><th>Campo da <code>task_struct</code></th><th>O que guarda</th><th>Parte do processo</th></tr></thead>
+    <tbody>
+      <tr><td><code>__state</code></td><td>pronto, em execução, em espera…</td><td>estado</td></tr>
+      <tr><td><code>mm</code></td><td>o mapa da memória (<code>mm_struct</code>)</td><td>espaço de endereçamento</td></tr>
+      <tr><td><code>pid</code>, <code>tgid</code></td><td>número desta tarefa; número do grupo (o processo)</td><td>identificação</td></tr>
+      <tr><td><code>real_parent</code></td><td>quem criou este processo</td><td>identificação</td></tr>
+      <tr><td><code>cred</code></td><td>UID e privilégios</td><td>contexto de software</td></tr>
+      <tr><td><code>files</code></td><td>arquivos abertos</td><td>contexto de software</td></tr>
+      <tr><td><code>signal</code></td><td>sinais e limites (quotas)</td><td>contexto de software</td></tr>
+      <tr><td><code>comm[16]</code></td><td>nome do programa, até 15 letras</td><td>identificação</td></tr>
+      <tr><td><code>nvcsw</code>, <code>nivcsw</code></td><td>quantas trocas voluntárias e involuntárias</td><td>contabilização</td></tr>
+      <tr><td><code>thread</code></td><td>registradores salvos na troca</td><td>contexto de hardware</td></tr>
+    </tbody>
+  </table></div>
   <ul class="b">
-    <li>Pronto: tem tudo para rodar, só falta a CPU. Espera na fila de prontos, que é uma lista de PCBs.</li>
-    <li>Espera (bloqueado): aguarda um evento de fora, como uma E/S ou um botão. Dar a CPU a ele não adianta nada.</li>
-    <li>Executando: com um core, só um por vez; com os 2 cores do RP2040, até dois.</li>
-    <li>Scheduler: escolhe qual pronto vai para a CPU (os critérios ficam para a <a href="/m8/comp/06-gerencia-recursos">aula 06</a>). Dispatcher: carrega o contexto do escolhido e salta para o PC dele.</li>
-    <li>Preempção: executando → pronto contra a vontade do processo, porque o quantum acabou ou chegou alguém mais prioritário.</li>
+    <li><code>pid</code> e <code>tgid</code>: no Linux, cada thread tem a sua <code>task_struct</code> e o seu <code>pid</code>. O <code>tgid</code> (thread group id) é o mesmo para todas as threads de um processo, e é ele que o <code>ps</code> mostra como PID. Num processo de uma thread só, os dois são iguais.</li>
+    <li><code>nvcsw</code> conta as vezes que o processo largou a CPU por conta própria (voluntary context switch); <code>nivcsw</code>, as vezes que foi tirado (involuntary). Os números estão em <a href="#cpu-io-bound">CPU-bound × I/O-bound</a>.</li>
+    <li>Tabela de processos: o conjunto de todas as <code>task_struct</code>. É o que <code>ps</code>, <code>top</code> e <code>btop</code> mostram.</li>
   </ul>
   <div class="cs-uso">
-    <p>A tarefa que espera o botão da meia, no módulo da rotina de vestir:</p>
+    <p>Troca de contexto, de A para B:</p>
     <ul class="b">
-      <li>Executando: acende o LED da meia e pede "me acorde quando o botão for apertado". Vai para espera.</li>
-      <li>Espera: fica lá uns 40 s, enquanto a pessoa veste a meia. A CPU atende outras tarefas.</li>
-      <li>O botão gera uma interrupção, e a ISR passa a tarefa para pronto.</li>
-      <li>O scheduler a escolhe: executando de novo, agora para a calça.</li>
+      <li>O processador executa A.</li>
+      <li>O sistema salva os registradores de A no PCB de A (no campo <code>thread</code>).</li>
+      <li>Carrega os registradores guardados no PCB de B.</li>
+      <li>O processador executa B, a partir do ponto onde B tinha parado.</li>
     </ul>
+    <p>Quem decide a hora é o sistema operacional; o processo não percebe que parou. Durante a troca nenhum processo avança: é overhead.</p>
+  </div>
+  <p class="prova">PCB = contexto de hardware (registradores, PC, SP, status) + contexto de software (PID, dono, prioridade, quotas, privilégios, arquivos abertos) + informações do espaço de endereçamento (código, dados, heap, pilha de execução) + estado.</p>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Errado: "o processo salva os próprios registradores quando quer parar". Certo: quem salva é o kernel, na hora que ele escolhe.</li>
+      <li>Errado: "o PCB fica na memória do processo". Certo: fica na memória do kernel; assim o processo não consegue, por exemplo, aumentar a própria prioridade.</li>
+    </ul>
+  </div>
+  <div data-ref-mn="mn-troca"></div>
+</section>
+
+<section class="cs" id="contexto-software" data-grupo="Processo" data-termos="contexto-software,pid,dono,quotas,privilegios">
+  <h2>Contexto de software num monitor real</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 112">
+<rect class="k" x="2" y="2" width="236" height="106" rx="6"/>
+<text class="tm st" x="8" y="16">PID</text><text class="tm st" x="48" y="16">USER</text><text class="tm st" x="94" y="16">PARENT</text><text class="tm st" x="142" y="16">THR</text><text class="tm st" x="172" y="16">CMD</text>
+<line class="s" x1="6" y1="24" x2="234" y2="24"/>
+<text class="tm st" x="8" y="40">1</text><text class="tm st" x="48" y="40">root</text><text class="tm st" x="94" y="40">0</text><text class="tm st" x="142" y="40">1</text><text class="tm st" x="172" y="40">systemd</text>
+<rect class="acf" x="4" y="49" width="232" height="18" rx="3"/><text class="tm st" x="8" y="58">2210</text><text class="tm st" x="48" y="58">maria</text><text class="tm st" x="94" y="58">1</text><text class="tm st" x="142" y="58">140</text><text class="tm st" x="172" y="58">firefox</text>
+<text class="tm st" x="8" y="80">3051</text><text class="tm st" x="48" y="80">maria</text><text class="tm st" x="94" y="80">2990</text><text class="tm st" x="142" y="80">1</text><text class="tm st" x="172" y="80">python3</text>
+<text class="tm st" x="8" y="98">3077</text><text class="tm st" x="48" y="98">maria</text><text class="tm st" x="94" y="98">2990</text><text class="tm st" x="142" y="98">1</text><text class="tm st" x="172" y="98">python3</text></svg>Linhas no estilo do btop: um firefox com 140 threads e dois python3, dois processos com PIDs diferentes.</aside>
+  <p class="cs-def">O contexto de software diz quem o processo é e o que ele pode. O livro separa em três grupos: identificação, quotas e privilégios. Um monitor de processos como o <code>btop</code> ou o <code>top</code> mostra boa parte deles.</p>
+  <ul class="b">
+    <li>Identificação: PID (o número do processo), User (o dono, pelo UID; o processo age com os direitos dele) e Parent (o PID de quem o criou).</li>
+    <li>Quotas: limites do que o processo pode alocar. No Linux, <code>ulimit -u</code> mostra o máximo de processos por usuário e <code>ulimit -n</code>, o de arquivos abertos por processo. Num servidor Xeon na nuvem, por exemplo, 32 045 processos por usuário e 20 000 arquivos por processo.</li>
+    <li>Fork bomb: um programa que se copia sem parar (cada cópia faz <code>fork</code> de novo) até esgotar a máquina. A quota de processos por usuário é o que a segura.</li>
+    <li>Privilégios: o que o processo pode fazer consigo, com os outros e com o sistema. Mandar <code>kill</code> para um processo de outro usuário exige privilégio. O root (Unix) e o administrator (Windows) podem tudo.</li>
+    <li>Num monitor de um desktop comum aparecem centenas de processos (455, por exemplo), e um navegador sozinho pode ter mais de 100 threads.</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Errado: "o processo tem os direitos do programa". Certo: tem os direitos do dono (UID) que o executou. O mesmo programa rodando como root pode tudo.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="estados" data-inclui="escalonador" data-grupo="Estados" data-termos="estado-processo,fila-prontos,escalonador,despachante,preempcao">
+  <h2>Os estados do processo</h2>
+  <p class="cs-def">Um processo passa por cinco estados: criação, pronto, execução, espera e terminado (na figura, novo e executando). Quem o move entre eles são eventos.</p>
+  <div class="tbl prose"><table>
+    <thead><tr><th>Transição</th><th>Evento</th><th>Quem provoca</th></tr></thead>
+    <tbody>
+      <tr><td>criação → pronto</td><td>admitido: o sistema terminou de montar o PCB</td><td>sistema</td></tr>
+      <tr><td>pronto → execução</td><td>o escalonador escolhe</td><td>escalonador</td></tr>
+      <tr><td>execução → pronto</td><td>acaba a fatia de tempo, ou chega alguém mais prioritário</td><td>sistema (preempção)</td></tr>
+      <tr><td>execução → espera</td><td>pede E/S ou espera um evento (tempo, recurso)</td><td>o próprio processo</td></tr>
+      <tr><td>espera → pronto</td><td>o evento acontece</td><td>sistema, ao tratar a interrupção</td></tr>
+      <tr><td>execução → terminado</td><td>termina</td><td>o processo ou o sistema</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="b">
+    <li>Pronto: só falta o processador. Espera: falta um evento (E/S, tempo, recurso). I/O é o nome em inglês de E/S.</li>
+    <li>Com um core, só um processo está em execução por vez. A impressão de que tudo roda junto vem das trocas rápidas.</li>
+    <li>Fatia de tempo (quantum): quanto um processo usa a CPU antes de o temporizador devolvê-la ao escalonador. Preempção é tirar a CPU de quem ainda queria usá-la.</li>
+    <li>O Zephyr, um sistema operacional de tempo real usado em produtos, usa os mesmos estados para as threads e acrescenta um: suspensa. Uma thread suspensa sai do escalonamento por ordem de outra e só volta quando alguém a retomar; ela não espera evento nenhum.</li>
+  </ul>
+  <div class="cs-uso">
+    <p>O processo do alerta, que acende a luz e toca o som dos dispositivos:</p>
+    <div class="tbl prose"><table>
+      <thead><tr><th>#</th><th>Evento</th><th>Estado depois</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>o módulo liga e o sistema cria o alerta, que ainda não pode ser escolhido</td><td>criação</td></tr>
+        <tr><td>2</td><td>entra na fila de prontos</td><td>pronto</td></tr>
+        <tr><td>3</td><td>o escalonador o escolhe; ele acende a luz da meia</td><td>execução</td></tr>
+        <tr><td>4</td><td>o processo do botão, mais prioritário, fica pronto e toma a CPU</td><td>pronto</td></tr>
+        <tr><td>5</td><td>é escolhido de novo</td><td>execução</td></tr>
+        <tr><td>6</td><td>pede para dormir até o botão ou até passarem 60 s</td><td>espera</td></tr>
+        <tr><td>7</td><td>a pessoa aperta o botão</td><td>pronto</td></tr>
+        <tr><td>8</td><td>o escalonador o escolhe</td><td>execução</td></tr>
+        <tr><td>9</td><td>apaga a luz, registra o horário e encerra</td><td>terminado</td></tr>
+      </tbody>
+    </table></div>
+    <p>Saiu por conta própria no evento 6 (e no 9, ao terminar). Foi tirado pelo sistema no evento 4, por preempção. Repare no 7: apertar o botão leva para pronto, não para execução.</p>
   </div>
   <p class="prova">Transições válidas: novo → pronto, pronto → executando, executando → espera, espera → pronto, executando → pronto (preempção) e executando → terminado. Não existem espera → executando nem pronto → espera.</p>
   <div class="cs-pegadinhas">
     <ul class="b">
-      <li>Errado: "o botão foi apertado, a tarefa volta a executar". Certo: volta para pronto e disputa a CPU de novo.</li>
-      <li>Errado: "um processo pronto pode pedir E/S". Certo: pedir é executar uma syscall, e só quem está executando executa algo.</li>
-      <li>Executando → pronto é involuntário (preempção); executando → espera é voluntário (o processo pediu).</li>
+      <li>Errado: "o evento aconteceu, o processo volta a executar". Certo: volta para pronto e disputa a CPU.</li>
+      <li>Errado: "um processo pronto pode pedir E/S". Certo: pedir é executar uma syscall, e só quem está em execução executa algo.</li>
+      <li>Errado: "num core só, cada thread tem um processo em execução". Certo: um core, um em execução no instante.</li>
     </ul>
   </div>
   <div data-ref="fig-estados"></div>
 </section>
 
-<section class="cs" id="troca-contexto" data-inclui="custo-troca" data-grupo="Estados e troca de contexto" data-termos="troca-contexto,overhead">
-  <h2>Troca de contexto e quanto ela custa</h2>
-  <p class="cs-def">Troca de contexto é passar a CPU de um processo para outro: salvar o contexto de A no PCB de A, escolher B, carregar o contexto de B, trocar o mapa de memória e saltar para o PC de B. Enquanto isso, nenhum processo avança: é overhead.</p>
+<section class="cs" id="cpu-io-bound" data-grupo="Estados" data-termos="cpu-bound,io-bound">
+  <h2>CPU-bound e I/O-bound, medido</h2>
+  <p class="cs-def">CPU-bound passa quase todo o tempo em execução ou pronto: só calcula. I/O-bound passa quase todo o tempo em espera: calcula um pouco e espera E/S. A diferença aparece em como cada um sai do processador.</p>
+  <div class="tbl prose"><table>
+    <thead><tr><th>Processo (5 s, Linux num Xeon)</th><th>Saiu por conta própria</th><th>Foi tirado pelo sistema</th><th>CPU usada</th></tr></thead>
+    <tbody>
+      <tr><td>I/O-bound: calcula um pouco e espera 2 ms</td><td>2 310</td><td>0</td><td>0,08 s</td></tr>
+      <tr><td>CPU-bound: só calcula, dividindo o core</td><td>1</td><td>1 360</td><td>2,4 s</td></tr>
+    </tbody>
+  </table></div>
   <ul class="b">
-    <li>Custo direto: salvar e carregar registradores, rodar o scheduler, trocar o mapa de memória. Alguns µs num PC ou servidor.</li>
-    <li>Custo indireto: cache e TLB estão cheias de dados do processo anterior, e os primeiros acessos do novo dão miss. Pode custar mais do que a troca em si.</li>
-    <li>No Cortex-M0+ com FreeRTOS: o hardware empilha 8 registradores e o port salva mais 8. São 16 × 4 = 64 bytes na pilha da tarefa, sem mapa de memória para trocar.</li>
+    <li>"Por conta própria" é execução → espera: pediu E/S ou um tempo. "Tirado pelo sistema" é execução → pronto: acabou a fatia ou outro tomou a vez. O Linux conta as duas no PCB, em <code>nvcsw</code> e <code>nivcsw</code>.</li>
+    <li>I/O-bound: 5 s / 2 310 ≈ 2,2 ms por volta (2 ms de espera e um pouquinho de conta). Calculou só 0,08 s / 2 310 ≈ 35 µs por volta. Nunca foi tirado: sempre largou antes de a fatia acabar.</li>
+    <li>CPU-bound: 5 000 ms / 1 360 ≈ 3,7 ms entre uma preempção e outra. Usou 2,4 s dos 5 s, quase metade, porque dividia o core com outro processo.</li>
+    <li>No Zephyr, threads de mesma prioridade revezam por fatia de tempo num core; quando chega uma thread de prioridade maior, ela toma o processador na hora (preempção).</li>
+    <li>Escalonadores costumam favorecer os I/O-bound: usam a CPU por pouco tempo e liberam logo (critérios na <a href="/m8/comp/06-gerencia-recursos">aula 06</a>).</li>
   </ul>
-  <div class="cs-formula">
-    <div class="formula">fração útil = q / (q + s)          overhead = s / (q + s)</div>
-    <div class="formula">espera até voltar a executar (pior caso) = (n − 1) × q + n × s</div>
-    <ul class="b">
-      <li>q: quantum, o tempo que cada um usa antes de ser trocado. s: o tempo de uma troca. n: quantos revezam.</li>
-      <li>Cada um espera os outros n − 1 quanta e n trocas: de A para o 2º, …, do último de volta para A.</li>
-    </ul>
-  </div>
-  <div class="cs-uso">
-    <ul class="b">
-      <li>q = 4 ms e s = 20 µs = 0,02 ms: 4 / 4,02 ≈ 0,995. A CPU trabalha 99,5 % do tempo.</li>
-      <li>Mesma troca com q = 0,1 ms: 0,1 / 0,12 ≈ 0,833. Agora 16,7 % vai embora em trocas.</li>
-      <li>5 processos, q = 4 ms, s = 0,02 ms: 4 × 4 + 5 × 0,02 = 16,1 ms até voltar.</li>
-      <li>RP2040 a 125 MHz com troca de 250 ciclos: s = 250 / 125 000 000 = 2 µs. Com tick de 1 ms, overhead = 0,002 / 1,002 ≈ 0,2 %.</li>
-    </ul>
-  </div>
-  <p class="prova">A troca de contexto é overhead: enquanto ela acontece, nenhum processo avança. Fração útil = q / (q + s). Quantum menor dá resposta mais rápida e mais overhead.</p>
   <div class="cs-pegadinhas">
     <ul class="b">
-      <li>Errado: pior espera = (n − 1) × q. Certo: some as n trocas.</li>
-      <li>Errado: "trocar de thread custa o mesmo que trocar de processo". Certo: entre threads do mesmo processo o mapa de memória não muda, e cache e TLB continuam úteis.</li>
+      <li>Errado: "o I/O-bound usa pouca CPU porque é lento". Certo: usa pouca CPU porque quase sempre está em espera, e por isso não atrapalha os outros.</li>
     </ul>
   </div>
-  <div data-ref-mn="mn-troca"></div>
-  <div data-ref="fig-custo"></div>
+  <div data-ref-loop="cpuio"></div>
+</section>
+
+<section class="cs" id="criacao" data-inclui="termino,sinais,tipos" data-grupo="Criação e sinais" data-termos="subprocesso,arvore-processos,fork,exec,zumbi,sinal">
+  <h2>Criar, esperar e sinalizar</h2>
+  <p class="cs-def">No Unix, um processo nasce de outro em três chamadas: <code>fork</code> cria a cópia, <code>exec</code> troca o programa da cópia, <code>wait</code> faz o pai esperar o filho. Sinal é o aviso que o sistema entrega a um processo.</p>
+<pre><code>pid_t pid = fork();              // agora são dois processos
+if (pid == 0) {                  // no filho:
+    execlp("ls", "ls", NULL);    // troca de programa
+} else {                         // no pai:
+    waitpid(pid, NULL, 0);       // espera o filho
+}</code></pre>
+  <ul class="b">
+    <li><code>fork</code>: o filho nasce como cópia do pai, com outro PID e outro espaço de endereçamento. A chamada "retorna duas vezes": devolve 0 no filho e o PID do filho no pai. No Linux a cópia da memória é preguiçosa (copy-on-write): as páginas só são copiadas quando alguém escreve.</li>
+    <li><code>exec</code> (aqui, <code>execlp</code>): o filho troca de programa e mantém o PID. O shell roda cada comando assim: fork e, no filho, exec.</li>
+    <li><code>wait</code> (aqui, <code>waitpid</code>): o pai fica em espera até o filho terminar e pode ler o código de saída. Até o pai ler, o filho que terminou fica como zumbi: só o PCB, sem memória.</li>
+    <li>Pais e filhos formam a árvore de processos; o campo <code>real_parent</code> da <code>task_struct</code> aponta para o pai.</li>
+  </ul>
+  <div class="tbl prose"><table>
+    <thead><tr><th>Como enviar</th><th>Sinal</th><th>O processo pode tratar ou ignorar?</th></tr></thead>
+    <tbody>
+      <tr><td><code>Ctrl-C</code> no terminal</td><td>SIGINT (interromper)</td><td>sim</td></tr>
+      <tr><td><code>kill PID</code></td><td>SIGTERM (pedido para terminar)</td><td>sim: em geral fecha arquivos e sai</td></tr>
+      <tr><td><code>kill -9 PID</code></td><td>SIGKILL (matar)</td><td>não</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="b">
+    <li>Analogia do livro: o sinal está para o processo como a interrupção está para o sistema operacional. Chega a qualquer momento e desvia o processo para uma rotina de tratamento.</li>
+    <li>O SIGKILL não pode ser tratado para que sempre exista um jeito de parar um processo travado ou malicioso.</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Errado: "o fork cria uma thread". Certo: cria um processo, com outro PID e outra memória.</li>
+      <li>Errado: "o exec cria um processo". Certo: troca o programa do processo que já existe, com o mesmo PID.</li>
+    </ul>
+  </div>
+  <div data-ref-mn="mn-arvore"></div>
 </section>
 
 <section class="cs" id="threads" data-inclui="por-que-threads,concorrencia" data-grupo="Threads" data-termos="thread,monothread,multithread,tcb,concorrencia,paralelismo">
-  <h2>Threads: o que dividem e o que é de cada uma</h2>
-  <p class="cs-def">Thread é um fluxo de instruções dentro de um processo e a menor unidade que o SO escalona. Cada thread tem contexto de hardware, pilha de execução e estado próprios; o espaço de endereçamento e os arquivos abertos são de todas.</p>
+  <h2>Threads: um processo, vários fluxos</h2>
+  <p class="cs-def">Thread é um fluxo de execução dentro de um processo. Cada thread tem os seus registradores (com PC e SP) e a sua pilha; o contexto de software e o espaço de endereçamento (código, dados e heap) são de todas.</p>
   <ul class="b">
-    <li>Por que existem: um servidor web com mil clientes precisaria de mil processos, mil espaços de endereçamento e conversa lenta pelo SO. Com threads, é um processo, e todas leem a mesma cache em memória.</li>
-    <li>Criar uma thread costuma ser uma ordem de grandeza mais rápido que criar um processo: não há espaço de endereçamento novo para montar.</li>
-    <li>O kernel guarda a parte individual de cada thread num TCB (thread control block), menor que o PCB e ligado a ele.</li>
-    <li>Concorrência: várias tarefas revezando um core. Paralelismo: várias no mesmo instante, em cores diferentes. Paralelo é sempre concorrente; o contrário, não.</li>
-    <li>Preço: nada protege uma thread da outra. Duas threads somando 1 no mesmo contador podem perder incrementos (é a <a href="/m8/comp/05-sincronizacao-deadlocks">aula 05</a>), e um erro fatal numa thread derruba o processo inteiro.</li>
+    <li>Compare três processos monothread (cada um com hardware, software e memória próprios) com um processo de três threads (três conjuntos de registradores e pilha, um só contexto de software, uma só memória).</li>
+    <li>Processo é a unidade de alocação de recursos (memória, arquivos). Thread é a unidade de escalonamento: o sistema escolhe uma thread para executar, não o processo inteiro.</li>
+    <li>No Linux, thread e processo usam a mesma estrutura, a <code>task_struct</code>. A diferença é só o que cada uma divide com as outras: threads do mesmo processo apontam para o mesmo <code>mm</code> (memória), os mesmos <code>files</code> e o mesmo <code>signal</code>, e têm o mesmo <code>tgid</code>.</li>
+    <li>O kernel guarda a parte individual de cada thread num TCB (thread control block), menor que o PCB.</li>
+    <li>Concorrência: várias threads revezando um core. Paralelismo: várias no mesmo instante, em cores diferentes.</li>
+    <li>Por que usar: um servidor atende mil clientes com mil threads num processo, todas lendo a mesma cache em memória; um editor tem uma thread para o teclado e outra salvando o arquivo.</li>
   </ul>
-  <div class="def"><span class="lab">Segurança · processo isola, thread não</span>
-    <ul class="b">
-      <li>O Chrome roda cada site num processo de renderização separado e com permissões cortadas (sandbox). Um bug derruba só aquela aba, e um ataque fica preso nela. Preço: mais memória.</li>
-      <li>Se as abas fossem threads de um processo só, um site comprometido leria a memória dos outros.</li>
-    </ul>
-  </div>
   <p class="prova">Threads do mesmo processo compartilham o espaço de endereçamento (código, dados globais, heap) e os arquivos abertos. Cada thread tem PC, registradores, pilha de execução e estado só seus.</p>
   <div class="cs-pegadinhas">
     <ul class="b">
-      <li>Errado: "a memória virtual protege uma thread da outra". Certo: ela separa processos; threads do mesmo processo veem a mesma memória.</li>
-      <li>Errado: "duas threads num core só rodam em paralelo". Certo: revezam; isso é concorrência.</li>
+      <li>Errado: "thread é sempre a escolha certa, porque é mais leve". Certo: é mais barata, mas divide a memória; um defeito ou uma invasão numa thread alcança todas. O Chrome e o Firefox usam processos de propósito (<a href="#seguranca">fronteira de segurança</a>).</li>
+      <li>Errado: "dobrar as threads dobra a velocidade". Certo: só ajuda se houver o que fazer em paralelo (esperas de E/S ou cores livres). Threads demais gastam tempo criando e trocando de contexto.</li>
     </ul>
   </div>
   <div data-ref-mn="mn-threads"></div>
   <div data-ref-tbl="tbl-threads"></div>
 </section>
 
-<section class="cs" id="modelos" data-inclui="ult,klt" data-grupo="Threads" data-termos="ult,klt,biblioteca-threads,chamada-bloqueante,modelos-thread">
-  <h2>ULT, KLT e os mapeamentos N:1, 1:1 e M:N</h2>
-  <p class="cs-def">A pergunta é quem cria e escalona as threads. ULT (user-level thread): uma biblioteca dentro do processo, e o kernel nem sabe que elas existem. KLT (kernel-level thread): o próprio kernel, que vê e escalona cada uma.</p>
+<section class="cs" id="custos" data-grupo="Threads" data-termos="">
+  <h2>Quanto custa, medido</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 172">
+<text class="tm st" x="2" y="8">criar processo + outro programa · 813 µs</text><rect class="am" x="2" y="18" width="232" height="7" rx="2"/>
+<text class="tm st" x="2" y="34">criar processo (fork) · 61 µs</text><rect class="am" x="2" y="44" width="179" height="7" rx="2"/>
+<text class="tm st" x="2" y="60">criar thread · 11,8 µs</text><rect class="bl" x="2" y="70" width="145" height="7" rx="2"/>
+<text class="tm st" x="2" y="86">trocar entre processos · 1,47 µs</text><rect class="k" x="2" y="96" width="102" height="7" rx="2"/>
+<text class="tm st" x="2" y="112">trocar entre threads · 1,37 µs</text><rect class="k" x="2" y="122" width="101" height="7" rx="2"/>
+<text class="tm st" x="2" y="138">trocar em modo usuário · 13 ns</text><rect class="gr" x="2" y="148" width="5" height="7" rx="2"/>
+<line class="s" x1="2" y1="160" x2="238" y2="160"/><text class="tm st" x="2" y="170">0,01</text><text class="tm" x="96" y="170">1</text><text class="tm" x="191" y="170">100 µs</text></svg>Escala logarítmica: cada marca é 100 vezes a anterior.</aside>
+  <p class="cs-def">Num Linux num servidor Xeon, criar um processo custa uns 5 vezes criar uma thread, e carregar outro programa, umas 70 vezes. Trocar entre processos e trocar entre threads quase empata: o que pesa é passar pelo kernel.</p>
+  <div class="tbl prose"><table>
+    <thead><tr><th>Operação</th><th>Como foi medida</th><th>Tempo</th></tr></thead>
+    <tbody>
+      <tr><td>criar processo com outro programa</td><td><code>posix_spawn</code> (fork e exec juntos)</td><td>813 µs</td></tr>
+      <tr><td>criar processo</td><td><code>fork</code></td><td>61 µs</td></tr>
+      <tr><td>criar thread</td><td><code>pthread_create</code></td><td>11,8 µs</td></tr>
+      <tr><td>trocar entre processos</td><td>dois processos passando um byte por um pipe, mesmo core</td><td>1,47 µs</td></tr>
+      <tr><td>trocar entre threads</td><td>duas threads, o mesmo pipe, mesmo core</td><td>1,37 µs</td></tr>
+      <tr><td>trocar em modo usuário</td><td>sem o kernel (biblioteca de threads)</td><td>13 ns</td></tr>
+    </tbody>
+  </table></div>
   <ul class="b">
-    <li>ULT: trocar de thread é uma chamada de função, nanossegundos. Mas uma chamada bloqueante (como <code>read</code>) põe o processo inteiro em espera, e não há paralelismo: o kernel só vê uma entidade.</li>
-    <li>KLT: uma thread em E/S não trava as outras, e 4 threads rodam em 4 cores ao mesmo tempo. Custo: criar e trocar passa pelo kernel.</li>
-    <li>N:1: várias ULT sobre uma entidade do kernel (green threads do Java antigo).</li>
-    <li>1:1: cada thread é uma KLT. Linux (pthreads com NPTL), Windows, Java atual.</li>
-    <li>M:N: M threads de usuário sobre N do kernel, com dois schedulers que precisam se entender. Goroutines do Go, threads virtuais do Java 21.</li>
-    <li>As tarefas do FreeRTOS são escalonadas pelo kernel do RTOS uma a uma: funcionam como 1:1.</li>
+    <li>Como ler: mediana de 5 execuções, no mesmo core. "Criar" inclui encerrar e esperar; "trocar" inclui escrever e ler no pipe (um canal do kernel que liga a saída de um à entrada do outro).</li>
+    <li>Criar: 61 / 11,8 ≈ 5. O fork monta um espaço de endereçamento novo e copia o mapa de memória do pai; a thread só ganha pilha e registradores.</li>
+    <li>Carregar outro programa: 813 / 11,8 ≈ 70. Além do processo, é preciso ler o executável do disco, montar a memória dele do zero e carregar as bibliotecas.</li>
+    <li>Trocar: 1,47 − 1,37 = 0,1 µs. Mudar de espaço de endereçamento somou só isso; o resto é entrar no kernel, salvar, escolher e carregar.</li>
+    <li>Sem o kernel: 1,37 µs / 13 ns ≈ 100. É a vantagem das threads de modo usuário (<a href="#modelos">próxima seção</a>).</li>
+    <li>Fica fora da medida o custo indireto: depois de trocar de processo, cache e TLB (<a href="/m8/comp/02-fundamentos-memoria">aula 02</a>) têm dados do anterior, e os primeiros acessos dão miss.</li>
   </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Errado: "trocar de processo é muito mais caro que trocar de thread". Certo: no custo direto quase empata (0,1 µs); a diferença grande está em criar, e na troca para modo usuário.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="modelos" data-inclui="ult,klt" data-grupo="Threads" data-termos="ult,klt,biblioteca-threads,chamada-bloqueante,modelos-thread,scheduler-activations">
+  <h2>Threads em modo usuário, em modo kernel e híbridas</h2>
+  <p class="cs-def">A pergunta é quem enxerga as threads. Em modo usuário (TMU, ou ULT), uma biblioteca dentro do processo as cria e escalona, e o kernel só enxerga o processo. Em modo kernel (TMK, ou KLT), o kernel enxerga e escalona cada thread. No híbrido, várias threads de usuário rodam sobre algumas threads de kernel.</p>
+  <ul class="b">
+    <li>Modo usuário é rápido: criar e trocar não passa pelo kernel (13 ns por troca). Mas uma chamada bloqueante (uma leitura que deixa quem chamou esperando) trava o processo inteiro, porque o kernel põe "o processo" em espera. E o processo não usa dois cores ao mesmo tempo.</li>
+    <li>Modo kernel é robusto: uma thread bloqueada não trava as outras, que podem rodar em cores diferentes. Mas cada operação é uma syscall, bem mais cara.</li>
+    <li>Híbrido é flexível: o programador escolhe quantas threads de kernel usar. Mas herda problemas dos dois: quando uma thread de usuário bloqueia, a de kernel que a carrega para junto, e dois escalonadores (o da biblioteca e o do kernel) precisam se entender. Scheduler activations é o mecanismo em que o kernel avisa a biblioteca antes de bloquear, para ela pôr outra thread para rodar.</li>
+    <li>Hoje: Linux e Windows usam uma thread de kernel por thread (1:1). Go (goroutines) e Java 21 (threads virtuais) voltaram ao híbrido, com até milhões de threads leves.</li>
+  </ul>
+  <div class="cs-uso">
+    <p>Um processo com três threads: botões, interpretador e aviso ao cuidador. A dos botões faz uma leitura bloqueante de 15 ms, 20 vezes por segundo; as outras quase sempre têm trabalho pronto.</p>
+    <ul class="b">
+      <li>Modo usuário: a cada leitura o processo inteiro para. 20 × 15 ms = 300 ms por segundo com as outras duas paradas, mesmo prontas (30 % do tempo).</li>
+      <li>Modo kernel: 0 ms. Só a thread dos botões espera.</li>
+      <li>Com 2 cores: em modo usuário, 1 thread do processo por vez; em modo kernel, 2 ao mesmo tempo.</li>
+    </ul>
+  </div>
   <p class="prova">ULT: troca rápida, mas uma chamada bloqueante bloqueia o processo todo e não há paralelismo. KLT: o kernel escalona cada thread, há paralelismo real e uma thread bloqueada não trava as outras, ao custo de mais overhead.</p>
   <div class="cs-pegadinhas">
     <ul class="b">
-      <li>Errado: "ULT é sempre mais rápida". Certo: a troca é mais rápida, mas uma única E/S para todas as threads.</li>
+      <li>Errado: "modo usuário é sempre mais rápido". Certo: a troca é mais rápida, mas uma única leitura bloqueante para todas as threads.</li>
     </ul>
   </div>
   <div data-ref-tbl="tbl-modelos"></div>
   <div data-ref="fig-modelos"></div>
 </section>
 
-<section class="cs" id="reais" data-inclui="superloop,rtos,mpu" data-grupo="Em chips reais" data-termos="superloop,isr,rtos,mpu">
-  <h2>Do superloop ao Linux nos chips do projeto</h2>
-  <p class="cs-def">Num microcontrolador, ter ou não SO é decisão de projeto. Superloop: um laço infinito, sem SO, interrompido por ISRs. RTOS: um kernel pequeno com tarefas, prioridades e prazos previsíveis. Linux: processos de verdade, que exigem MMU.</p>
+<section class="cs" id="corrida" data-grupo="Condição de corrida" data-termos="">
+  <h2>Condição de corrida</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 118">
+<text class="tm st" x="2" y="22">A</text><text class="tm st" x="2" y="56">B</text><text class="tm st" x="2" y="94">X</text>
+<rect class="bl" x="16" y="12" width="34" height="20" rx="3"/><text class="tm" x="33" y="22">LOAD</text>
+<rect class="bl" x="53" y="12" width="34" height="20" rx="3"/><text class="tm" x="70" y="22">+1</text>
+<rect class="am" x="90" y="46" width="34" height="20" rx="3"/><text class="tm" x="107" y="56">LOAD</text>
+<rect class="am" x="127" y="46" width="34" height="20" rx="3"/><text class="tm" x="144" y="56">−1</text>
+<rect class="bl" x="164" y="12" width="34" height="20" rx="3"/><text class="tm" x="181" y="22">STORE</text>
+<rect class="am" x="201" y="46" width="34" height="20" rx="3"/><text class="tm" x="218" y="56">STORE</text>
+<text x="33" y="94">2</text><text x="70" y="94">2</text><text x="107" y="94">2</text><text x="144" y="94">2</text><text x="181" y="94">3</text>
+<rect class="rd" x="204" y="83" width="28" height="22" rx="4"/><text x="218" y="94">1</text>
+<text class="tm" x="120" y="114">o STORE de B apaga o de A</text></svg>X começa em 2; A soma 1, B tira 1. O certo era 2.</aside>
+  <p class="cs-def">Condição de corrida (race condition): duas ou mais threads ou processos mexem no mesmo dado, e o resultado depende da ordem em que as instruções deles se intercalam. Pode dar certo mil vezes e errado na seguinte. Região crítica é o trecho de código que mexe nesse dado: enquanto uma thread está nele, nenhuma outra pode mexer no mesmo dado.</p>
   <ul class="b">
-    <li>Arduino Uno (ATmega328P, 16 MHz, 2 KB de SRAM): superloop. Não há processo nem thread; a concorrência vem só das ISRs. A resposta mínima a uma interrupção é 4 ciclos: 4 / 16 MHz = 0,25 µs.</li>
-    <li>No superloop, o pior atraso para ver um botão lido por polling é uma volta inteira do laço. Por isso o laço nunca espera parado: confere <code>millis()</code> e segue.</li>
-    <li>RP2040 (2 × Cortex-M0+, 264 KB de SRAM, sem MMU) com FreeRTOS: cada tarefa tem pilha e TCB próprios e divide a memória com as outras. São threads. Scheduler preemptivo por prioridade; o port suporta os dois cores.</li>
-    <li>MPU (memory protection unit): confere cada acesso contra até 8 regiões por core e gera HardFault se não for permitido. Só permite ou nega; não traduz endereço. O port do FreeRTOS para o RP2040 não a usa.</li>
-    <li>Raspberry Pi 4 (4 × Cortex-A72, MMU): Linux, com processos isolados e threads 1:1. Preço: boot de segundos e nenhum prazo prometido.</li>
+    <li>No dia a dia: duas pessoas abrem a mesma planilha com saldo 100. A primeira soma 10 e salva: 110. A segunda, que abriu antes, tira 20 da cópia dela e salva: 80. A soma da primeira sumiu, e ninguém viu erro.</li>
+    <li>Por que acontece com threads: <code>X = X + 1</code> vira três instruções, ler X, somar e gravar. Uma troca de contexto, ou outro core, pode entrar entre elas, e quem leu antes de o outro gravar soma em cima de um valor velho.</li>
+    <li>No kernel também: no xv6, uma função <code>push</code> insere um nó numa lista com <code>l-&gt;next = list;</code> e depois <code>list = l;</code>. Se as duas CPUs executam a primeira linha antes de qualquer uma executar a segunda, os dois nós apontam para o mesmo antigo início, e uma inserção some.</li>
+    <li>Como proteger a região crítica (semáforo, mutex) é a <a href="/m8/comp/05-sincronizacao-deadlocks">aula 05</a>.</li>
   </ul>
   <div class="cs-uso">
-<pre><code>unsigned long inicio;                 // millis() de quando a peça atual começou
-void loop() {
-  if (botaoApertado()) proximaPeca();  // só confere; não espera
-  unsigned long t = millis() - inicio; // ms desde o início da peça
-  if (t &gt;= 120000) avisaCuidador();
-  else if (t &gt;= 60000) reforco();     // luz forte e som
-  // nada de delay(60000): ele pararia o laço inteiro por 60 s
-}</code></pre>
-  </div>
-  <div class="def"><span class="lab">Segurança · pilha estourada sem MPU</span>
+    <p>O exemplo do livro: X começa em 2, o processo A faz <code>X := X + 1</code> e o B faz <code>X := X − 1</code>. Um depois do outro, X termina em 2. Cada linha vira <code>LOAD X, R</code> (copia X para o registrador), <code>ADD</code> ou <code>SUB</code> (mexe só no registrador) e <code>STORE R, X</code> (grava de volta).</p>
+    <div class="tbl prose"><table>
+      <thead><tr><th>Passo</th><th>Quem</th><th>Instrução</th><th>X</th><th>Ra</th><th>Rb</th><th>O que acontece</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>A</td><td>LOAD X, Ra</td><td>2</td><td>2</td><td>*</td><td>A copia X: Ra = 2</td></tr>
+        <tr><td>2</td><td>A</td><td>ADD 1, Ra</td><td>2</td><td>3</td><td>*</td><td>soma só no registrador; o SO troca para B</td></tr>
+        <tr><td>3</td><td>B</td><td>LOAD X, Rb</td><td>2</td><td>*</td><td>2</td><td>B lê 2: a soma de A não chegou à memória</td></tr>
+        <tr><td>4</td><td>B</td><td>SUB 1, Rb</td><td>2</td><td>*</td><td>1</td><td>o SO volta para A</td></tr>
+        <tr><td>5</td><td>A</td><td>STORE Ra, X</td><td>3</td><td>3</td><td>*</td><td>A grava 3</td></tr>
+        <tr><td>6</td><td>B</td><td>STORE Rb, X</td><td>1</td><td>*</td><td>1</td><td>B grava 1 por cima do 3</td></tr>
+      </tbody>
+    </table></div>
     <ul class="b">
-      <li>Sem MPU, a pilha estourada de uma tarefa escreve por cima das estruturas de outra, que falha longe da causa. No Linux, a mesma recursão mata só aquele processo (SIGSEGV).</li>
-      <li>Defesas no RP2040: guarda de 32 bytes da MPU no fundo da pilha (HardFault na hora), <code>configCHECK_FOR_STACK_OVERFLOW</code> (percebe depois da troca) e watchdog para reiniciar.</li>
+      <li>O * marca o registrador de quem não está rodando: o valor está guardado no PCB, no contexto de hardware. É por isso que Ra ainda vale 3 quando A volta.</li>
+      <li>Resultado: 1, e o certo era 2. Com outras ordens, daria 2 ou 3.</li>
+      <li>Mesma coisa com um contador de doses: <code>restantes = 10</code>, duas threads fazem <code>restantes − 1</code>. Se B lê antes de A gravar, as duas gravam 9; o certo era 8. O app mostra uma dose a mais por tomar, e o cuidador pode dar uma dose extra. A região crítica é o LOAD, SUB e STORE de <code>restantes</code>. Testar com as confirmações chegando com 1 s de diferença, mil vezes, não prova nada: elas nunca se intercalam.</li>
     </ul>
   </div>
   <div class="cs-pegadinhas">
     <ul class="b">
-      <li>Errado: "tarefa do FreeRTOS é um processo". Certo: é uma thread; todas dividem a mesma memória.</li>
-      <li>Errado: "RTOS é um SO mais rápido". Certo: é previsível; o que ele promete é cumprir prazos.</li>
-      <li>Errado: "MPU é uma MMU pequena". Certo: a MPU só permite ou nega; a MMU traduz endereço, e é isso que dá a cada processo a sua memória.</li>
+      <li>Errado: "rodei dez vezes e deu certo, então não há corrida". Certo: depende de onde caem as trocas de contexto ou de dois cores ao mesmo tempo, e pode aparecer uma vez por mês. No Therac-25, aparelho de radioterapia, condições de corrida estão entre as causas de seis acidentes com superdosagem, de 1985 a 1987.</li>
+      <li>Errado: "num core só não há corrida". Certo: a troca de contexto entre o LOAD e o STORE basta, como no passo 2.</li>
     </ul>
   </div>
-  <div data-ref-mn="mn-espectro"></div>
-  <div data-ref-tbl="tbl-reais"></div>
 </section>
 
-<section class="cs" id="treino" data-grupo="Treino (autoral)" data-termos="">
-  <h2>Treino no formato do encontro</h2>
-  <p class="cs-def">Exercícios autorais no hardware do projeto, do mecânico ao aberto, cada um com uma linha de Leitura. Não são do professor; tempos marcados como exemplo não são medidas.</p>
+<section class="cs" id="seguranca" data-grupo="Segurança" data-termos="">
+  <h2>O processo como fronteira de segurança</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 132">
+<rect class="acf" x="60" y="4" width="120" height="28" rx="6"/><text x="120" y="14" style="font-size:12px">navegador (broker)</text><text class="tm" x="120" y="26">guarda os privilégios</text>
+<rect class="k" x="4" y="60" width="232" height="56" rx="8" style="stroke-dasharray:4 3"/><text class="tm st" x="10" y="72">sandbox: mínimo de permissões</text>
+<rect class="bl" x="12" y="80" width="64" height="28" rx="4"/><text class="tm" x="44" y="94">site A</text>
+<rect class="rd" x="88" y="80" width="64" height="28" rx="4"/><text class="tm" x="120" y="94">site B invadido</text>
+<rect class="bl" x="164" y="80" width="64" height="28" rx="4"/><text class="tm" x="196" y="94">site C</text>
+<path class="s" d="M44 80 L100 34" marker-end="url(#mnarrow)"/><path class="s" d="M196 80 L140 34" marker-end="url(#mnarrow)"/>
+<text class="tm" x="120" y="128">o atacante fica preso no processo de B</text></svg>Um processo por site; só o broker tem privilégio.</aside>
+  <p class="cs-def">Cada processo tem o seu espaço de endereçamento e não enxerga o dos outros. Threads do mesmo processo não têm essa proteção: uma thread com defeito, ou invadida, alcança a memória de todas. Por isso separar em processos é uma decisão de segurança.</p>
+  <ul class="b">
+    <li>Chrome: o processo do navegador, chamado broker, guarda os privilégios (arquivos, rede, senhas). O conteúdo das páginas roda em processos separados, numa sandbox (caixa de areia: um processo com o mínimo de permissões). Se uma página for invadida, o atacante fica preso naquele processo.</li>
+    <li>Site Isolation (2018): um processo por site. É a defesa do Chrome contra o Spectre da <a href="/m8/comp/03-pipelines-paralelismo">aula 03</a>, que lê memória dentro do mesmo processo: se o site do atacante e o do banco não dividem processo, não há o que ler.</li>
+    <li>O preço: mais processos, mais memória e mais trocas de contexto. É a conta de <a href="#custos">quanto custa</a>, paga em troca de isolamento.</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Errado: "a memória virtual protege uma thread da outra". Certo: protege um processo do outro; threads do mesmo processo veem a mesma memória.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="projeto" data-inclui="superloop,rtos,mpu" data-grupo="No projeto" data-termos="superloop,isr,rtos">
+  <h2>No módulo de controle</h2>
+  <p class="cs-def">Quase toda tarefa do módulo espera alguma coisa. A concorrência ali serve para uma espera, como a da rede, não travar as outras, como a leitura do botão. Velocidade não é o objetivo.</p>
+  <div class="tbl prose"><table>
+    <thead><tr><th>Tarefa</th><th>Onde ela espera</th><th>Tipo</th></tr></thead>
+    <tbody>
+      <tr><td>ler os botões dos dispositivos</td><td>o aperto da pessoa</td><td>I/O-bound</td></tr>
+      <tr><td>executar a rotina (interpretador)</td><td>o próximo evento</td><td>I/O-bound</td></tr>
+      <tr><td>controlar os alertas</td><td>o tempo: 60 s, 120 s</td><td>I/O-bound</td></tr>
+      <tr><td>avisar o cuidador</td><td>a rede e o celular</td><td>I/O-bound</td></tr>
+      <tr><td>receber rotinas novas da IDE</td><td>USB ou Wi-Fi</td><td>I/O-bound</td></tr>
+      <tr><td>registrar as demoras</td><td>a gravação na flash</td><td>I/O-bound</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="b">
+    <li>O dado dividido: o passo atual da rotina. Quem trata o botão escreve; o interpretador e os alertas leem. Todo trecho que mexe nele é região crítica.</li>
+  </ul>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 132">
+<text class="tm" x="60" y="10">um laço só</text><text class="tm" x="182" y="10">tarefas separadas</text>
+<line class="s" x1="122" y1="2" x2="122" y2="128" style="stroke-dasharray:3 3"/>
+<rect class="k" x="10" y="18" width="100" height="20" rx="4"/><text class="tm" x="60" y="28">checar alertas</text>
+<rect class="rd" x="10" y="42" width="100" height="20" rx="4"/><text class="tm" x="60" y="52">avisar: tenta 40 s</text>
+<rect class="am" x="10" y="66" width="100" height="20" rx="4"/><text class="tm" x="60" y="76">ler botões: parado</text>
+<rect class="k" x="10" y="90" width="100" height="20" rx="4"/><text class="tm" x="60" y="100">atualizar luzes</text>
+<path class="s" d="M112 100 Q120 60 112 22" marker-end="url(#mnarrow)"/>
+<rect class="rd" x="134" y="30" width="96" height="22" rx="4"/><text class="tm" x="182" y="41">aviso: espera a rede</text>
+<rect class="gr" x="134" y="66" width="96" height="22" rx="4"/><text class="tm" x="182" y="77">botão: segue</text>
+<text class="tm" x="182" y="112">a espera de um não</text><text class="tm" x="182" y="124">trava o outro</text></svg>Com um laço só, o reenvio do aviso para tudo.</aside>
   <div class="cs-uso">
-    <details class="treino"><summary><span class="q">Exercício 1</span> Superloop no Uno: botão 5 µs, LEDs 40 µs e 8 bytes de EEPROM a 3,3 ms cada, por volta</summary>
-      <p>(a) Quanto dura uma volta e quantas voltas por segundo? (b) Pior atraso para ver o botão por polling, e por interrupção? (c) O que um <code>delay(60000)</code> no laço faz com a rotina?</p>
-      <ul class="b">
-        <li>(a) 0,005 + 0,040 + 8 × 3,3 = 26,445 ms por volta; 1000 / 26,445 ≈ 37,8 voltas/s.</li>
-        <li>(b) Polling: até ≈ 26,4 ms. Interrupção: a CPU desvia em 0,25 µs; a ISR anota, e o laço reage na volta seguinte.</li>
-        <li>(c) Para o laço 60 s: o botão fica sem resposta e o aviso dos 120 s atrasa. Use <code>millis()</code>.</li>
-      </ul>
-      <p>Leitura. No superloop, o pior caso é a soma de tudo o que está no laço.</p>
-    </details>
-    <details class="treino"><summary><span class="q">Exercício 2</span> FreeRTOS no RP2040 a 125 MHz: troca de 250 ciclos (exemplo), tick de 1 ms, 4 tarefas</summary>
-      <p>Tarefas: botão, LEDs, alerta e log. (a) Quanto vale s e qual o overhead? (b) Com as 4 na mesma prioridade, quanto o alerta espera no pior caso? (c) E com o alerta na maior prioridade, se entrar numa interrupção custa 15 ciclos?</p>
-      <ul class="b">
-        <li>(a) s = 250 / 125 MHz = 2 µs; overhead = 0,002 / 1,002 ≈ 0,2 %.</li>
-        <li>(b) (n − 1) × q + n × s = 3 × 1 + 4 × 0,002 = 3,008 ms.</li>
-        <li>(c) 15 + 250 = 265 ciclos ≈ 2,1 µs, mais o tempo da ISR.</li>
-      </ul>
-      <p>Leitura. 3 ms diante de um prazo de 120 s é 0,0025 %. O que derruba o aviso é a tarefa nunca rodar (starvation ou bloqueio), não os 2 µs da troca.</p>
-    </details>
-    <details class="treino"><summary><span class="q">Exercício 3</span> Heap de 64 KB para tarefas de 512 bytes de pilha + 96 de TCB; recursão de 40 bytes por nível</summary>
-      <p>(a) Quantas tarefas cabem? (b) A troca de contexto já ocupa 64 bytes da pilha. Quantos níveis de recursão cabem? (c) O que acontece no nível seguinte, sem MPU, com a guarda da MPU e no Linux?</p>
-      <ul class="b">
-        <li>(a) 65 536 / 608 ≈ 107,8 → 107 tarefas.</li>
-        <li>(b) (512 − 64) / 40 = 11,2 → 11 níveis. O 12º usa 64 + 12 × 40 = 544 bytes, 32 além do fim.</li>
-        <li>(c) Sem MPU: os 32 bytes caem sobre outra tarefa. Com a guarda de 32 bytes: HardFault na hora, e o watchdog reinicia. No Linux: SIGSEGV só naquele processo.</li>
-      </ul>
-      <p>Leitura. Sem MPU, uma tarefa é tão isolada quanto uma thread.</p>
-    </details>
-    <details class="treino"><summary><span class="q">Projeto</span> O módulo de controle precisa de SO? O aviso dos 120 s nunca pode falhar.</summary>
-      <p>Responda em quatro partes: decisão na primeira frase; do que abre mão e quem sente; um número que pesou; o que faria mudar.</p>
-      <ul class="b">
-        <li>Decisão de exemplo: FreeRTOS no RP2040, alerta na maior prioridade, ISR do botão só acorda tarefas, watchdog como rede de segurança.</li>
-        <li>Abre mão da simplicidade do superloop e do isolamento do Linux; quem sente é a equipe de firmware.</li>
-        <li>Número: 26,4 ms por volta no superloop, em que um único <code>delay</code> basta para atrasar o aviso, contra ≈ 2,1 µs para o alerta com prioridade.</li>
-        <li>Mudaria se o módulo precisar de tela, Wi-Fi ou atualização remota (Linux para a interface, microcontrolador para o alerta), ou se a rotina for só botão e relógio (superloop com <code>millis()</code>).</li>
-      </ul>
-    </details>
+    <p>Três falhas típicas de um módulo assim, cada uma de um conceito desta aula:</p>
+    <ul class="b">
+      <li>Um laço só (superloop): <code>avisar_cuidador()</code> fica em <code>while (!enviar(msg)) sleep(1);</code> enquanto o roteador está fora. Nesses 40 s ninguém lê o botão: no log, o aperto e o passo seguinte aparecem no mesmo segundo do envio. A luz da próxima peça demora, e o aviso de "não vestiu" chega quando a pessoa já vestiu. Conserto: tirar o aviso do caminho do botão (thread de kernel, outro processo ou laço que não bloqueia) e mandar o horário na mensagem, com um segundo aviso "já vestiu" quando o aperto chegar.</li>
+      <li>Uma thread por rotina, um contador só: <code>atrasos = atrasos + 1</code> em duas threads (vestir e remédio), numa placa Linux de 4 cores. As duas passam do prazo no mesmo segundo, e o log mostra <code>total=4</code> duas vezes: o certo era 5. No teste de bancada só a rotina de vestir rodava, 50 vezes, e nunca houve duas threads juntas. Conserto: tratar o trecho como região crítica e testar as rotinas ao mesmo tempo.</li>
+      <li>Rotinas pelo Wi-Fi sem conferir quem mandou: a thread receptora faz <code>accept</code>, lê e carrega a rotina. Às 2h59 chega uma rotina de um endereço que não é o da terapeuta, que dispara "precisa de ajuda" e envia o registro da semana para um site. <code>ps -T</code> (que lista as threads: SPID é o <code>pid</code> de cada uma, todas sob o mesmo processo) mostra tudo como root, no mesmo processo. Conserto: aceitar só rotina assinada pela IDE da terapeuta (o IP não prova quem mandou: qualquer aparelho na rede pode usá-lo) e rodar o interpretador num processo separado, sem root e sem acesso ao registro nem à rede, como a sandbox do Chrome. O registro é dado de saúde.</li>
+    </ul>
+    <p>Cada versão consertou um problema e abriu outro: o superloop travou na espera, as threads abriram a corrida, e tudo num processo root abriu o vazamento.</p>
+  </div>
+  <div class="tbl prose"><table>
+    <thead><tr><th></th><th>Microcontrolador com RTOS</th><th>Placa com Linux</th></tr></thead>
+    <tbody>
+      <tr><td>Organização</td><td>um programa só; as tarefas são threads e dividem toda a memória</td><td>processos separados (interpretador num, aviso em outro), conversando por pipe ou socket</td></tr>
+      <tr><td>Botão</td><td>gera uma interrupção (ISR); a tarefa do interpretador acorda</td><td>se a rede travar, a rotina continua noutro processo</td></tr>
+      <tr><td>Custo</td><td>leve, barato, troca em µs</td><td>mais memória, mais energia, mais tempo para ligar</td></tr>
+      <tr><td>Risco</td><td>um defeito numa tarefa pode corromper as outras</td><td>dentro de cada processo ainda pode haver threads</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="b">
+    <li>Nos dois casos, o passo atual da rotina é dividido entre tarefas e precisa de proteção contra condição de corrida.</li>
+    <li>A decisão sobre a estrutura do módulo vai no formato de sempre: a decisão na primeira frase; do que se abre mão e quem sente; um número que pesou (por exemplo, 61 µs contra 11,8 µs para criar, ou 300 ms parados por segundo com threads de usuário); o que faria mudar de ideia.</li>
+    <li>Duas perguntas definem o que não pode parar e de quem aceitar rotina: se o módulo perder a conexão com o celular no meio da rotina, o que ele faz? E quem pode mandar rotina nova: só a terapeuta, ou o cuidador também?</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Errado: "o pedido veio do IP da terapeuta, então é dela". Certo: IP não prova identidade; quem prova é uma assinatura que só a IDE dela consegue fazer.</li>
+      <li>Errado: "tudo I/O-bound, então não precisa de concorrência". Certo: precisa justamente para uma espera não travar as outras.</li>
+    </ul>
   </div>
 </section>

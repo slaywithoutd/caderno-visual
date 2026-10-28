@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { site, modulos, aulasDe, eixosDe, hrefRevisao, hrefRevisaoEixo, hrefGlossario, glossarioGlobal, tempoAula, formatarTempo } from '../lib/catalogo.js';
+import { site, modulos, aulasDe, eixosDe, hrefRevisao, hrefRevisaoEixo, hrefGlossario, glossarioGlobal, tempoAula, tempoEnxuta, formatarTempo } from '../lib/catalogo.js';
 const nTermos = Object.keys(glossarioGlobal).length;
 const nAulas = (n) => `${n} ${n === 1 ? 'aula' : 'aulas'}`;
 ---
@@ -44,6 +44,7 @@ const nAulas = (n) => `${n} ${n === 1 ? 'aula' : 'aulas'}`;
                           <span class="aula-meta"><span class="aula-tempo">~{formatarTempo(tempoAula(a).minutos)}</span></span>
                           <span class="aula-go" aria-hidden="true">→</span>
                         </a>
+                        {a.hrefEnxuta && <a class="aula-alt" href={a.hrefEnxuta}>Versão enxuta, para o encontro · ~{formatarTempo(tempoEnxuta(a).minutos)} →</a>}
                       </li>
                     ))}
                   </ol>
@@ -123,6 +124,7 @@ const nAulas = (n) => `${n} ${n === 1 ? 'aula' : 'aulas'}`;
   .aula-tags span{font-size:.74rem;padding:2px 9px;border-radius:999px;background:var(--surface2);color:var(--muted);border:1px solid var(--line)}
   .aula-meta{font-size:.8rem;color:var(--muted);padding-top:5px;white-space:nowrap;display:flex;flex-direction:column;align-items:flex-end;gap:2px}
   .aula-tempo{font-family:var(--f-mono);font-size:.74rem}
+  .aula-alt{display:inline-block;margin:-12px 0 16px 80px;font-size:.84rem;color:var(--accent)}
   .aula-go{color:var(--muted);padding-top:2px;transition:transform .2s,color .2s}
-  @media (max-width:640px){.aula-row{grid-template-columns:36px minmax(0,1fr)}.aula-meta,.aula-go{display:none}.area-head,.eixo-head{flex-direction:column;align-items:flex-start}}
+  @media (max-width:640px){.aula-alt{margin-left:64px}.aula-row{grid-template-columns:36px minmax(0,1fr)}.aula-meta,.aula-go{display:none}.area-head,.eixo-head{flex-direction:column;align-items:flex-start}}
 </style>

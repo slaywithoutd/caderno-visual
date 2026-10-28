@@ -3,6 +3,7 @@
      meta.json        título, resumo, seções, fontes   (obrigatório)
      conteudo.html    texto da aula, modo Leitura      (obrigatório)
      consulta.html    a mesma aula por conceito, modo Consulta (opcional; ver CLAUDE.md)
+     enxuta.html      recorte do consulta.html para preparar o encontro (opcional; rota /enxuta)
      index.js         figuras/loops/glossário no navegador
      glossario.js     termos                            revisao.js  cartões e cola
      notas/           anotações (.md), slides (.pdf) e fotos da aula */
@@ -11,6 +12,7 @@ import { site, modulos } from '../data/estrutura.js';
 const metas = import.meta.glob('/src/aulas/*/*/*/meta.json', { eager: true, import: 'default' });
 const conteudos = import.meta.glob('/src/aulas/*/*/*/conteudo.html', { eager: true, query: '?raw', import: 'default' });
 const consultas = import.meta.glob('/src/aulas/*/*/*/consulta.html', { eager: true, query: '?raw', import: 'default' });
+const enxutas = import.meta.glob('/src/aulas/*/*/*/enxuta.html', { eager: true, query: '?raw', import: 'default' });
 const revisoes = import.meta.glob('/src/aulas/*/*/*/revisao.js', { eager: true });
 const glossarios = import.meta.glob('/src/aulas/*/*/*/glossario.js', { eager: true, import: 'default' });
 const notasMd = import.meta.glob('/src/aulas/*/*/*/notas/*.md', { eager: true });
@@ -40,6 +42,8 @@ export const aulas = Object.entries(metas)
       conteudo: conteudos[`${dir}/conteudo.html`] || '',
       consulta: consultas[`${dir}/consulta.html`] || '',
       hrefConsulta: consultas[`${dir}/consulta.html`] ? url(`/${modulo}/${materia}/${slug}/consulta`) : null,
+      enxuta: enxutas[`${dir}/enxuta.html`] || '',
+      hrefEnxuta: enxutas[`${dir}/enxuta.html`] ? url(`/${modulo}/${materia}/${slug}/enxuta`) : null,
       cartoes: rev.cartoes || [],
       cola: rev.cola || [],
       glossario: glossarios[`${dir}/glossario.js`] || {},
@@ -155,6 +159,22 @@ export const tempoAula = (a) => tempoLeitura({
   cartoes: a.cartoes.length,
 });
 
+/* cartões e cola (3º item = seção do consulta.html) levados para as seções da enxuta: a seção de mesmo id
+   ou a que a junta em data-inclui. Os de seções que a enxuta deixou de fora não entram. */
+export function revisaoNaEnxuta(C, lista) {
+  const para = new Map();
+  for (const s of C.secoes) { para.set(s.id, s.id); s.inclui.forEach((i) => para.has(i) || para.set(i, s.id)); }
+  return lista.filter((item) => para.has(item[2])).map(([p, r, sec]) => [p, r, para.get(sec)]);
+}
+
+/* versão enxuta (enxuta.html): o texto dela e só os cartões e linhas de cola das seções que ela tem */
+export function tempoEnxuta(a) {
+  if (!a.enxuta) return null;
+  const C = montarConsulta({ ...a, consulta: a.enxuta });
+  const cartoes = revisaoNaEnxuta(C, a.cartoes), cola = revisaoNaEnxuta(C, a.cola);
+  return tempoLeitura({ html: C.html, extras: [...cartoes.flat(), ...cola.flat()].join(' '), cartoes: cartoes.length });
+}
+
 export const formatarTempo = (m) => (m < 60 ? `${m} min` : `${Math.floor(m / 60)} h${m % 60 ? ` ${m % 60} min` : ''}`);
 
 /* linha "tempo de leitura" mostrada logo abaixo do título de toda página de leitura */
@@ -204,7 +224,8 @@ export function montarConsulta(aula) {
   for (const m of aula.consulta.matchAll(/<section\b[^>]*class="cs\b[^"]*"[^>]*>\s*<h2>([\s\S]*?)<\/h2>/g)) {
     const tag = m[0].slice(0, m[0].indexOf('>') + 1);
     const id = attr(tag, 'id');
-    secoes.push({ id, titulo: m[1].replace(/<[^>]+>/g, '').trim(), grupo: attr(tag, 'data-grupo') });
+    /* data-inclui (só na enxuta): ids das seções do consulta.html que esta seção junta, para trazer os cartões delas */
+    secoes.push({ id, titulo: m[1].replace(/<[^>]+>/g, '').trim(), grupo: attr(tag, 'data-grupo'), inclui: attr(tag, 'data-inclui').split(',').map((t) => t.trim()).filter(Boolean) });
     attr(tag, 'data-termos').split(',').map((t) => t.trim()).filter(Boolean).forEach((k) => { secaoDe[k] = id; });
     leituraDe[id] = attr(tag, 'data-leitura').split(',').map((t) => t.trim()).filter(Boolean);
   }

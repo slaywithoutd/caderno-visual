@@ -1,0 +1,12 @@
+---
+/* Versão enxuta de uma aula (enxuta.html, opcional): recorte do consulta.html para preparar o encontro,
+   no mesmo formato e com as mesmas figuras. A aula completa continua em /consulta. */
+import ConsultaPagina from '../../../../components/ConsultaPagina.astro';
+import { aulas } from '../../../../lib/catalogo.js';
+
+export function getStaticPaths() {
+  return aulas.filter((a) => a.enxuta).map((a) => ({ params: { modulo: a.modulo, materia: a.materia, aula: a.slug }, props: { aula: a } }));
+}
+const { aula } = Astro.props;
+---
+<ConsultaPagina aula={aula} enxuta />

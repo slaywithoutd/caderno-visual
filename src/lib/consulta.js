@@ -83,19 +83,20 @@ export function initDefinicoes() {
    - Cada desenho de margem sobe para perto do texto visível, para o texto contornar o desenho em vez de
      ele ficar sozinho no fim da seção.
    - A seção "Resumo" (id encontro) fica inteira. Chegar a uma seção por link abre os detalhes dela; o botão
-     do topo abre ou recolhe todos, e a escolha fica no navegador. */
+     do topo abre ou recolhe todos, e a escolha fica no navegador.
+   - recolher: false (versão enxuta) deixa tudo à vista e só arruma os desenhos de margem. */
 const SEMPRE_ABERTAS = new Set(['encontro']);
 const ESSENCIAL = 'h2, .cs-def, .cs-resumo, .cs-formula, p.prova, aside.mn, figure, .tbl, .widget';
 const LINHAS_MIN = 5;
 const PARTES = [
   ['.cs-uso', 'como usar'], ['.cs-pegadinhas', 'pegadinhas'], ['.cs-ponderada', 'ponderada'], ['pre', 'código'],
 ];
-export function initCompacto() {
+export function initCompacto({ recolher = true } = {}) {
   const secoes = [...document.querySelectorAll('#aula-root section.cs')];
   const todos = [];
   for (const sec of secoes) {
     const linha = parseFloat(getComputedStyle(sec).lineHeight) || 28;
-    if (!SEMPRE_ABERTAS.has(sec.id)) {
+    if (recolher && !SEMPRE_ABERTAS.has(sec.id)) {
       const longos = [...sec.children].filter((el) => !el.matches(ESSENCIAL) && el.offsetHeight > LINHAS_MIN * linha);
       if (longos.length) {
         const det = H('details', { class: 'cs-detalhes' });

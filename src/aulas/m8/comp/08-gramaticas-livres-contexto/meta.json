@@ -1,0 +1,23 @@
+{
+  "numero": "08",
+  "data": "2026-10-29",
+  "titulo": "Gramáticas livres do contexto",
+  "tema": "Linguagens formais e autômatos",
+  "modos": ["consulta"],
+  "resumo": "Como ler uma GLC e sua árvore, como descobrir a linguagem de uma gramática e construir a gramática de uma linguagem, ambiguidade, forma normal de Chomsky e o caminho até o analisador sintático do projeto.",
+  "topicos": ["Convenções de GLC", "Percurso da árvore", "L(G) de uma gramática", "Construir GLCs", "Ambiguidade", "Precedência", "Forma normal de Chomsky", "Analisador sintático"],
+  "secoes": [],
+  "fontes": [
+    { "titulo": "Gramáticas livres de contexto (Carla Quem Disse)", "url": "https://www.youtube.com/watch?v=W88XbH2e4_w", "nota": "Autoestudo, 25 min. Transcrição automática do YouTube lida inteira." },
+    { "titulo": "GLCs: mais exemplos, parte 1 (Carla Quem Disse)", "url": "https://www.youtube.com/watch?v=nFosAsJ1ymo", "nota": "Autoestudo, 38 min. Dada a gramática, qual linguagem. Transcrição lida inteira." },
+    { "titulo": "GLCs: mais exemplos, parte 2 (Carla Quem Disse)", "url": "https://www.youtube.com/watch?v=egWpcPXe1ak", "nota": "Autoestudo, 26 min. Dada a linguagem, qual gramática. Transcrição lida inteira." },
+    { "titulo": "Simulando GLCs e APs (Carla Quem Disse)", "url": "https://www.youtube.com/watch?v=3EqWy6rQAgE", "nota": "Autoestudo, 4 min. JFLAP. Transcrição lida inteira; a tela do JFLAP não foi vista." },
+    { "titulo": "Discussão sobre GLCs (Carla Quem Disse)", "url": "https://www.youtube.com/watch?v=EtDUzu-ghy0", "nota": "Autoestudo, 15 min. Ambiguidade, forma normal de Chomsky, subárvores. Transcrição lida inteira." },
+    { "titulo": "Linguagens livres de contexto: o fim! (Carla Quem Disse)", "url": "https://www.youtube.com/watch?v=7-ABbECfErM", "nota": "Autoestudo, 4 min. Problemas de decisão. Transcrição lida inteira." },
+    { "titulo": "Barbosa et al., Compiladores · Sintaxe de linguagens de programação, seção Gramáticas livres de contexto (p. 33–43)", "nota": "Autoestudo. Não consultado: o livro não estava acessível." },
+    { "titulo": "Barbosa et al., Compiladores · cap. 3 · Gramáticas livres de contexto (p. 33–46)", "nota": "Autoestudo. Não consultado: o livro não estava acessível." },
+    { "titulo": "Slides do encontro de 27/10, Análise léxica (prof. Resina)", "nota": "Usados a prévia da análise sintática (gramática do português, L₁ e L₂) e a tabela de tokens da dinâmica." },
+    { "titulo": "Slides da aula 01 (prof. Resina)", "nota": "Roteiro das ponderadas e as linguagens de exemplo, já em notas/ da aula 01." }
+  ],
+  "observacao": "Escrita a partir das seis transcrições e dos slides do prof. Resina. Os dois trechos do livro da Barbosa não foram consultados: confira neles a notação e os exemplos. Ficaram fora dos autoestudos, marcados no texto: a gramática de expressões com um nível por operador, a gramática de tokens do projeto e a descida recursiva em Python."
+}

@@ -1,0 +1,997 @@
+{
+  "aula": "m8/comp/08-gramaticas-livres-contexto",
+  "data": "2026-10-29",
+  "criterio": "Conferência das transcrições completas dos seis vídeos, bloco a bloco, contra as seções do modo Consulta. Não equivale à leitura dos trechos do livro, que não foram acessados.",
+  "fontes": [
+    {
+      "id": "carla-glc",
+      "url": "https://www.youtube.com/watch?v=W88XbH2e4_w",
+      "escopo": "Carla Quem Disse, Gramáticas livres de contexto, 25:07; unidades = blocos de 2 minutos da transcrição (1 = 0:00–2:00)",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube, extraída do painel de transcrição do vídeo e lida inteira. Trechos com reconhecimento ruim foram interpretados pelo contexto, sem inventar conteúdo.",
+      "totalUnidades": 13,
+      "unidades": [
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "Gramática como gerador; terminais, variáveis, cada variável uma linguagem; regras de substituição",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "convencoes"
+          ],
+          "evidencias": [
+            "cada variavel gera a sua propria linguagem"
+          ]
+        },
+        {
+          "paginas": [
+            2
+          ],
+          "assunto": "Exemplo A → 0A | ε, abreviação com |, inicial = primeira regra",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "convencoes",
+            "catalogo"
+          ],
+          "evidencias": [
+            "primeira regra",
+            "a → 0a | ε"
+          ]
+        },
+        {
+          "paginas": [
+            3
+          ],
+          "assunto": "Derivando zeros; tipos de gramática (regular, livre, sensível, irrestrita)",
+          "antes": "ja-coberto",
+          "justificativa": "Já explicado na aula 01; aqui entra como link e com o que o vídeo acrescenta.",
+          "consulta": [
+            "decisao"
+          ],
+          "evidencias": [
+            "hierarquia de chomsky"
+          ]
+        },
+        {
+          "paginas": [
+            4
+          ],
+          "assunto": "Gramática da linguagem C e frase em português (bolo gosto eu de)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "catalogo",
+            "sintatico"
+          ],
+          "evidencias": [
+            "bolo gosto eu de",
+            "if/else"
+          ]
+        },
+        {
+          "paginas": [
+            5
+          ],
+          "assunto": "Definição formal (V, Σ, R, S), símbolos distintos, maiúscula e minúscula, A → α",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "convencoes"
+          ],
+          "evidencias": [
+            "g = (v, σ, r, s)",
+            "maiuscula"
+          ]
+        },
+        {
+          "paginas": [
+            6
+          ],
+          "assunto": "Formalizando o exemplo; aplicação de regra ⇒ e diferença entre → e ⇒",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "convencoes"
+          ],
+          "evidencias": [
+            "um passo"
+          ]
+        },
+        {
+          "paginas": [
+            7
+          ],
+          "assunto": "⇒* (inclui α = β) e definição de árvore sintática",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "convencoes",
+            "ler-arvore"
+          ],
+          "evidencias": [
+            "α ⇒* α",
+            "arvore sintatica"
+          ]
+        },
+        {
+          "paginas": [
+            8
+          ],
+          "assunto": "Árvore do exemplo; segunda gramática A → 0A1 | ε",
+          "antes": "ja-coberto",
+          "justificativa": "Já explicado na aula 01; aqui entra como link e com o que o vídeo acrescenta.",
+          "consulta": [
+            "ler-arvore",
+            "catalogo"
+          ],
+          "evidencias": [
+            "a → 0a1 | ε",
+            "folha ε"
+          ]
+        },
+        {
+          "paginas": [
+            9
+          ],
+          "assunto": "Leitura da cadeia gerada pela árvore em ordem; árvore não binária",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "ler-arvore"
+          ],
+          "evidencias": [
+            "percurso em ordem",
+            "nao e binaria"
+          ]
+        },
+        {
+          "paginas": [
+            10
+          ],
+          "assunto": "Gramática de 5 regras dos palíndromos; derivando 1001001",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "ler-arvore",
+            "catalogo"
+          ],
+          "evidencias": [
+            "1001001"
+          ]
+        },
+        {
+          "paginas": [
+            11
+          ],
+          "assunto": "Linguagem da gramática L(G)",
+          "antes": "ja-coberto",
+          "justificativa": "Já explicado na aula 01; aqui entra como link e com o que o vídeo acrescenta.",
+          "consulta": [
+            "convencoes"
+          ],
+          "evidencias": [
+            "l(g) e a linguagem da variavel inicial"
+          ]
+        },
+        {
+          "paginas": [
+            12
+          ],
+          "assunto": "Intuição: P gera cadeias iguais ao reverso",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "catalogo"
+          ],
+          "evidencias": [
+            "palindromos"
+          ]
+        },
+        {
+          "paginas": [
+            13
+          ],
+          "assunto": "Não confiar só em exemplos: justificar",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "qual-linguagem"
+          ],
+          "evidencias": [
+            "confiar so nos exemplos"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "carla-glc-ex1",
+      "url": "https://www.youtube.com/watch?v=nFosAsJ1ymo",
+      "escopo": "Carla Quem Disse, GLCs: mais exemplos (parte 1), 38:15; unidades = blocos de 2 minutos da transcrição (1 = 0:00–2:00)",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube, extraída do painel de transcrição do vídeo e lida inteira. Trechos com reconhecimento ruim foram interpretados pelo contexto, sem inventar conteúdo.",
+      "totalUnidades": 20,
+      "unidades": [
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "Os dois problemas; G1 = P → aP | Pb | ε, gerando exemplos",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "qual-linguagem"
+          ],
+          "evidencias": [
+            "p → ap | pb | ε"
+          ]
+        },
+        {
+          "paginas": [
+            2
+          ],
+          "assunto": "Árvore e percurso em ordem, não binária",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "ler-arvore"
+          ],
+          "evidencias": [
+            "nao e binaria"
+          ]
+        },
+        {
+          "paginas": [
+            3
+          ],
+          "assunto": "Invariante: os a ficam à esquerda de P e os b à direita; chute aⁿbᵐ",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "qual-linguagem"
+          ],
+          "evidencias": [
+            "nunca aparece b antes de a"
+          ]
+        },
+        {
+          "paginas": [
+            4
+          ],
+          "assunto": "Justificar L(G) = X nos dois sentidos",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "qual-linguagem"
+          ],
+          "evidencias": [
+            "os dois lados"
+          ]
+        },
+        {
+          "paginas": [
+            5
+          ],
+          "assunto": "G2 = P → aP | bP | ε",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "qual-linguagem",
+            "catalogo"
+          ],
+          "evidencias": [
+            "gera qualquer coisa"
+          ]
+        },
+        {
+          "paginas": [
+            6
+          ],
+          "assunto": "Justificativa de Σ* e uso do bloco 'qualquer coisa' em outras gramáticas",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "construir"
+          ],
+          "evidencias": [
+            "qualquer coisa"
+          ]
+        },
+        {
+          "paginas": [
+            7
+          ],
+          "assunto": "G3 = S → SS | iS | iSeS | ε; escolha da variável; derivação mais à esquerda",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "catalogo",
+            "uma-arvore"
+          ],
+          "evidencias": [
+            "s → ss | is | ises | ε",
+            "mais a esquerda"
+          ]
+        },
+        {
+          "paginas": [
+            8
+          ],
+          "assunto": "SS concatena; árvore com 4 filhos",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "catalogo",
+            "construir"
+          ],
+          "evidencias": [
+            "sequencia"
+          ]
+        },
+        {
+          "paginas": [
+            9
+          ],
+          "assunto": "A árvore não mostra a ordem; várias derivações chegam na mesma cadeia",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "uma-arvore"
+          ],
+          "evidencias": [
+            "a arvore nao guarda essa escolha"
+          ]
+        },
+        {
+          "paginas": [
+            10
+          ],
+          "assunto": "Outra árvore para a mesma cadeia; sequências de if/else",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "catalogo",
+            "uma-arvore"
+          ],
+          "evidencias": [
+            "corpo do if"
+          ]
+        },
+        {
+          "paginas": [
+            11
+          ],
+          "assunto": "Justificativa do if/else; G4 com S, T e X",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "catalogo",
+            "convencoes"
+          ],
+          "evidencias": [
+            "s → tt | x"
+          ]
+        },
+        {
+          "paginas": [
+            12
+          ],
+          "assunto": "Derivando 0#00#0; regras de S não misturam T e X",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "convencoes"
+          ],
+          "evidencias": [
+            "zeros do meio se juntam"
+          ]
+        },
+        {
+          "paginas": [
+            13
+          ],
+          "assunto": "X → 0X00 | #: dois zeros à direita para cada um à esquerda",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "convencoes"
+          ],
+          "evidencias": [
+            "0ⁿ#0²ⁿ"
+          ]
+        },
+        {
+          "paginas": [
+            14
+          ],
+          "assunto": "Descrição da linguagem de G4",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "convencoes"
+          ],
+          "evidencias": [
+            "0ⁱ#0ʲ#0ᵏ"
+          ]
+        },
+        {
+          "paginas": [
+            15
+          ],
+          "assunto": "Cada variável gera a sua linguagem",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "convencoes"
+          ],
+          "evidencias": [
+            "linguagem da variavel inicial"
+          ]
+        },
+        {
+          "paginas": [
+            16
+          ],
+          "assunto": "Justificativa de X e de S",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "convencoes"
+          ],
+          "evidencias": [
+            "s escolhe"
+          ]
+        },
+        {
+          "paginas": [
+            17
+          ],
+          "assunto": "G5 = S → aSbS | bSaS | ε",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "catalogo"
+          ],
+          "evidencias": [
+            "tantos a quanto b"
+          ]
+        },
+        {
+          "paginas": [
+            18
+          ],
+          "assunto": "Árvore de G5; a e b gerados casados",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "catalogo",
+            "construir"
+          ],
+          "evidencias": [
+            "nasce na mesma regra"
+          ]
+        },
+        {
+          "paginas": [
+            19
+          ],
+          "assunto": "Justificativa; a linguagem não é regular",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "catalogo"
+          ],
+          "evidencias": [
+            "nao e regular"
+          ]
+        },
+        {
+          "paginas": [
+            20
+          ],
+          "assunto": "As cinco linguagens são livres do contexto por definição",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "catalogo"
+          ],
+          "evidencias": [
+            "pela propria definicao"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "carla-glc-ex2",
+      "url": "https://www.youtube.com/watch?v=egWpcPXe1ak",
+      "escopo": "Carla Quem Disse, GLCs: mais exemplos (parte 2), 26:25; unidades = blocos de 2 minutos da transcrição (1 = 0:00–2:00)",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube, extraída do painel de transcrição do vídeo e lida inteira. Trechos com reconhecimento ruim foram interpretados pelo contexto, sem inventar conteúdo.",
+      "totalUnidades": 14,
+      "unidades": [
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "Dada L, construir G; não achar não prova; L1 (≥ três 1)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "construir",
+            "exemplos-l"
+          ],
+          "evidencias": [
+            "nao achar nao prova",
+            "pelo menos tres 1"
+          ]
+        },
+        {
+          "paginas": [
+            2
+          ],
+          "assunto": "L2 vazia, L3 parênteses, L4 wwᴿ, L5, L6 (lista)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "exemplos-l"
+          ],
+          "evidencias": [
+            "parenteses balanceados",
+            "wwᴿ"
+          ]
+        },
+        {
+          "paginas": [
+            3
+          ],
+          "assunto": "Formato genérico α1β1γ1λ",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "exemplos-l"
+          ],
+          "evidencias": [
+            "α1β1γ1λ"
+          ]
+        },
+        {
+          "paginas": [
+            4
+          ],
+          "assunto": "T gera qualquer coisa; justificativa de L1",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "exemplos-l",
+            "construir"
+          ],
+          "evidencias": [
+            "t → 0t | 1t | ε"
+          ]
+        },
+        {
+          "paginas": [
+            5
+          ],
+          "assunto": "Linguagem vazia: variáveis que nunca somem",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "exemplos-l",
+            "construir"
+          ],
+          "evidencias": [
+            "nenhuma derivacao termina",
+            "s nunca some"
+          ]
+        },
+        {
+          "paginas": [
+            6
+          ],
+          "assunto": "Parênteses: ( α ) e concatenação; gramática e justificativa",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "exemplos-l"
+          ],
+          "evidencias": [
+            "(s) | ss | ε"
+          ]
+        },
+        {
+          "paginas": [
+            7
+          ],
+          "assunto": "wwᴿ: palíndromos de tamanho par",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "exemplos-l"
+          ],
+          "evidencias": [
+            "101 nao entra"
+          ]
+        },
+        {
+          "paginas": [
+            8
+          ],
+          "assunto": "S → aSa | bSb | ε e justificativa",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "exemplos-l"
+          ],
+          "evidencias": [
+            "s → asa | bsb | ε"
+          ]
+        },
+        {
+          "paginas": [
+            9
+          ],
+          "assunto": "L5: dividir os b em dois grupos",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "exemplos-l"
+          ],
+          "evidencias": [
+            "separe os b em dois grupos"
+          ]
+        },
+        {
+          "paginas": [
+            10
+          ],
+          "assunto": "Posição da variável na regra (aXbb e não abbX)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "construir"
+          ],
+          "evidencias": [
+            "x → abbx"
+          ]
+        },
+        {
+          "paginas": [
+            11
+          ],
+          "assunto": "Justificativa de X, Y e S; início de L6",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "exemplos-l"
+          ],
+          "evidencias": [
+            "x vem antes de y"
+          ]
+        },
+        {
+          "paginas": [
+            12
+          ],
+          "assunto": "L6: n ≠ m como união; não dá para gerar a e b soltos",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "exemplos-l",
+            "construir"
+          ],
+          "evidencias": [
+            "pelo menos um a",
+            "cada um cresce sem controle"
+          ]
+        },
+        {
+          "paginas": [
+            13
+          ],
+          "assunto": "Variáveis auxiliares A e B que não se misturam; justificativa",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "exemplos-l"
+          ],
+          "evidencias": [
+            "a e b nao se misturam"
+          ]
+        },
+        {
+          "paginas": [
+            14
+          ],
+          "assunto": "Fechamento da justificativa de L6",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "exemplos-l"
+          ],
+          "evidencias": [
+            "gere casado"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "carla-jflap",
+      "url": "https://www.youtube.com/watch?v=3EqWy6rQAgE",
+      "escopo": "Carla Quem Disse, Simulando GLCs e APs, 3:51; unidades = blocos de 2 minutos da transcrição (1 = 0:00–2:00)",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube, extraída do painel de transcrição do vídeo e lida inteira. Trechos com reconhecimento ruim foram interpretados pelo contexto, sem inventar conteúdo.",
+      "totalUnidades": 2,
+      "unidades": [
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "JFLAP: entrada de gramática, teste de tipo (CFG, regular, linear à direita), conversão para AP (LL/LR)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "jflap-glc"
+          ],
+          "evidencias": [
+            "linear a direita",
+            "convert cfg to pda"
+          ]
+        },
+        {
+          "paginas": [
+            2
+          ],
+          "assunto": "AP de 0ⁿ1ⁿ com 4 estados, Single Character Input, aceitação por estado final",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "jflap-glc"
+          ],
+          "evidencias": [
+            "0011 e aceita",
+            "estado final"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "carla-discussao",
+      "url": "https://www.youtube.com/watch?v=EtDUzu-ghy0",
+      "escopo": "Carla Quem Disse, Discussão sobre GLCs, 15:24; unidades = blocos de 2 minutos da transcrição (1 = 0:00–2:00)",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube, extraída do painel de transcrição do vídeo e lida inteira. Trechos com reconhecimento ruim foram interpretados pelo contexto, sem inventar conteúdo.",
+      "totalUnidades": 8,
+      "unidades": [
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "Gramática ambígua; d+d*d com duas árvores; por que é ruim em compiladores",
+          "antes": "ja-coberto",
+          "justificativa": "Já explicado na aula 01; aqui entra como link e com o que o vídeo acrescenta.",
+          "consulta": [
+            "ambigua"
+          ],
+          "evidencias": [
+            "d+d*d",
+            "duas arvores"
+          ]
+        },
+        {
+          "paginas": [
+            2
+          ],
+          "assunto": "Sem algoritmo para decidir ou remover ambiguidade; técnicas para linguagens de programação; inerentemente ambíguas",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "ambigua",
+            "precedencia"
+          ],
+          "evidencias": [
+            "inerentemente ambiguas",
+            "existem tecnicas"
+          ]
+        },
+        {
+          "paginas": [
+            3
+          ],
+          "assunto": "Derivações diferentes sem ambiguidade; mais à esquerda única; definição da FNC",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "ambigua",
+            "uma-arvore",
+            "fnc"
+          ],
+          "evidencias": [
+            "duas derivacoes quaisquer nao bastam",
+            "a → bc"
+          ]
+        },
+        {
+          "paginas": [
+            4
+          ],
+          "assunto": "Teorema da FNC e utilidade; início da troca de subárvores",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "fnc",
+            "subarvore"
+          ],
+          "evidencias": [
+            "toda linguagem livre do contexto tem uma gramatica na fnc"
+          ]
+        },
+        {
+          "paginas": [
+            5
+          ],
+          "assunto": "Trocar subárvore de E por outra com raiz E",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "subarvore"
+          ],
+          "evidencias": [
+            "e ⇒* αeβ"
+          ]
+        },
+        {
+          "paginas": [
+            6
+          ],
+          "assunto": "Generalização αᵏ … βᵏ",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "subarvore"
+          ],
+          "evidencias": [
+            "αᵏ x βᵏ"
+          ]
+        },
+        {
+          "paginas": [
+            7
+          ],
+          "assunto": "Notação compacta (triângulo), altura, caminho raiz-folha com variáveis",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "subarvore"
+          ],
+          "evidencias": [
+            "triangulo",
+            "altura da arvore"
+          ]
+        },
+        {
+          "paginas": [
+            8
+          ],
+          "assunto": "Várias árvores para a mesma cadeia; a menor; destacar e substituir subárvores",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "subarvore"
+          ],
+          "evidencias": [
+            "a menor"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "carla-fim",
+      "url": "https://www.youtube.com/watch?v=7-ABbECfErM",
+      "escopo": "Carla Quem Disse, Linguagens livres de contexto: o fim!, 4:09; unidades = blocos de 2 minutos da transcrição (1 = 0:00–2:00)",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube, extraída do painel de transcrição do vídeo e lida inteira. Trechos com reconhecimento ruim foram interpretados pelo contexto, sem inventar conteúdo.",
+      "totalUnidades": 3,
+      "unidades": [
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "LLC = GLC = AP; regulares ⊂ LLC; problema da soma",
+          "antes": "ja-coberto",
+          "justificativa": "Já explicado na aula 01; aqui entra como link e com o que o vídeo acrescenta.",
+          "consulta": [
+            "decisao"
+          ],
+          "evidencias": [
+            "abbccc"
+          ]
+        },
+        {
+          "paginas": [
+            2
+          ],
+          "assunto": "Palíndromos, parênteses, programas em C; problemas decidíveis sobre GLCs",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "decisao"
+          ],
+          "evidencias": [
+            "g gera a palavra w",
+            "programas sintaticamente corretos"
+          ]
+        },
+        {
+          "paginas": [
+            3
+          ],
+          "assunto": "O que é difícil; mapa das classes; exemplo fora das LLC",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "decisao"
+          ],
+          "evidencias": [
+            "aⁿbⁿcⁿ"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "resina-entradas",
+      "url": "https://drive.google.com/file/d/13rsXlBIBu3gmc0WRAO8XwDpf4G98hXVg",
+      "escopo": "entradas.txt da dinâmica de 27/10 (dois códigos de teste)",
+      "acesso": "integral",
+      "metodo": "Lido inteiro pelo conector do Google Drive.",
+      "totalUnidades": 1,
+      "unidades": [
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "codigo_teste_1 e codigo_teste_2 (com @)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Os dois testes viram os exemplos da gramática do projeto.",
+          "consulta": [
+            "sintatico"
+          ],
+          "evidencias": [
+            "b = (y - 2) * z;",
+            "z = x @ y;"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "resina-slides-02",
+      "url": "https://drive.google.com/file/d/1mGV9NRZk12v5u9l3TMXluj8hUXh3-cvk",
+      "escopo": "Slides do encontro de 27/10, Análise Léxica (prof. Resina)",
+      "acesso": "parcial",
+      "limitacao": "Lido o texto extraído pelo conector do Drive; diagramas e figuras não foram conferidos visualmente. Usados a prévia da análise sintática (S → SN SV, árvore de 'O gato bebe leite', L₁ e L₂), o exemplo lexicamente certo e sintaticamente errado e a tabela de tokens da dinâmica. O resto pertence à aula 07 e ainda não foi integrado lá."
+    },
+    {
+      "id": "resina-slides-01",
+      "url": "src/aulas/m8/comp/01-conceitos/notas/slides-conceitos-m8.pdf",
+      "escopo": "Slides da aula 01: roteiro das ponderadas e linguagens de exemplo",
+      "acesso": "parcial",
+      "limitacao": "Usados só o roteiro (semana 4: autômatos, linguagens formais e gramáticas) e as linguagens de exemplo nos exercícios de treino; o resto pertence à aula 01."
+    },
+    {
+      "id": "barbosa-1",
+      "url": "sem URL: livro indicado no roteiro de autoestudo",
+      "escopo": "Barbosa et al., Compiladores, Sintaxe de linguagens de programação, seção Gramáticas livres de contexto, p. 33–43",
+      "acesso": "indisponivel",
+      "limitacao": "O livro não estava acessível (nem no Drive compartilhado, nem localmente). Nada da aula vem dele; não declarar cobertura."
+    },
+    {
+      "id": "barbosa-2",
+      "url": "sem URL: livro indicado no roteiro de autoestudo",
+      "escopo": "Barbosa et al., Compiladores, cap. 3, Gramáticas livres de contexto, p. 33–46",
+      "acesso": "indisponivel",
+      "limitacao": "O livro não estava acessível (nem no Drive compartilhado, nem localmente). Nada da aula vem dele; não declarar cobertura."
+    }
+  ]
+}

@@ -49,12 +49,38 @@ export function initGlossary(G, { listar = Object.keys(G), global = null, secaoD
   /* termos no texto: primeira ocorrência de cada termo por seção vira botão */
   const form2key = new Map(); keys.forEach((k) => G[k].m.forEach((f) => { if (!form2key.has(f.toLowerCase())) form2key.set(f.toLowerCase(), k); }));
   const forms = [...form2key.keys()].sort((a, b) => b.length - a.length).map((f) => f.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  /* links escritos à mão para a seção dona de um termo (nesta página ou na aula de origem) também abrem a
+     janelinha no 1º clique; o 2º segue o link. Casa pelo texto do link ou, se não der, pelo destino. */
+  const semFim = (p) => p.replace(/\/consulta\/?$/, '').replace(/\/$/, '');
+  const porDestino = new Map();
+  const anotar = (dest, k) => { if (!porDestino.has(dest)) porDestino.set(dest, []); porDestino.get(dest).push(k); };
+  keys.forEach((k) => {
+    if (secaoDe && secaoDe[k]) anotar(`#${secaoDe[k]}`, k);
+    const o = G[k].origem; if (!o) return;
+    const u = new URL(o.href, location.href); anotar(semFim(u.pathname) + u.hash, k);
+  });
+  function termoDoLink(a) {
+    const href = a.getAttribute('href') || '';
+    const txt = a.textContent.trim().toLowerCase();
+    if (/^aula\s*\d+/.test(txt)) return null; /* "aula 02" é link para a aula, não para um termo */
+    const u = new URL(href, location.href);
+    const aqui = u.pathname === location.pathname && href.startsWith('#');
+    const cand = (aqui ? porDestino.get(u.hash) : porDestino.get(semFim(u.pathname) + u.hash)) || [];
+    return form2key.get(txt) || cand.find((c) => c === u.hash.slice(1)) || (cand.length === 1 ? cand[0] : null);
+  }
+  const SKIP = 'code,h1,h2,h3,figure,.src,.formula,button,a,.gterm,.num,.lab,.widget,.tbl,.cards,.cheat,#glossario,section.fontes,.mn,.kicker,footer,summary';
+  const SKIP_LINK = SKIP.split(',').filter((s) => s !== 'a' && s !== '.gterm').join(',');
   if (forms.length) {
     const re = new RegExp('(?<![\\p{L}\\p{N}*⁺-])(' + forms.join('|') + ')(?![\\p{L}\\p{N}-])', 'giu');
-    const SKIP = 'code,h1,h2,h3,figure,.src,.formula,button,a,.gterm,.num,.lab,.widget,.tbl,.cards,.cheat,#glossario,section.fontes,.mn,.kicker,footer,summary';
     document.querySelectorAll('section.chap, section.cs').forEach((sec) => {
       if (sec.id === 'glossario' || sec.id === 'revisao' || sec.id === 'cola') return;
-      const seen = new Set(); const tw = document.createTreeWalker(sec, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement.closest(SKIP) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
+      const seen = new Set();
+      sec.querySelectorAll('a[href]:not(.gterm)').forEach((a) => {
+        if (a.closest(SKIP_LINK) || a.querySelector('*')) return;
+        const k = termoDoLink(a); if (!k || !G[k]) return;
+        a.classList.add('gterm', 'glink'); a.dataset.g = k; seen.add(k);
+      });
+      const tw = document.createTreeWalker(sec, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement.closest(SKIP) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
       const nodes = []; while (tw.nextNode()) nodes.push(tw.currentNode);
       nodes.forEach((node) => {
         const txt = node.nodeValue; re.lastIndex = 0; let m, last = 0; const frag = document.createDocumentFragment(); let changed = false;
@@ -86,7 +112,9 @@ export function initGlossary(G, { listar = Object.keys(G), global = null, secaoD
   }
   function openPop(k, el) {
     const e = G[k]; if (!e) return; anchor = el;
-    const ir = destino(k);
+    /* link escrito à mão: o destino é o do próprio link */
+    const href = el.tagName === 'A' && el.getAttribute('href');
+    const ir = href && !href.startsWith('#') ? { href, rotulo: e.origem ? e.origem.rotulo : 'abrir o link' } : destino(k);
     const nome = ir ? `<a class="p-term" href="${ir.href}" title="${ir.rotulo}">${e.t}</a>` : `<div class="p-term">${e.t}</div>`;
     pop.innerHTML = nome + (e.f ? `<div class="p-f">${e.f}</div>` : '') + `<div class="p-def">${e.d}</div>` + (e.a ? `<div class="p-a"><span class="gl-k">como se fosse</span>${e.a}</div>` : '') + (e.x ? `<div class="p-x"><span class="gl-k">pra ir além</span>${e.x}</div>` : '') +
       `<div class="p-foot">${(e.see || []).filter((s) => G[s]).map((s) => `<button class="seebtn" type="button" data-see="${s}">${G[s].t}</button>`).join('')}${ir ? `<a class="seebtn p-go" href="${ir.href}">${ir.rotulo} →</a>` : ''}</div>`;

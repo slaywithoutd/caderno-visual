@@ -98,7 +98,7 @@ export const glossarioGlobal = (() => {
       }
     }
     for (const [k, v] of Object.entries(a.glossario)) {
-      if (!G[k]) G[k] = { ...v, origem: { rotulo: `${mat ? mat.titulo : a.materia} · ${a.titulo}`, href: `${a.href}#${destinosConsulta[k] || `gl-${k}`}`, aula: a.id, tema: a.tema || '' } };
+      if (!G[k]) G[k] = { ...v, origem: { rotulo: `${mat ? mat.titulo : a.materia} · ${a.titulo}`, href: `${a.href}#${destinosConsulta[k] || `gl-${k}`}`, aula: a.id, materia: `${a.modulo}/${a.materia}`, tema: a.tema || '' } };
     }
   }
   return G;
@@ -106,10 +106,14 @@ export const glossarioGlobal = (() => {
 
 /* Termos que viram link numa aula: os do glossário global que vêm de aulas do mesmo eixo (tema).
    Termos de outro eixo davam falso positivo ("conjunto" de linguagens formais dentro de "associativa em
-   conjunto" de cache); eles continuam no glossário coletivo, só não viram link aqui. */
+   conjunto" de cache); eles continuam no glossário coletivo, só não viram link aqui.
+   Exceção: o verbete com `alcance: 'materia'` vale em toda aula da mesma matéria (compilador, processo…),
+   e o com `alcance: 'todas'` vale em qualquer aula (LGPD, tecnologia assistiva). */
 export function glossarioDaAula(aula) {
   const tema = (aula.tema || '').toLowerCase();
-  return Object.fromEntries(Object.entries(glossarioGlobal).filter(([k, e]) => aula.glossario[k] || (e.origem.tema || '').toLowerCase() === tema));
+  const mat = `${aula.modulo}/${aula.materia}`;
+  const vale = (e) => (e.origem.tema || '').toLowerCase() === tema || e.alcance === 'todas' || (e.alcance === 'materia' && e.origem.materia === mat);
+  return Object.fromEntries(Object.entries(glossarioGlobal).filter(([k, e]) => aula.glossario[k] || vale(e)));
 }
 
 /* Destaques "cai na prova": <p class="prova"> no conteúdo e "> [!prova]" nas notas */

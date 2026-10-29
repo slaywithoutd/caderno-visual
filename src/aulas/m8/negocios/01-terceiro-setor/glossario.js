@@ -49,6 +49,6 @@ export default {
   'teoria-mudanca': { t: 'Teoria da mudança', m: ['teoria da mudança'], d: 'Mapa que liga o que você investe ao efeito que quer causar: insumos, atividades, produtos, resultados e impacto. Deixa explícito por que a ação deveria funcionar.' },
   'indicador': { t: 'Indicador', m: ['indicador', 'indicadores'], d: 'Medida observável que permite acompanhar se algo está acontecendo, como o número de etapas de uma rotina concluídas sem ajuda.' },
   'governanca': { t: 'Governança', m: ['governança'], d: 'Regras sobre quem decide, quem responde e como se presta conta numa organização ou num projeto.' },
-  'lgpd': { t: 'LGPD', m: ['lgpd', 'lei geral de proteção de dados'], d: 'Lei 13.709/2018, que regula o tratamento de dados pessoais. Dados sobre saúde são dados pessoais sensíveis e pedem cuidado extra, como base legal clara e coleta mínima.' },
+  'lgpd': { t: 'LGPD', m: ['lgpd', 'lei geral de proteção de dados'], d: 'Lei 13.709/2018, que regula o tratamento de dados pessoais. Dados sobre saúde são dados pessoais sensíveis e pedem cuidado extra, como base legal clara e coleta mínima.', alcance: 'todas' },
   'mvp': { t: 'MVP (produto mínimo viável)', m: ['mvp', 'produto mínimo viável'], d: 'A versão mais simples de um produto que já permite testar a ideia com usuários reais.' },
 };

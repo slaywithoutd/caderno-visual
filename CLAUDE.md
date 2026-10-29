@@ -304,6 +304,13 @@ export default {
 };
 ```
 
+Termos só viram link nas aulas do mesmo eixo (palavras como "conjunto" ou "estado" mudam de sentido
+entre eixos). Verbete que vale fora do eixo ganha `alcance: 'materia'` (toda aula da matéria: compilador,
+processo, thread, bytecode…) ou `alcance: 'todas'` (qualquer aula: LGPD, tecnologia assistiva).
+
+Link escrito à mão cujo texto é um termo, ou que aponta para a seção dona de um termo (nesta aula ou em
+outra), também abre a janelinha no 1º clique e segue o link no 2º. "aula 02" continua link direto.
+
 Se a chave já existe em outra aula, **não** redefina: o glossário global usa a primeira definição (a da aula
 mais antiga). Toda chave em `see` precisa existir (em qualquer aula). `m` em minúsculas, do mais específico ao mais geral. Evite formas
 curtas demais que casam com palavras comuns.
@@ -405,7 +412,9 @@ banqueiro" porque o livro brasileiro usa assim).
   As barras não passam por cima do texto. Figura decide 1 ou 2 colunas pela própria largura
   (`@container fig`). Blocos com fundo ou borda são `flow-root`, para encolher ao lado de um desenho.
 - Termo do glossário no texto: o 1º clique abre a janelinha (definição, fórmula, ver também); o 2º clique,
-  no termo ou no nome dentro da janelinha, leva à seção dona do termo (`src/lib/glossary.js`).
+  no termo ou no nome dentro da janelinha, leva à seção dona do termo (`src/lib/glossary.js`). Vale para
+  termo de outra aula (a janelinha mostra a definição de lá; o 2º clique vai para a aula de origem) e para
+  link escrito à mão que aponta para um termo.
 - Home: matérias e eixos são retráteis (`details`), e o que a dona fecha continua fechado. Aulas por data
   do encontro.
 - Nenhuma animação roda (nem com o mouse em cima, nem loop) sem que **pelo menos 80%** dela esteja na

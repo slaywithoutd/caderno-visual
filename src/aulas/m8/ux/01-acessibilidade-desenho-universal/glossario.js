@@ -14,7 +14,7 @@ export default {
   'ux-tolerancia-erro': { t: 'Tolerância ao erro', m: ['tolerância ao erro'], d: 'Reduzir riscos e consequências de ações acidentais, com prevenção e recuperação apropriadas.' },
   'ux-baixo-esforco': { t: 'Baixo esforço físico', m: ['baixo esforço físico'], d: 'Permitir uso confortável sem força, repetição ou posturas cansativas desnecessárias.' },
   'ux-espaco-alcance': { t: 'Tamanho e espaço para aproximação e uso', m: ['tamanho e espaço para aproximação e uso'], d: 'Considerar aproximação, alcance, postura e espaço para corpos e recursos de apoio diferentes.' },
-  'ux-ta': { t: 'Tecnologia assistiva', m: ['tecnologia assistiva', 'assistive technology'], d: 'Área interdisciplinar de recursos e serviços que favorecem funcionalidade, participação e independência.' },
+  'ux-ta': { t: 'Tecnologia assistiva', m: ['tecnologia assistiva', 'assistive technology'], d: 'Área interdisciplinar de recursos e serviços que favorecem funcionalidade, participação e independência.', alcance: 'todas' },
   'ux-recurso': { t: 'Recurso assistivo', m: ['recurso assistivo'], d: 'Produto, equipamento ou outro meio utilizado para apoiar uma atividade.' },
   'ux-servico': { t: 'Serviço assistivo', m: ['serviço assistivo'], d: 'Apoio à avaliação, escolha, adaptação e aprendizagem de uso dos recursos assistivos.' },
   'ux-caa': { t: 'Comunicação aumentativa e alternativa', m: ['comunicação aumentativa e alternativa', 'CAA'], d: 'Meios que complementam ou substituem a fala conforme a necessidade, como pranchas de símbolos.' },

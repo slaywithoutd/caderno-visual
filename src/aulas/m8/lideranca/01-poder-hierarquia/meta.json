@@ -1,0 +1,49 @@
+{
+  "numero": "01",
+  "data": "2026-10-30",
+  "titulo": "Poder, hierarquia e voz: o caso Challenger",
+  "tema": "Poder nas organizações",
+  "modos": [
+    "consulta"
+  ],
+  "resumo": "Como o poder circula numa organização, quando a hierarquia ajuda e quando ela cala quem sabe. As quatro chaves de uma hierarquia saudável e o desastre da Challenger como caso.",
+  "topicos": [
+    "Poder e autoridade",
+    "Para que serve a hierarquia",
+    "Quatro chaves de uma hierarquia saudável",
+    "Challenger: a falha técnica",
+    "Challenger: a decisão de lançar",
+    "Lições sobre voz e segurança"
+  ],
+  "secoes": [],
+  "fontes": [
+    {
+      "tipo": "Vídeo",
+      "titulo": "Ciência Todo Dia · O erro que explodiu um ônibus espacial",
+      "url": "https://www.youtube.com/watch?v=NRM6MDdeHIk",
+      "duracao": "22 min",
+      "secao": "challenger",
+      "nota": "Autoestudo. Transcrição em português conferida do começo ao fim. Dois detalhes técnicos do vídeo estão corrigidos numa curiosidade."
+    },
+    {
+      "tipo": "Livro",
+      "titulo": "Tajra, S. F.; Santos, N. · Planejamento e liderança: conceitos, estratégias e comportamento humano, seção 9.4 (p. 121 a 123)",
+      "nota": "Autoestudo indicado, mas as páginas não foram acessadas e a edição não foi identificada. Nada desta aula é atribuído ao livro. A seção Poder é base de fora dos autoestudos."
+    },
+    {
+      "tipo": "Artigo",
+      "titulo": "Greater Good · Four Keys to a Healthy Workplace Hierarchy (Lindred Greer, 29/09/2020)",
+      "url": "https://greatergood.berkeley.edu/article/item/four_keys_to_a_healthy_workplace_hierarchy",
+      "secao": "hierarquia",
+      "nota": "Autoestudo. Lido por inteiro."
+    },
+    {
+      "tipo": "Relatório",
+      "titulo": "Report of the Presidential Commission on the Space Shuttle Challenger Accident (1986), apêndice F (Feynman)",
+      "url": "https://www.nasa.gov/history/rogersrep/genindex.htm",
+      "secao": "comissao",
+      "nota": "Fora do autoestudo. Usado só nas curiosidades."
+    }
+  ],
+  "observacao": "Síntese do vídeo e do artigo. O capítulo do livro não foi lido: a seção Poder traz vocabulário clássico (French e Raven, 1959) para você chegar ao encontro com base, sem prometer que é o que as autoras dizem. Caixas tracejadas marcadas como Curiosidade são repertório de fora dos autoestudos: não entram na revisão nem são matéria de prova. A seção de lições e os exercícios são leitura autoral, não do professor."
+}

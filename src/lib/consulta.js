@@ -89,7 +89,7 @@ const SEMPRE_ABERTAS = new Set(['encontro']);
 const ESSENCIAL = 'h2, .cs-def, .cs-resumo, .cs-formula, p.prova, aside.mn, figure, .tbl, .widget';
 const LINHAS_MIN = 5;
 const PARTES = [
-  ['.cs-uso', 'como usar'], ['.cs-pegadinhas', 'pegadinhas'], ['.cs-ponderada', 'ponderada'], ['pre', 'código'],
+  ['.cs-uso', 'como usar'], ['.cs-pegadinhas', 'pegadinhas'], ['.cs-ponderada', 'ponderada'], ['pre', 'código'], ['.curio', 'curiosidades'],
 ];
 export function initCompacto({ recolher = true } = {}) {
   const secoes = [...document.querySelectorAll('#aula-root section.cs')];

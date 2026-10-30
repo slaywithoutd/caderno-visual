@@ -619,6 +619,12 @@ section.cs h3{font-size:1.02rem;margin:1.6rem 0 .5rem}
 .cs-resumo::before{content:'Em resumo';display:block;font-size:.68rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--green);margin-bottom:.35rem}
 .cs-resumo p,.cs-resumo ul.b{margin:.3rem 0;max-width:none}
 .cs-resumo .cs-fonte{font-size:.8rem;color:var(--muted);margin-top:.5rem}
+/* Curiosidade: repertório de fora dos autoestudos. Borda tracejada e rótulo próprio para não se confundir com a matéria;
+   nunca leva p.prova e não entra na revisão. */
+.curio{margin:1rem 0 1.2rem;padding:10px 16px;border:1px dashed var(--line2);border-radius:10px;background:var(--surface2);color:var(--fg2)}
+.curio::before{content:'Curiosidade · fora do autoestudo · não cai na prova';display:block;font-size:.68rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem}
+.curio p,.curio ul.b{margin:.3rem 0;max-width:none}
+.curio .cs-fonte{font-size:.8rem;color:var(--muted);margin-top:.5rem}
 details.cs-detalhes{margin:.6rem 0 0}
 details.cs-detalhes > summary{cursor:pointer;list-style:none;display:inline-flex;gap:8px;align-items:baseline;font-size:.84rem;font-weight:600;color:var(--accent);padding:4px 0}
 details.cs-detalhes > summary::-webkit-details-marker{display:none}
@@ -667,7 +673,7 @@ a.gterm.glink:hover{color:var(--accent)}
 section.cs aside.mn{float:right;clear:right;width:min(42%,250px);margin:.25rem 0 .9rem 24px}
 html.margem-livre section.cs aside.mn{width:240px;margin:.25rem calc(-240px - 32px) .9rem 0}
 /* só caixas com fundo ou borda: listas e parágrafos contornam o desenho e voltam à largura toda quando ele acaba */
-section.cs :is(.cs-resumo,.cs-formula .formula,.cs-ponderada,pre,.def,p.prova,.tbl,details.treino){display:flow-root}
+section.cs :is(.cs-resumo,.curio,.cs-formula .formula,.cs-ponderada,pre,.def,p.prova,.tbl,details.treino){display:flow-root}
 @container conteudo (max-width:620px){
   section.cs aside.mn,section.cs aside.mn.loop{float:none;width:100%;max-width:320px;margin:.6rem auto 1.2rem}
 }

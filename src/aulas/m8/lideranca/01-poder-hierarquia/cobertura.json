@@ -1,0 +1,50 @@
+{
+  "aula": "m8/lideranca/01-poder-hierarquia",
+  "data": "2026-10-30",
+  "criterio": "Conferência humana do vídeo (transcrição em português, do começo ao fim) e do artigo de Greer (lido por inteiro). O capítulo do livro não foi acessado. Curiosidades (div.curio) e a seção Poder são complementos de fora do autoestudo, marcados como tal e fora da revisão.",
+  "fontes": [
+    {
+      "id": "video-challenger",
+      "url": "https://www.youtube.com/watch?v=NRM6MDdeHIk",
+      "escopo": "Ciência Todo Dia, O erro que explodiu um ônibus espacial, cerca de 22 min. Unidade n = minuto n−1 do vídeo (unidade 1 = 0:00 a 0:59).",
+      "acesso": "integral",
+      "metodo": "Transcrição em português baixada do YouTube e lida inteira. O trecho de propaganda (2:14 a 2:29) não vira conteúdo.",
+      "totalUnidades": 23,
+      "unidades": [
+        { "paginas": [1, 2, 3, 4], "assunto": "Contexto do programa, peças do ônibus espacial, lançamento, pluma aos 58 s e fim aos 73 s, Christa McAuliffe", "antes": "conteudo-novo-da-aula", "justificativa": "Peças e linha do tempo do voo na seção da falha técnica; a meta de 48 voos por ano também.", "consulta": ["challenger"], "evidencias": ["48 voos por ano", "58 s"] },
+        { "paginas": [5, 6], "assunto": "Silêncio da NASA, Comissão Rogers e juntas de campo", "antes": "conteudo-novo-da-aula", "justificativa": "Comissão na seção da investigação; junta de campo e 0,6 s na falha técnica.", "consulta": ["comissao", "challenger"], "evidencias": ["William Rogers", "0,6 s"] },
+        { "paginas": [7], "assunto": "Memorandos de Richard C. Cook", "antes": "conteudo-novo-da-aula", "justificativa": "Os memorandos mostram que o risco era conhecido antes: entram na zona de conforto.", "consulta": ["zona-conforto"], "evidencias": ["Richard C. Cook"] },
+        { "paginas": [8, 9, 10], "assunto": "Depoimento de Mulloy, experimento de Feynman, temperaturas, McDonald ignorado e levantando", "antes": "conteudo-novo-da-aula", "justificativa": "Depoimento e experimento na investigação; as temperaturas na falha técnica.", "consulta": ["comissao", "challenger"], "evidencias": ["água gelada", "12 °C"] },
+        { "paginas": [11, 12, 13], "assunto": "Anéis primário e secundário, criticidade 1R e 1, erosão, fuligem, desencaixe no frio", "antes": "conteudo-novo-da-aula", "justificativa": "Mecanismo na falha técnica (com loop); a sequência de avisos na zona de conforto (com desenho).", "consulta": ["challenger", "zona-conforto"], "evidencias": ["1R", "fuligem"] },
+        { "paginas": [14, 15], "assunto": "Pressão por lançamentos, contratos da Thiokol, expansão da zona de conforto", "antes": "conteudo-novo-da-aula", "justificativa": "Causa organizacional na seção da zona de conforto.", "consulta": ["zona-conforto"], "evidencias": ["contratos"] },
+        { "paginas": [16, 17, 18], "assunto": "Reunião de 27/01: pressão, alerta de McDonald e Boisjoly, Em abril?, inversão do critério, reunião a sós, assinatura", "antes": "conteudo-novo-da-aula", "justificativa": "Seção própria com figura passo a passo.", "consulta": ["reuniao"], "evidencias": ["Em abril", "Kilminster", "30 minutos"] },
+        { "paginas": [19, 20], "assunto": "Linha do tempo da falha no voo e falha na separação entre administração e engenharia", "antes": "conteudo-novo-da-aula", "justificativa": "Linha do tempo na falha técnica; a separação entre decisões na leitura pelas quatro chaves.", "consulta": ["challenger", "licoes"], "evidencias": ["cerca de 2 s"] },
+        { "paginas": [21, 22, 23], "assunto": "Apêndice F de Feynman, segurança retórica, imagem e contratos, lição de respeito e confiança", "antes": "conteudo-novo-da-aula", "justificativa": "Apêndice F e fecho na investigação; a lição abre a seção de lições.", "consulta": ["comissao", "licoes"], "evidencias": ["apêndice F", "respeito e confiança"] }
+      ]
+    },
+    {
+      "id": "artigo-greer",
+      "url": "https://greatergood.berkeley.edu/article/item/four_keys_to_a_healthy_workplace_hierarchy",
+      "escopo": "Lindred Greer, Four Keys to a Healthy Workplace Hierarchy, Greater Good Magazine, 29/09/2020. Unidades: 1 introdução, 2 benefícios e problemas, 3 a 6 as quatro chaves, 7 conclusão.",
+      "acesso": "integral",
+      "metodo": "Página lida por inteiro (HTTP 200). Estudos citados só por link, sem nome de pesquisador; não foram abertos.",
+      "totalUnidades": 7,
+      "unidades": [
+        { "paginas": [1], "assunto": "Tese, holacracia e Zappos", "antes": "conteudo-novo-da-aula", "justificativa": "Na seção sobre para que serve a hierarquia.", "consulta": ["hierarquia"], "evidencias": ["Zappos"] },
+        { "paginas": [2], "assunto": "Mapa da hierarquia, coordenação, basquete, silêncio (2012), revisão com efeito pequeno", "antes": "conteudo-novo-da-aula", "justificativa": "Na seção sobre para que serve a hierarquia, com desenho do efeito médio.", "consulta": ["hierarquia"], "evidencias": ["basquete", "2012", "muito pequeno"] },
+        { "paginas": [3], "assunto": "Chave 1: expertise, deserto (45%), equipes holandesas, hierarquias paralelas", "antes": "conteudo-novo-da-aula", "justificativa": "Seção própria.", "consulta": ["expertise"], "evidencias": ["45%", "holandesas"] },
+        { "paginas": [4], "assunto": "Chave 2: áreas de responsabilidade, Marshmallow Challenge, job crafting", "antes": "conteudo-novo-da-aula", "justificativa": "Seção própria com tabela 2 × 2.", "consulta": ["ownership"], "evidencias": ["Marshmallow Challenge", "seis meses"] },
+        { "paginas": [5], "assunto": "Chave 3: escada × triângulo (2019)", "antes": "conteudo-novo-da-aula", "justificativa": "Seção própria com desenho.", "consulta": ["formato"], "evidencias": ["2019"] },
+        { "paginas": [6], "assunto": "Chave 4: distância de poder, vice, símbolos, imprevisibilidade, vulnerabilidade", "antes": "conteudo-novo-da-aula", "justificativa": "Seção própria com desenho.", "consulta": ["distancia"], "evidencias": ["vulnerável"] },
+        { "paginas": [7], "assunto": "Conclusão: recuar para ouvir, avançar para decidir", "antes": "conteudo-novo-da-aula", "justificativa": "Fecho na seção da chave 4.", "consulta": ["distancia"], "evidencias": ["humildade"] }
+      ]
+    },
+    {
+      "id": "livro-tajra-santos",
+      "url": "https://www.martinsfontespaulista.com.br/planejamento-e-lideranca-745702/p",
+      "escopo": "Tajra e Santos, Planejamento e liderança: conceitos, estratégias e comportamento humano (Érica), seção 9.4, p. 121 a 123. Edição não identificada.",
+      "acesso": "indisponivel",
+      "limitacao": "Nenhuma página acessada (só a ficha do livro em catálogo). Nada é atribuído às autoras; a seção Poder é base de fora dos autoestudos."
+    }
+  ]
+}

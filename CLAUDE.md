@@ -163,6 +163,10 @@ Cada seção:
   </details>
   ```
   Uma seção inteira de base (como "Antes de começar") usa `<span class="base-tag">Base · fora dos autoestudos</span>` no `.src`.
+- **Curiosidade** (repertório de fora dos autoestudos, pedido da dona para Liderança e matérias em que é fácil
+  sair do escopo): `<div class="curio"><p>…</p><p class="cs-fonte">fonte</p></div>`. O CSS põe o rótulo
+  "Curiosidade · fora do autoestudo · não cai na prova" e a borda tracejada. Nunca leva `p.prova`, termo em
+  negrito nem cartão/cola em `revisao.js`, e não entra no Resumo. Sempre com fonte identificada.
 - **Definição em duas camadas** dentro de `.def.key`: `<p class="simples">` (em palavras simples, com
   exemplo) e depois `<p class="formal">` (como está no livro). Notação pesada vai num `<p class="nota-formal">`
   logo abaixo, traduzida símbolo por símbolo.

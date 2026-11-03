@@ -1,0 +1,276 @@
+{
+  "aula": "m8/comp/09-especificacao-linguagem",
+  "data": "2026-11-03",
+  "criterio": "Conferência da transcrição completa do vídeo (blocos de 2 minutos) e do PDF inteiro do artigo (página a página) contra as seções do modo Consulta. Não equivale à leitura da seção 2.4 do livro da Melo, que não foi acessada.",
+  "fontes": [
+    {
+      "id": "jabur-dsl",
+      "url": "https://www.youtube.com/watch?v=qn5uxhP416Q",
+      "escopo": "Thiago Jabur, Domain Specific Language, Linguagem Específica de Domínio, DSL, JetBrains MPS, cerca de 14:15; unidades = blocos de 2 minutos da transcrição (1 = 0:00–2:00)",
+      "acesso": "integral",
+      "metodo": "Transcrição automática em português do YouTube, baixada e lida inteira. Trechos mal reconhecidos (\"marketing Roller\" = Martin Fowler, \"Let's eat\" = LaTeX, \"she Text\" = Xtext) foram interpretados pelo contexto. As telas do vídeo não foram vistas.",
+      "totalUnidades": 8,
+      "unidades": [
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "Definição de DSL, Martin Fowler, menos complexa que GPL, feita com especialistas e usada por não programadores; domínio (médica, tributária, EAD, direito); placas de trânsito; SQL, LaTeX, HTML, Javadoc, TeX",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do trecho.",
+          "consulta": [
+            "dsl"
+          ],
+          "evidencias": [
+            "martin fowler",
+            "placas de transito",
+            "tributos"
+          ]
+        },
+        {
+          "paginas": [
+            2
+          ],
+          "assunto": "UML é DSL?; fórmula do Excel; construtores de telas; linguagem para apps de smartphone",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do trecho.",
+          "consulta": [
+            "dsl"
+          ],
+          "evidencias": [
+            "uml e dsl",
+            "formula do excel",
+            "construtor de telas"
+          ]
+        },
+        {
+          "paginas": [
+            3
+          ],
+          "assunto": "Notação matemática (matrizes, seno, cosseno); modelos lidos por parser geram artefatos; campo das ideias → modelo → mapeamento → código de máquina; vários produtos de um modelo; modelo, plataforma, integração",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do trecho.",
+          "consulta": [
+            "dsl",
+            "modelos"
+          ],
+          "evidencias": [
+            "soma de matrizes",
+            "plataforma",
+            "codigo de maquina"
+          ]
+        },
+        {
+          "paginas": [
+            4
+          ],
+          "assunto": "Vantagens (idioma do domínio, abstração, produtividade, gera código, documentação viva) e desvantagens (custo, especialistas, aprendizado); ferramentas ANTLR e Xtext",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do trecho.",
+          "consulta": [
+            "pros-contras"
+          ],
+          "evidencias": [
+            "documentacao viva",
+            "metamodelagem",
+            "xtext"
+          ]
+        },
+        {
+          "paginas": [
+            5
+          ],
+          "assunto": "JetBrains MPS e metaprogramação; exemplo do artigo de 2010: metamodelo do menu da wiki (menus hierárquicos, título, tipo, profundidade, itens com ação e rótulo)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do trecho.",
+          "consulta": [
+            "pros-contras",
+            "modelos"
+          ],
+          "evidencias": [
+            "metaprogramacao",
+            "profundidade maxima"
+          ]
+        },
+        {
+          "paginas": [
+            6
+          ],
+          "assunto": "Modelo preenchido (Sobre nós, Estatutos 2010 e 2009); geração de menu web acessível; trocar geradores mantendo o modelo; usuários sem novo treino",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do trecho.",
+          "consulta": [
+            "modelos"
+          ],
+          "evidencias": [
+            "estatutos",
+            "leitor de tela",
+            "bootstrap"
+          ]
+        },
+        {
+          "paginas": [
+            7
+          ],
+          "assunto": "Questão de concurso AOCP 2016: qual alternativa é DSL (HTML)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do trecho.",
+          "consulta": [
+            "dsl"
+          ],
+          "evidencias": [
+            "aocp",
+            "html"
+          ]
+        },
+        {
+          "paginas": [
+            8
+          ],
+          "assunto": "Encerramento do vídeo, sem conteúdo novo",
+          "antes": "ja-coberto",
+          "justificativa": "Só despedida; nada a cobrir.",
+          "consulta": [
+            "dsl"
+          ],
+          "evidencias": []
+        }
+      ]
+    },
+    {
+      "id": "karsai-guidelines",
+      "url": "https://arxiv.org/pdf/1409.2378",
+      "escopo": "Karsai, Krahn, Pinkernell, Rumpe, Schindler e Völkel, Design guidelines for domain specific languages, DSM'09; unidades = páginas do PDF (6). Trecho indicado: seção 2, p. 2–6",
+      "acesso": "integral",
+      "metodo": "PDF baixado do arXiv e extraído com pdftotext; texto lido inteiro e conferido página a página. O artigo não tem figuras nem tabelas.",
+      "totalUnidades": 6,
+      "unidades": [
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "Resumo e introdução: DSLs aumentam produtividade mas costumam ser estreitas; MontiCore e GME; diretrizes tornam o projeto sistemático; seção 1.1: Hoare e Wirth, computadores mais rápidos, geradores de parser",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do trecho.",
+          "consulta": [
+            "dsl",
+            "pros-contras",
+            "diretrizes"
+          ],
+          "evidencias": [
+            "produtividade",
+            "monticore",
+            "hoare"
+          ]
+        },
+        {
+          "paginas": [
+            2
+          ],
+          "assunto": "Fim da 1.1 (Paige: simplicidade, unicidade, consistência, escalabilidade; diretrizes não viram métrica automática); 1.2 categorias e semântica fora delas; seção 2.1, diretrizes 1 a 3; abertura da 2.2",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do trecho.",
+          "consulta": [
+            "diretrizes",
+            "proposito"
+          ],
+          "evidencias": [
+            "unicidade",
+            "semantica nao e um grupo",
+            "simulacao",
+            "independente de plataforma"
+          ]
+        },
+        {
+          "paginas": [
+            3
+          ],
+          "assunto": "Diretrizes 4 a 10: gráfica × textual, compor (OCL, seamlessness), reaproveitar definições e padrões de linguagem, reaproveitar sistema de tipos; 2.3: conceitos necessários, simplicidade, sem generalidade",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do trecho.",
+          "consulta": [
+            "realizacao",
+            "conteudo-ling"
+          ],
+          "evidencias": [
+            "ocl",
+            "padroes de linguagem",
+            "polimorfismo",
+            "projete so o necessario"
+          ]
+        },
+        {
+          "paginas": [
+            4
+          ],
+          "assunto": "Diretrizes 11 a 16: sublinguagens e bibliotecas (Pascal × C++), redundância (class × struct), elementos ineficientes (Java); 2.4: notação dos especialistas (SQL), notação descritiva (\u0007lpha), elementos distinguíveis (preto e branco, backtracking)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do trecho.",
+          "consulta": [
+            "conteudo-ling",
+            "notacao"
+          ],
+          "evidencias": [
+            "class e struct",
+            "todas as instancias",
+            "letra grega",
+            "preto e branco"
+          ]
+        },
+        {
+          "paginas": [
+            5
+          ],
+          "assunto": "Diretrizes 17 a 23: açúcar sintático (for do Java 5), comentários (Javadoc, Hoare), organização (import, nomes qualificados), compacto × compreensível, mesmo estilo (OCL), convenções de uso; 2.5: alinhar abstrata e concreta (= da OCL)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do trecho.",
+          "consulta": [
+            "notacao",
+            "estilo",
+            "abstrata"
+          ],
+          "evidencias": [
+            "for aprimorado",
+            "javadoc",
+            "java code conventions",
+            "let"
+          ]
+        },
+        {
+          "paginas": [
+            6
+          ],
+          "assunto": "Diretrizes 24 a 26 (layout, Stateflow, modularidade, Parnas, interfaces); seção 3, discussão dos conflitos e pesos; seção 4, conclusão",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Seções 3 e 4 ficam logo depois do trecho indicado; entram como contexto.",
+          "consulta": [
+            "abstrata",
+            "conflitos",
+            "diretrizes"
+          ],
+          "evidencias": [
+            "stateflow",
+            "parnas",
+            "modificadores de visibilidade",
+            "tabela de simbolos",
+            "lista nao esta completa"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "melo-2-4",
+      "url": "sem URL: e-book indicado no roteiro de autoestudo (ISBN 9788521214922)",
+      "escopo": "Melo e Silva, Princípios de linguagens de programação, Blucher, 2003, cap. 2, seção 2.4",
+      "acesso": "indisponivel",
+      "limitacao": "O e-book não estava acessível nesta sessão (só registros de catálogo). Não se sabe o tema exato da seção; a seção especificacao é complemento marcado como fora dos autoestudos. Nada da aula vem dele; não declarar cobertura."
+    },
+    {
+      "id": "resina-slide-aula01",
+      "url": "src/aulas/m8/comp/01-conceitos/notas/slides-conceitos-m8.pdf",
+      "escopo": "Slides da aula 01: roteiro do módulo (fases do compilador e \"a linguagem que vamos construir\") e ponderadas",
+      "acesso": "parcial",
+      "limitacao": "Usado só o roteiro do módulo; o resto pertence à aula 01. Não há slide do encontro de 29/10 nem anúncio do encontro de 03/11."
+    }
+  ]
+}

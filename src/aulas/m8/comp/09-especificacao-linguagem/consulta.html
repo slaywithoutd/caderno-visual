@@ -1,0 +1,440 @@
+<!-- Aula 09 · Especificação da nova linguagem. Aula somente Consulta: figuras, loops e desenhos estão aqui mesmo.
+     Um conceito por seção, na ordem das dependências. Gramática, BNF, token, sintaxe/semântica e precedência
+     moram nas aulas 01, 07 e 08 e aqui são só link. Os ids usados por figuras.js e loops.js estão nesta página. -->
+
+<!-- ================= Resumo ================= -->
+<section class="cs" id="encontro" data-grupo="Resumo" data-termos="">
+  <h2>Resumo</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 160"><rect class="am" x="6" y="8" width="108" height="34" rx="8"/><text class="tm" x="60" y="20">para quê? quem?</text><text x="60" y="34" style="font-size:10px">propósito</text><rect class="bl" x="126" y="8" width="108" height="34" rx="8"/><text class="tm" x="180" y="20">texto ou desenho?</text><text x="180" y="34" style="font-size:10px">realização</text><path class="s" d="M60 44 V62" marker-end="url(#mnarrow)"/><path class="s" d="M180 44 V62" marker-end="url(#mnarrow)"/><rect class="k" x="6" y="64" width="228" height="58" rx="8"/><text class="tm st" x="16" y="80">especificação</text><text class="st" x="16" y="96" style="font-size:10px">tokens · gramática (EBNF)</text><text class="st" x="16" y="112" style="font-size:10px">regras de significado · exemplos</text><path class="s" d="M120 124 V140" marker-end="url(#mnarrow)"/><text class="tm" x="120" y="152">parser, gerador, compilador</text></svg>Decidir para que serve vem antes de escrever a gramática.</aside>
+  <p class="cs-def">Uma linguagem nova começa por uma pergunta: para que e para quem ela serve. Esta aula mostra o que é uma linguagem específica de domínio, as diretrizes para projetar uma e como juntar léxico, gramática e regras de significado numa especificação.</p>
+  <ul class="b">
+    <li>DSL é linguagem de uma área só (SQL, HTML, fórmula do Excel). Linguagem de propósito geral serve para qualquer programa (Java, Python).</li>
+    <li>Com uma DSL você escreve um modelo do problema, e um gerador o transforma em código. Trocar o gerador reaproveita o modelo.</li>
+    <li>Ganha: notação de quem conhece o domínio, abstração e produtividade. Paga: custo para criar, gente que entenda de linguagem e do domínio, usuários aprendendo.</li>
+    <li>Karsai et al. listam 26 diretrizes em cinco grupos: propósito, realização, conteúdo, sintaxe concreta e sintaxe abstrata. Elas brigam entre si, e o projeto decide o peso de cada uma.</li>
+    <li>Sintaxe concreta é o texto; abstrata é a árvore que sobra sem a pontuação. O que é diferente no texto tem de ser diferente na árvore, e o layout não deve mudar o significado.</li>
+    <li>A especificação traz os tokens (expressões regulares), a gramática (BNF ou EBNF), as regras que a gramática não confere e exemplos válidos e inválidos.</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>HTML não é linguagem de programação e mesmo assim é DSL: o "L" é de linguagem.</li>
+      <li>Açúcar sintático não deixa a linguagem dizer nada novo; só muda o jeito de escrever.</li>
+      <li>Começar do zero é a última opção. Antes, tente compor ou reaproveitar uma linguagem pronta.</li>
+      <li>Usar <code>=</code> para atribuição e para igualdade na mesma linguagem é o exemplo clássico do que evitar.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= O que é uma DSL ================= -->
+<section class="cs" id="dsl" data-grupo="O que é uma DSL" data-termos="dsl,gpl,dominio,uml">
+  <h2>Linguagem específica de domínio × propósito geral</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="k" x="6" y="8" width="228" height="56" rx="8"/><text class="tm st" x="16" y="24">propósito geral</text><text class="st" x="16" y="42" style="font-size:11px">Java · Python · PHP · Pascal</text><text class="tm st" x="16" y="56">qualquer programa, nenhum atalho</text><rect class="bl" x="6" y="76" width="70" height="66" rx="8"/><text class="tb" x="41" y="98">SQL</text><text class="tm" x="41" y="118">consultas</text><rect class="bl" x="85" y="76" width="70" height="66" rx="8"/><text class="tb" x="120" y="98">HTML</text><text class="tm" x="120" y="118">páginas</text><rect class="bl" x="164" y="76" width="70" height="66" rx="8"/><text class="tb" x="199" y="98">=SOMA()</text><text class="tm" x="199" y="118">planilhas</text></svg>Uma DSL diz pouco fora da sua área, e muito dentro dela.</aside>
+  <p class="cs-def">Uma linguagem específica de domínio (DSL, domain specific language) tem notação e abstrações feitas para uma área só. Uma linguagem de propósito geral (GPL), como Java ou Python, serve para escrever qualquer programa.</p>
+  <ul class="b">
+    <li>O domínio é a área de conhecimento da linguagem, com conceitos, regras e termos próprios: medicina, tributos, direito, ensino a distância.</li>
+    <li>Uma DSL é menos complexa que uma GPL. Ela é feita junto com especialistas da área e costuma ser usada por eles, que não programam, mas dominam o assunto.</li>
+    <li>O autor de referência no assunto, segundo o vídeo, é Martin Fowler.</li>
+    <li>Pode ser textual (SQL) ou gráfica. As placas de trânsito são uma DSL gráfica: poucos símbolos, sentido preciso, só servem no trânsito.</li>
+    <li>Para Karsai et al., DSLs são criadas para aumentar a produtividade num domínio, mas muitas servem só para um problema bem estreito e não têm qualidade para muita gente usar.</li>
+  </ul>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>Exemplo do vídeo</th><th>Para quê</th></tr></thead>
+      <tbody>
+        <tr><td>SQL</td><td>consultar banco de dados</td></tr>
+        <tr><td>HTML</td><td>mostrar conteúdo em páginas web (é de marcação, não de programação)</td></tr>
+        <tr><td>LaTeX, TeX, Javadoc</td><td>escrever documentos e documentar código</td></tr>
+        <tr><td>Fórmula do Excel</td><td>contas numa planilha, com sintaxe e palavras próprias</td></tr>
+        <tr><td>Construtor de telas</td><td>montar a interface arrastando caixas, sem escrever o código delas</td></tr>
+        <tr><td>Linguagem de apps de celular</td><td>combinar elementos em regras e estados</td></tr>
+        <tr><td>Notação matemática no JetBrains MPS</td><td>soma de matrizes, potência, seno, cosseno</td></tr>
+        <tr><td>UML</td><td>modelar sistemas de software</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>A UML é DSL? O critério é a área: ela é específica para modelar software, então a maioria a considera DSL. Vista como "linguagem de modelagem genérica", não seria.</li>
+      <li>Questão de concurso do vídeo (banca AOCP, 2016): "DSL é uma linguagem de programação ou de especificação dedicada a um domínio de problema, a uma técnica de representação ou a uma técnica de solução particular. Qual alternativa é uma DSL?" Entre PHP, Pascal, Python, HTML e mais uma de propósito geral, a resposta é HTML: as outras servem para qualquer sistema.</li>
+    </ul>
+  </div>
+  <p class="prova">DSL é linguagem de programação ou de especificação dedicada a um domínio de problema. HTML é DSL; PHP, Pascal e Python são de propósito geral.</p>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>"HTML nem é linguagem de programação, então não é DSL." Errado: a definição fala em linguagem de programação <i>ou de especificação</i>.</li>
+      <li>DSL não precisa ser executável. Placas de trânsito e diagramas só de documentação também contam.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="modelos" data-grupo="O que é uma DSL" data-termos="metamodelo,transformador">
+  <h2>Modelo, metamodelo e gerador de código</h2>
+  <aside class="mn loop" data-loop="geradores" data-ms="9000" data-still="0.2" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>O mesmo modelo passa por geradores diferentes.</aside>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="bl" x="6" y="6" width="96" height="62" rx="6"/><text class="tb" x="54" y="20">metamodelo</text><text class="st" x="12" y="36" style="font-size:9px">Wiki: 0..n Menu</text><text class="st" x="12" y="48" style="font-size:9px">Menu: título, tipo,</text><text class="st" x="12" y="60" style="font-size:9px">profundidade, itens</text><path class="s" d="M104 36 H128" marker-end="url(#mnarrow)"/><text class="tm" x="116" y="28" style="font-size:8px">preenche</text><rect class="k" x="130" y="6" width="104" height="104" rx="6"/><text class="tb" x="182" y="20">modelo</text><text class="st" x="138" y="38" style="font-size:9px">Créditos</text><text class="st" x="138" y="52" style="font-size:9px">Sobre nós</text><text class="st" x="150" y="66" style="font-size:9px">Estatutos</text><text class="st" x="162" y="80" style="font-size:9px">2010</text><text class="st" x="162" y="94" style="font-size:9px">2009</text><path class="s" d="M182 112 V128" marker-end="url(#mnarrow)"/><text class="tm" x="182" y="142">menu web acessível</text></svg>O exemplo do vídeo: um menu de wiki.</aside>
+  <p class="cs-def">Com uma DSL você escreve um modelo do problema. Um gerador de código lê o modelo e produz o resto: código, dados, configuração. O metamodelo é o modelo dos modelos: diz que elementos um modelo pode ter.</p>
+  <ul class="b">
+    <li>O caminho: do campo das ideias para um modelo perto do domínio; de lá, um mapeamento gera código, e o código vira código de máquina.</li>
+    <li>O gerador primeiro faz o parse do modelo, isto é, lê e entende a estrutura, como um <a href="/m8/comp/07-analise-lexica/consulta#fases">compilador</a>. Depois gera os artefatos: código, dados, arquivos de configuração, diagramas.</li>
+    <li>Você escreve a linguagem uma vez e cria quantos geradores quiser. Vários produtos saem da mesma ideia.</li>
+    <li>Três palavras do vídeo: <i>modelo</i> representa o problema; <i>plataforma</i> é o ambiente onde ele é resolvido; <i>integração</i> junta modelos em uma ou mais plataformas.</li>
+    <li>O metamodelo está para o modelo como a <a href="/m8/comp/01-conceitos/consulta#gramatica">gramática</a> está para o programa.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Exemplo do vídeo, de um artigo do autor de 2010: uma DSL para montar o menu de uma wiki acessível.</li>
+      <li>Metamodelo: a wiki tem zero ou mais menus hierárquicos. Cada menu tem título, tipo (vertical ou horizontal) e a profundidade máxima mostrada. Cada item tem uma ação (para onde navega) e um rótulo (o texto), e pode ter subitens.</li>
+      <li>Modelo: o metamodelo preenchido. "Créditos", "Sobre nós" e, dentro de "Sobre nós", "Estatutos" com 2010 e 2009.</li>
+      <li>Gerador: lê o modelo e escreve o menu web acessível, que funciona pelo teclado e com leitor de tela, não só com o mouse.</li>
+      <li>Depois de 2010 vieram Bootstrap e outras tecnologias. Basta trocar o gerador: a leitura do modelo e o próprio modelo continuam iguais, e quem cria os sites (jornalistas, criadores de conteúdo) não precisa de treino novo.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b"><li>Confundir modelo e metamodelo. O metamodelo é a regra (quais elementos existem); o modelo é o que a pessoa escreve seguindo a regra.</li></ul>
+  </div>
+</section>
+
+<section class="cs" id="pros-contras" data-grupo="O que é uma DSL" data-termos="workbench">
+  <h2>Vantagens, custos e ferramentas</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 140"><path class="s" d="M120 30 V120"/><path class="s" d="M30 30 H210"/><path class="s" d="M80 128 H160"/><path class="gr" d="M8 34 H74 L64 74 H18 Z"/><text class="tm" x="41" y="48">abstração</text><text class="tm" x="41" y="62">produtividade</text><path class="am" d="M166 34 H232 L222 86 H176 Z"/><text class="tm" x="199" y="50">custo</text><text class="tm" x="199" y="64">especialistas</text><text class="tm" x="199" y="78">aprender</text><polygon class="k" points="120,22 114,30 126,30"/></svg>O prato dos custos pesa mais no começo.</aside>
+  <p class="cs-def">Uma DSL troca um custo alto de criação por ganho de quem a usa no dia a dia. Ferramentas próprias (language workbenches) baixam parte desse custo.</p>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>Vantagens</th><th>Desvantagens</th></tr></thead>
+      <tbody>
+        <tr><td>Soluções escritas no idioma da área</td><td>Custo alto: é metamodelagem, criar uma linguagem para modelar algo</td></tr>
+        <tr><td>Nível de abstração maior: palavras do próprio domínio</td><td>Exige técnicos especializados que também entendam o domínio</td></tr>
+        <tr><td>Mais produtividade e modelos mais fáceis de entender</td><td>Os especialistas precisam ter maturidade nos problemas da área</td></tr>
+        <tr><td>Gera código de sistemas ou componentes</td><td>Os usuários precisam aprender a linguagem nova, que tem de compensar esse esforço</td></tr>
+        <tr><td>Documentação viva: a notação é conferida pelo computador</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <ul class="b">
+    <li>Ferramentas do vídeo: <a href="/m8/comp/07-analise-lexica/consulta#antlr">ANTLR</a> (gratuito), Eclipse Xtext (o autor usou no doutorado) e JetBrains MPS, um sistema de metaprogramação com material em português. O exemplo de matemática do vídeo vem do site do MPS.</li>
+    <li>No artigo: EMF e MetaEdit+ para DSLs gráficas; MontiCore e Xtext para textuais. Os autores criaram o MontiCore e o GME.</li>
+    <li>"Documentação viva": o modelo segue regras que o computador confere, então não fica desatualizado como um texto solto.</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b"><li>Achar que a DSL sempre compensa. Para uma linguagem pequena, usada num projeto só, o custo de criar e ensinar pode não se pagar (veja <a href="#conflitos">quando as diretrizes brigam</a>).</li></ul>
+  </div>
+</section>
+
+<!-- ================= Diretrizes de projeto ================= -->
+<section class="cs" id="diretrizes" data-grupo="Diretrizes de projeto" data-termos="diretriz">
+  <h2>As 26 diretrizes em cinco grupos</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 170"><rect class="am" x="20" y="4" width="200" height="24" rx="6"/><text x="120" y="16" style="font-size:10px">1 · propósito (1–3)</text><rect class="bl" x="20" y="36" width="200" height="24" rx="6"/><text x="120" y="48" style="font-size:10px">2 · realização (4–7)</text><rect class="bl" x="20" y="68" width="200" height="24" rx="6"/><text x="120" y="80" style="font-size:10px">3 · conteúdo (8–13)</text><rect class="gr" x="20" y="100" width="200" height="24" rx="6"/><text x="120" y="112" style="font-size:10px">4 · sintaxe concreta (14–22)</text><rect class="gr" x="20" y="132" width="200" height="24" rx="6"/><text x="120" y="144" style="font-size:10px">5 · sintaxe abstrata (23–26)</text><path class="s" d="M8 10 V160" marker-end="url(#mnarrow)"/><text class="tm" x="120" y="167">semântica atravessa todos</text></svg>Os grupos seguem as etapas do projeto.</aside>
+  <p class="cs-def">Karsai et al. reúnem 26 diretrizes para projetar uma DSL, tiradas da literatura e da experiência deles. Elas estão agrupadas pela etapa do projeto, para você olhar só as que importam naquele momento.</p>
+  <ul class="b">
+    <li>A discussão é antiga. Em 1973, Hoare pedia simplicidade, segurança, tradução rápida, código objeto eficiente e legibilidade. Em 1974, Wirth discutiu o projeto de linguagens e de compiladores.</li>
+    <li>De lá para cá, os computadores ficaram rápidos, então velocidade e espaço pesam menos, e <a href="/m8/comp/07-analise-lexica/consulta#geradores">geradores de analisadores</a> fazem o parser por você.</li>
+    <li>Paige et al. propõem simplicidade, unicidade, consistência e escalabilidade para linguagens de modelagem, mas não dizem como chegar lá. Muitas diretrizes não viram uma conta que uma ferramenta confira.</li>
+    <li>O foco do artigo são DSLs textuais, mas as diretrizes valem também para as gráficas.</li>
+    <li>A semântica não é um grupo: ela pesa em todas as etapas.</li>
+    <li>As diretrizes às vezes se contradizem, e o peso de cada uma muda com o projeto. Para uma linguagem de configuração usada num projeto só, entregar logo vale mais que caprichar na usabilidade.</li>
+    <li>Os autores dizem que a lista não está completa e muda com o tempo: algumas regras dos anos 1970 já importam menos.</li>
+  </ul>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>Grupo</th><th>Pergunta</th><th>Diretrizes</th></tr></thead>
+      <tbody>
+        <tr><td><a href="#proposito">Propósito</a></td><td>Para que e para quem?</td><td>1–3</td></tr>
+        <tr><td><a href="#realizacao">Realização</a></td><td>Como construir: texto ou desenho, do zero ou reaproveitando?</td><td>4–7</td></tr>
+        <tr><td><a href="#conteudo-ling">Conteúdo</a></td><td>Que elementos a linguagem tem?</td><td>8–13</td></tr>
+        <tr><td><a href="#notacao">Sintaxe concreta</a></td><td>Como ela se lê e se escreve?</td><td>14–22</td></tr>
+        <tr><td><a href="#abstrata">Sintaxe abstrata</a></td><td>Como ela fica por dentro?</td><td>23–26</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="cs" id="proposito" data-grupo="Diretrizes de projeto" data-termos="subespecificacao,statechart">
+  <h2>Propósito (1–3): para que e para quem</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 140"><circle class="k" cx="70" cy="70" r="56"/><circle class="bl" cx="70" cy="70" r="36"/><circle class="am" cx="70" cy="70" r="14"/><text x="70" y="70" style="font-size:9px">uso</text><text class="st" x="138" y="22" style="font-size:10px">quem modela?</text><text class="st" x="138" y="44" style="font-size:10px">quem revisa?</text><text class="st" x="138" y="66" style="font-size:10px">quando?</text><text class="st" x="138" y="88" style="font-size:10px">quem usa os</text><text class="st" x="138" y="102" style="font-size:10px">modelos, e para quê?</text><path class="s" d="M134 60 L88 68" marker-end="url(#mnarrow)"/></svg>Os usos decidem os conceitos.</aside>
+  <p class="cs-def">A linguagem depende tanto do que ela descreve quanto do que se faz com ela. Por isso a primeira atividade é analisar o objetivo: os usos, as pessoas e a coerência de cada recurso com esse objetivo.</p>
+  <ul class="b">
+    <li>Diretriz 1, identifique os usos cedo. Os mais comuns são documentar conhecimento e gerar código. Há outros: definir ou gerar testes, verificação formal, análises automáticas, configurar o sistema na implantação ou na execução e, cada vez mais, simulação.</li>
+    <li>O uso decide o que a linguagem pode oferecer. Com conceitos subespecificados, como Statecharts não determinísticos, nem sempre dá para gerar código: o gerador precisa de uma escolha concreta.</li>
+    <li>Se o alvo é uma máquina pequena (celular, central de um carro), os conceitos de alto nível precisam ser pensados para gerar código otimizado. Para simular ou validar requisitos, a eficiência pesa pouco.</li>
+    <li>Diretriz 2, faça perguntas. Encaixe os usos no processo de desenvolvimento: quem vai modelar na DSL? Quem revisa os modelos, e quando? Quem usa os modelos, e para quê?</li>
+    <li>Com as respostas, reveja se a linguagem está complexa demais ou se falta algum elemento do domínio, e prepare tutoriais para cada usuário.</li>
+    <li>Diretriz 3, seja consistente. Cada recurso tem de contribuir para o propósito; se não contribui, sai. Numa linguagem independente de plataforma, todos os recursos precisam ser independentes de plataforma.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b"><li>No menu da wiki (<a href="#modelos">vídeo</a>): o uso é gerar código de menu; quem modela são jornalistas e criadores de conteúdo; o modelo é revisado quando o site muda. Daí a linguagem ter só menus, itens, ações e rótulos.</li></ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b"><li>Começar pela sintaxe. Sem saber o uso, você não sabe se pode deixar algo em aberto (documentação) ou se tudo precisa virar código (geração).</li></ul>
+  </div>
+</section>
+
+<section class="cs" id="realizacao" data-grupo="Diretrizes de projeto" data-termos="composicao,ocl,sistema-tipos">
+  <h2>Realização (4–7): texto ou desenho, do zero ou reaproveitando</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><text class="tm" x="60" y="12">textual</text><rect class="k" x="10" y="20" width="100" height="56" rx="6"/><text class="st" x="18" y="38" style="font-size:9px">menu Sobre {</text><text class="st" x="26" y="52" style="font-size:9px">item Estatutos</text><text class="st" x="18" y="66" style="font-size:9px">}</text><text class="tm" x="180" y="12">gráfica</text><rect class="bl" x="150" y="22" width="60" height="18" rx="4"/><text x="180" y="31" style="font-size:9px">Sobre</text><rect class="bl" x="160" y="56" width="70" height="18" rx="4"/><text x="195" y="65" style="font-size:9px">Estatutos</text><path class="s" d="M170 40 L182 56" marker-end="url(#mnarrow)"/><text class="tm" x="60" y="94">mais rápida de fazer</text><text class="tm" x="60" y="106">independe de ferramenta</text><text class="tm" x="180" y="94">visão geral melhor</text><text class="tm" x="180" y="106">mais fácil de entender</text><text class="tm" x="120" y="136">reaproveitar &gt; compor &gt; do zero</text></svg>Pese as duas formas contra o que os usuários preferem.</aside>
+  <p class="cs-def">Na realização você decide como construir a linguagem: textual ou gráfica, e se ela nasce do zero ou reaproveita linguagens, gramáticas e sistemas de tipos que já existem. A ordem de preferência é reaproveitar; do zero, só quando nada serve.</p>
+  <ul class="b">
+    <li>Diretriz 4, escolha com cuidado entre gráfica e textual. Textual costuma ser mais rápida de desenvolver e não depende de plataforma nem de ferramenta. Gráfica dá melhor visão geral e facilita entender o modelo. Pese isso contra o que os usuários preferem; depois escolha a ferramenta.</li>
+    <li>Diretriz 5, componha linguagens que já existem. A forma mais útil é embutir uma linguagem sem mudar nada nela: a OCL entra em outras linguagens para escrever restrições. Uma variante é a linguagem hospedeira ter "buracos" previstos para outras.</li>
+    <li>Os conceitos compostos precisam combinar. Na UML, diagramas de classes e Statecharts combinam porque os dois são orientados a objetos. E evite construções parecidas com significados diferentes.</li>
+    <li>Diretriz 6, reaproveite definições de linguagem. Se não dá para compor, parta da definição de outra linguagem (estender ou especializar), em vez de começar do zero. A sintaxe concreta e a abstrata ganham, e o usuário reconhece notações familiares.</li>
+    <li>Há "padrões de linguagem", como padrões de projeto: expressões, expressões primárias e comandos têm quase a mesma forma em todas as linguagens. Os sites de geradores de parser, como o do ANTLR, têm gramáticas prontas para começar.</li>
+    <li>Diretriz 7, reaproveite um sistema de tipos. Projetar um é das tarefas mais difíceis, por causa de espaços de nomes, tipos genéricos, conversões e polimorfismo. Um sistema de tipos estranho também afasta o usuário. Adapte um conhecido, como o da OCL ou o do Java.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b"><li>Uma DSL de consultas para um sistema de notas pode embutir SQL sem mudanças (diretriz 5), em vez de inventar outra sintaxe de busca.</li></ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b"><li>Juntar duas linguagens em que o mesmo símbolo quer dizer coisas diferentes. A composição só funciona se os conceitos se encaixam.</li></ul>
+  </div>
+</section>
+
+<section class="cs" id="conteudo-ling" data-grupo="Diretrizes de projeto" data-termos="redundancia">
+  <h2>Conteúdo (8–13): só o necessário, sem repetir conceito</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 140"><path class="k" d="M10 8 H230 L150 78 V122 H90 V78 Z"/><text class="tm" x="120" y="22">conceitos do domínio</text><text class="st" x="30" y="40" style="font-size:9px">menu · item · cor · fonte · log</text><text class="st" x="40" y="54" style="font-size:9px">ação · rótulo · usuário · tema</text><text class="tm" x="120" y="92">só o que</text><text class="tm" x="120" y="104">serve ao uso</text><text class="tm" x="120" y="136">poucos elementos, sem dois iguais</text></svg>Um funil: o domínio inteiro não cabe na linguagem.</aside>
+  <p class="cs-def">O conteúdo são os elementos da linguagem. Entram só os conceitos do domínio que servem aos usos, no menor número possível, sem dois conceitos para a mesma coisa e sem elementos que obriguem a gerar código lento.</p>
+  <ul class="b">
+    <li>Diretriz 8, reflita só os conceitos necessários. Escreva cedo alguns modelos de exemplo: eles mostram como o domínio aparece na linguagem e servem para os especialistas darem opinião.</li>
+    <li>Diretriz 9, mantenha simples. Uma linguagem nova já exige ferramentas e processos novos; se ela é complexa, é mais difícil de adotar e entrega menos do que prometia. As diretrizes 10 a 12 dizem como.</li>
+    <li>Diretriz 10, evite generalidade desnecessária. "Vamos generalizar para mudanças futuras" complica e atrasa a adoção. Projete só o necessário.</li>
+    <li>Diretriz 11, limite o número de elementos. Para domínios grandes, divida em sublinguagens: a UML tem diagramas de estrutura, de comportamento e de implantação, cada um com poucos conceitos.</li>
+    <li>Outra saída são bibliotecas: elementos saem da linguagem e viram modelos reaproveitáveis. Entrada e saída é parte da linguagem Pascal e fica na biblioteca em C++. Para isso, a linguagem precisa de algum jeito de definir e importar coisas.</li>
+    <li>Diretriz 12, evite redundância conceitual. Dois conceitos para o mesmo fato fazem cada pessoa escrever de um jeito. Em C++, class e struct só diferem no acesso padrão aos membros (privado e público), e guias de codificação acabam proibindo um deles.</li>
+    <li>Diretriz 13, evite elementos ineficientes. O usuário mexe no modelo, mas o código gerado decide a eficiência do sistema. A eficiência deve depender do modelo, não de um elemento caro escondido na linguagem.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b"><li>Java não tem operador que devolva todas as instâncias de uma classe: ele gastaria memória e tempo em qualquer programa. Quem precisa, implementa; assim só o usuário pode introduzir a ineficiência.</li></ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b"><li>Generalizar "para o futuro" parece prudente e é o que a diretriz 10 desaconselha.</li></ul>
+  </div>
+</section>
+
+<section class="cs" id="concreta-abstrata" data-grupo="Diretrizes de projeto" data-termos="sintaxe-concreta,sintaxe-abstrata">
+  <h2>Sintaxe concreta e sintaxe abstrata</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 140"><rect class="k" x="6" y="8" width="96" height="28" rx="6"/><text x="54" y="22" style="font-size:12px">x = a + 2;</text><path class="s" d="M104 22 H128" marker-end="url(#mnarrow)"/><circle class="bl" cx="180" cy="20" r="14"/><text x="180" y="20" style="font-size:12px">=</text><circle class="k" cx="148" cy="66" r="12"/><text x="148" y="66">x</text><circle class="bl" cx="210" cy="66" r="14"/><text x="210" y="66">+</text><circle class="k" cx="188" cy="112" r="12"/><text x="188" y="112">a</text><circle class="k" cx="230" cy="112" r="9"/><text x="230" y="112">2</text><line class="s" x1="172" y1="31" x2="154" y2="55"/><line class="s" x1="188" y1="31" x2="204" y2="53"/><line class="s" x1="204" y1="79" x2="193" y2="101"/><line class="s" x1="216" y1="79" x2="226" y2="103"/><text class="tm st" x="6" y="62">concreta: o texto</text><text class="tm st" x="6" y="78">abstrata: a árvore</text><text class="tm st" x="6" y="94">o ; não vira nó</text></svg>A pontuação some; a estrutura fica.</aside>
+  <p class="cs-def">A sintaxe concreta é a forma que você lê e escreve: texto (ou desenho) com palavras-chave, pontuação e espaços. A sintaxe abstrata é a estrutura interna que a ferramenta guarda: quais elementos existem e quem está dentro de quem, sem o que só servia para ler.</p>
+  <ul class="b">
+    <li>No artigo: a concreta é a representação legível, externa; a abstrata é a representação interna. O artigo trata primeiro da concreta e depois da abstrata.</li>
+    <li>Linguagens diferentes podem ter a mesma sintaxe abstrata. <code>x = a + 2;</code>, <code>x := a + 2</code> e <code>(setq x (+ a 2))</code> viram a mesma árvore: atribuição de uma soma.</li>
+    <li>A sintaxe abstrata costuma ser uma árvore, a árvore sintática abstrata (AST). Geradores e transformações trabalham sobre ela; pretty printing faz o caminho de volta, da árvore para um texto bem formatado.</li>
+    <li>A <a href="/m8/comp/01-conceitos/consulta#arvore">árvore de derivação</a> é outra árvore: ela tem um nó para cada variável usada (EXPR, SOMA, TERMO…) e para cada terminal, inclusive <code>;</code>. A abstrata guarda só o que tem significado.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b"><li>A Figura 1 lê a mesma ordem em três sintaxes concretas e monta uma árvore só. O último passo mostra o que acontece quando um símbolo quer dizer duas coisas.</li></ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b"><li>Chamar a árvore de derivação de sintaxe abstrata. Na derivação de <code>b = (y - 2) * z;</code> da <a href="/m8/comp/08-gramaticas-livres-contexto/consulta#sintatico">aula 08</a> aparecem FATOR, TERMO, os parênteses e o ponto e vírgula; na abstrata, só atribuição, multiplicação e subtração.</li></ul>
+  </div>
+  <figure class="fig" id="fig-ast">
+    <div class="fig-head"><span class="fig-title">Figura 1 · Três textos, uma árvore</span></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <pre class="code" id="ast-codigo"></pre>
+        <svg id="ast-svg" viewBox="0 0 360 230" role="img" aria-label="Árvore sintática abstrata de x = a + 2"></svg>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+</section>
+
+<section class="cs" id="notacao" data-grupo="Diretrizes de projeto" data-termos="acucar">
+  <h2>Sintaxe concreta (14–17): notação que já se conhece</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 140"><rect class="gr" x="6" y="6" width="68" height="40" rx="6"/><text x="40" y="22" style="font-size:16px">+</text><text class="tm" x="40" y="38">soma</text><rect class="gr" x="86" y="6" width="68" height="40" rx="6"/><text x="120" y="22" style="font-size:16px">, ;</text><text class="tm" x="120" y="38">separam</text><rect class="gr" x="166" y="6" width="68" height="40" rx="6"/><text x="200" y="22" style="font-size:12px">\alpha</text><text class="tm" x="200" y="38">α pelo nome</text><rect class="rd" x="6" y="62" width="228" height="34" rx="6"/><text x="120" y="74" style="font-size:10px">a + b  que concatena listas e apaga a</text><text class="tm" x="120" y="88">símbolo conhecido, sentido trocado</text><text class="tm" x="120" y="118">lido muitas vezes,</text><text class="tm" x="120" y="132">escrito uma</text></svg>Reaproveite o sentido que os símbolos já têm.</aside>
+  <p class="cs-def">A sintaxe concreta precisa ser fácil de ler. A regra geral: copie a notação que os especialistas já usam, mantenha o sentido de sempre dos símbolos, deixe cada elemento fácil de reconhecer e use açúcar sintático com moderação.</p>
+  <ul class="b">
+    <li>Diretriz 14, adote a notação que os especialistas já usam. Eles usam a mesma linguagem por anos e não querem aprender outra. Consultas a banco de dados se escrevem em SQL, mesmo que só uma parte da DSL faça consultas: SQL pode ir embutida.</li>
+    <li>Se não existe notação no domínio, chegue o mais perto possível de outras notações da área ou de linguagens comuns. Expressões aritméticas são o exemplo de notação que todo mundo aceita.</li>
+    <li>Diretriz 15, use notação descritiva. Reaproveite termos e símbolos conhecidos, com o mesmo sentido: <code>+</code> é soma ou algo parecido; vírgula e ponto e vírgula separam. No LaTeX, a letra grega α se escreve <code>\alpha</code>, pelo nome.</li>
+    <li>Palavras-chave com sentido conhecido, fáceis de identificar, poucas e fáceis de lembrar. Um editor que destaca palavras-chave ajuda.</li>
+    <li>Diretriz 16, deixe os elementos distinguíveis. Numa DSL gráfica, cor sozinha falha quando o modelo é impresso em preto e branco. Numa textual, as palavras-chave separam os tipos de elemento e precisam estar em posições que não obriguem o leitor a voltar atrás.</li>
+    <li>Tirar palavras-chave para escrever menos é um motivo fraco: o modelo é lido muito mais vezes do que escrito, então projete pensando em quem lê.</li>
+    <li>Diretriz 17, use açúcar sintático com cuidado. Açúcar não aumenta o que a linguagem expressa; melhora a leitura e às vezes ajuda o parser. "Se não dá para fazer um parser eficiente, a linguagem provavelmente é difícil também para gente."</li>
+    <li>Açúcar demais distrai, e várias formas para o mesmo conceito atrapalham a conversa entre pessoas que preferem formas diferentes.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b"><li>O for aprimorado do Java 5 é açúcar: <code>for (int x : v) soma += x;</code> faz o mesmo que <code>for (int i = 0; i &lt; v.length; i++) soma += v[i];</code>. Ele contraria a diretriz 12 (dois jeitos de repetir), mas percorrer um vetor é tão comum que a forma curta compensa.</li></ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Açúcar sintático deixa a linguagem mais expressiva? Não: tudo o que ele escreve já dava para escrever.</li>
+      <li>Trocar o sentido de um símbolo conhecido (um <code>+</code> que não soma) quebra a diretriz 15, mesmo que a gramática esteja certa.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="estilo" data-grupo="Diretrizes de projeto" data-termos="convencao-uso">
+  <h2>Sintaxe concreta (18–22): comentários, arquivos e estilo</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 140"><rect class="k" x="6" y="6" width="228" height="78" rx="6"/><text class="st tm" x="14" y="22">// comentário de linha</text><text class="st" x="14" y="38" style="font-size:10px">import notas.Turma;</text><text class="st" x="14" y="54" style="font-size:10px">notas.Turma.media</text><text class="st tm" x="14" y="72">/* comentário em grupo */</text><rect class="am" x="6" y="96" width="108" height="36" rx="6"/><text x="60" y="108" style="font-size:10px">uso frequente</text><text class="tm" x="60" y="122">forma curta</text><rect class="bl" x="126" y="96" width="108" height="36" rx="6"/><text x="180" y="108" style="font-size:10px">uso raro</text><text class="tm" x="180" y="122">pode ser longa</text></svg>Comentário, import e nome qualificado.</aside>
+  <p class="cs-def">O resto da sintaxe concreta trata de como o modelo é escrito no dia a dia: comentários, divisão em arquivos, equilíbrio entre curto e claro, um estilo só e regras de estilo que ficam fora da gramática.</p>
+  <ul class="b">
+    <li>Diretriz 18, permita comentários. Eles explicam decisões para outras pessoas e permitem trabalhar em grupo. Use as formas conhecidas, <code>/* … */</code> e <code>// …</code>; numa DSL gráfica, caixas de texto e dicas.</li>
+    <li>Comentários com estrutura geram documentação, como o Javadoc gera páginas HTML. Hoare dizia que o propósito de uma linguagem é ajudar a documentar programas. A linguagem pode até definir o formato do comentário.</li>
+    <li>Diretriz 19, dê estrutura de organização. Sistemas grandes ficam em muitos arquivos; pacotes e diretórios, como no Java, evitam uma pasta lotada.</li>
+    <li>Arquivos precisam se referir uns aos outros: <code>import</code> deixa visível o que outro arquivo define, e nomes qualificados como <code>pacote.Arquivo.nome</code> apontam um elemento direto.</li>
+    <li>Diretriz 20, equilibre compacto e compreensível. O documento é escrito uma vez e lido muitas, então clareza vem primeiro, sem prolixidade. Forma curta para o que se usa muito; para o raro, pode ser longa.</li>
+    <li>Diretriz 21, use o mesmo estilo em toda parte. Se uma sublinguagem agrupa com chaves e outra com parênteses, ninguém cria intuição. Ajuda também uma regra simples, como "toda palavra-chave é uma palavra só, em minúsculas".</li>
+    <li>Dilema da OCL embutida: adaptar a sintaxe dela ao estilo da hospedeira dá um estilo só; manter a OCL padrão deixa a OCL igual em todo lugar. O artigo pende para a padrão.</li>
+    <li>Diretriz 22, identifique convenções de uso. Nem tudo cabe na definição da linguagem (diretriz 11), e forçar layout pela ferramenta é rígido demais. Convenções descrevem regras que podem ser seguidas sem serem obrigatórias: maiúsculas nos nomes, atributos antes de métodos, formato dos comentários.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b"><li>As Java Code Conventions são o exemplo do artigo: ninguém é obrigado pelo compilador a escrever nomes de classe com maiúscula, mas todo mundo escreve.</li></ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b"><li>Pôr regra de estilo na gramática (o compilador recusa nome de variável com maiúscula). A diretriz 22 manda deixar isso como convenção.</li></ul>
+  </div>
+</section>
+
+<section class="cs" id="abstrata" data-grupo="Diretrizes de projeto" data-termos="layout-significativo,modularidade,interface-dsl">
+  <h2>Sintaxe abstrata (23–26): alinhar, ignorar o layout, dividir</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="k" x="6" y="6" width="108" height="56" rx="6"/><text class="st" x="12" y="22" style="font-size:10px">se x &gt; 0:</text><text class="st" x="24" y="38" style="font-size:10px">y = 1</text><text class="st" x="24" y="54" style="font-size:10px">z = 2</text><rect class="k" x="126" y="6" width="108" height="56" rx="6"/><text class="st" x="132" y="22" style="font-size:10px">se x &gt; 0:</text><text class="st" x="144" y="38" style="font-size:10px">y = 1</text><text class="st" x="132" y="54" style="font-size:10px">z = 2</text><text class="tm" x="60" y="78">z dentro do se</text><text class="tm" x="180" y="78">z sempre roda</text><rect class="rd" x="40" y="94" width="160" height="40" rx="6"/><text x="120" y="108" style="font-size:10px">4 espaços de diferença,</text><text x="120" y="124" style="font-size:10px">duas árvores diferentes</text></svg>Com layout significativo, espaço em branco vira significado.</aside>
+  <p class="cs-def">As diretrizes da sintaxe abstrata pedem uma representação interna que acompanhe a concreta, que não dependa do layout e que permita dividir o sistema em partes com interfaces.</p>
+  <ul class="b">
+    <li>Diretriz 23, alinhe sintaxe abstrata e concreta. A estrutura interna deve seguir de perto o texto, para facilitar processar, transformar e reimprimir o modelo. Três princípios:</li>
+    <li>Primeiro, o que é diferente na concreta tem notação abstrata diferente. Segundo, elementos com significado parecido podem reaproveitar um conceito abstrato (em geral por subclasse), uma decisão mais de semântica que de estrutura. Terceiro, a notação abstrata depende só do elemento, nunca do contexto em que ele aparece.</li>
+    <li>Mau exemplo do artigo: na OCL, <code>=</code> é atribuição dentro do <code>let</code> e igualdade nas expressões. Mesmo texto, significados diferentes, decididos pelo contexto.</li>
+    <li>Quem usa um motor de transformação acaba vendo a estrutura interna. O alinhamento deixa o domínio aparecer na linguagem com pouco viés de implementação.</li>
+    <li>Diretriz 24, prefira layout que não afete a tradução da concreta para a abstrata. Um bom layout ajuda a ler, mas não deve mudar o significado. Espaços, tabulações e quebras de linha mudam de editor para editor e são difíceis de enxergar.</li>
+    <li>No gráfico, o mau exemplo é o Stateflow: a posição das transições no desenho (a "semântica do meio-dia") muda a ordem em que elas são testadas e, portanto, o comportamento.</li>
+    <li>Diretriz 25, permita modularidade. Dividir um sistema em peças pequenas, definidas separadamente, é a técnica principal contra a complexidade (Parnas, 1972) e permite gerar código só da parte que mudou. A linguagem precisa de elementos para referenciar outros arquivos.</li>
+    <li>Diretriz 26, introduza interfaces. Uma interface diz o que uma parte oferece ou precisa e esconde como ela faz. Dá para trocar a implementação sem afetar o resto, desde que a interface fique igual. Exemplos: modificadores de visibilidade do Java, portas em diagramas de estrutura composta.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b"><li>No desenho, a mesma sequência de caracteres com 4 espaços a menos antes de <code>z = 2</code> tira o comando de dentro do <code>se</code>. Numa linguagem com chaves, <code>se (x &gt; 0) { y = 1; } z = 2;</code> diz isso com símbolos visíveis.</li></ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b"><li>Python segue a indentação e funciona, então a diretriz 24 está errada? O artigo é uma recomendação para DSLs: o custo é o cuidado extra com editores e trabalho em grupo, não a impossibilidade.</li></ul>
+  </div>
+</section>
+
+<section class="cs" id="conflitos" data-grupo="Diretrizes de projeto" data-termos="">
+  <h2>Quando as diretrizes brigam</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 120"><rect class="bl" x="6" y="24" width="88" height="40" rx="8"/><text x="50" y="38" style="font-size:10px">reaproveitar</text><text class="tm" x="50" y="52">5 · 6 · 7</text><rect class="am" x="146" y="24" width="88" height="40" rx="8"/><text x="190" y="38" style="font-size:10px">do zero</text><text class="tm" x="190" y="52">liberdade</text><path class="s" d="M96 44 H144"/><circle class="k" cx="120" cy="44" r="6"/><text class="tm" x="120" y="88">a decisão mais importante</text><text class="tm" x="120" y="102">do projeto</text></svg>Cabo de guerra entre reuso e liberdade.</aside>
+  <p class="cs-def">As diretrizes se contradizem, e cada uma pesa diferente conforme o tamanho dos modelos, o uso da linguagem e o custo de aplicá-la. O artigo trata as 26 como propostas a considerar, não como lei.</p>
+  <ul class="b">
+    <li>O conflito maior: reaproveitar (5, 6 e 7) ou criar do zero. Reaproveitar economiza tempo, já traz alguma qualidade e cumpre de graça diretrizes como estilo único (21) e modularidade (25).</li>
+    <li>Mas reaproveitar engessa: adaptar a linguagem herdada pode ser difícil ou impossível, e corrigir nela uma diretriz que não foi seguida pode exigir mudança grande.</li>
+    <li>Reaproveitar também briga com a diretriz 14: se nenhuma linguagem pronta lembra a notação do domínio, não dá para atender as duas. E juntar várias linguagens traz estilos e sistemas de tipos diferentes.</li>
+    <li>Do zero você ganha liberdade, mas paga sintaxe concreta e abstrata, condições de contexto e sistema de tipos. Escolher entre os dois caminhos é das decisões mais importantes.</li>
+    <li>Tamanho dos modelos: numa linguagem de configuração, com modelos de poucas linhas, organização em arquivos (19) e modularidade (25) quase não valem; para sistemas grandes, valem muito.</li>
+    <li>Uso: numa DSL só de documentação, evitar elementos ineficientes (13) não faz sentido; numa que vira código em execução, importa muito.</li>
+    <li>Custo: permitir comentários (18) e elementos distinguíveis (16) é barato; referências entre arquivos (19) exigem resolução de nomes e <a href="/m8/comp/07-analise-lexica/consulta#fases">tabela de símbolos</a>. Em DSL pequena, o caro pode ficar de fora.</li>
+    <li>Só que DSLs crescem, e pôr modularidade numa linguagem que já cresceu custa mais do que no começo. Analisar uso e usuários cedo (1 e 2) evita esse custo.</li>
+  </ul>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>Briga</th><th>Por quê</th></tr></thead>
+      <tbody>
+        <tr><td>5–7 × 14</td><td>reaproveitar uma linguagem × usar a notação do domínio, que pode não parecer com nenhuma</td></tr>
+        <tr><td>12 × 17</td><td>sem redundância × açúcar sintático (o for aprimorado do Java)</td></tr>
+        <tr><td>21 × 5</td><td>um estilo só × embutir a OCL padrão, com o estilo dela</td></tr>
+        <tr><td>20 consigo mesma</td><td>compacto para escrever × claro para ler</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ================= Especificar a nova linguagem ================= -->
+<section class="cs" id="especificacao" data-grupo="Especificar a nova linguagem" data-termos="especificacao,ebnf">
+  <h2>O que uma especificação de linguagem traz</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 160"><rect class="gr" x="6" y="6" width="228" height="30" rx="6"/><text class="st" x="14" y="21" style="font-size:10px">léxico: tokens e padrões</text><text class="tm" x="210" y="21">aula 07</text><rect class="bl" x="6" y="42" width="228" height="30" rx="6"/><text class="st" x="14" y="57" style="font-size:10px">sintaxe: GLC em BNF/EBNF</text><text class="tm" x="210" y="57">aula 08</text><rect class="am" x="6" y="78" width="228" height="30" rx="6"/><text class="st" x="14" y="93" style="font-size:10px">semântica: regras e significado</text><text class="tm" x="210" y="93">aula 07</text><rect class="k" x="6" y="114" width="228" height="30" rx="6"/><text class="st" x="14" y="129" style="font-size:10px">exemplos válidos e inválidos</text><text class="tm" x="120" y="156">cada camada confere o que a de cima não pega</text></svg>Uma camada por fase do compilador.</aside>
+  <p class="cs-def">Especificar uma linguagem é escrever, sem deixar dúvida, o que é um programa válido e o que ele significa. A especificação tem uma camada para cada fase do <a href="/m8/comp/07-analise-lexica/consulta#fases">compilador</a>: léxico, sintaxe e semântica, mais exemplos.</p>
+  <ul class="b">
+    <li>Esta seção é complemento: o vídeo e o artigo falam de projetar a linguagem, não de como escrever o documento. Confira a notação na seção 2.4 do livro da Melo.</li>
+    <li>Léxico: a lista de tokens, cada um com seu padrão (uma <a href="/m8/comp/07-analise-lexica/consulta#lexema-token">expressão regular</a>), as palavras-chave e o que é descartado (espaços, comentários).</li>
+    <li>Sintaxe: a <a href="/m8/comp/01-conceitos/consulta#glc">GLC</a>, escrita em <a href="/m8/comp/01-conceitos/consulta#bnf">BNF</a> ou EBNF, cujos terminais são os tipos de token. Ela não pode ser ambígua; em expressões, use <a href="/m8/comp/08-gramaticas-livres-contexto/consulta#precedencia">um nível por operador</a>.</li>
+    <li>Semântica: o que cada construção faz e as regras que a gramática não confere, como tipos compatíveis e "declarar antes de usar" (<a href="/m8/comp/07-analise-lexica/consulta#sintaxe">aula 07</a>). Em geral fica em texto, uma regra por linha.</li>
+    <li>Exemplos: programas válidos e um programa com cada tipo de erro (léxico, sintático, semântico). Eles servem de teste para o compilador depois.</li>
+    <li>A EBNF é uma BNF com atalhos para repetição e opção. Ela não gera nenhuma linguagem que a BNF não gere: cada atalho vira regras comuns.</li>
+  </ul>
+  <div class="cs-formula">
+    <div class="formula">{ x }   zero ou mais x<br>[ x ]   x opcional<br>( a | b )   a ou b, agrupado<br>"se"   terminal escrito como está</div>
+    <ul class="b"><li>Nesta aula, variável em minúsculas (<code>expr</code>), token em maiúsculas (<code>INTEIRO</code>), texto fixo entre aspas e <code>;</code> no fim de cada regra. Muita documentação e o ANTLR usam <code>*</code>, <code>+</code> e <code>?</code> no lugar de { } e [ ], como nas expressões regulares.</li></ul>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>EBNF: <code>lista = item { "," item } ;</code>. A mesma coisa em GLC: <code>L → I R</code>, <code>R → , I R | ε</code>. A chave virou uma variável nova que se repete ou some.</li>
+      <li>EBNF: <code>se = "se" "(" expr ")" bloco [ "senao" bloco ] ;</code>. Em GLC, o opcional vira duas alternativas: <code>SE → se ( E ) B | se ( E ) B senao B</code>.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>A EBNF não é mais poderosa que a BNF; é só mais curta.</li>
+      <li>Escrever a regra semântica dentro da gramática ("o identificador tem de ter sido declarado"). A GLC não consegue conferir isso; vai para a seção de semântica.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="nova-linguagem" data-grupo="Especificar a nova linguagem" data-termos="mini">
+  <h2>Especificando uma linguagem pequena: a Mini</h2>
+  <p class="cs-def">Um exemplo autoral de ponta a ponta: a Mini, uma linguagem pequena para estudantes escreverem contas e decisões. Cada parte da especificação aplica uma ou mais diretrizes. A Figura 2 monta o documento passo a passo.</p>
+  <ul class="b">
+    <li>A Mini não é a linguagem do projeto. Os tokens de expressão seguem a <a href="/m8/comp/08-gramaticas-livres-contexto/consulta#sintatico">gramática da aula 08</a> para você ver como uma especificação cresce a partir dela.</li>
+    <li>Propósito (1–3): quem escreve são estudantes; o uso é traduzir para Python e rodar; tudo o que não serve a contas e decisões fica de fora.</li>
+    <li>Realização (4–7): textual, porque é rápida de construir com ANTLR. Expressões e comandos copiam a forma de C e Python (6), e os tipos são só inteiro e booleano, como em qualquer linguagem (7).</li>
+    <li>Conteúdo (8–13): atribuição, <code>se</code>/<code>senao</code>, <code>enquanto</code>, <code>escreva</code> e expressões. Um comando de repetição só (12).</li>
+    <li>Sintaxe concreta (14–22): <code>+</code> soma, <code>;</code> termina comando, comentário <code>//</code>, palavras-chave em minúsculas. Igualdade é <code>==</code> e atribuição é <code>=</code>, dois tokens diferentes (23).</li>
+    <li>Blocos entre chaves: a indentação não muda nada (24) e cada <code>senao</code> fica preso ao <code>se</code> do seu bloco, sem a dúvida do if/else da <a href="/m8/comp/08-gramaticas-livres-contexto/consulta#catalogo">aula 08</a>.</li>
+  </ul>
+  <div class="cs-formula">
+    <div class="formula">programa = { comando } ;<br>comando = atribuicao | se | enquanto | escreva ;<br>atribuicao = IDENT "=" expr ";" ;<br>se = "se" "(" expr ")" bloco [ "senao" bloco ] ;<br>enquanto = "enquanto" "(" expr ")" bloco ;<br>escreva = "escreva" "(" expr ")" ";" ;<br>bloco = "{" { comando } "}" ;<br>expr = soma [ OPREL soma ] ;<br>soma = termo { OPSOMA termo } ;<br>termo = fator { OPMUL fator } ;<br>fator = "(" expr ")" | IDENT | INTEIRO | "verdadeiro" | "falso" ;</div>
+    <ul class="b"><li>IDENT é <code>[a-z][a-z0-9_]*</code> menos as palavras-chave; INTEIRO é <code>[0-9]+</code>; OPREL é <code>== != &lt; &lt;= &gt; &gt;=</code>; OPSOMA é <code>+ -</code>; OPMUL é <code>* /</code>. Espaços e comentários <code>// …</code> até o fim da linha são descartados.</li></ul>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Regras semânticas: variável só pode ser lida depois de receber valor; a condição de <code>se</code> e de <code>enquanto</code> tem de ser booleana; <code>+ - * /</code> e <code>&lt; &gt;</code> só entre inteiros; <code>==</code> e <code>!=</code> entre dois valores do mesmo tipo.</li>
+      <li>Válido: <code>n = 5; f = 1; enquanto (n &gt; 1) { f = f * n; n = n - 1; } escreva(f);</code> escreve 120.</li>
+      <li>Erro léxico: <code>x = 2 @ 3;</code> (<code>@</code> não é token). Erro sintático: <code>x = 3 + ;</code>. Erro semântico: <code>escreva(y);</code> sem atribuir <code>y</code> antes, ou <code>se (3) { … }</code>.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>A gramática aceita <code>se (1 + 2) { … }</code>. Rejeitar condição que não é booleana é tarefa da semântica, não da GLC.</li>
+      <li>Na Mini, <code>verdadeiro</code> casa com o padrão de IDENT; a palavra-chave precisa ter prioridade, como na <a href="/m8/comp/07-analise-lexica/consulta#desempate">aula 07</a>.</li>
+    </ul>
+  </div>
+  <figure class="fig" id="fig-spec">
+    <div class="fig-head"><span class="fig-title">Figura 2 · A especificação da Mini, parte por parte</span></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <div class="tks chips fases" id="spec-partes"></div>
+        <div class="lbl" id="spec-dir"></div>
+        <pre class="code" id="spec-texto"></pre>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+</section>
+
+<!-- ================= Treino ================= -->
+<section class="cs" id="treino" data-grupo="Treino" data-termos="">
+  <h2>Treino: exercícios autorais</h2>
+  <p class="cs-def">Exercícios autorais, não do professor, sobre o vídeo, o artigo e a especificação. Resolva antes de abrir a resposta; ela é uma solução possível, não a única.</p>
+  <div class="cs-uso">
+    <details><summary>1 · Classifique como DSL ou propósito geral: SQL, C, CSS, Python, expressão regular, Makefile.</summary>
+      <details><summary>Uma resposta</summary><p>DSL: SQL (consultas), CSS (aparência de páginas), expressão regular (padrões de texto), Makefile (como compilar um projeto). Propósito geral: C e Python.</p></details>
+    </details>
+    <details><summary>2 · Uma DSL tem <code>repita 3 vezes { … }</code> e também <code>enquanto (i &lt; 3) { … }</code>. Que diretriz isso arrisca e como você defenderia manter os dois?</summary>
+      <details><summary>Uma resposta</summary><p>Diretriz 12 (redundância conceitual): dois jeitos de repetir. A defesa é a 17: se repetir um número fixo de vezes é muito comum na área, a forma curta é açúcar que compensa, como o for aprimorado do Java.</p></details>
+    </details>
+    <details><summary>3 · Numa linguagem, <code>x = 3</code> atribui fora de um <code>teste</code> e compara dentro dele. Qual diretriz é quebrada e como corrigir?</summary>
+      <details><summary>Uma resposta</summary><p>Diretriz 23: a notação abstrata depende do contexto, como o = da OCL. Corrija com dois tokens, <code>=</code> para atribuir e <code>==</code> para comparar, que viram nós diferentes na árvore.</p></details>
+    </details>
+    <details><summary>4 · Um time quer uma DSL para analistas financeiros escreverem regras de crédito. Faça as perguntas da diretriz 2 e diga uma decisão que depende das respostas.</summary>
+      <details><summary>Uma resposta</summary><p>Quem escreve as regras (analistas)? Quem revisa (risco, jurídico), e quando (antes de cada mudança)? Quem usa os modelos, e para quê (o sistema, para aprovar crédito; auditoria, para explicar a decisão)? Se a auditoria lê, a linguagem precisa de notação descritiva e comentários (15 e 18); se o sistema executa, nada pode ficar subespecificado (1).</p></details>
+    </details>
+    <details><summary>5 · Escreva em EBNF uma lista de parâmetros como <code>(a, b, c)</code>, que também pode ser <code>()</code>. Depois passe para GLC.</summary>
+      <details><summary>Uma resposta</summary><p>EBNF: <code>params = "(" [ IDENT { "," IDENT } ] ")" ;</code>. GLC: <code>P → ( ) | ( L )</code>, <code>L → id R</code>, <code>R → , id R | ε</code>.</p></details>
+    </details>
+    <details><summary>6 · Na Mini, classifique o erro: <code>escreva(1 &lt; verdadeiro);</code>, <code>enquanto n &gt; 0 { n = n - 1; }</code> e <code>x = 10 # 2;</code>.</summary>
+      <details><summary>Uma resposta</summary><p>Semântico (<code>&lt;</code> só entre inteiros); sintático (faltam os parênteses da condição); léxico (<code>#</code> não é token).</p></details>
+    </details>
+    <details><summary>7 · Desenhe a sintaxe abstrata de <code>se (a &gt; 0) { b = a * 2; }</code> e diga o que da sintaxe concreta não aparece nela.</summary>
+      <details><summary>Uma resposta</summary><p>Raiz <i>Se</i> com dois filhos: a condição <i>Maior(a, 0)</i> e o bloco com <i>Atribuição(b, Mult(a, 2))</i>. Somem os parênteses, as chaves, o <code>;</code> e as palavras <code>se</code> e <code>=</code>, que viraram o tipo dos nós.</p></details>
+    </details>
+    <details><summary>8 · Para uma DSL de configuração com arquivos de 10 linhas, vale implementar import entre arquivos (diretriz 19)?</summary>
+      <details><summary>Uma resposta</summary><p>Provavelmente não: modelos pequenos quase não ganham com isso, e referências entre arquivos exigem resolução de nomes e tabela de símbolos. A ressalva do artigo: se a DSL tende a crescer, pôr isso depois custa mais.</p></details>
+    </details>
+  </div>
+  <div class="cs-pegadinhas">Uma boa resposta cita o número da diretriz e diz o que a decisão custa para quem usa a linguagem.</div>
+</section>

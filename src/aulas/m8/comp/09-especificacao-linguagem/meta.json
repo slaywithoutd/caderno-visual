@@ -1,0 +1,17 @@
+{
+  "numero": "09",
+  "data": "2026-11-03",
+  "titulo": "Especificação da nova linguagem",
+  "tema": "Linguagens formais e autômatos",
+  "modos": ["consulta"],
+  "resumo": "O que é uma linguagem específica de domínio (DSL), as 26 diretrizes de Karsai et al. para projetar uma, a diferença entre sintaxe concreta e abstrata e como juntar léxico, gramática e regras de significado na especificação de uma linguagem nova.",
+  "topicos": ["DSL × propósito geral", "Modelo, metamodelo e geradores", "Vantagens e custos", "26 diretrizes", "Sintaxe concreta e abstrata", "Açúcar sintático", "EBNF", "Especificação de uma linguagem"],
+  "secoes": [],
+  "fontes": [
+    { "titulo": "Thiago Jabur · Domain Specific Language, Linguagem Específica de Domínio, DSL, JetBrains MPS", "url": "https://www.youtube.com/watch?v=qn5uxhP416Q", "nota": "Autoestudo, 14 min. Transcrição automática do YouTube lida inteira; as telas do vídeo não foram vistas." },
+    { "titulo": "Karsai, Krahn, Pinkernell, Rumpe, Schindler e Völkel, Design guidelines for domain specific languages (DSM'09) · seção 2, DSL design guidelines (p. 2–6)", "url": "https://arxiv.org/pdf/1409.2378", "nota": "Autoestudo. PDF de 6 páginas lido inteiro; a seção 2 é o trecho indicado, as seções 1, 3 e 4 entram como contexto." },
+    { "titulo": "Melo e Silva, Princípios de linguagens de programação, Blucher, 2003 · cap. 2, seção 2.4", "nota": "Autoestudo. Não consultado: o e-book não estava acessível. O tema da seção não foi conferido." },
+    { "titulo": "Slides da aula 01 (prof. Resina)", "nota": "Roteiro do módulo (fases do compilador, \"a linguagem que vamos construir\") e ponderadas, já em notas/ da aula 01." }
+  ],
+  "observacao": "Escrita a partir da transcrição do vídeo e do artigo inteiro. A seção 2.4 do livro da Melo não foi lida: confira nela a notação e os exemplos de especificação. Ficaram fora dos autoestudos, marcados no texto: a EBNF, o roteiro de especificação e a linguagem Mini, um exemplo autoral para treinar."
+}

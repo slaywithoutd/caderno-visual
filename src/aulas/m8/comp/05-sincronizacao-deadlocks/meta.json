@@ -1,5 +1,6 @@
 {
   "numero": "05",
+  "data": "2026-11-04",
   "titulo": "Semáforos, sincronização e deadlocks",
   "tema": "Do silício ao sistema operacional",
   "resumo": "Race condition (condição de corrida), região crítica e exclusão mútua; soluções por hardware e por software; semáforos, monitores e troca de mensagens; produtor/consumidor, leitores e escritores, filósofos; interrupção e laço principal, spinlocks e FIFOs do RP2040; TOCTOU e Dirty COW; deadlock, condições de Coffman, grafo de alocação, prevenção, algoritmo do banqueiro, detecção e recuperação.",

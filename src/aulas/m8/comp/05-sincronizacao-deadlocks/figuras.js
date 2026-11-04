@@ -516,6 +516,7 @@ const SUAVE = { A: 'var(--blue-soft)', B: 'var(--amber-soft)' };
 /* ============ Fig 5: algoritmo do banqueiro ============ */
 (function () {
   const root = document.getElementById('fig-bank');
+  if (!root) return;
   const tab = document.getElementById('bank-tab'), trail = document.getElementById('bank-trail');
   const ver = document.getElementById('bank-verdict'), cap = document.getElementById('bank-cap');
   const TOTAL = 10, ALOC = [3, 2, 2], MAX = [9, 4, 7];

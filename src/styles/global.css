@@ -606,12 +606,13 @@ section.cs:first-of-type{border-top:0}
 section.cs > h2{font-size:1.45rem;margin:0 0 .9rem}
 section.cs h3{font-size:1.02rem;margin:1.6rem 0 .5rem}
 .cs-def{font-size:1.07rem;line-height:1.65;color:var(--fg);margin:0 0 1.1rem;max-width:68ch}
-.cs-formula,.cs-uso,.cs-pegadinhas,.cs-ponderada,.cs-mais{margin:1.3rem 0}
-.cs-formula::before,.cs-uso::before,.cs-pegadinhas::before,.cs-ponderada::before,.cs-mais::before{display:block;font-size:.68rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:.45rem}
+.cs-formula,.cs-uso,.cs-pegadinhas,.cs-ponderada,.cs-comentar,.cs-mais{margin:1.3rem 0}
+.cs-formula::before,.cs-uso::before,.cs-pegadinhas::before,.cs-ponderada::before,.cs-comentar::before,.cs-mais::before{display:block;font-size:.68rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:.45rem}
 .cs-formula::before{content:'Fórmula'}
 .cs-uso::before{content:'Como usar'}
 .cs-pegadinhas::before{content:'Pegadinhas'}
 .cs-ponderada::before{content:'Na ponderada'}
+.cs-comentar::before{content:'Para comentar'}
 .cs-mais::before{content:'Detalhes'}
 .cs-formula .formula{margin:.3rem 0}
 /* "Em resumo" (versão curta de um complemento do professor) e o "Detalhes" do modo compacto (lib/consulta.js) */

@@ -38,6 +38,7 @@ const SUAVE = { A: 'var(--blue-soft)', B: 'var(--amber-soft)' };
 /* ============ Fig 1: condição de corrida ============ */
 (function () {
   const root = document.getElementById('fig-corrida');
+  if (!root) return;
   const svg = document.getElementById('corrida-svg'), cap = document.getElementById('corrida-cap');
   const ARIT = ['LOAD R1, saldo', 'ADD R1, R1, 1', 'STORE saldo, R1'];
   const MUT = ['P(mutex)', ...ARIT, 'V(mutex)'];
@@ -184,6 +185,7 @@ const SUAVE = { A: 'var(--blue-soft)', B: 'var(--amber-soft)' };
 /* ============ Fig 2: semáforo com valor e fila ============ */
 (function () {
   const root = document.getElementById('fig-sem');
+  if (!root) return;
   const svg = document.getElementById('sem-svg'), trail = document.getElementById('sem-trail');
   const CEN = {
     cont: {
@@ -292,6 +294,7 @@ const SUAVE = { A: 'var(--blue-soft)', B: 'var(--amber-soft)' };
 /* ============ Fig 3: produtor/consumidor ============ */
 (function () {
   const root = document.getElementById('fig-pc');
+  if (!root) return;
   const svg = document.getElementById('pc-svg'), cap = document.getElementById('pc-cap');
   const nIn = document.getElementById('pc-n'), nOut = document.getElementById('pc-nv');
   const ROTEIROS = {
@@ -405,6 +408,7 @@ const SUAVE = { A: 'var(--blue-soft)', B: 'var(--amber-soft)' };
 /* ============ Fig 4: grafo de alocação de recursos ============ */
 (function () {
   const root = document.getElementById('fig-dl');
+  if (!root) return;
   const svg = document.getElementById('dl-svg'), cap = document.getElementById('dl-cap');
   /* posições em volta de uma elipse: x = 320 + 210 cos θ, y = 150 − 110 sin θ */
   const anel = (g) => [320 + 210 * Math.cos(g * Math.PI / 180), 150 - 110 * Math.sin(g * Math.PI / 180)];

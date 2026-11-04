@@ -34,6 +34,11 @@
     ["projeto", "Aplicação ao projeto"]
   ],
   "fontes": [
+    { "tipo": "Slides", "titulo": "João Luisi · S04 - Sistemas operacionais: semáforos e deadlock · 04/11/2026 · 31 páginas conferidas", "secao": "encontro" },
+    { "tipo": "Documentação", "titulo": "PostgreSQL · deadlock_timeout, locks explícitos e códigos de erro", "url": "https://www.postgresql.org/docs/current/explicit-locking.html", "secao": "postgres" },
+    { "tipo": "Documentação", "titulo": "Linux · lockdep e futex(7)", "url": "https://docs.kernel.org/locking/lockdep-design.html", "secao": "estrategias" },
+    { "tipo": "Documentação", "titulo": "The Go Authors · Effective Go", "url": "https://go.dev/doc/effective_go", "secao": "monitor" },
+    { "tipo": "Documentação", "titulo": "Zephyr · Mutexes", "url": "https://docs.zephyrproject.org/latest/kernel/services/synchronization/mutexes.html", "secao": "semaforo" },
     { "tipo": "Livro", "titulo": "Machado & Maia, Arquitetura de sistemas operacionais, cap. 7 · Aplicações concorrentes e especificação de concorrência (p. 93–96)", "secao": "antes" },
     { "tipo": "Livro", "titulo": "Machado & Maia, cap. 7 · Problemas de compartilhamento de recursos (p. 96–98)", "secao": "corrida" },
     { "tipo": "Livro", "titulo": "Machado & Maia, cap. 7 · Exclusão mútua e soluções de hardware (p. 98–101)", "secao": "exclusao" },
@@ -53,5 +58,5 @@
     { "tipo": "Documentação", "titulo": "Red Hat · CVE-2016-5195 (Dirty COW)", "url": "https://access.redhat.com/security/cve/cve-2016-5195", "secao": "seguranca" },
     { "tipo": "Código", "titulo": "Linux · commit 19be0eaf, correção do Dirty COW", "url": "https://github.com/torvalds/linux/commit/19be0eaffa3ac7d8eb6784ad9bdbc7d67ed8e619", "secao": "seguranca" }
   ],
-  "observacao": "Autoestudo: Machado & Maia, Arquitetura de sistemas operacionais, cap. 7; os slides de Luisi (19/10/2026, p. 37) confirmam a 5ª edição (LTC, 2013). As faixas de página por seção vêm da indicação do autoestudo e não foram conferidas contra o livro. O livro chama P e V de DOWN e UP; aqui as três duplas de nomes aparecem juntas. O passo a passo do algoritmo do banqueiro segue a forma usual dos livros de SO (Tanenbaum, Silberschatz), mais detalhada que a do Machado & Maia. As seções 8 e 9 vão além do capítulo: aplicam a sincronização aos chips do projeto e a ataques reais, com números das fontes listadas. O guia do encontro, o quiz, os exercícios e a decisão de projeto são autorais, com valores de exemplo; não são questões do professor. Os slides do encontro desta aula ainda não existem e serão integrados depois."
+  "observacao": "Autoestudo: Machado & Maia, Arquitetura de sistemas operacionais, cap. 7; os slides de Luisi (19/10/2026, p. 37) confirmam a 5ª edição (LTC, 2013). As faixas de página por seção vêm da indicação do autoestudo e não foram conferidas contra o livro. O livro chama P e V de DOWN e UP; aqui as três duplas de nomes aparecem juntas. O passo a passo do algoritmo do banqueiro segue a forma usual dos livros de SO (Tanenbaum, Silberschatz), mais detalhada que a do Machado & Maia. As seções 8 e 9 vão além do capítulo: aplicam a sincronização aos chips do projeto e a ataques reais, com números das fontes listadas. O guia do encontro, o quiz, os exercícios e a decisão de projeto são autorais, com valores de exemplo; não são questões do professor. Os slides do encontro de 04/11 (31 páginas) foram conferidos e integrados na versão enxuta; a aula completa ainda não os recebeu."
 }

@@ -1,14 +1,14 @@
 {
   "aula": "m8/comp/05-sincronizacao-deadlocks",
   "data": "2026-10-21",
-  "criterio": "Rastreabilidade das fontes desta aula. O livro não foi lido integralmente nesta revisão e os slides do encontro ainda não existem; nada aqui equivale a conferência de leitura integral.",
+  "criterio": "Rastreabilidade das fontes desta aula. O livro não foi lido integralmente nesta revisão; nada aqui equivale a conferência de leitura integral.",
   "fontes": [
     {
       "id": "luisi-encontro",
-      "url": "src/aulas/m8/comp/05-sincronizacao-deadlocks/notas/",
+      "url": "arquivo enviado pela dona: S04 - Sistemas operacionais - Semaforos e deadlock.pdf (não republicado)",
       "escopo": "Slides do encontro presencial de João Luisi sobre sincronização e deadlocks (Machado & Maia, cap. 7)",
-      "acesso": "indisponivel",
-      "limitacao": "O PDF do encontro ainda não existe. Será integrado depois do encontro com a skill integrar-notas, e esta matriz ganhará as unidades por página. O guia, o quiz, os exercícios e a aplicação ao projeto da aula são autorais, no formato do encontro de 19/10, e não reproduzem questões do professor."
+      "acesso": "parcial",
+      "limitacao": "PDF de 04/11/2026 lido nas 31 páginas e com as figuras conferidas. Integrado página por página só em enxuta.html, na ordem dos slides; o consulta.html não foi alterado, a pedido da dona, e a matriz por unidade contra ele continua pendente. O vídeo S04-cc08-jantar-dos-filosofos.mp4 ainda não foi assistido: passa do limite do conector do Drive."
     },
     {
       "id": "machado-cap7",

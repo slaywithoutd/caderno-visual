@@ -11,11 +11,12 @@ export const modulos = [
     titulo: 'Módulo 8',
     materias: [
       {
-        slug: 'comp', titulo: 'Computação', descricao: 'Dois eixos: linguagens formais e autômatos; arquitetura de computadores e sistemas operacionais.',
+        slug: 'comp', titulo: 'Computação', descricao: 'Três eixos: linguagens formais e autômatos; arquitetura de computadores e sistemas operacionais; interface com dispositivos embarcados.',
         /* eixos da matéria, na ordem das aulas. Cada aula entra no eixo cujo título é igual ao "tema" do meta.json. */
         eixos: [
           { slug: 'lfa', titulo: 'Linguagens formais e autômatos', descricao: 'Linguagens, gramáticas e as máquinas que as reconhecem.' },
           { slug: 'sistemas', titulo: 'Do silício ao sistema operacional', descricao: 'Arquitetura de computadores e sistemas operacionais: do processador e da memória até processos, sincronização e gerência de recursos.' },
+          { slug: 'interface', titulo: 'Interface com dispositivos embarcados', descricao: 'Como um programa no computador, inclusive uma página no navegador, conversa com um microcontrolador: porta serial, USB e Web Serial API.' },
         ],
       },
       { slug: 'mat', titulo: 'Matemática', descricao: '' },

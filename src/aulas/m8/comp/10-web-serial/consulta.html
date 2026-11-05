@@ -1,0 +1,472 @@
+<!-- Aula 07 de Computação (05/11/2026), eixo "Interface com dispositivos embarcados", só modo Consulta.
+     Um conceito por seção, em ordem de dependência. Estrutura de cada seção:
+     h2 → p.cs-def → .cs-formula → .cs-uso → .cs-pegadinhas → .cs-ponderada → visuais.
+     Os visuais (desenhos de margem, tabelas, figuras e loops) estão escritos aqui mesmo; não há conteudo.html. -->
+
+<!-- ================= Resumo ================= -->
+<section class="cs" id="encontro" data-grupo="Resumo" data-termos="">
+  <h2>Resumo</h2>
+  <p class="cs-def">Uma página conversa com um microcontrolador pela Web Serial API: pede a porta num clique, abre com o baud rate do firmware e troca bytes por streams, montando as mensagens ela mesma.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 118"><rect class="k" x="2" y="26" width="108" height="56" rx="6"/><text x="56" y="46">página</text><text class="tm" x="56" y="64">navigator.serial</text><rect class="gr" x="166" y="26" width="72" height="56" rx="6"/><text x="202" y="46">placa</text><text class="tm" x="202" y="64">UART/USB</text><path class="s" d="M112,42 H162" marker-end="url(#mnarrow)"/><text class="tm" x="138" y="32">0x31</text><path class="s" d="M164,68 H114" marker-end="url(#mnarrow)"/><text class="tm" x="138" y="78">"ok"</text><text class="tm" x="120" y="104">bytes nos dois sentidos, aos pedaços</text></svg>A página escreve bytes, a placa responde bytes. Mensagem é combinação de vocês dois.</aside>
+  <ul class="b">
+    <li>Na UART, cada byte viaja num quadro de bits. Em 8N1 são 10 bits por byte, então 115200 baud dão 11 520 bytes por segundo.</li>
+    <li>USB e Bluetooth clássico emulam uma porta serial (USB CDC-ACM e SPP). O Arduino Uno chega lá por uma ponte USB-serial; o RP2040, pelo próprio USB.</li>
+    <li>A página só vê a porta que a pessoa escolher: <code>requestPort()</code> num clique, seletor do navegador, permissão guardada para aquela origem, e tudo isso só em HTTPS.</li>
+    <li><code>open({ baudRate })</code> abre a porta. <code>readable</code> e <code>writable</code> são streams de bytes (<code>Uint8Array</code>), e cada <code>read()</code> entrega um chunk.</li>
+    <li>Chunk não é mensagem. Texto passa por <code>TextDecoder</code> e é cortado num delimitador; dado binário leva tamanho, checksum e confirmação.</li>
+    <li>Para fechar: <code>cancel()</code>, <code>releaseLock()</code> e <code>close()</code>, nessa ordem. <code>forget()</code> apaga a permissão.</li>
+  </ul>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>115200 baud não são 115200 bytes por segundo: em 8N1, são 11 520.</li>
+    <li>Abrir a porta reinicia o Uno. Configurar 1200 baud tira o RP2040 do programa (pico-sdk).</li>
+    <li>O artigo do dev.to é de 2020 e manda ligar uma flag. Desde o Chrome 89 isso não é mais preciso.</li>
+    <li>A Web Serial não fala com dispositivo BLE: BLE não emula porta serial.</li>
+  </ul></div>
+</section>
+
+<!-- ================= Antes de começar ================= -->
+<section class="cs" id="antes" data-grupo="Antes de começar" data-termos="promise,async-await,uint8array">
+  <h2>Antes de começar</h2>
+  <p class="cs-def">A aula usa três peças do JavaScript assíncrono (Promise, async/await e Uint8Array) e alguns conceitos do eixo Do silício ao sistema operacional. Quem já sabe, fecha as caixas.</p>
+  <details class="base" open>
+    <summary><span class="base-tag">Base</span> O que vem do eixo anterior</summary>
+    <ul class="b">
+      <li>Sistema embarcado, firmware e bootloader: <a href="/m8/comp/02-fundamentos-memoria">aula 02</a>. O bootloader é o programa que roda primeiro e consegue gravar um firmware novo; ele volta várias vezes aqui.</li>
+      <li>Hexadecimal: <a href="/m8/comp/02-fundamentos-memoria">aula 02</a>. Cada dígito vale 4 bits, então 0x2341 = 2·16³ + 3·16² + 4·16 + 1 = 9025.</li>
+      <li>Buffer e interrupção: <a href="/m8/comp/04-processos-threads">aula 04</a>. A UART do chip guarda cada byte que chega num buffer pequeno e avisa a CPU por interrupção; se ninguém esvazia, o buffer enche (o buffer limitado da <a href="/m8/comp/05-sincronizacao-deadlocks">aula 05</a>).</li>
+      <li>Superloop: <a href="/m8/comp/04-processos-threads">aula 04</a>. É o <code>loop()</code> do Arduino, que faz uma coisa depois da outra para sempre.</li>
+      <li>Driver: <a href="/m8/comp/06-gerencia-recursos">aula 06</a>. É o código do sistema operacional que sabe falar com um tipo de dispositivo.</li>
+    </ul>
+  </details>
+  <details class="base" open>
+    <summary><span class="base-tag">Base</span> JavaScript assíncrono em 3 minutos</summary>
+    <ul class="b">
+      <li>Uma <b>Promise</b> é um resultado que ainda vai chegar. Ela termina cumprida (com um valor) ou rejeitada (com um erro). Abrir a porta, esperar um byte e escrever devolvem Promises, porque dependem do mundo de fora.</li>
+      <li><b>async e await</b>: dentro de uma função <code>async</code>, <code>await p</code> pausa a função até a Promise <code>p</code> terminar. Se ela for rejeitada, vira uma exceção, e o <code>try/catch</code> de sempre pega. A tela não trava enquanto isso.</li>
+      <li><b>Uint8Array</b>: array em que cada posição é um byte de 0 a 255. <code>new Uint8Array([104, 105])</code> são os bytes de "hi". É o formato que a porta entrega e recebe.</li>
+    </ul>
+  </details>
+  <div class="tbl prose"><table>
+    <thead><tr><th>Você vê</th><th>Leia como</th></tr></thead>
+    <tbody>
+      <tr><td><code>await port.open(…)</code></td><td>espere a porta abrir; se der errado, vira exceção</td></tr>
+      <tr><td><code>const { value, done } = r</code></td><td>pegue <code>r.value</code> e <code>r.done</code> em duas variáveis (desestruturação)</td></tr>
+      <tr><td><code>'serial' in navigator</code></td><td>o objeto <code>navigator</code> tem a propriedade <code>serial</code>?</td></tr>
+      <tr><td><code>0x2E8A</code></td><td>número em hexadecimal (11 914)</td></tr>
+      <tr><td><code>'\n'</code> e <code>'\r\n'</code></td><td>fim de linha: LF (0x0A); CR LF (0x0D 0x0A), o que o <code>Serial.println</code> do Arduino manda</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ================= O fio ================= -->
+<section class="cs" id="serial" data-grupo="O fio" data-termos="comunicacao-serial,uart,baud-rate,quadro-uart,start-stop-bit,paridade,notacao-8n1,controle-fluxo">
+  <h2>UART, quadro e baud rate</h2>
+  <p class="cs-def">Na <b>comunicação serial</b>, os bits de cada byte saem um depois do outro pelo mesmo fio. A <b>UART</b> é o periférico do chip que faz isso, e o <b>baud rate</b> diz quantos bits por segundo passam pela linha.</p>
+  <aside class="mn loop" data-loop="quadro" data-ms="7000" data-still="0.92" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>"A" (0x41) em 8N1: start 0, os 8 bits do menos significativo para o mais, stop 1.</aside>
+  <ul class="b">
+    <li>Três fios: o TX de um lado vai no RX do outro, e o terra é comum. Não há fio de clock. Por isso a UART é assíncrona, e por isso os dois lados combinam a velocidade antes.</li>
+    <li>Parada, a linha fica em 1. Cada byte viaja num <b>quadro</b>: um <b>start bit</b> (0), os 8 bits de dados começando pelo menos significativo, um <b>bit de paridade</b> opcional e um ou dois <b>stop bits</b> (1).</li>
+    <li>A configuração vira sigla. <b>8N1</b> é 8 bits de dados, sem paridade (N) e 1 stop bit; é o padrão da Web Serial e do Arduino. 8E1 tem paridade par (E, de even); 8O1, ímpar.</li>
+    <li>A <b>paridade</b> acrescenta um bit que deixa a contagem de 1s par (ou ímpar). Um bit trocado no caminho quebra a conta e o receptor percebe.</li>
+    <li>O <b>controle de fluxo</b> por hardware usa dois fios a mais, RTS e CTS, para o receptor pedir "pare". O padrão da Web Serial é sem controle de fluxo, e o Uno nem liga esses fios até o microcontrolador.</li>
+  </ul>
+  <div class="cs-formula"><div class="formula">bytes por segundo = baud rate ÷ bits por quadro<br>8N1: 1 + 8 + 1 = 10 bits por byte</div><ul class="b"><li>O baud rate está em bits por segundo. Os bits por quadro contam start, dados, paridade e stop.</li></ul></div>
+  <div class="cs-uso"><ul class="b">
+    <li>A 9600 baud em 8N1: 9600 ÷ 10 = 960 bytes por segundo. Um byte leva 1 ÷ 960 ≈ 1,04 ms.</li>
+    <li>A 115200 baud: 11 520 bytes por segundo, 86,8 µs por byte e 8,68 µs por bit.</li>
+    <li>O artigo do dev.to lista os valores esperados: de 50 a 115200 (115200, 57600, 38400, 19200, 9600, 4800, 2400, 1800, 1200, 600, 300, 200, 150, 134, 110, 75, 50).</li>
+    <li>Se um lado está em 9600 e o outro em 115200, o receptor mede cada bit na hora errada. Chegam bytes sem sentido e aparecem framing errors (<a href="#streams">streams</a>).</li>
+  </ul></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>115200 baud não são 115200 bytes por segundo. Start e stop ocupam 2 de cada 10 bits: sobram 11 520 bytes.</li>
+    <li>O primeiro bit de dado é o menos significativo: 0x41 = 0100 0001 sai como 1 0 0 0 0 0 1 0.</li>
+    <li>Paridade detecta um bit trocado, mas não diz qual foi e não vê dois bits trocados.</li>
+  </ul></div>
+  <div class="tbl prose"><table>
+    <thead><tr><th>Baud rate</th><th>Bytes por segundo (8N1)</th><th>Um byte leva</th></tr></thead>
+    <tbody>
+      <tr><td>9600</td><td>960</td><td>1,04 ms</td></tr>
+      <tr><td>57600</td><td>5 760</td><td>174 µs</td></tr>
+      <tr><td>115200</td><td>11 520</td><td>86,8 µs</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="cs" id="porta-virtual" data-grupo="O fio" data-termos="porta-serial,usb-cdc,bluetooth-spp,ponte-usb-serial,vid-pid,webusb,webhid">
+  <h2>Porta serial física e virtual</h2>
+  <p class="cs-def">Para um programa, uma <b>porta serial</b> é um nome do sistema operacional (COM3 no Windows, /dev/ttyACM0 no Linux). Por trás dele pode haver uma UART de verdade ou um dispositivo USB ou Bluetooth que emula uma.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 148"><text class="tm st" x="4" y="8">Arduino Uno: ponte USB-serial</text><rect class="k" x="4" y="20" width="40" height="30" rx="4"/><text x="24" y="35">PC</text><path class="s" d="M46,35 H70" marker-end="url(#mnarrow)"/><text class="tm" x="58" y="58">USB</text><rect class="bl" x="72" y="20" width="56" height="30" rx="4"/><text x="100" y="35">16U2</text><path class="s" d="M130,35 H160" marker-end="url(#mnarrow)"/><text class="tm" x="145" y="58">UART</text><rect class="am" x="162" y="20" width="74" height="30" rx="4"/><text x="199" y="35">328P</text><text class="tm st" x="4" y="84">Raspberry Pi Pico: USB nativo</text><rect class="k" x="4" y="96" width="40" height="30" rx="4"/><text x="24" y="111">PC</text><path class="s" d="M46,111 H70" marker-end="url(#mnarrow)"/><text class="tm" x="58" y="134">USB</text><rect class="gr" x="72" y="96" width="164" height="30" rx="4"/><text x="154" y="111">RP2040</text></svg>No Uno, o baud combinado vale no trecho UART. No Pico, não há trecho UART.</aside>
+  <ul class="b">
+    <li>Pelo USB, o dispositivo se apresenta como <b>USB CDC-ACM</b>, a classe padrão "sou uma porta serial". O sistema operacional já tem driver para ela: a placa aparece sem instalar nada.</li>
+    <li>Pelo Bluetooth clássico, o perfil é o <b>Bluetooth SPP</b>, que roda sobre o protocolo RFCOMM.</li>
+    <li>Todo dispositivo USB informa um <b>vendor ID</b> (o fabricante, atribuído pelo USB-IF) e um <b>product ID</b> (o produto, escolhido pelo fabricante), de 16 bits cada.</li>
+    <li>Duas APIs vizinhas cobrem o que não é porta serial. A <b>WebUSB</b> fala USB cru com um dispositivo que nenhum driver do sistema pegou. A <b>WebHID</b> fala com dispositivos HID: teclados, controles de jogo.</li>
+    <li>Exemplos de dispositivos serial, segundo o MDN: impressoras 3D, placas ESP32 e microcontroladores como o BBC micro:bit.</li>
+  </ul>
+  <div class="cs-uso"><ul class="b">
+    <li>Arduino Uno R3: dois chips. O ATmega16U2 é uma <b>ponte USB-serial</b>: fala CDC com o computador e UART com o ATmega328P, que roda o seu sketch. Clones usam um CH340 e aparecem como /dev/ttyUSB0.</li>
+    <li>Raspberry Pi Pico: o RP2040 tem USB próprio, e o pico-sdk o apresenta como CDC. Não há UART no caminho.</li>
+    <li>Por isso o baud do <code>open()</code> importa no Uno (é a velocidade do trecho UART) e é ignorado pela emulação no Pico, com uma exceção perigosa (<a href="#abrir">abrir a porta</a>).</li>
+    <li>Se o programa da placa demora para ler, o Uno perde bytes: o buffer de recepção do 328P tem 64 B e não há controle de fluxo. No Pico, o próprio USB segura o envio até o RP2040 ter espaço.</li>
+  </ul></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Mesmo vendor ID não é mesma placa: 0x2341 é qualquer Arduino; o product ID separa o Uno (0x0043) dos outros.</li>
+    <li>BLE (Bluetooth Low Energy) não tem SPP. Um dispositivo BLE não aparece como porta serial.</li>
+  </ul></div>
+  <div class="cs-ponderada"><p>A pulseira manda o log por BLE. Como BLE não emula porta serial, uma página que quisesse ler esse log usaria a Web Bluetooth, não a Web Serial.</p></div>
+  <div class="tbl prose"><table>
+    <thead><tr><th></th><th>Arduino Uno R3</th><th>Raspberry Pi Pico (RP2040)</th></tr></thead>
+    <tbody>
+      <tr><td>Quem fala USB</td><td>ATmega16U2 (ponte)</td><td>o próprio RP2040</td></tr>
+      <tr><td>Vendor ID : product ID</td><td>0x2341 : 0x0043</td><td>0x2E8A : 0x000A (pico-sdk, stdio por USB)</td></tr>
+      <tr><td>O <code>baudRate</code> do <code>open()</code></td><td>vale: é a velocidade da UART até o 328P</td><td>ignorado, exceto 1200</td></tr>
+      <tr><td>Se o programa não lê a tempo</td><td>buffer de 64 B enche e bytes se perdem</td><td>o USB segura o envio</td></tr>
+      <tr><td>Ao abrir a porta</td><td>o 328P reinicia (reset automático)</td><td>nada muda</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tbl prose"><table>
+    <thead><tr><th>API</th><th>Para quê</th><th>Exemplo</th></tr></thead>
+    <tbody>
+      <tr><td>Web Serial</td><td>porta serial, física ou emulada (CDC, SPP)</td><td>Arduino, Pico, impressora 3D</td></tr>
+      <tr><td>WebUSB</td><td>USB cru, sem driver do sistema</td><td>gravador de firmware próprio</td></tr>
+      <tr><td>WebHID</td><td>classe HID</td><td>controle de jogo, teclado especial</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ================= A API ================= -->
+<section class="cs" id="web-serial" data-grupo="A API" data-termos="web-serial,navigator-serial,serialport,feature-detection,worker">
+  <h2>A Web Serial API</h2>
+  <p class="cs-def">A <b>Web Serial API</b> deixa uma página ler e escrever numa porta serial com JavaScript. Tudo começa em <b>navigator.serial</b>, que entrega objetos <b>SerialPort</b>, um por porta.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 138"><rect class="acf" x="50" y="4" width="140" height="26" rx="5"/><text x="120" y="17">navigator.serial</text><path class="s" d="M120,32 V50" marker-end="url(#mnarrow)"/><text class="tm st" x="126" y="41">requestPort() · getPorts()</text><rect class="k" x="60" y="52" width="120" height="26" rx="5"/><text x="120" y="65">SerialPort</text><path class="s" d="M100,80 L64,98" marker-end="url(#mnarrow)"/><path class="s" d="M140,80 L176,98" marker-end="url(#mnarrow)"/><rect class="bl" x="6" y="100" width="104" height="24" rx="5"/><text x="58" y="112">readable</text><rect class="am" x="130" y="100" width="104" height="24" rx="5"/><text x="182" y="112">writable</text><text class="tm" x="58" y="133">ReadableStream</text><text class="tm" x="182" y="133">WritableStream</text></svg>Do objeto Serial às portas, e de cada porta aos dois streams.</aside>
+  <ul class="b">
+    <li>Duas interfaces. Serial (o <code>navigator.serial</code>): <code>requestPort()</code>, <code>getPorts()</code> e os eventos <code>connect</code> e <code>disconnect</code>. SerialPort: <code>open()</code>, <code>close()</code>, <code>getInfo()</code>, <code>forget()</code>, <code>setSignals()</code>, <code>getSignals()</code> e as propriedades <code>readable</code>, <code>writable</code> e <code>connected</code>.</li>
+    <li>SerialPort não tem construtor. Você só ganha um de <code>requestPort()</code> ou <code>getPorts()</code>.</li>
+    <li>Tudo é assíncrono de propósito: dados chegam a qualquer hora, e esperar por eles com Promises não trava a tela.</li>
+    <li>Funciona na página e em <b>workers</b> dedicados, onde o mesmo objeto se chama <code>WorkerNavigator.serial</code>.</li>
+    <li>Quem usa: Arduino Create, Betaflight Configurator, Espruino Web IDE e Microsoft MakeCode. Antes, esses sites precisavam de um programa instalado ou de um app em Electron.</li>
+    <li>A ideia do artigo do dev.to: quem já sabe web começa a mexer com hardware sem sair do navegador.</li>
+  </ul>
+  <div class="cs-uso">
+    <p>Antes de tudo, <b>feature detection</b>: teste se a API existe em vez de adivinhar pelo nome do navegador.</p>
+<pre><code>if ('serial' in navigator) {
+  // pode usar a Web Serial
+} else {
+  mostrar('Use Chrome, Edge ou Opera no computador, ou Firefox 151+.');
+}</code></pre>
+    <ul class="b">
+      <li>No Android sem suporte nativo, existe um polyfill que imita a Web Serial por cima da WebUSB, para placas que nenhum driver do sistema pegou.</li>
+      <li>Para praticar, o Codelab do Google usa a Web Serial para desenhar na matriz de LEDs 5×5 de um micro:bit.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>O artigo do dev.to (abril de 2020) manda ligar Experimental Web Platform Features. Ele mesmo traz a atualização: desde o Chrome 89 a API é estável, sem flag e sem origin trial.</li>
+    <li>Em <code>http://</code> comum, <code>'serial' in navigator</code> é falso até no Chrome. A API só existe em contexto seguro (<a href="#permissao">próxima seção</a>).</li>
+    <li>O MDN ainda marca Serial e SerialPort como experimentais.</li>
+  </ul></div>
+  <div class="tbl prose"><table>
+    <thead><tr><th>Navegador</th><th>Web Serial (MDN, novembro de 2026)</th></tr></thead>
+    <tbody>
+      <tr><td>Chrome, Edge e Opera no computador</td><td>sim, desde a versão 89</td></tr>
+      <tr><td>Chrome no Android</td><td>sim desde a 148; da 138 à 147, só portas Bluetooth RFCOMM</td></tr>
+      <tr><td>Firefox no computador</td><td>sim, desde a versão 151</td></tr>
+      <tr><td>Firefox no Android, Safari (macOS e iOS), WebView do Android</td><td>não</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="cs" id="permissao" data-grupo="A API" data-termos="ativacao-transitoria,filtro-porta,permissao-origem,contexto-seguro,permissions-policy,conexao-logica">
+  <h2>Escolher a porta: permissão e segurança</h2>
+  <p class="cs-def">A página não enxerga as portas do computador. Ela chama <code>requestPort()</code>, o navegador mostra um seletor e a pessoa escolhe um dispositivo; daí em diante, aquele site tem permissão só para ele.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 128"><rect class="k" x="8" y="4" width="224" height="118" rx="8"/><text class="st" x="20" y="20" style="font-size:11px">o site quer uma porta</text><rect class="acf" x="20" y="34" width="200" height="22" rx="4"/><text class="st" x="30" y="45" style="font-size:11.5px">Pico · COM5</text><rect class="k" x="20" y="62" width="200" height="22" rx="4" style="opacity:.45"/><text class="tm st" x="30" y="73">Uno · COM3 (fora do filtro)</text><rect class="k" x="104" y="94" width="56" height="20" rx="4"/><text class="tm" x="132" y="104" style="font-size:9.5px">Cancelar</text><rect class="acf" x="166" y="94" width="56" height="20" rx="4"/><text x="194" y="104" style="font-size:9.5px">Conectar</text></svg>Com o filtro 0x2E8A, só a placa Raspberry Pi aparece.</aside>
+  <ul class="b">
+    <li><code>requestPort()</code> só funciona dentro de uma <b>ativação transitória</b>: logo depois de um clique, toque ou tecla. Chamada no carregamento da página, falha.</li>
+    <li><b>Filtros</b> limitam o seletor: <code>filters: [{ usbVendorId: 0x2E8A }]</code> mostra só placas Raspberry Pi. Sem filtro, aparece tudo. No Bluetooth, o filtro é <code>bluetoothServiceClassId</code>; um serviço RFCOMM próprio, fora da faixa padrão, também precisa estar em <code>allowedBluetoothServiceClassIds</code>.</li>
+    <li>Três finais: a Promise cumpre com um SerialPort; rejeita com <code>NotFoundError</code> se a pessoa fecha sem escolher; rejeita com <code>SecurityError</code> se a política do site bloqueia ou a permissão foi negada.</li>
+    <li>A <b>permissão por origem</b> fica guardada. Ao recarregar, <code>getPorts()</code> devolve as portas já liberadas que estão ligadas, sem seletor.</li>
+    <li><code>getInfo()</code> diz qual placa é: <code>{ usbVendorId, usbProductId }</code>, ou <code>bluetoothServiceClassId</code> numa porta Bluetooth. Fora disso, os campos vêm <code>undefined</code>.</li>
+    <li>Os eventos <code>connect</code> e <code>disconnect</code> de cada porta sobem até <code>navigator.serial</code>, com a porta em <code>event.target</code>. Eles só valem para portas que o site já tem.</li>
+    <li><code>port.connected</code> diz se a porta está <b>conectada logicamente</b>. Uma porta Bluetooth fora de alcance fecha, mas continua conectada logicamente; aí a página pode tentar abrir de novo. Se a pessoa desligou o dispositivo de propósito, não deve.</li>
+    <li><code>port.forget()</code> devolve a permissão. O MDN dá o exemplo do laboratório com um computador e muitas placas: sem limpar, as permissões se acumulam.</li>
+  </ul>
+  <div class="cs-uso">
+<pre><code>// ao carregar: portas que este site já recebeu
+let portas = await navigator.serial.getPorts();
+
+botaoConectar.addEventListener('click', async () =&gt; {
+  try {
+    const port = await navigator.serial.requestPort({
+      filters: [{ usbVendorId: 0x2E8A }],        // só Raspberry Pi
+    });
+    const { usbVendorId, usbProductId } = port.getInfo();
+  } catch (e) {
+    // NotFoundError: a pessoa fechou o seletor sem escolher
+  }
+});
+
+navigator.serial.addEventListener('disconnect', (e) =&gt; {
+  // e.target é a porta que saiu: tire da tela
+});</code></pre>
+    <div class="def"><span class="lab">Segurança · por que o clique e o seletor</span>
+      <ul class="b">
+        <li>O que daria para fazer sem eles: o Uno reinicia quando a porta abre, e o bootloader Optiboot grava o firmware que chegar pela serial no primeiro segundo, sem conferir assinatura. É assim que a IDE do Arduino faz upload. Um site com acesso livre às portas trocaria o programa de qualquer Arduino ligado ao computador.</li>
+        <li>A decisão de arquitetura explorada: o bootloader confia em quem está do outro lado do fio.</li>
+        <li>O que a API põe no caminho: só em <b>contexto seguro</b> (HTTPS ou localhost); só depois de um gesto; a pessoa escolhe um dispositivo por vez; a permissão fica presa à origem; e a <b>Permissions-Policy</b> (diretiva <code>serial</code>, padrão <code>self</code>) bloqueia um iframe de outro site.</li>
+        <li>O que ela não faz: depois da escolha, a página pode tudo naquela porta. Se o firmware aceita "apague a rotina", qualquer página com permissão também apaga.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li><code>requestPort()</code> no carregamento da página falha. Precisa vir de um clique.</li>
+    <li><code>getPorts()</code> não lista portas novas, só as que o site já recebeu.</li>
+    <li>Fechar o seletor rejeita a Promise (<code>NotFoundError</code>). Sem <code>try/catch</code>, vira erro não tratado.</li>
+    <li>A permissão é por origem: <code>localhost:4321</code> e o site publicado pedem cada um a sua.</li>
+  </ul></div>
+  <figure class="fig" id="fig-conexao">
+    <div class="fig-head"><span class="fig-title">Figura 1 · Da página carregada à permissão esquecida</span><div class="fig-tabs"></div></div>
+    <div class="fig-body">
+      <div class="fig-stage"><svg id="conexao-svg" viewBox="0 0 640 300"></svg></div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+</section>
+
+<section class="cs" id="abrir" data-grupo="A API" data-termos="sinais-controle,reset-automatico,bootsel">
+  <h2>Abrir a porta e os sinais</h2>
+  <p class="cs-def"><code>port.open({ baudRate })</code> abre a porta com a configuração do quadro. Só <code>baudRate</code> é obrigatório; o resto tem padrão: 8N1, sem controle de fluxo, buffers de 255 bytes.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 112"><line class="s" x1="6" y1="56" x2="234" y2="56"/><path class="ac" d="M10,22 V50" marker-end="url(#mnarrow)"/><text class="ta" x="12" y="14" style="font-size:11px">open()</text><rect class="rd" x="10" y="46" width="14" height="20" rx="2"/><rect class="am" x="24" y="46" width="124" height="20" rx="2"/><text class="tm" x="86" y="56">bootloader ≈ 1 s</text><rect class="bl" x="148" y="46" width="38" height="20" rx="2"/><text class="tm" x="167" y="56">setup</text><rect class="gr" x="186" y="46" width="48" height="20" rx="2"/><text class="tm" x="210" y="56">pronto</text><text class="tm" x="17" y="80">reset</text><path class="s" d="M24,88 H148" style="stroke-dasharray:3 3"/><text class="tm" x="86" y="100">o que chegar aqui se perde</text></svg>Uno: abrir a porta reinicia o chip. Espere o "pronto" do firmware.</aside>
+  <ul class="b">
+    <li>Quando a Promise cumpre, <code>port.readable</code> e <code>port.writable</code> passam a existir.</li>
+    <li>A configuração tem de bater com o firmware: <code>Serial.begin(115200)</code> no Uno pede <code>baudRate: 115200</code>. O MDN e o artigo dizem o mesmo: consulte a documentação do dispositivo.</li>
+    <li>Dois erros: <code>InvalidStateError</code> se a porta já está aberta; <code>NetworkError</code> se o sistema não conseguiu abrir, por exemplo porque o Monitor Serial da IDE do Arduino está com ela.</li>
+    <li><b>Sinais de controle</b>: <code>setSignals({ dataTerminalReady, requestToSend, break })</code> liga ou desliga DTR, RTS e break; <code>getSignals()</code> devolve CTS, DCD, DSR e RI (<code>clearToSend</code>, <code>dataCarrierDetect</code>, <code>dataSetReady</code>, <code>ringIndicator</code>). Com a porta fechada, <code>setSignals()</code> dá <code>InvalidStateError</code>.</li>
+    <li>O guia do Chrome avisa: algumas placas, como o Arduino, entram em modo de gravação quando o DTR muda.</li>
+  </ul>
+  <div class="cs-uso">
+<pre><code>await port.open({ baudRate: 115200 });   // igual ao Serial.begin(115200) do Uno
+// o Uno acabou de reiniciar: espere ele mandar "pronto" antes de escrever</code></pre>
+    <ul class="b">
+      <li><b>Reset automático</b> do Uno: o DTR passa por um capacitor até o pino de reset do 328P. Abrir a porta mexe no DTR, o chip reinicia e o Optiboot espera 1 s por um firmware novo; depois roda o <code>setup()</code>. O que a página mandar nesse intervalo vai para o bootloader e some.</li>
+      <li>Em vez de chutar um tempo, faça o firmware mandar uma linha ("pronto") no fim do <code>setup()</code> e a página esperar por ela.</li>
+      <li>Para o Uno não reiniciar, a placa tem uma trilha RESET-EN que dá para cortar. Sem ela, o upload pela IDE passa a exigir o botão de reset.</li>
+    </ul>
+    <div class="def"><span class="lab">Segurança · 1200 baud tira o RP2040 do ar</span>
+      <ul class="b">
+        <li>No pico-sdk, quando o computador configura a porta USB para 1200 baud, o RP2040 sai do programa e entra em <b>modo BOOTSEL</b>: vira um pendrive à espera de um firmware (arquivo UF2). Ferramentas de gravação usam isso para não exigir o botão.</li>
+        <li>O efeito: um único <code>open({ baudRate: 1200 })</code> para a rotina e o aviso ao cuidador. O módulo só volta quando alguém tira e põe o cabo. É uma negação de serviço, e o watchdog não ajuda, porque quem roda agora é a ROM, não o seu programa travado.</li>
+        <li>A decisão explorada: um número que a emulação deveria ignorar virou comando.</li>
+        <li>Defesa: a página fixa o baud em vez de oferecer uma lista (a do artigo tem 1200 no meio); o firmware desliga o recurso com <code>PICO_ENABLE_USB_RESET_VIA_BAUD_RATE=0</code>.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li><code>open()</code> sem <code>baudRate</code> rejeita, mesmo no Pico, onde o valor é ignorado.</li>
+    <li>Uma porta, um programa: com o Monitor Serial aberto, a página não abre (<code>NetworkError</code>).</li>
+    <li>Escrever logo depois do <code>open()</code> no Uno perde a mensagem: o chip está reiniciando.</li>
+  </ul></div>
+  <div class="tbl prose"><table>
+    <thead><tr><th>Opção do <code>open()</code></th><th>Valores</th><th>Padrão</th></tr></thead>
+    <tbody>
+      <tr><td><code>baudRate</code></td><td>número positivo</td><td>obrigatório</td></tr>
+      <tr><td><code>dataBits</code></td><td>7 ou 8</td><td>8</td></tr>
+      <tr><td><code>stopBits</code></td><td>1 ou 2</td><td>1</td></tr>
+      <tr><td><code>parity</code></td><td><code>"none"</code>, <code>"even"</code>, <code>"odd"</code></td><td><code>"none"</code></td></tr>
+      <tr><td><code>flowControl</code></td><td><code>"none"</code>, <code>"hardware"</code> (RTS/CTS)</td><td><code>"none"</code></td></tr>
+      <tr><td><code>bufferSize</code></td><td>bytes dos buffers de leitura e escrita, menos de 16 MB</td><td>255</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ================= Os dados ================= -->
+<section class="cs" id="streams" data-grupo="Os dados" data-termos="stream,readablestream,writablestream,reader-writer,lock-stream,chunk,backpressure,erro-fatal,framing-error">
+  <h2>Ler e escrever: streams, reader e writer</h2>
+  <p class="cs-def">Aberta a porta, <code>port.readable</code> é um <b>ReadableStream</b> de onde chegam bytes e <code>port.writable</code> é um <b>WritableStream</b> para onde eles vão. Quem lê é um <b>reader</b>; quem escreve, um <b>writer</b>.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 120"><rect class="k" x="4" y="24" width="60" height="72" rx="6"/><text x="34" y="60">página</text><rect class="gr" x="176" y="24" width="60" height="72" rx="6"/><text x="206" y="60">placa</text><path class="s" d="M174,42 H68" marker-end="url(#mnarrow)"/><rect class="bl" x="92" y="30" width="22" height="16" rx="2"/><text class="tm" x="103" y="38">6F</text><rect class="bl" x="116" y="30" width="22" height="16" rx="2"/><text class="tm" x="127" y="38">6B</text><text class="tb" x="120" y="14" style="font-size:11px">readable</text><path class="s" d="M66,78 H172" marker-end="url(#mnarrow)"/><rect class="am" x="110" y="70" width="22" height="16" rx="2"/><text class="tm" x="121" y="78">31</text><text class="tam" x="120" y="104" style="font-size:11px">writable</text></svg>Chega o chunk [0x6F, 0x6B] ("ok"); sai [0x31] ("1").</aside>
+  <ul class="b">
+    <li>Um <b>stream</b> é um fluxo de dados que chega aos pedaços, sem fim marcado. Cada pedaço é um <b>chunk</b>; na porta, um <code>Uint8Array</code>.</li>
+    <li><code>reader.read()</code> devolve uma Promise de <code>{ value, done }</code>. <code>value</code> é o chunk; <code>done</code> fica <code>true</code> quando o reader foi cancelado ou o stream acabou.</li>
+    <li><code>writer.write(bytes)</code> devolve uma Promise que cumpre quando o chunk foi aceito. Só aceita bytes (<code>ArrayBuffer</code>, <code>Uint8Array</code> ou <code>DataView</code>): texto passa antes pelo <code>TextEncoder</code> (<a href="#texto">próxima seção</a>).</li>
+    <li><code>getReader()</code> deixa o <b>stream travado</b> para aquele reader; <code>releaseLock()</code> solta. Com um stream travado, a porta não fecha.</li>
+    <li><b>Backpressure</b>: se a placa não consome, a Promise do <code>write()</code> demora a cumprir. Use <code>await</code> em cada escrita e você nunca escreve mais rápido do que o outro lado lê.</li>
+    <li><b>Erros não fatais</b> (buffer overflow, <b>framing error</b>, erro de paridade) viram exceção no <code>read()</code>, mas a porta cria um <code>readable</code> novo e dá para continuar. <b>Erro fatal</b> (cabo arrancado) deixa <code>port.readable</code> em <code>null</code>.</li>
+    <li>Para controlar a memória, <code>getReader({ mode: 'byob' })</code> ("traga o seu buffer") lê para dentro de um <code>ArrayBuffer</code> seu. Existe desde o Chrome 106; dimensione <code>bufferSize</code> do <code>open()</code> para pelo menos esse tamanho.</li>
+  </ul>
+  <div class="cs-uso">
+    <p>O laço de leitura do MDN. A figura logo abaixo executa ele passo a passo.</p>
+<pre><code>while (port.readable) {                  // externo: sobrevive a erro não fatal
+  const reader = port.readable.getReader();
+  try {
+    while (true) {                       // interno: um chunk por volta
+      const { value, done } = await reader.read();
+      if (done) break;                   // reader.cancel() foi chamado
+      tratar(value);                     // Uint8Array, ex.: [111, 107]
+    }
+  } catch (erro) {
+    // framing error, overflow, paridade… ou o cabo saiu
+  } finally {
+    reader.releaseLock();                // destrava, para poder fechar depois
+  }
+}</code></pre>
+<pre><code>const writer = port.writable.getWriter();
+await writer.write(new Uint8Array([104, 105]));   // "hi"
+writer.releaseLock();</code></pre>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Um <code>read()</code> devolve um chunk, não uma mensagem (<a href="#texto">de bytes a mensagens</a>).</li>
+    <li>Sem o laço externo, o primeiro framing error encerra a leitura para sempre.</li>
+    <li>O artigo guarda reader e writer em variáveis globais e nunca chama <code>releaseLock()</code>. Funciona até a hora de fechar: aí <code>close()</code> falha.</li>
+    <li>O <code>read()</code> do artigo devolve a mensagem de erro como se fosse dado. Quem chama não sabe a diferença entre "chegou isto" e "deu erro".</li>
+  </ul></div>
+  <figure class="fig" id="fig-leitura">
+    <div class="fig-head"><span class="fig-title">Figura 2 · O laço de leitura, volta por volta</span><div class="fig-tabs"></div></div>
+    <div class="fig-body">
+      <div class="fig-stage"><svg id="leitura-svg" viewBox="0 0 640 300"></svg></div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+</section>
+
+<section class="cs" id="texto" data-grupo="Os dados" data-termos="utf8,textencoder,transformstream,pipe-stream,delimitador,enquadramento,checksum,ack">
+  <h2>De bytes a mensagens</h2>
+  <p class="cs-def">A porta só entrega bytes, em chunks de tamanho qualquer. Para trocar texto, você codifica e decodifica em <b>UTF-8</b>; para trocar mensagens, você define o <b>enquadramento</b>: onde cada uma começa e termina.</p>
+  <aside class="mn loop" data-loop="chunks" data-ms="9000" data-still="0.85" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Duas linhas chegam em três chunks. O resto espera o próximo pedaço; cada "\n" solta uma linha.</aside>
+  <ul class="b">
+    <li><b>TextEncoder</b> transforma texto em bytes: <code>"1"</code> vira <code>[0x31]</code>. <b>TextDecoder</b> faz o contrário: <code>[0x6F, 0x6B]</code> vira <code>"ok"</code>. É o par que o artigo do dev.to usa.</li>
+    <li>O exemplo do artigo: a página manda <code>"1"</code> e o LED da placa do Arduino acende; manda <code>"0"</code> e apaga. Na versão "avançada", o mesmo código desenha numa matriz de LEDs 8×8 com o driver MAX7219.</li>
+    <li>Os chunks não respeitam a mensagem. O Arduino manda <code>"T=23\n"</code>, e a página pode ler <code>"T=2"</code> num <code>read()</code> e <code>"3\nT=2"</code> no seguinte. O guia do Chrome diz: os dados chegam divididos de forma arbitrária.</li>
+    <li>A saída para texto é um <b>delimitador</b>: acumule os chunks e corte em cada <code>"\n"</code>. O que sobrar sem <code>"\n"</code> espera o próximo chunk.</li>
+    <li>"ç" em UTF-8 são dois bytes, 0xC3 0xA7. Se o chunk termina entre eles, <code>decode(bytes)</code> mostra "�". Com <code>decode(bytes, { stream: true })</code>, o TextDecoder guarda o byte solto até o próximo.</li>
+    <li>A versão com streams: um <b>TransformStream</b> fica entre a porta e o laço e transforma no meio. <code>TextDecoderStream</code> (bytes → texto) e <code>TextEncoderStream</code> (texto → bytes) vêm prontos; você liga os canos com <b>pipeTo</b> e <code>pipeThrough</code>.</li>
+    <li>Dado binário, como a rotina do TAPI, pode ter o byte 0x0A no meio. Aí o enquadramento é por tamanho: um cabeçalho com o número de bytes, os bytes, e um <b>checksum</b> (ou CRC) no fim. O receptor confere e responde <b>ACK</b> (recebi certo) ou NACK (mande de novo).</li>
+    <li>O firmware também confere o tamanho do cabeçalho contra o espaço que tem antes de copiar. Senão, qualquer página com permissão estoura o buffer do módulo.</li>
+    <li>Para depurar, <code>port.readable.tee()</code> divide a leitura em dois streams iguais: um para a aplicação, outro para o console. No Chrome, <code>about://device-log</code> mostra os eventos das portas.</li>
+  </ul>
+  <div class="cs-uso">
+<pre><code>const decoder = new TextDecoder();
+let resto = '';
+// no laço de leitura, para cada chunk (value):
+resto += decoder.decode(value, { stream: true });
+const linhas = resto.split('\n');
+resto = linhas.pop();                  // pedaço sem "\n": espera o próximo chunk
+for (const linha of linhas) mostrar(linha.trim());   // trim tira o "\r" do println</code></pre>
+    <p>A mesma ideia como TransformStream (adaptada do guia do Chrome):</p>
+<pre><code>class SeparadorDeLinhas {
+  constructor() { this.resto = ''; }
+  transform(chunk, controller) {        // chamado a cada chunk de texto
+    this.resto += chunk;
+    const linhas = this.resto.split('\r\n');
+    this.resto = linhas.pop();
+    linhas.forEach((l) =&gt; controller.enqueue(l));
+  }
+  flush(controller) { controller.enqueue(this.resto); }   // quando o stream fecha
+}
+
+const decoder = new TextDecoderStream();
+const leituraFechou = port.readable.pipeTo(decoder.writable);
+const reader = decoder.readable
+  .pipeThrough(new TransformStream(new SeparadorDeLinhas()))
+  .getReader();                          // agora cada read() é uma linha
+
+const encoder = new TextEncoderStream();
+const escritaFechou = encoder.readable.pipeTo(port.writable);
+const writer = encoder.writable.getWriter();
+await writer.write('1');                 // texto direto: o encoder vira bytes</code></pre>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>O <code>read()</code> do artigo funciona com <code>"1"</code> e <code>"0"</code> porque cada mensagem tem 1 byte. Com mensagens maiores, ele devolve pedaços.</li>
+    <li><code>Serial.println</code> termina a linha com <code>"\r\n"</code>. Cortar só em <code>"\n"</code> deixa um <code>"\r"</code> no fim de cada linha.</li>
+    <li>Checksum diz ao receptor se chegou certo. Só o ACK diz a quem enviou que chegou.</li>
+  </ul></div>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 96"><text class="tm st" x="4" y="8">"aç" em UTF-8: 0x61 0xC3 0xA7</text><rect class="bl" x="4" y="20" width="30" height="22" rx="3"/><text class="tm" x="19" y="31">61</text><rect class="rd" x="36" y="20" width="30" height="22" rx="3"/><text class="tm" x="51" y="31">C3</text><text class="tm" x="35" y="54">chunk 1</text><rect class="rd" x="96" y="20" width="30" height="22" rx="3"/><text class="tm" x="111" y="31">A7</text><text class="tm" x="111" y="54">chunk 2</text><text class="tm st" x="4" y="74">sem stream: true → "a�" e "�"</text><text class="tm st" x="4" y="90">com stream: true → "a" e "ç"</text></svg>Um caractere de 2 bytes cortado entre dois chunks.</aside>
+</section>
+
+<section class="cs" id="fechar" data-grupo="Os dados" data-termos="">
+  <h2>Fechar a porta</h2>
+  <p class="cs-def"><code>port.close()</code> só fecha com <code>readable</code> e <code>writable</code> destravados. Um laço de leitura deixa o <code>readable</code> travado para sempre; então primeiro <code>reader.cancel()</code>, depois <code>releaseLock()</code>, depois <code>close()</code>.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 84"><rect class="am" x="4" y="14" width="68" height="28" rx="5"/><text x="38" y="28" style="font-size:12px">cancel()</text><path class="s" d="M74,28 H86" marker-end="url(#mnarrow)"/><rect class="bl" x="88" y="14" width="78" height="28" rx="5"/><text x="127" y="28" style="font-size:11px">releaseLock()</text><path class="s" d="M168,28 H180" marker-end="url(#mnarrow)"/><rect class="gr" x="182" y="14" width="54" height="28" rx="5"/><text x="209" y="28" style="font-size:12px">close()</text><text class="tm" x="38" y="58">read() → done</text><text class="tm" x="127" y="58">destrava</text><text class="tm" x="209" y="58">fecha</text><text class="tm" x="120" y="78">pule um passo e o close() rejeita</text></svg>A ordem para fechar sem erro.</aside>
+  <div class="cs-uso">
+    <p>O padrão do MDN, com uma flag para o laço externo não criar outro reader:</p>
+<pre><code>let continuar = true;
+let reader;
+
+async function lerAteFechar() {
+  while (port.readable &amp;&amp; continuar) {
+    reader = port.readable.getReader();
+    try {
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;                 // cancel() cai aqui
+        tratar(value);
+      }
+    } catch (erro) {
+      // erro de leitura
+    } finally {
+      reader.releaseLock();
+    }
+  }
+  await port.close();
+}
+
+const fechou = lerAteFechar();
+botaoFechar.addEventListener('click', async () =&gt; {
+  continuar = false;
+  reader.cancel();                       // read() cumpre na hora com done: true
+  await fechou;
+});</code></pre>
+    <ul class="b">
+      <li>Com transform streams (os da seção anterior), o erro precisa atravessar os canos: <code>reader.cancel()</code>; <code>await leituraFechou.catch(() =&gt; {})</code>, ignorando o erro do cancelamento; <code>writer.close()</code>; <code>await escritaFechou</code>; e só então <code>await port.close()</code>.</li>
+      <li><code>close()</code> encerra a conexão e mantém a permissão. <code>forget()</code> apaga a permissão. Arrancar o cabo dispara <code>disconnect</code> e deixa <code>readable</code> em <code>null</code>.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li><code>close()</code> com um reader ativo rejeita: o stream está travado.</li>
+    <li><code>cancel()</code> sem a flag: o laço externo vê <code>port.readable</code>, cria outro reader e continua lendo.</li>
+  </ul></div>
+  <div class="tbl prose"><table>
+    <thead><tr><th></th><th><code>close()</code></th><th><code>forget()</code></th><th>cabo arrancado</th></tr></thead>
+    <tbody>
+      <tr><td>Conexão</td><td>fechada</td><td>fechada</td><td>fechada (erro fatal)</td></tr>
+      <tr><td>Permissão</td><td>fica</td><td>some</td><td>fica</td></tr>
+      <tr><td>Próxima vez</td><td><code>getPorts()</code> devolve</td><td>clique e seletor de novo</td><td>evento <code>connect</code> ao voltar</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ================= Treino ================= -->
+<section class="cs" id="exercicios" data-grupo="Treino" data-termos="">
+  <h2>Treino · exercícios autorais</h2>
+  <p class="cs-def">Exercícios autorais, do mecânico ao aberto, com o Uno, o RP2040 e a rotina do TAPI. Não são do professor. Cada resposta termina com uma Leitura do número.</p>
+  <div class="cs-uso">
+    <details class="treino"><summary><span class="q">Exercício 1</span> Bytes por segundo a 9600 e a 115200 baud, 8N1. Quanto leva um byte?</summary><p>9600 ÷ 10 = 960 B/s, 1,04 ms por byte. 115200 ÷ 10 = 11 520 B/s, 86,8 µs por byte (8,68 µs por bit). Leitura: o baud conta todos os bits, e 2 de cada 10 (start e stop) não carregam dado.</p></details>
+    <details class="treino"><summary><span class="q">Exercício 2</span> A rotina da aula 02 tem 20 B (estilo CISC) ou 148 B (estilo RISC). Quanto leva para mandar cada uma a 9600 e a 115200?</summary><p>A 9600: 20 ÷ 960 = 20,8 ms e 148 ÷ 960 = 154 ms. A 115200: 20 ÷ 11 520 = 1,7 ms e 148 ÷ 11 520 = 12,8 ms. Leitura: mesmo a 9600, a rotina maior chega em menos de 0,2 s. Na troca de rotina, a velocidade da linha não é o problema.</p></details>
+    <details class="treino"><summary><span class="q">Exercício 3</span> Um sensor pede 8E1. Quantos bits por quadro, quantos bytes por segundo a 115200, e como fica o <code>open()</code>?</summary><p>1 + 8 + 1 + 1 = 11 bits. 115200 ÷ 11 = 10 473 B/s, 9% a menos que em 8N1. <code>port.open({ baudRate: 115200, parity: 'even' })</code>; <code>dataBits</code> 8 e <code>stopBits</code> 1 já são o padrão. Leitura: a paridade custa 1 bit em 11 e só pega uma quantidade ímpar de bits trocados.</p></details>
+    <details class="treino"><summary><span class="q">Exercício 4</span> A página manda os 148 B da rotina de uma vez para o Uno, a 115200. O superloop lê a serial uma vez por volta, e a volta leva 26,4 ms (exercício 1 da aula 04). Quantos bytes se perdem? Qual a volta máxima? E a 9600?</summary><p>Os 148 B chegam em 12,8 ms, antes da próxima leitura. O buffer do 328P guarda 64 B: perdem-se 148 − 64 = 84 B. Para não perder nada a 115200, o firmware precisa esvaziar o buffer a cada 64 ÷ 11 520 = 5,6 ms. A 9600, numa volta chegam 960 × 0,0264 ≈ 25 B, menos de 64: não perde, desde que leia tudo o que tem a cada volta. Leitura: sem controle de fluxo, quem decide se perde é a volta do laço, não o baud. Outras saídas: mandar em blocos de até 64 B esperando ACK a cada bloco, ou usar o RP2040, cujo USB segura o envio.</p></details>
+    <details class="treino"><summary><span class="q">Exercício 5</span> O Arduino manda <code>T=23\r\n</code> e <code>T=24\r\n</code> com <code>Serial.println</code>. A página usa o <code>read()</code> do artigo e mostra cada retorno numa linha. Os chunks chegam como <code>"T=2"</code> e <code>"3\r\nT=24\r\n"</code>. O que aparece, e como corrigir?</summary><p>Aparecem "T=2" numa linha e "3", "T=24" (com quebras soltas) na seguinte: a leitura parece corrompida, mas os bytes estão certos. Correção: acumular os chunks e cortar em "\r\n", com o decoder em <code>{ stream: true }</code>, ou ligar <code>TextDecoderStream</code> e o <code>SeparadorDeLinhas</code>. Leitura: quem decide o tamanho do chunk é o sistema operacional e o USB, não o <code>println</code>.</p></details>
+    <details class="treino"><summary><span class="q">Exercício 6</span> A IDE do terapeuta tem um menu de baud copiado da lista do artigo (de 50 a 115200, com 1200 no meio). O módulo é um RP2040 com pico-sdk e stdio por USB. O que acontece se alguém escolhe 1200? Que mudança você faz na página e qual no firmware?</summary><p>O RP2040 entra em BOOTSEL: o programa para, a rotina para e o aviso dos 120 s não sai. O módulo só volta com o cabo tirado e posto de novo. Na página: tirar o menu, porque no USB nativo o baud é ignorado, e fixar um valor. No firmware: <code>PICO_ENABLE_USB_RESET_VIA_BAUD_RATE=0</code>. Leitura: o único valor de baud que muda alguma coisa no Pico é o que derruba o módulo.</p></details>
+  </div>
+</section>
+
+<section class="cs" id="projeto" data-grupo="Treino" data-termos="">
+  <h2>Projeto: a rotina chega ao módulo</h2>
+  <p class="cs-def">No TAPI, o compilador da rotina roda na IDE do terapeuta, e o interpretador, no módulo de controle (<a href="/m8/comp/02-fundamentos-memoria">aula 02</a>). Se a IDE é uma página, a Web Serial liga os dois com um cabo USB e nenhum programa instalado.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 124"><rect class="k" x="4" y="6" width="70" height="26" rx="5"/><text x="39" y="19" style="font-size:11px">terapeuta</text><path class="s" d="M76,19 H90" marker-end="url(#mnarrow)"/><rect class="acf" x="92" y="6" width="144" height="26" rx="5"/><text x="164" y="19" style="font-size:11px">IDE + compilador</text><path class="s" d="M164,34 V50" marker-end="url(#mnarrow)"/><rect class="am" x="92" y="52" width="144" height="26" rx="5"/><text x="164" y="65" style="font-size:10.5px">tamanho · 148 B · CRC</text><path class="s" d="M90,65 H70" marker-end="url(#mnarrow)"/><text class="tm" x="39" y="42">Web Serial</text><rect class="gr" x="4" y="52" width="64" height="26" rx="5"/><text x="36" y="65" style="font-size:11px">RP2040</text><path class="s" d="M36,80 V96 H164 V82" style="stroke-dasharray:3 3" marker-end="url(#mnarrow)"/><text class="tm" x="120" y="112">ACK ou NACK volta pela mesma porta</text></svg>A rotina sai do compilador, atravessa o USB enquadrada e só vale depois do ACK.</aside>
+  <ul class="b">
+    <li>O caminho: terapeuta → IDE (página em HTTPS) → compilador → bytes da rotina (20 B ou 148 B) → Web Serial → USB → interpretador do módulo → ACK.</li>
+    <li>Receber rotina nova vira uma tarefa do módulo de controle, ao lado do botão, da luz e do aviso ao cuidador. Esta aula diz como os bytes chegam até ela.</li>
+  </ul>
+  <div class="cs-uso">
+    <p>Um exemplo de decisão (autoral, não é gabarito), no formato de quatro partes:</p>
+    <ul class="b">
+      <li>Decisão: a IDE manda a rotina pelo USB nativo do RP2040 com a Web Serial, numa mensagem com tamanho, os bytes da rotina e um CRC, e o módulo só troca a rotina em uso depois de conferir e responder ACK.</li>
+      <li>Do que abre mão e quem sente: de Safari, iPad e iPhone, que não têm Web Serial. Quem sente é o terapeuta que trabalha num tablet ou num Mac com Safari, e o suporte, que vai ter de dizer "use Chrome ou Edge". Também abre mão de mandar rotina à distância: precisa do cabo.</li>
+      <li>Um número que pesou: 148 B a 115200 chegam em 12,8 ms. No Uno, com uma volta de 26,4 ms, 84 desses bytes se perderiam; no RP2040, o USB segura o envio, e o CRC pega o que sobrar.</li>
+      <li>O que faria mudar: se os terapeutas montam a rotina num tablet, o caminho vira Bluetooth com um app (a Web Bluetooth também não existe no Safari) ou Wi-Fi. Se a rotina muda em casa, pelo cuidador, a atualização precisa ser remota.</li>
+    </ul>
+    <p>Pergunta para levar ao parceiro: em que aparelho o terapeuta monta a rotina, e o módulo fica no consultório ou na casa da pessoa?</p>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Trocar a rotina enquanto ela roda deixa o módulo com meia rotina velha e meia nova. Guarde a nova inteira, confira o CRC e só então troque.</li>
+  </ul></div>
+</section>

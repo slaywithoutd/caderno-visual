@@ -1,0 +1,68 @@
+{
+  "numero": "10",
+  "data": "2026-11-05",
+  "titulo": "Interface com um dispositivo embarcado",
+  "tema": "Interface com dispositivos embarcados",
+  "modos": [
+    "consulta"
+  ],
+  "resumo": "Como uma página no navegador conversa com um microcontrolador pela Web Serial API: a UART e o baud rate, a porta serial virtual do USB e do Bluetooth, permissão e segurança, abrir a porta, ler e escrever com streams, montar mensagens a partir de bytes e fechar; com o Arduino Uno e o RP2040 como exemplos e a rotina do TAPI chegando ao módulo.",
+  "topicos": [
+    "UART e baud rate",
+    "Porta serial virtual (USB CDC, Bluetooth SPP)",
+    "Web Serial API",
+    "Permissão e segurança",
+    "Abrir a porta e sinais",
+    "Streams: ler e escrever",
+    "Bytes, texto e mensagens",
+    "Fechar a porta",
+    "Uno e RP2040",
+    "Rotina do TAPI pelo USB"
+  ],
+  "secoes": [],
+  "fontes": [
+    {
+      "tipo": "Documentação",
+      "titulo": "MDN · Web Serial API (página de visão geral)",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API",
+      "secao": "web-serial",
+      "nota": "Autoestudo. Lida por inteiro no repositório oficial do MDN (mdn/content), em 05/11/2026."
+    },
+    {
+      "tipo": "Artigo",
+      "titulo": "Diego Coy · The amazing powers of the web: Web Serial API (dev.to, 2020)",
+      "url": "https://dev.to/unjavascripter/the-amazing-powers-of-the-web-web-serial-api-3ilc",
+      "secao": "texto",
+      "nota": "Autoestudo. Lido por inteiro. É de abril de 2020: a parte de flags e origin trial está superada pela nota de atualização do próprio artigo (estável desde o Chrome 89). Os dois GIFs e as demos no Glitch não foram abertos."
+    },
+    {
+      "tipo": "Documentação",
+      "titulo": "MDN · páginas de Serial e SerialPort (requestPort, getPorts, open, getInfo, readable, writable, close, forget, connected, setSignals, getSignals, connect) e Permissions-Policy: serial",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/API/SerialPort",
+      "secao": "abrir",
+      "nota": "Complemento: as páginas que a visão geral linka, lidas para conferir parâmetros, valores padrão e exceções."
+    },
+    {
+      "tipo": "Documentação",
+      "titulo": "Chrome for Developers · Read from and write to a serial port (François Beaufort)",
+      "url": "https://developer.chrome.com/docs/capabilities/serial",
+      "secao": "texto",
+      "nota": "Complemento indicado no \"See also\" do MDN. Usado para chunks, TextDecoderStream, quebra de linha, fechar com transform streams, sinais e o modelo de permissão."
+    },
+    {
+      "tipo": "Dados",
+      "titulo": "MDN browser-compat-data · api.Serial",
+      "url": "https://github.com/mdn/browser-compat-data/blob/main/api/Serial.json",
+      "secao": "web-serial",
+      "nota": "Tabela de compatibilidade conferida em 05/11/2026."
+    },
+    {
+      "tipo": "Código",
+      "titulo": "ArduinoCore-avr (HardwareSerial.h, boards.txt), Optiboot (optiboot.c) e pico-sdk (stdio_usb_descriptors.c, usb_reset_config.h)",
+      "url": "https://github.com/raspberrypi/pico-sdk/blob/master/src/rp2_common/pico_usb_reset/include/pico/usb_reset_config.h",
+      "secao": "porta-virtual",
+      "nota": "Complemento para os números dos chips: buffer de recepção de 64 B do Uno, VID e PID do Uno e do Pico, espera de 1 s do Optiboot e reset para BOOTSEL a 1200 baud."
+    }
+  ],
+  "observacao": "Os dois autoestudos foram lidos por inteiro. UART, quadro, sinais de controle, chips e segurança vêm dos complementos listados, não dos autoestudos. Exercícios, contas e a decisão de projeto são autorais e não são do professor. Compatibilidade de navegadores conferida em 05/11/2026; ela muda rápido."
+}

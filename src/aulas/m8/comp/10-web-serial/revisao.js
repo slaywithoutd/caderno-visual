@@ -1,0 +1,30 @@
+export const cartoes = [
+  ['Quantos bytes por segundo passam a 115200 baud em 8N1?', '11 520. Cada byte ocupa 10 bits (start, 8 de dados, stop), então 115200 ÷ 10. Um byte leva 86,8 µs.', 'serial'],
+  ['O que é um quadro 8N1 e em que ordem saem os bits?', 'Start bit 0, 8 bits de dados do menos significativo para o mais, sem paridade, 1 stop bit 1. 0x41 sai como 0, 1 0 0 0 0 0 1 0, 1.', 'serial'],
+  ['Por que o baud rate dos dois lados precisa ser igual?', 'A UART não tem fio de clock: o receptor mede cada bit pelo tempo combinado. Com baud diferente, lê lixo e aparecem framing errors.', 'serial'],
+  ['O que é USB CDC-ACM e por que importa para a Web Serial?', 'A classe USB de "porta serial". O sistema operacional já tem driver e a placa aparece como porta COM; é isso que a Web Serial enxerga. USB cru é WebUSB; HID é WebHID.', 'porta-virtual'],
+  ['Qual a diferença entre o Uno e o Pico no caminho USB?', 'No Uno, o ATmega16U2 é uma ponte USB-serial e o baud vale no trecho UART até o 328P (buffer de 64 B). No Pico, o RP2040 fala USB direto, o baud é ignorado e o USB segura o envio.', 'porta-virtual'],
+  ['Quais as condições para requestPort() funcionar?', 'Contexto seguro (HTTPS ou localhost), ativação transitória (logo depois de um clique) e a Permissions-Policy permitir. A pessoa escolhe no seletor; fechar sem escolher dá NotFoundError.', 'permissao'],
+  ['Qual a diferença entre requestPort() e getPorts()?', 'requestPort() abre o seletor, exige clique e pode liberar uma porta nova. getPorts() não abre nada e só devolve as portas que a origem já recebeu e estão ligadas.', 'permissao'],
+  ['Que opções o open() aceita e quais os padrões?', 'baudRate (obrigatório), dataBits 8, stopBits 1, parity "none", flowControl "none", bufferSize 255.', 'abrir'],
+  ['O que acontece quando a página abre a porta de um Uno? E com 1200 baud num Pico?', 'O Uno reinicia pelo DTR e o bootloader espera ≈ 1 s: o que chegar nesse tempo se perde. O Pico (pico-sdk) a 1200 baud entra em BOOTSEL e o programa para.', 'abrir'],
+  ['O que read() devolve e quando done é true?', 'Uma Promise de { value, done }: value é um chunk (Uint8Array). done é true quando o reader foi cancelado ou o stream acabou.', 'streams'],
+  ['Para que serve o laço externo while (port.readable)?', 'Erro não fatal (framing, paridade, overflow) derruba o reader, mas a porta cria outro readable e o laço segue. Erro fatal deixa readable null e o laço termina.', 'streams'],
+  ['Por que um read() não é uma mensagem?', 'O tamanho do chunk depende de quando os bytes chegaram. A página acumula e corta num delimitador ("\n") ou usa um cabeçalho com tamanho e checksum.', 'texto'],
+  ['Por que decode(bytes, { stream: true })?', 'Um caractere UTF-8 de 2 bytes, como "ç" (0xC3 0xA7), pode ficar cortado entre dois chunks. Com stream: true, o TextDecoder guarda o byte solto até o próximo.', 'texto'],
+  ['Em que ordem se fecha a porta?', 'reader.cancel() (read() cumpre com done: true), reader.releaseLock(), e só então port.close(). Com transform streams, espere também as Promises do pipeTo.', 'fechar'],
+];
+
+export const cola = [
+  ['Taxa', 'bytes/s = baud ÷ bits por quadro. 8N1: 10 bits. 9600 → 960 B/s; 115200 → 11 520 B/s.', 'serial'],
+  ['Quadro', 'start 0 · 8 dados, LSB primeiro · paridade opcional · stop 1. Linha parada em 1.', 'serial'],
+  ['Porta virtual', 'USB CDC-ACM ou Bluetooth SPP (RFCOMM). BLE não. USB cru: WebUSB. HID: WebHID.', 'porta-virtual'],
+  ['Uno × Pico', 'Uno: 16U2 + UART, baud vale, buffer 64 B, reinicia ao abrir, 0x2341:0x0043. Pico: USB nativo, baud ignorado (1200 → BOOTSEL), 0x2E8A:0x000A.', 'porta-virtual'],
+  ['Suporte', 'Chrome, Edge e Opera 89+ no computador; Firefox 151+; Chrome Android 148+. Safari não. Teste com "serial" in navigator.', 'web-serial'],
+  ['Permissão', 'HTTPS + clique → requestPort({ filters }) → seletor → permissão da origem. getPorts() devolve as já liberadas. forget() apaga.', 'permissao'],
+  ['open()', 'baudRate obrigatório; 8N1, sem flow control e 255 B de buffer por padrão. Sinais: setSignals (DTR, RTS, break), getSignals (CTS, DCD, DSR, RI).', 'abrir'],
+  ['Ler', 'while (port.readable) { getReader → while read() → finally releaseLock }. Chunk = Uint8Array.', 'streams'],
+  ['Escrever', 'getWriter → await write(bytes) → releaseLock. Só bytes; texto via TextEncoder.', 'streams'],
+  ['Mensagens', 'Acumule e corte no delimitador ("\r\n" do println). Binário: tamanho + dados + CRC, resposta ACK ou NACK.', 'texto'],
+  ['Fechar', 'cancel → releaseLock → close. close mantém a permissão; forget apaga.', 'fechar'],
+];

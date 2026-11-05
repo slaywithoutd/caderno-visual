@@ -1,0 +1,778 @@
+{
+  "aula": "m8/comp/10-web-serial",
+  "data": "2026-11-05",
+  "criterio": "Aula nova. Cada seção (unidade) das fontes lidas por inteiro foi inventariada e ligada à seção do consulta.html que a cobre, com uma evidência textual. Os trechos de código dos chips foram consultados só nas linhas citadas. Rastreabilidade não prova equivalência semântica.",
+  "fontes": [
+    {
+      "id": "mdn-web-serial",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API",
+      "escopo": "Página de visão geral, 8 seções (cabeçalho, Concepts and Usage, Interfaces, Extensions to other interfaces, HTTP headers, Examples: Checking for available ports, Examples: Reading data from a port, Specifications/Browser compatibility/See also).",
+      "acesso": "integral",
+      "metodo": "Markdown-fonte do repositório mdn/content (files/en-us/web/api/web_serial_api/index.md), lido inteiro em 05/11/2026. A tabela {{Compat}} conferida no browser-compat-data.",
+      "totalUnidades": 8,
+      "unidades": [
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "Abertura: ler e escrever em dispositivos serial; contexto seguro; disponível na janela e em workers dedicados",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Definição da API, contexto seguro e workers.",
+          "consulta": [
+            "web-serial"
+          ],
+          "evidencias": [
+            "workers",
+            "contexto seguro"
+          ]
+        },
+        {
+          "paginas": [
+            2
+          ],
+          "assunto": "Concepts and Usage: porta virtual por USB CDC-ACM e Bluetooth SPP; diferença para WebUSB e WebHID; impressoras 3D, ESP32, micro:bit",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Porta física e virtual, APIs vizinhas e exemplos de dispositivos.",
+          "consulta": [
+            "porta-virtual"
+          ],
+          "evidencias": [
+            "cdc-acm",
+            "webhid",
+            "micro:bit"
+          ]
+        },
+        {
+          "paginas": [
+            3
+          ],
+          "assunto": "Interfaces Serial e SerialPort",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Duas interfaces e seus membros.",
+          "consulta": [
+            "web-serial"
+          ],
+          "evidencias": [
+            "serialport"
+          ]
+        },
+        {
+          "paginas": [
+            4
+          ],
+          "assunto": "Navigator.serial e WorkerNavigator.serial",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Ponto de entrada na página e no worker.",
+          "consulta": [
+            "web-serial"
+          ],
+          "evidencias": [
+            "workernavigator.serial"
+          ]
+        },
+        {
+          "paginas": [
+            5
+          ],
+          "assunto": "Permissions-Policy, diretiva serial",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Na caixa de segurança, com o padrão self (página da diretiva).",
+          "consulta": [
+            "permissao"
+          ],
+          "evidencias": [
+            "permissions-policy",
+            "self"
+          ]
+        },
+        {
+          "paginas": [
+            6
+          ],
+          "assunto": "Exemplo: eventos connect e disconnect, getPorts(), ativação do usuário e filtro por vendor ID",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Código e bullets da seção de permissão; figura 1.",
+          "consulta": [
+            "permissao"
+          ],
+          "evidencias": [
+            "getports()",
+            "ativacao transitoria",
+            "usbvendorid"
+          ]
+        },
+        {
+          "paginas": [
+            7
+          ],
+          "assunto": "Exemplo: laço de leitura com laço externo para erros não fatais e readable null no erro fatal",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Código do laço e figura 2.",
+          "consulta": [
+            "streams"
+          ],
+          "evidencias": [
+            "laco externo",
+            "erro fatal"
+          ]
+        },
+        {
+          "paginas": [
+            8
+          ],
+          "assunto": "Especificação, compatibilidade e leituras indicadas (guia do Chrome, Codelab)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Compatibilidade em tabela; o guia do Chrome entrou como complemento; o Codelab em uma linha.",
+          "consulta": [
+            "web-serial"
+          ],
+          "evidencias": [
+            "codelab",
+            "desde a versao 89"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "devto-coy-2020",
+      "url": "https://dev.to/unjavascripter/the-amazing-powers-of-the-web-web-serial-api-3ilc",
+      "escopo": "Artigo de Diego Coy, 9/4/2020, 10 seções (abertura e flags, Why?, Connection, Reading and Writing, Writing, Reading, Examples, Origin Trial, Browser support, Further reading/Next steps).",
+      "acesso": "integral",
+      "metodo": "body_markdown pela API pública do dev.to (api/articles/unjavascripter/…), lido inteiro em 05/11/2026. Imagens (seletor do navegador e dois GIFs) não abertas; demos no Glitch não abertas.",
+      "totalUnidades": 10,
+      "unidades": [
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "Abertura: o que a API faz; suporte só em Chromium (2020) e flag Experimental Web Platform Features",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Pegadinha: a flag está superada.",
+          "consulta": [
+            "web-serial"
+          ],
+          "evidencias": [
+            "experimental web platform features"
+          ]
+        },
+        {
+          "paginas": [
+            2
+          ],
+          "assunto": "Why?: quem sabe web entra em IoT pelo navegador",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Uma linha.",
+          "consulta": [
+            "web-serial"
+          ],
+          "evidencias": [
+            "sem sair do navegador"
+          ]
+        },
+        {
+          "paginas": [
+            3
+          ],
+          "assunto": "Connection: feature detection, requestPort, open com baudRate igual ao do dispositivo, lista de baud rates, reader e writer globais",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Lista de baud em serial; baud igual ao firmware em abrir; reader e writer globais como pegadinha em streams; detecção em web-serial.",
+          "consulta": [
+            "serial",
+            "abrir",
+            "streams",
+            "web-serial"
+          ],
+          "evidencias": [
+            "115200, 57600, 38400",
+            "variaveis globais",
+            "'serial' in navigator"
+          ]
+        },
+        {
+          "paginas": [
+            4
+          ],
+          "assunto": "Reading and Writing: encoder para enviar, decoder para ler",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "TextEncoder e TextDecoder.",
+          "consulta": [
+            "texto"
+          ],
+          "evidencias": [
+            "textencoder",
+            "textdecoder"
+          ]
+        },
+        {
+          "paginas": [
+            5
+          ],
+          "assunto": "Writing: encode e writer.write, que devolve Promise",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "write() devolve Promise; só aceita bytes.",
+          "consulta": [
+            "streams",
+            "texto"
+          ],
+          "evidencias": [
+            "writer.write"
+          ]
+        },
+        {
+          "paginas": [
+            6
+          ],
+          "assunto": "Reading: reader.read e decoder.decode; catch devolve a mensagem de erro",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Pegadinhas: chunk não é mensagem; erro devolvido como dado. Exercício 5.",
+          "consulta": [
+            "streams",
+            "texto"
+          ],
+          "evidencias": [
+            "mensagem de erro como se fosse dado",
+            "cada mensagem tem 1 byte"
+          ]
+        },
+        {
+          "paginas": [
+            7
+          ],
+          "assunto": "Exemplos: LED da placa com \"1\" e \"0\"; matriz 8×8 com MAX7219",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Exemplo do artigo na seção de texto.",
+          "consulta": [
+            "texto"
+          ],
+          "evidencias": [
+            "max7219"
+          ]
+        },
+        {
+          "paginas": [
+            8
+          ],
+          "assunto": "Origin trial e a atualização: estável desde o Chrome 89",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Pegadinha sobre a flag.",
+          "consulta": [
+            "web-serial"
+          ],
+          "evidencias": [
+            "origin trial",
+            "chrome 89"
+          ]
+        },
+        {
+          "paginas": [
+            9
+          ],
+          "assunto": "Suporte (2020): Chrome 80 experimental, 89 estável; Edge; Opera com flag",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Substituído pela tabela atual do MDN.",
+          "consulta": [
+            "web-serial"
+          ],
+          "evidencias": [
+            "chrome, edge e opera"
+          ]
+        },
+        {
+          "paginas": [
+            10
+          ],
+          "assunto": "Leituras (rascunho e explainer do WICG, Codelab) e próximos passos com Raspberry Pi",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Estrutural. O explainer do WICG não foi lido; o Codelab aparece em uma linha.",
+          "consulta": [
+            "web-serial"
+          ],
+          "evidencias": [
+            "codelab"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mdn-subpaginas",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/API/SerialPort",
+      "escopo": "Complemento: 15 páginas do MDN linkadas pela visão geral (Serial, requestPort, getPorts, SerialPort, open, getInfo, close, readable, writable, setSignals, getSignals, forget, connected, connect event, Permissions-Policy: serial).",
+      "acesso": "integral",
+      "metodo": "Markdown-fonte do mdn/content, até a seção Specifications de cada página, em 05/11/2026.",
+      "totalUnidades": 15,
+      "unidades": [
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "Serial: métodos e eventos que borbulham das portas",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Membros e event.target.",
+          "consulta": [
+            "web-serial",
+            "permissao"
+          ],
+          "evidencias": [
+            "event.target"
+          ]
+        },
+        {
+          "paginas": [
+            2
+          ],
+          "assunto": "requestPort: filtros (usbVendorId, usbProductId, bluetoothServiceClassId), allowedBluetoothServiceClassIds, SecurityError, NotFoundError, transient activation",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Bullets e código da seção.",
+          "consulta": [
+            "permissao"
+          ],
+          "evidencias": [
+            "allowedbluetoothserviceclassids",
+            "notfounderror",
+            "securityerror"
+          ]
+        },
+        {
+          "paginas": [
+            3
+          ],
+          "assunto": "getPorts: portas conectadas com permissão; SecurityError",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Bullet e código.",
+          "consulta": [
+            "permissao"
+          ],
+          "evidencias": [
+            "getports()"
+          ]
+        },
+        {
+          "paginas": [
+            4
+          ],
+          "assunto": "SerialPort: propriedades, métodos, eventos; exemplos de abrir, ler e escrever \"PING\"",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Lista de membros; escrita com writer.",
+          "consulta": [
+            "web-serial",
+            "streams"
+          ],
+          "evidencias": [
+            "nao tem construtor"
+          ]
+        },
+        {
+          "paginas": [
+            5
+          ],
+          "assunto": "open: baudRate obrigatório; bufferSize 255, dataBits, flowControl, parity, stopBits; InvalidStateError, NetworkError",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Tabela de opções e erros.",
+          "consulta": [
+            "abrir"
+          ],
+          "evidencias": [
+            "invalidstateerror",
+            "networkerror",
+            "255"
+          ]
+        },
+        {
+          "paginas": [
+            6
+          ],
+          "assunto": "getInfo: usbVendorId, usbProductId, bluetoothServiceClassId; filtro do Arduino Uno 0x2341",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "getInfo na permissão; VID:PID do Uno na tabela de chips.",
+          "consulta": [
+            "permissao",
+            "porta-virtual"
+          ],
+          "evidencias": [
+            "getinfo()",
+            "0x2341"
+          ]
+        },
+        {
+          "paginas": [
+            7
+          ],
+          "assunto": "close: exige streams destravados; reader.cancel(); exemplo com keepReading",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Seção Fechar a porta.",
+          "consulta": [
+            "fechar"
+          ],
+          "evidencias": [
+            "cancel()",
+            "continuar = false"
+          ]
+        },
+        {
+          "paginas": [
+            8
+          ],
+          "assunto": "readable: chunks Uint8Array; não nulo enquanto aberta sem erro fatal",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Bullets da seção.",
+          "consulta": [
+            "streams"
+          ],
+          "evidencias": [
+            "uint8array"
+          ]
+        },
+        {
+          "paginas": [
+            9
+          ],
+          "assunto": "writable: chunks ArrayBuffer, TypedArray ou DataView",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Bullet sobre o que write() aceita.",
+          "consulta": [
+            "streams"
+          ],
+          "evidencias": [
+            "dataview"
+          ]
+        },
+        {
+          "paginas": [
+            10
+          ],
+          "assunto": "setSignals: dataTerminalReady, requestToSend, break; InvalidStateError, NetworkError",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Bullet de sinais.",
+          "consulta": [
+            "abrir"
+          ],
+          "evidencias": [
+            "dataterminalready"
+          ]
+        },
+        {
+          "paginas": [
+            11
+          ],
+          "assunto": "getSignals: clearToSend, dataCarrierDetect, dataSetReady, ringIndicator",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Bullet de sinais.",
+          "consulta": [
+            "abrir"
+          ],
+          "evidencias": [
+            "ringindicator"
+          ]
+        },
+        {
+          "paginas": [
+            12
+          ],
+          "assunto": "forget: revoga a permissão; exemplo do computador compartilhado",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Bullet e tabela close × forget.",
+          "consulta": [
+            "permissao",
+            "fechar"
+          ],
+          "evidencias": [
+            "forget()"
+          ]
+        },
+        {
+          "paginas": [
+            13
+          ],
+          "assunto": "connected: conexão lógica; Bluetooth fora de alcance; não reabrir se a pessoa desligou",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Bullet sobre port.connected.",
+          "consulta": [
+            "permissao"
+          ],
+          "evidencias": [
+            "conectada logicamente"
+          ]
+        },
+        {
+          "paginas": [
+            14
+          ],
+          "assunto": "connect event: quando a porta fica logicamente conectada (USB ou Bluetooth); borbulha para Serial",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Bullet de eventos e figura 1.",
+          "consulta": [
+            "permissao"
+          ],
+          "evidencias": [
+            "connect"
+          ]
+        },
+        {
+          "paginas": [
+            15
+          ],
+          "assunto": "Permissions-Policy: serial; padrão self; SecurityError quando bloqueia",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Caixa de segurança.",
+          "consulta": [
+            "permissao"
+          ],
+          "evidencias": [
+            "self"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chrome-serial",
+      "url": "https://developer.chrome.com/docs/capabilities/serial",
+      "escopo": "Complemento indicado no See also do MDN: \"Read from and write to a serial port\", François Beaufort, 16 blocos (o que é; casos de uso; status; feature detection; abrir; ler; leitor BYOB; escrever; fechar; connect/disconnect; sinais; transforming streams e tee; forget; dicas, codelab, suporte e polyfill; segurança e privacidade; feedback, links e demos).",
+      "acesso": "integral",
+      "metodo": "HTML da página baixado e convertido em texto em 05/11/2026; imagens não inspecionadas.",
+      "totalUnidades": 16,
+      "unidades": [
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "O que é: interface bidirecional byte a byte; companheira da WebUSB",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Definição e APIs vizinhas.",
+          "consulta": [
+            "web-serial",
+            "porta-virtual"
+          ],
+          "evidencias": [
+            "webusb"
+          ]
+        },
+        {
+          "paginas": [
+            2
+          ],
+          "assunto": "Casos de uso: Arduino Create, Betaflight, Espruino, MakeCode; antes, agentes instalados ou Electron",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Bullet de quem usa.",
+          "consulta": [
+            "web-serial"
+          ],
+          "evidencias": [
+            "betaflight",
+            "electron"
+          ]
+        },
+        {
+          "paginas": [
+            3
+          ],
+          "assunto": "Status: lançada no Chrome 89",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Tabela de compatibilidade.",
+          "consulta": [
+            "web-serial"
+          ],
+          "evidencias": [
+            "89"
+          ]
+        },
+        {
+          "paginas": [
+            4
+          ],
+          "assunto": "Feature detection",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Código.",
+          "consulta": [
+            "web-serial"
+          ],
+          "evidencias": [
+            "feature detection"
+          ]
+        },
+        {
+          "paginas": [
+            5
+          ],
+          "assunto": "Abrir: requestPort ou getPorts; filtros do Uno; baudRate em bps; ignorado por algumas emulações USB/Bluetooth; opções com bufferSize < 16 MB",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Baud ignorado na emulação (Pico); limite de 16 MB na tabela.",
+          "consulta": [
+            "permissao",
+            "abrir",
+            "porta-virtual"
+          ],
+          "evidencias": [
+            "16 mb",
+            "ignorado"
+          ]
+        },
+        {
+          "paginas": [
+            6
+          ],
+          "assunto": "Ler: Uint8Array, done, trava; erros não fatais (overflow, framing, paridade) e fatais; TextDecoderStream",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Laço, erros e TextDecoderStream.",
+          "consulta": [
+            "streams",
+            "texto"
+          ],
+          "evidencias": [
+            "framing error",
+            "textdecoderstream"
+          ]
+        },
+        {
+          "paginas": [
+            7
+          ],
+          "assunto": "Leitor BYOB (Chrome 106+) e leitura de tamanho fixo",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Uma linha sobre mode: byob.",
+          "consulta": [
+            "streams"
+          ],
+          "evidencias": [
+            "byob",
+            "chrome 106"
+          ]
+        },
+        {
+          "paginas": [
+            8
+          ],
+          "assunto": "Escrever: Uint8Array, releaseLock, TextEncoderStream",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Código de escrita e TextEncoderStream.",
+          "consulta": [
+            "streams",
+            "texto"
+          ],
+          "evidencias": [
+            "textencoderstream"
+          ]
+        },
+        {
+          "paginas": [
+            9
+          ],
+          "assunto": "Fechar: sem e com transform streams (readableStreamClosed, writableStreamClosed)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Padrão com flag e sequência com transform streams.",
+          "consulta": [
+            "fechar"
+          ],
+          "evidencias": [
+            "leiturafechou.catch"
+          ]
+        },
+        {
+          "paginas": [
+            10
+          ],
+          "assunto": "Eventos connect e disconnect; event.port antes do Chrome 89",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Bullet de eventos. O detalhe de event.port (anterior ao Chrome 89) ficou de fora por ser histórico.",
+          "consulta": [
+            "permissao"
+          ],
+          "evidencias": [
+            "disconnect"
+          ]
+        },
+        {
+          "paginas": [
+            11
+          ],
+          "assunto": "Sinais: DTR faz o Arduino entrar em modo de gravação; setSignals e getSignals",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Bullet citando o guia e o reset automático.",
+          "consulta": [
+            "abrir"
+          ],
+          "evidencias": [
+            "modo de gravacao"
+          ]
+        },
+        {
+          "paginas": [
+            12
+          ],
+          "assunto": "Transforming streams: chunks arbitrários, LineBreakTransformer com pipeThrough, tee() para depurar",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "SeparadorDeLinhas adaptado e tee().",
+          "consulta": [
+            "texto"
+          ],
+          "evidencias": [
+            "separadordelinhas",
+            "tee()"
+          ]
+        },
+        {
+          "paginas": [
+            13
+          ],
+          "assunto": "Revogar acesso com forget() (Chrome 103+)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Bullet de forget(). A versão 103 ficou de fora: a tabela atual já cobre.",
+          "consulta": [
+            "permissao"
+          ],
+          "evidencias": [
+            "forget()"
+          ]
+        },
+        {
+          "paginas": [
+            14
+          ],
+          "assunto": "Dicas (about://device-log), Codelab micro:bit, suporte em desktop, polyfill no Android via WebUSB",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "device-log em texto; Codelab e polyfill em web-serial.",
+          "consulta": [
+            "web-serial",
+            "texto"
+          ],
+          "evidencias": [
+            "polyfill",
+            "device-log"
+          ]
+        },
+        {
+          "paginas": [
+            15
+          ],
+          "assunto": "Segurança e privacidade: modelo de permissão, um dispositivo por vez, escolha ativa",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Caixa de segurança. O explainer citado não foi lido.",
+          "consulta": [
+            "permissao"
+          ],
+          "evidencias": [
+            "um dispositivo por vez"
+          ]
+        },
+        {
+          "paginas": [
+            16
+          ],
+          "assunto": "Feedback, links úteis, demos e agradecimentos",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Estrutural: não traz conceito.",
+          "consulta": [
+            "web-serial"
+          ],
+          "evidencias": []
+        }
+      ]
+    },
+    {
+      "id": "codigo-chips",
+      "url": "https://github.com/raspberrypi/pico-sdk/blob/master/src/rp2_common/pico_usb_reset/include/pico/usb_reset_config.h",
+      "escopo": "Trechos de código-fonte para os números dos chips: ArduinoCore-avr HardwareSerial.h (SERIAL_RX_BUFFER_SIZE 64) e boards.txt (uno.vid/pid), Optiboot optiboot.c (WDTTIME padrão 1 s), pico-sdk stdio_usb_descriptors.c (VID 0x2E8A, PID 0x000A) e usb_reset_config.h e usb_reset.c (1200 baud → BOOTSEL, ligado por padrão sem TinyUSB direto).",
+      "acesso": "trecho",
+      "limitacao": "Só as linhas citadas foram conferidas. O reset automático do Uno pelo DTR e a trilha RESET-EN seguem a documentação conhecida da placa e o guia do Chrome, sem leitura do esquemático."
+    }
+  ]
+}

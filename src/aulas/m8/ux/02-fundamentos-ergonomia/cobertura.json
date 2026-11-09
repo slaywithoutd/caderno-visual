@@ -1,0 +1,134 @@
+{
+  "aula": "m8/ux/02-fundamentos-ergonomia",
+  "data": "2026-11-10",
+  "criterio": "Conferência humana das fontes do autoestudo que abriram (página da IEA, transcrição do vídeo da NN/g, página da Superflux) e do artigo relacionado da NN/g, com destinos verificáveis no modo Consulta. O PDF do Drive e o filme da Superflux não foram acessados. Complementos (Wobbrock, ANSUR II, MacKenzie) foram lidos em trechos identificados. As quatro categorias de suposição e os critérios vêm do enunciado da ponderada (notas/ponderada.md).",
+  "fontes": [
+    {
+      "id": "iea-ergonomia",
+      "url": "https://iea.cc/about/what-is-ergonomics/",
+      "escopo": "IEA, What Is Ergonomics (HFE)?. Unidades: 1 definição e etimologia; 2 domínios; 3 abordagem sistêmica e não específica de setor; 4 princípios e valores; 5 perspectivas micro e macro; 6 participação no projeto; 7 partes interessadas; 8 valor no trabalho; 9 referências citadas.",
+      "acesso": "integral",
+      "metodo": "HTML baixado (HTTP 200) e texto extraído e lido do começo ao fim, sem menus e rodapé.",
+      "totalUnidades": 9,
+      "unidades": [
+        { "paginas": [1], "assunto": "Definição da IEA (2000), ergon e nomos, ergonomia = fatores humanos", "antes": "conteudo-novo-da-aula", "justificativa": "Definição no cs-def da seção ergonomia; etimologia e sinonímia nos detalhes.", "consulta": ["ergonomia"], "evidencias": ["ergon", "IEA em 2000"] },
+        { "paginas": [2], "assunto": "Domínios físico, cognitivo e organizacional, com tópicos", "antes": "conteudo-novo-da-aula", "justificativa": "Seção própria com tabela dos tópicos de cada domínio.", "consulta": ["dominios"], "evidencias": ["ergonomia física", "resposta motora", "teletrabalho"] },
+        { "paginas": [3], "assunto": "Problemas sistêmicos, ciência não específica de setor, especialista considera os outros domínios", "antes": "conteudo-novo-da-aula", "justificativa": "Sistema na seção ergonomia; sobreposição de domínios na seção dominios.", "consulta": ["ergonomia", "dominios"], "evidencias": ["sistêmicos", "não pertence a um setor", "considere os outros"] },
+        { "paginas": [4], "assunto": "Valores: pessoas como ativos, tecnologia como ferramenta, qualidade de vida, diferenças individuais, responsabilidade", "antes": "conteudo-novo-da-aula", "justificativa": "Lista de valores na seção ergonomia.", "consulta": ["ergonomia"], "evidencias": ["qualidade de vida", "diferenças individuais"] },
+        { "paginas": [5], "assunto": "Microergonomia e macroergonomia", "antes": "conteudo-novo-da-aula", "justificativa": "Um bullet com os dois níveis.", "consulta": ["ergonomia"], "evidencias": ["Microergonomia", "macroergonomia"] },
+        { "paginas": [6], "assunto": "Abordagem sistêmica, iterativa e guiada pelo projeto; ergonomia participativa", "antes": "conteudo-novo-da-aula", "justificativa": "Termo ergonomia participativa e as três características do método.", "consulta": ["ergonomia"], "evidencias": ["ergonomia participativa", "iterativo"] },
+        { "paginas": [7], "assunto": "Partes interessadas: influenciadores, decisores, especialistas, atores", "antes": "conteudo-novo-da-aula", "justificativa": "Bullet com os quatro tipos.", "consulta": ["ergonomia"], "evidencias": ["Partes interessadas"] },
+        { "paginas": [8], "assunto": "Valor da ergonomia no trabalho: desempenho, custos diretos e indiretos", "antes": "conteudo-novo-da-aula", "justificativa": "Um bullet sobre o valor econômico.", "consulta": ["ergonomia"], "evidencias": ["rotatividade"] },
+        { "paginas": [9], "assunto": "Referências citadas pela página (Bridger, Read et al., IEA/OIT, Wilson, Dul et al., Hendrick)", "antes": "conteudo-novo-da-aula", "justificativa": "Bibliografia da própria página; não foi aberta nem citada na aula.", "consulta": ["ergonomia"], "evidencias": [] }
+      ]
+    },
+    {
+      "id": "nng-video-fitts",
+      "url": "https://www.nngroup.com/videos/fittss-law/",
+      "escopo": "NN/g, Fitts's Law, vídeo de Lexie Kane (2019-01-11), cerca de 1 min 40 s, YouTube M-9FbUJk6tI. Unidade 1 = 0:00–0:21; 2 = 0:22–0:30; 3 = 0:31–1:05; 4 = 1:06–1:28; 5 = 1:29–fim.",
+      "acesso": "integral",
+      "metodo": "Transcrição manual em inglês do YouTube baixada e lida inteira. A equação mostrada na tela (\"Here's the equation\") não está na transcrição e não foi vista.",
+      "totalUnidades": 5,
+      "unidades": [
+        { "paginas": [1], "assunto": "Lei fundamental e ignorada; Paul Fitts e o modelo de seleção de alvo", "antes": "conteudo-novo-da-aula", "justificativa": "Autor do modelo na seção fitts.", "consulta": ["fitts"], "evidencias": ["Paul Fitts"] },
+        { "paginas": [2], "assunto": "Onde vale: sites, apps, interfaces de aparelhos e painéis físicos", "antes": "conteudo-novo-da-aula", "justificativa": "No cs-def da seção fitts.", "consulta": ["fitts"], "evidencias": ["painéis físicos"] },
+        { "paginas": [3], "assunto": "Tempo em função de tamanho e distância; alvo e distância; custo de interação", "antes": "conteudo-novo-da-aula", "justificativa": "cs-def, fórmula e conta passo a passo. A forma exata mostrada no vídeo não foi conferida; a aula usa a forma de Shannon e mostra as outras.", "consulta": ["fitts"], "evidencias": ["Alvo grande e perto custa pouco"] },
+        { "paginas": [4], "assunto": "Aplicações: concluir perto dos campos, ação importante maior, listas curtas como guia", "antes": "conteudo-novo-da-aula", "justificativa": "Bullet de aplicações citando Kane.", "consulta": ["fitts"], "evidencias": ["botão de concluir", "regra absoluta"] },
+        { "paginas": [5], "assunto": "Fecho: alvos grandes e menos tempo mantêm o custo baixo", "antes": "conteudo-novo-da-aula", "justificativa": "Mesma ideia do cs-def.", "consulta": ["fitts"], "evidencias": ["custa caro"] }
+      ]
+    },
+    {
+      "id": "nng-artigo-fitts",
+      "url": "https://www.nngroup.com/articles/fitts-law/",
+      "escopo": "Raluca Budiu, Fitts's Law and Its Applications in UX, NN/g, 2022-07-31 (artigo relacionado na página do vídeo). Unidades: 1 história; 2 fórmula e variáveis; 3 modelo de dois componentes; 4 alvos grandes e rótulos; 5 bordas da tela; 6 espaçamento e área ativa; 7 menus; 8 controles em sequência; 9 conclusão e referências.",
+      "acesso": "integral",
+      "metodo": "HTML baixado e texto lido inteiro; as equações são imagens, conferidas pelo texto alternativo (forma log₂(2D/w)).",
+      "totalUnidades": 9,
+      "unidades": [
+        { "paginas": [1], "assunto": "Fitts, cockpits na Segunda Guerra e teoria da informação de Shannon", "antes": "conteudo-novo-da-aula", "justificativa": "Bullet de história na seção fitts.", "consulta": ["fitts"], "evidencias": ["teoria da informação"] },
+        { "paginas": [2], "assunto": "Fórmula com 2D/w, a e b dependem do ponteiro, W na direção do movimento ou menor dimensão", "antes": "conteudo-novo-da-aula", "justificativa": "Forma de Fitts na tabela de variantes e pegadinha; menor dimensão em medir-dispositivo.", "consulta": ["fitts", "medir-dispositivo"], "evidencias": ["2D/W", "menor dimensão"] },
+        { "paginas": [3], "assunto": "Modelo de dois componentes de Woodworth; log em vez de proporção", "antes": "conteudo-novo-da-aula", "justificativa": "Bullet sobre por que log; loop da margem.", "consulta": ["fitts"], "evidencias": ["Woodworth", "não o dobra"] },
+        { "paginas": [4], "assunto": "Alvos grandes; ícone com rótulo", "antes": "conteudo-novo-da-aula", "justificativa": "Bullet de aplicações de Budiu.", "consulta": ["fitts"], "evidencias": ["rótulo"] },
+        { "paginas": [5], "assunto": "Bordas como alvos infinitos com mouse; sem vantagem no toque (Avrahami)", "antes": "conteudo-novo-da-aula", "justificativa": "Pegadinha sobre tela sensível ao toque.", "consulta": ["fitts"], "evidencias": ["Avrahami"] },
+        { "paginas": [6], "assunto": "Alvos próximos demais e área ativa invisível", "antes": "conteudo-novo-da-aula", "justificativa": "Bullet de aplicações de Budiu.", "consulta": ["fitts"], "evidencias": ["vizinho"] },
+        { "paginas": [7], "assunto": "Menus linear, retangular e em pizza", "antes": "conteudo-novo-da-aula", "justificativa": "Bullet de aplicações de Budiu.", "consulta": ["fitts"], "evidencias": ["pizza"] },
+        { "paginas": [8], "assunto": "Controles usados em sequência perto um do outro; enviar perto do último campo", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto pelo bullet de Kane sobre o botão de concluir.", "consulta": ["fitts"], "evidencias": ["campos ativos"] },
+        { "paginas": [9], "assunto": "Conclusão e referências (Avrahami, Elliott et al., Fitts 1954, MacKenzie e Buxton 1992)", "antes": "conteudo-novo-da-aula", "justificativa": "MacKenzie e Buxton citados em medir-dispositivo; Fitts 1954 na tabela de variantes.", "consulta": ["fitts", "medir-dispositivo"], "evidencias": ["MacKenzie e Buxton"] }
+      ]
+    },
+    {
+      "id": "superflux-pagina",
+      "url": "https://superflux.in/index.php/work/uninvited-guests/",
+      "escopo": "Superflux, Uninvited Guests (2015), página do projeto. Unidades: 1 ficha e sinopse; 2 ThingTank; 3 perguntas de pesquisa; 4 temas e espectro de cenários; 5 foco no cuidado de idosos; 6 pergunta do tamanho único; 7 objetos como marcadores; 8 intenção de design fiction e agradecimentos.",
+      "acesso": "integral",
+      "metodo": "HTML baixado (HTTP 200) e texto do projeto lido inteiro; lista de notícias do rodapé ignorada.",
+      "totalUnidades": 8,
+      "unidades": [
+        { "paginas": [1], "assunto": "Encomenda, ano, equipe, ator e sinopse de Thomas", "antes": "conteudo-novo-da-aula", "justificativa": "Seção própria.", "consulta": ["design-ficcao"], "evidencias": ["Thomas, 70 anos", "James Leahy"] },
+        { "paginas": [2], "assunto": "Superflux Lab e o consórcio ThingTank", "antes": "conteudo-novo-da-aula", "justificativa": "Bullet do projeto.", "consulta": ["design-ficcao"], "evidencias": ["ThingTank"] },
+        { "paginas": [3], "assunto": "Relação com objetos autônomos, agência humana, ritmos e rotinas", "antes": "conteudo-novo-da-aula", "justificativa": "Bullet das perguntas.", "consulta": ["design-ficcao"], "evidencias": ["agência humana"] },
+        { "paginas": [4], "assunto": "The Neural Network, Objects with Attitude, Defiant Behaviours; útil, crítico e desviante", "antes": "conteudo-novo-da-aula", "justificativa": "Bullet dos temas.", "consulta": ["design-ficcao"], "evidencias": ["Defiant Behaviours", "desviante"] },
+        { "paginas": [5], "assunto": "Casa conectada, cuidado de idosos, monitoramento remoto, substituir cuidadores", "antes": "conteudo-novo-da-aula", "justificativa": "Mesmo bullet dos temas.", "consulta": ["design-ficcao"], "evidencias": ["monitoramento remoto"] },
+        { "paginas": [6], "assunto": "Comportamentos humanos contra o cuidado tamanho único", "antes": "conteudo-novo-da-aula", "justificativa": "Pergunta central e ligação com suposições.", "consulta": ["design-ficcao"], "evidencias": ["tamanho único"] },
+        { "paginas": [7], "assunto": "Objetos como marcadores de lugar e fantasmas do futuro", "antes": "conteudo-novo-da-aula", "justificativa": "Bullet próprio.", "consulta": ["design-ficcao"], "evidencias": ["marcadores de lugar"] },
+        { "paginas": [8], "assunto": "Design fiction cômica para provocar perguntas; agradecimentos", "antes": "conteudo-novo-da-aula", "justificativa": "Definição de design fiction no cs-def; agradecimentos não entram.", "consulta": ["design-ficcao"], "evidencias": ["provocar perguntas"] }
+      ]
+    },
+    {
+      "id": "superflux-filme",
+      "url": "https://vimeo.com/128873380",
+      "escopo": "Uninvited Guests, filme de 283 s (4 min 43 s) no Vimeo, segundo o oEmbed.",
+      "acesso": "indisponivel",
+      "limitacao": "Filme não assistido e sem transcrição. Nenhuma cena é descrita; a seção usa só o texto da página."
+    },
+    {
+      "id": "drive-pdf",
+      "url": "https://drive.google.com/file/d/16Z8U7LPeQ4IZ1AUflmsqZaDjODe7ZiJ2/view",
+      "escopo": "Arquivo do Drive indicado no autoestudo; título, autor e número de páginas desconhecidos.",
+      "acesso": "indisponivel",
+      "limitacao": "O Drive respondeu com a tela de login (HTTP 401). Nenhum PDF com nome parecido em Downloads, Desktop e Documents. Nada é atribuído a ele."
+    },
+    {
+      "id": "wobbrock-2011",
+      "url": "https://faculty.washington.edu/wobbrock/pubs/taccess-11.pdf",
+      "escopo": "Wobbrock, Kane, Gajos, Harada e Froehlich, Ability-Based Design: Concept, Principles and Examples, ACM TACCESS 3(3), artigo 9, 2011, 27 páginas.",
+      "acesso": "trecho",
+      "limitacao": "Lidas as seções 1 a 4 (páginas 9:1 a 9:9) e a abertura da seção 5. Projetos da seção 5, agenda de pesquisa e conclusão não lidos."
+    },
+    {
+      "id": "wobbrock-2018",
+      "url": "https://faculty.washington.edu/wobbrock/pubs/cacm-18.pdf",
+      "escopo": "Wobbrock, Gajos, Kane e Vanderheiden, Ability-Based Design, Communications of the ACM 61(6), 2018.",
+      "acesso": "trecho",
+      "limitacao": "Lidos a abertura, suposições de habilidade, quiosque, cockpits, definições de habilidade e estratégias. O resto não foi lido."
+    },
+    {
+      "id": "ansur-ii",
+      "url": "https://www.openlab.psu.edu/ansur2/",
+      "escopo": "Gordon et al., 2012 Anthropometric Survey of U.S. Army Personnel: Methods and Summary Statistics, NATICK/TR-15/007, dez. 2014, e CSV públicos (4.082 homens, 1.986 mulheres).",
+      "acesso": "trecho",
+      "limitacao": "Conferidos resumo da amostra, período, base de trabalho e as páginas das medidas 42 (largura da mão) e 44 (comprimento da mão). Percentis recalculados dos CSV para conferência. O resto do relatório não foi lido."
+    },
+    {
+      "id": "soukoreff-mackenzie-2004",
+      "url": "https://www.yorku.ca/mack/ijhcs2004.pdf",
+      "escopo": "Soukoreff e MacKenzie, Towards a standard for pointing device evaluation, IJHCS 61, 751–789, 2004.",
+      "acesso": "trecho",
+      "limitacao": "Lidas as recomendações I a VII, as seções 3.3 (forma de Shannon) e 3.4 (regressão) e as notas sobre bits e largura efetiva. Revisão dos 24 modelos não lida."
+    },
+    {
+      "id": "mackenzie-2013",
+      "url": "https://www.yorku.ca/mack/ojas2013.pdf",
+      "escopo": "MacKenzie, A Note on the Validity of the Shannon Formulation for Fitts' Index of Difficulty, Open Journal of Applied Sciences 3, 360–368, 2013.",
+      "acesso": "trecho",
+      "limitacao": "Usado só para as três formas do ID (Fitts, Welford, Shannon) e a justificativa do +0,5 e do +1."
+    },
+    {
+      "id": "referencias-catalogo",
+      "url": "https://www.routledge.com/Bodyspace-Anthropometry-Ergonomics-and-the-Design-of-Work/Pheasant-Haslegrave/p/book/9780415285209",
+      "escopo": "Pheasant e Haslegrave, Bodyspace, 3ª ed. (CRC Press, 2006); ISO 7250-1:2017; Iida e Guimarães, Ergonomia: projeto e produção, 3ª ed. (Blucher, 2016); INT (1988).",
+      "acesso": "catalogo",
+      "limitacao": "Só edição, editora, sumário ou escopo conferidos em catálogo e menções de terceiros. Nenhum valor dessas obras é usado; a aula avisa que não foram conferidas."
+    }
+  ]
+}

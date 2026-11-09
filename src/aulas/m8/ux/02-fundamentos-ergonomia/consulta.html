@@ -1,0 +1,402 @@
+<!-- Aula 02 de Design/UX (10/11/2026), só modo Consulta. Um conceito por seção, em ordem de dependência.
+     Estrutura de cada seção: h2 → p.cs-def → .cs-formula → .cs-uso → .cs-pegadinhas → .cs-ponderada → visuais.
+     O aparelho dos exemplos (leitor de código de barras de mão) é fictício: as medidas DELE são inventadas.
+     Os dados do corpo são do ANSUR II, conferidos no relatório (Gordon et al., 2014) e nos dados públicos. -->
+
+<!-- ================= Resumo ================= -->
+<section class="cs" id="encontro" data-grupo="Resumo" data-termos="">
+  <h2>Resumo</h2>
+  <p class="cs-def">Todo dispositivo supõe um corpo: tamanho de mão, força, precisão e sentidos disponíveis. A ergonomia torna essas suposições explícitas, mede, compara com dados do corpo humano e transforma o que exclui em requisito que o sistema precisa cumprir.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="k" x="4" y="10" width="68" height="34" rx="6"/><text x="38" y="31">dispositivo</text><rect class="am" x="86" y="10" width="68" height="34" rx="6"/><text x="120" y="31">suposição</text><rect class="bl" x="168" y="10" width="68" height="34" rx="6"/><text x="202" y="25">dado</text><text class="tm" x="202" y="38">mm · P95 · bits</text><path class="s" d="M72 27 H84" marker-end="url(#mnarrow)"/><path class="s" d="M154 27 H166" marker-end="url(#mnarrow)"/><path class="s" d="M202 44 V66 H160" marker-end="url(#mnarrow)"/><rect class="rd" x="86" y="56" width="72" height="34" rx="6"/><text x="122" y="77">barreira</text><path class="s" d="M122 90 V104" marker-end="url(#mnarrow)"/><rect class="gr" x="78" y="106" width="88" height="38" rx="6"/><text x="122" y="122">requisito</text><text class="tm" x="122" y="136">com critério</text></svg>Do objeto ao requisito, sempre com número e fonte.</aside>
+  <ul class="b">
+    <li>Ergonomia, pela definição da IEA (2000), estuda a interação entre pessoas e os outros elementos de um sistema para otimizar bem-estar e desempenho. Tem três domínios: físico, cognitivo e organizacional.</li>
+    <li>Uma suposição de habilidade se escreve do lado de quem usa: "exige alcançar com o polegar 40 mm". "O botão fica a 40 mm" descreve o objeto.</li>
+    <li>Design baseado em habilidades (Wobbrock et al., 2011) pergunta o que a pessoa consegue fazer e põe no sistema o peso de se adaptar.</li>
+    <li>Antropometria compara a medida do aparelho com o percentil de uma população identificada: folga pelo maior (P95), alcance pelo menor (P5). A média não serve de medida de projeto.</li>
+    <li>Lei de Fitts: MT = a + b · log₂(D/W + 1). O ID, em bits, sai só de D e W; a e b saem de medição com aquele dispositivo e aquelas pessoas.</li>
+    <li>Barreira precisa de evidência com fonte, requisito precisa de critério que alguém consiga medir, e saída de IA precisa ser conferida na fonte primária.</li>
+  </ul>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Percentil vale para a população medida. O P95 de militares americanos de 17 a 58 anos (ANSUR II) não descreve idosos brasileiros.</li>
+    <li>Na Lei de Fitts, o log é na base 2. Com ln, o número sai menor e em outra unidade.</li>
+    <li>D e W na mesma unidade. O relatório do ANSUR II publica em cm; os dados públicos, em mm.</li>
+    <li>"Ser ergonômico" e "o usuário deve treinar" não são requisitos verificáveis.</li>
+  </ul></div>
+</section>
+
+<!-- ================= Ergonomia ================= -->
+<section class="cs" id="ergonomia" data-grupo="Ergonomia" data-termos="erg-ergonomia,erg-sociotecnico,erg-participativa">
+  <h2>Ergonomia: a pessoa dentro de um sistema</h2>
+  <p class="cs-def"><b>Ergonomia</b> (ou fatores humanos, HFE) é a disciplina científica que estuda as interações entre pessoas e os outros elementos de um sistema, e a profissão que aplica teoria, princípios, dados e métodos ao projeto para otimizar o bem-estar humano e o desempenho do sistema. É a definição adotada pela IEA em 2000.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><circle class="acf" cx="120" cy="75" r="26"/><text x="120" y="79">pessoa</text><rect class="k" x="6" y="8" width="74" height="28" rx="6"/><text x="43" y="26">tarefa</text><rect class="k" x="160" y="8" width="74" height="28" rx="6"/><text x="197" y="26">ferramenta</text><rect class="k" x="6" y="114" width="74" height="28" rx="6"/><text x="43" y="132">ambiente</text><rect class="k" x="160" y="114" width="74" height="28" rx="6"/><text x="197" y="132">organização</text><path class="s" d="M80 30 L100 58 M160 30 L140 58 M80 120 L100 92 M160 120 L140 92"/><text class="tm" x="120" y="12">bem-estar + desempenho</text></svg>A IEA olha a pessoa junto com tudo o que a cerca.</aside>
+  <div class="cs-uso"><ul class="b">
+    <li>O nome vem do grego <i>ergon</i> (trabalho) e <i>nomos</i> (leis): "ciência do trabalho". A IEA usa ergonomia e fatores humanos como sinônimos.</li>
+    <li>Repare nos dois objetivos juntos. Um aparelho rápido que machuca o punho falha no bem-estar; um confortável que erra a leitura falha no desempenho.</li>
+    <li>A palavra que mais pesa é "sistema". A IEA trata os problemas como sistêmicos: pessoa, ferramenta, tarefa, ambiente e organização se afetam. Daí ver o trabalho como um <b>sistema sociotécnico</b>, em que gente e tecnologia são projetadas juntas.</li>
+    <li>Microergonomia olha a ferramenta, o procedimento e o contexto imediato; macroergonomia olha a organização do trabalho, os papéis, a comunicação e o retorno. A IEA diz que um não pode ser visto isolado do outro.</li>
+    <li>Valores declarados pela IEA: pessoas como ativos, tecnologia como ferramenta para ajudar pessoas, qualidade de vida, respeito às diferenças individuais e responsabilidade com todas as partes interessadas.</li>
+    <li>Partes interessadas são todas as pessoas que afetam, são afetadas ou se sentem afetadas por uma decisão: quem regula (governos, órgãos de normas), quem decide (gestores, compradores), quem projeta (especialistas) e quem usa.</li>
+    <li>A IEA pede <b>ergonomia participativa</b>: quem é afetado participa do projeto. O método é sistêmico, iterativo e passo a passo, guiado pelo projeto e mirando desempenho e bem-estar.</li>
+    <li>A ergonomia não pertence a um setor. Ela vale para tarefas, produtos, ambientes e sistemas, no trabalho e fora dele.</li>
+    <li>A IEA também defende o valor econômico: postos bem projetados reduzem custos diretos e indiretos, como perdas de produtividade, falhas de qualidade e rotatividade.</li>
+  </ul>
+  <p>Recapitulando: pessoa e sistema se projetam juntos, com dois objetivos (bem-estar e desempenho) e com quem é afetado participando.</p></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Ergonomia vai muito além de cadeira e postura. O físico é um dos três domínios; o cognitivo e o organizacional contam igual.</li>
+    <li>Treinar a pessoa para caber no objeto inverte a lógica da IEA, que põe a tecnologia como ferramenta para ajudar pessoas.</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="dominios" data-grupo="Ergonomia" data-termos="erg-fisica,erg-cognitiva,erg-organizacional,erg-biomecanica">
+  <h2>Três domínios: físico, cognitivo e organizacional</h2>
+  <p class="cs-def">A IEA divide a ergonomia em três domínios. A <b>ergonomia física</b> trata das características anatômicas, antropométricas, fisiológicas e biomecânicas ligadas à atividade física. A <b>ergonomia cognitiva</b> trata de processos mentais como percepção, memória, raciocínio e resposta motora. A <b>ergonomia organizacional</b> trata de estruturas, políticas e processos de sistemas sociotécnicos.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><circle class="bl" cx="88" cy="58" r="46" style="fill-opacity:.55"/><circle class="am" cx="152" cy="58" r="46" style="fill-opacity:.55"/><circle class="gr" cx="120" cy="104" r="42" style="fill-opacity:.55"/><text class="tb" x="70" y="46">física</text><text class="tam" x="172" y="46">cognitiva</text><text x="120" y="128">organizacional</text><text class="tm" x="120" y="80">dispositivo</text></svg>Os domínios se sobrepõem: o mesmo aparelho aparece nos três.</aside>
+  <div class="cs-uso"><ul class="b">
+    <li><b>Biomecânica</b> é o estudo das forças e dos movimentos do corpo tratado como sistema mecânico. É dela que vêm postura, força, carga e repetição.</li>
+    <li>Os domínios não são caixas fechadas. A IEA pede que o especialista de um domínio considere os outros; repare que "resposta motora" está na lista do domínio cognitivo.</li>
+    <li>As <a href="#suposicao">quatro categorias da ponderada</a> moram quase todas no domínio físico. Sensorial e motora encostam no cognitivo, que cuida de percepção e resposta motora.</li>
+    <li>Na tabela abaixo, a última coluna aplica os domínios a um aparelho fictício, um leitor de código de barras de mão, que acompanha os exemplos desta aula.</li>
+  </ul></div>
+  <div class="cs-pegadinhas">Organizacional parece "fora do aparelho", mas quem escolhe o aparelho, quem configura e quem recebe o alerta mudam o que ele exige de quem usa.</div>
+  <div class="tbl prose"><table>
+    <thead><tr><th>Domínio</th><th>Tópicos que a IEA lista</th><th>No leitor de código de barras (autoral)</th></tr></thead>
+    <tbody>
+      <tr><td>Física</td><td>Posturas de trabalho, manuseio de materiais, movimentos repetitivos, distúrbios musculoesqueléticos ligados ao trabalho, layout do posto, segurança e saúde física</td><td>Cabo que cabe na mão, peso sustentado, punho dobrado a cada leitura, gatilho apertado centenas de vezes por turno</td></tr>
+      <tr><td>Cognitiva</td><td>Carga mental, tomada de decisão, desempenho especializado, interação humano-computador, confiabilidade humana, estresse, treinamento</td><td>Entender que o bipe quer dizer "leu", lembrar qual botão troca o modo</td></tr>
+      <tr><td>Organizacional</td><td>Comunicação, gestão de equipes, desenho do trabalho e dos horários, trabalho em equipe, projeto participativo, ergonomia comunitária, trabalho cooperativo, teletrabalho, gestão da qualidade</td><td>Meta de itens por minuto no caixa, pausas, quem escolheu o modelo do aparelho</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ================= Habilidades ================= -->
+<section class="cs" id="suposicao" data-grupo="Habilidades" data-termos="erg-suposicao,erg-capacidade-exigida,erg-categorias">
+  <h2>Suposição de habilidade: o que o objeto exige de quem usa</h2>
+  <p class="cs-def">Uma <b>suposição de habilidade</b> é uma capacidade que o projeto presume que toda pessoa tem: tamanho de mão, força, precisão, sentidos disponíveis. Ela quase nunca está escrita. Escrita do lado de quem usa, com verbo e número, ela vira uma <b>capacidade exigida</b>: "exige alcançar com o polegar 40 mm".</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><text class="tm" x="60" y="12">o objeto</text><text class="tm" x="180" y="12">quem usa</text><rect class="k" x="4" y="20" width="112" height="36" rx="6"/><text x="60" y="36">botão de 9 mm</text><text class="tm" x="60" y="49">a 40 mm do polegar</text><path class="s" d="M118 38 H130" marker-end="url(#mnarrow)"/><rect class="acf" x="132" y="20" width="104" height="36" rx="6"/><text x="184" y="36">exige alcançar</text><text x="184" y="49">40 mm e acertar 9</text><rect class="k" x="4" y="82" width="112" height="36" rx="6"/><text x="60" y="98">confirma só</text><text class="tm" x="60" y="111">com bipe e LED</text><path class="s" d="M118 100 H130" marker-end="url(#mnarrow)"/><rect class="acf" x="132" y="82" width="104" height="36" rx="6"/><text x="184" y="98">exige ouvir</text><text x="184" y="111">ou ver LED de 3 mm</text><text class="tm" x="120" y="140">mesma informação, outro sujeito</text></svg>A coluna da direita é a que a ponderada pede.</aside>
+  <div class="cs-uso"><ul class="b">
+    <li>Exemplo de Wobbrock et al. (2018): um quiosque com tela sensível ao toque diz "é só tocar na tela". Tocar exige fechar a mão, estender o indicador, levantar o braço, ver o alvo, acertar, manter firme, levantar o dedo sem arrastar e, antes de tudo, ler e entender a instrução. Não tem nada de "só".</li>
+    <li>De onde vêm as suposições, segundo os mesmos autores: das habilidades de quem projeta, das que se imagina que os outros têm e das do "usuário médio". As duas primeiras são enviesadas; a terceira parece estatística e não descreve ninguém (veja a história dos cockpits em <a href="#antropometria">antropometria</a>).</li>
+    <li>Reescreva em três passos. (1) Aponte a característica: "gatilho de 10 mm a 60 mm da curva do cabo". (2) Pergunte que parte do corpo ou que sentido ela usa: o indicador. (3) Escreva com verbo de capacidade e número: "exige alcançar com o indicador 60 mm e apertar um alvo de 10 mm".</li>
+    <li>Verbos que ajudam: exige alcançar, abarcar, sustentar, apertar com força, manter firme, acertar, repetir, ver, ouvir, sentir.</li>
+    <li>As <b>quatro categorias</b> do enunciado da ponderada: antropométrica (tamanho e alcance do corpo), biomecânica (força, postura, carga, repetição), motora (precisão, velocidade, estabilidade do movimento) e sensorial (ver, ouvir, sentir pelo tato ou pela vibração).</li>
+    <li>A tabela abaixo usa as quatro colunas do enunciado. As medidas do aparelho são inventadas para o exemplo; os dados do corpo são do ANSUR II.</li>
+  </ul>
+  <p>Recapitulando: troque o sujeito da frase (do objeto para a pessoa), ponha um número e diga de onde ele veio.</p></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>"Botão pequeno" descreve o objeto. "Exige acertar um alvo de 9 mm" descreve a pessoa. A ponderada avalia a segunda forma.</li>
+    <li>Suposição sem número fica no ar. O que não dá para medir em casa (a força do gatilho, sem dinamômetro) entra como observação descrita.</li>
+    <li>Suposição ainda não é barreira. Ela vale para todo mundo; vira barreira para quem não tem aquela capacidade (veja <a href="#barreiras">barreiras</a>).</li>
+  </ul></div>
+  <div class="cs-ponderada"><p>A tabela pede ao menos cinco suposições, de ao menos três das quatro categorias, cada uma escrita como capacidade exigida de quem usa. É o critério Mapeamento das suposições de habilidade (2,0).</p></div>
+  <div class="tbl prose"><table>
+    <thead><tr><th>Suposição de habilidade</th><th>Categoria</th><th>Característica do dispositivo</th><th>Evidência (medida ou observação)</th></tr></thead>
+    <tbody>
+      <tr><td>Exige que os quatro dedos caibam lado a lado no cabo</td><td>Antropométrica</td><td>Cabo com 95 mm de comprimento útil</td><td>C1 = 95 mm (paquímetro). ANSUR II, largura da mão, homens, P95: 9,6 cm. Ao menos 5% dos homens medidos não cabem (aproximação: a largura é medida nos metacarpos)</td></tr>
+      <tr><td>Exige alcançar com o indicador o gatilho a 60 mm da curva do cabo</td><td>Antropométrica</td><td>Gatilho a 60 mm</td><td>C2 = 60 mm (régua). O ANSUR II não tem alcance de dedo: precisa de outra fonte</td></tr>
+      <tr><td>Exige sustentar 240 g com o punho dobrado a cada leitura</td><td>Biomecânica</td><td>Massa de 240 g; cabo inclinado</td><td>Balança de cozinha; postura observada em 10 leituras</td></tr>
+      <tr><td>Exige levar o polegar 40 mm até um botão de 9 mm e acertá-lo</td><td>Motora</td><td>Botão de modo no topo</td><td>C3 = 40 mm, C4 = 9 mm. Lei de Fitts: ID = 2,44 bits</td></tr>
+      <tr><td>Exige ouvir um bipe curto ou ver um LED de 3 mm para saber que leu</td><td>Sensorial</td><td>Confirmação só por som e LED</td><td>C5 = 3 mm (paquímetro); LED fora do campo de visão enquanto se olha o produto</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="cs" id="design-habilidades" data-grupo="Habilidades" data-termos="erg-design-habilidades,erg-limitacao-situacional">
+  <h2>Design baseado em habilidades: quem muda é o sistema</h2>
+  <p class="cs-def"><b>Design baseado em habilidades</b> (ability-based design) foca no que a pessoa consegue fazer, em vez de no que lhe falta, e responde a um mau desempenho mudando o sistema, não a pessoa. A proposta é de Wobbrock, Kane, Gajos, Harada e Froehlich (2011).</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><text class="tm" x="40" y="12">(a) encaixa</text><text class="tm" x="120" y="12">(b) acessório</text><text class="tm" x="200" y="12">(c) sistema muda</text><path class="bl" d="M18 22 h44 v40 h-14 l-8 -10 l-8 10 h-14 z"/><text class="tm" x="40" y="38">sistema</text><path class="k" d="M18 70 h14 l8 -10 l8 10 h14 v34 h-44 z"/><path class="bl" d="M98 22 h44 v40 h-14 l-8 -10 l-8 10 h-14 z"/><text class="tm" x="120" y="38">sistema</text><rect class="am" x="100" y="64" width="40" height="8" rx="2"/><path class="k" d="M98 82 h14 v-6 h16 v6 h14 v22 h-44 z"/><path class="gr" d="M178 22 h44 v40 h-14 v-8 h-16 v8 h-14 z"/><text class="tm" x="200" y="38">sistema</text><path class="k" d="M178 72 h14 v-8 h16 v8 h14 v32 h-44 z"/><text class="tm" x="40" y="118">pessoa</text><text class="tm" x="120" y="118">pessoa</text><text class="tm" x="200" y="118">pessoa</text><text class="tm" x="120" y="140">quem carrega o ajuste?</text></svg>Em (b) a pessoa põe um adaptador; em (c) o sistema toma a forma dela.</aside>
+  <div class="cs-uso"><ul class="b">
+    <li>A pergunta muda de "que deficiência a pessoa tem?" para "o que a pessoa consegue fazer?". Os autores comparam com o design centrado no usuário, que tirou o foco do sistema e pôs no usuário.</li>
+    <li>Três situações, como na figura 2 do artigo: (a) as habilidades da pessoa batem com as que o sistema supõe; (b) não batem, e a pessoa põe um acessório entre ela e o sistema, que continua sem saber nada dela; (c) o sistema se adapta, ou é adaptado, às habilidades dela.</li>
+    <li>Exemplo dos autores para (b): alguém digita com uma ponteira de boca. O teclado sabe o que exige e não sabe nada de quem digita; a ponteira existe para tornar a pessoa aceitável para o teclado.</li>
+    <li>Exemplo deles para (c): o SUPPLE mede como a pessoa aponta com o mouse e redesenha, reorganiza e redimensiona a interface para ela.</li>
+    <li>Adaptar não é obrigatório, mas é o que tira o peso de quem usa e põe no sistema. Wobbrock et al. (2018) listam caminhos: adaptação automática, muita configuração pelo próprio usuário, ajuste por um terceiro (um terapeuta, por exemplo) e versões diferentes para habilidades diferentes.</li>
+    <li>Habilidade depende do contexto. Frio, luva, chuva, caminhar, pouca luz, barulho e mãos ocupadas reduzem habilidades por um tempo: é a <b>limitação situacional</b>. O que ajuda quem tem uma deficiência pode ajudar também quem está numa dessas situações.</li>
+    <li>Os sete princípios estão na tabela. Os dois primeiros são obrigatórios em qualquer projeto baseado em habilidades.</li>
+  </ul>
+  <p>Recapitulando: pergunte o que a pessoa consegue, e quando algo dá errado, mude o sistema.</p></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Não é sinônimo de tecnologia assistiva. A TA costuma inserir um acessório entre pessoa e sistema; aqui o próprio sistema muda. As duas convivem.</li>
+    <li>Requisito que começa com "o usuário deve…" (treinar, comprar um adaptador, se esforçar mais) viola o princípio 2.</li>
+    <li>O desenho universal pergunta "o que todo mundo consegue fazer?"; o design baseado em habilidades pergunta "o que você consegue fazer?" (os autores citam Harper). Um não anula o outro.</li>
+  </ul></div>
+  <div class="cs-ponderada"><p>Os três requisitos precisam pôr no sistema a responsabilidade de se adaptar: é o princípio 2 aplicado. Veja <a href="#requisitos">requisitos verificáveis</a>.</p></div>
+  <div class="tbl prose"><table>
+    <thead><tr><th>#</th><th>Princípio</th><th>O que diz</th><th>Grau</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Habilidade (ability)</td><td>Focar no que a pessoa consegue fazer, não no que falta</td><td>Obrigatório</td></tr>
+      <tr><td>2</td><td>Responsabilização (accountability)</td><td>Diante de mau desempenho, mudar o sistema e deixar a pessoa como ela é</td><td>Obrigatório</td></tr>
+      <tr><td>3</td><td>Adaptação (adaptation)</td><td>A interface se adapta sozinha ou pode ser adaptada pela pessoa</td><td>Recomendado</td></tr>
+      <tr><td>4</td><td>Transparência (transparency)</td><td>A pessoa vê as adaptações e pode inspecionar, desfazer, guardar, recuperar, pré-visualizar e testar</td><td>Recomendado</td></tr>
+      <tr><td>5</td><td>Desempenho (performance)</td><td>O sistema pode medir, modelar ou prever o desempenho de quem usa</td><td>Recomendado</td></tr>
+      <tr><td>6</td><td>Contexto (context)</td><td>O sistema pode detectar o contexto e antecipar o efeito dele nas habilidades</td><td>Recomendado</td></tr>
+      <tr><td>7</td><td>Componentes comuns (commodity)</td><td>Preferir hardware e software baratos e fáceis de encontrar</td><td>Incentivado</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ================= Medir e comparar ================= -->
+<section class="cs" id="antropometria" data-grupo="Medir e comparar" data-termos="erg-antropometria,erg-populacao,erg-percentil,erg-distribuicao-normal,erg-desvio-padrao,erg-extremo,erg-ajustavel,erg-media-projeto">
+  <h2>Antropometria: população, percentil e extremos</h2>
+  <p class="cs-def"><b>Antropometria</b> é a medição sistemática do corpo humano: alturas, larguras, alcances, circunferências. Todo dado antropométrico vem de uma <b>população medida</b> (quem, onde, com que idade, quando) e se lê em <b>percentis</b>: o P5 da largura da mão é o valor abaixo do qual ficam 5% das pessoas medidas.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><path class="s" d="M10 118 H230"/><path class="ac" d="M14 117 C60 116 80 30 120 26 C160 30 180 116 226 117" style="fill:none;stroke-width:2"/><path class="am" d="M62 118 V78 M178 118 V78" style="stroke-dasharray:3 3"/><path class="s" d="M120 118 V26" style="stroke-dasharray:3 3"/><text class="tm" x="62" y="72">P5</text><text class="tm" x="120" y="20">P50</text><text class="tm" x="178" y="72">P95</text><text x="62" y="132">8,1</text><text x="120" y="132">8,8</text><text x="178" y="132">9,6 cm</text><text class="tm" x="120" y="146">largura da mão · homens · ANSUR II</text></svg>Entre P5 e P95 ficam 90% dos homens medidos.</aside>
+  <div class="cs-formula"><div class="formula">P5 ≈ média − 1,645 × dp &nbsp;&nbsp;&nbsp; P95 ≈ média + 1,645 × dp</div><p>dp é o <b>desvio padrão</b>. 1,645 é quantos desvios padrão a <b>distribuição normal</b> precisa andar, a partir da média, para deixar 5% de um lado. Só vale se a medida segue a curva normal; na dúvida, use o percentil publicado na tabela da fonte.</p></div>
+  <div class="cs-uso">
+    <details class="base" open>
+      <summary><span class="base-tag">Base</span> Percentil e desvio padrão em 3 minutos</summary>
+      <ul class="b">
+        <li>Ponha 100 pessoas em fila, da mão mais estreita para a mais larga. A 5ª mão é o P5; a 50ª é o P50 (a mediana); a 95ª é o P95.</li>
+        <li>O desvio padrão diz quanto as mãos costumam se afastar da média. Se todas forem quase iguais, ele é pequeno.</li>
+        <li>Na curva normal (o sino), a média fica no meio e os dois lados são espelhados. Por isso P5 e P95 ficam à mesma distância da média.</li>
+        <li>Confira com dado real: nos dados públicos do ANSUR II, a largura da mão dos homens tem média 88,3 mm e dp 4,4 mm. 88,3 − 1,645 × 4,4 = 81,1 mm. O relatório publica P5 = 8,1 cm. Bateu.</li>
+      </ul>
+    </details>
+    <ul class="b">
+      <li>Dados reais do relatório do ANSUR II, largura da mão nos metacarpos (sem o polegar). Mulheres: P5 7,2 cm, P50 7,8 cm, P95 8,5 cm. Homens: P5 8,1 cm, P50 8,8 cm, P95 9,6 cm.</li>
+      <li>Comprimento da mão (do punho à ponta do dedo médio), mesmo relatório. Mulheres: P5 16,5 cm, P50 18,0 cm, P95 19,9 cm. Homens: P5 17,7 cm, P50 19,3 cm, P95 21,0 cm.</li>
+      <li>Os percentis são de cada sexo, separado. O P95 masculino da largura da mão (9,6 cm) cobre 95% dos homens e, nos dados públicos, todas as mulheres medidas (a maior largura feminina é 9,2 cm).</li>
+      <li><b>Projetar para o extremo</b>. Folga (algo do corpo precisa passar: cabo, alça, vão) se projeta pelo maior, geralmente o P95 do grupo maior. Alcance (algo precisa ser alcançado: botão, gatilho, prateleira) se projeta pelo menor, geralmente o P5 do grupo menor.</li>
+      <li><b>Projeto ajustável</b>. Quando um valor fixo não serve a todos, ofereça uma faixa, por exemplo do P5 feminino ao P95 masculino.</li>
+      <li><b>Projetar para a média</b> só quando a medida pesa pouco e não dá para ajustar. Numa folga ou num alcance, a média deixa cerca de metade das pessoas de fora.</li>
+      <li>A história dos cockpits, contada por Wobbrock et al. (2018) a partir de Rose: depois da Segunda Guerra, a Força Aérea americana mediu 4.063 pilotos em 140 dimensões e projetou cockpits para o piloto médio. O tenente Gilbert Daniels pegou 10 dimensões, aceitou uma tolerância de 30% da faixa em volta de cada média e contou quantos pilotos cabiam em todas: zero. Os acidentes só caíram com cockpits ajustáveis do P5 ao P95.</li>
+      <li>Antes de usar qualquer tabela, anote quatro coisas: população, ano, unidade e definição da medida. A tabela abaixo traz fontes reais com esses cuidados.</li>
+    </ul>
+    <p>Recapitulando: diga de quem é o dado, escolha o extremo certo (folga pelo maior, alcance pelo menor) e prefira ajuste quando um valor não serve a todos.</p>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Percentil não passa de uma medida para outra. Quem é P95 em largura de mão pode ser P40 em comprimento; "uma pessoa P95" não existe.</li>
+    <li>O ANSUR II mediu pessoas de 17 a 58 anos. Se a condição do projeto envolve pessoas idosas, diga que a fonte não cobre essa população e o que isso muda na conclusão.</li>
+    <li>Folga pelo P5 ou alcance pelo P95 inverte a regra e exclui justamente quem ela protege.</li>
+    <li>A largura da mão do ANSUR II é medida nos metacarpos, sem o polegar. Se o cabo precisa caber com o polegar, a medida é outra.</li>
+  </ul></div>
+  <div class="cs-ponderada"><p>Cada medida do dispositivo precisa ser comparada com um dado antropométrico de fonte citada, com a população medida e o percentil ou a faixa adotada. Isso sustenta o critério Fundamentação antropométrica e motora (2,0).</p></div>
+  <div class="tbl prose"><table>
+    <thead><tr><th>Fonte</th><th>População e ano</th><th>O que traz</th><th>Cuidado</th></tr></thead>
+    <tbody>
+      <tr><td>ANSUR II: Gordon et al., <i>2012 Anthropometric Survey of U.S. Army Personnel</i>, relatório NATICK/TR-15/007 (dez. 2014); dados públicos desde 2017 no OPEN Design Lab (Penn State)</td><td>4.082 homens e 1.986 mulheres do Exército dos EUA, medidos de outubro de 2010 a abril de 2012; 17 a 58 anos nos dados públicos</td><td>93 medidas diretas; percentis no relatório (em cm) e dados individuais (em mm)</td><td>Militares adultos. O próprio OPEN Design Lab avisa que a amostra não representa a população civil americana</td></tr>
+      <tr><td>Pheasant e Haslegrave, <i>Bodyspace: Anthropometry, Ergonomics and the Design of Work</i>, 3ª ed., CRC Press, 2006</td><td>Uma população por tabela</td><td>Capítulo "Hands and Handles" e um banco de dados antropométricos no fim</td><td>Cite a tabela e a população dela, não "o livro". Os valores não foram conferidos nesta aula</td></tr>
+      <tr><td>ISO 7250-1:2017, <i>Basic human body measurements for technological design</i>, parte 1</td><td>Não é dado de população</td><td>Definição das medidas e dos pontos do corpo usados para medir</td><td>Serve para saber se a "largura da mão" da sua fonte é a mesma que você mediu. Não traz percentis</td></tr>
+      <tr><td>Iida e Guimarães, <i>Ergonomia: projeto e produção</i>, 3ª ed., Blucher, 2016</td><td>Livro brasileiro; a população depende da tabela</td><td>Ergonomia e antropometria em português</td><td>Ache a pesquisa original e a população de cada tabela antes de citar. Não conferido nesta aula</td></tr>
+      <tr><td>INT (Instituto Nacional de Tecnologia), 1988</td><td>Operários da indústria de transformação do Rio de Janeiro</td><td>Levantamento brasileiro citado em trabalhos de ergonomia</td><td>O relatório original não foi conferido aqui. Só use se achar a fonte primária</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="cs" id="medir-dispositivo" data-grupo="Medir e comparar" data-termos="erg-paquimetro,erg-cota">
+  <h2>Medir o dispositivo e marcar a foto</h2>
+  <p class="cs-def">Medir é transformar impressão em número: comprimento em mm, massa em g, com o instrumento anotado. A foto marcada mostra ao leitor onde você mediu: cada <b>linha de cota</b> liga dois pontos e leva o valor com a unidade.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><path class="k" d="M30 30 H170 Q182 30 182 42 V58 Q182 66 172 66 H96 L110 132 Q111 140 102 140 H82 Q74 140 72 132 L56 66 H38 Q26 66 26 54 V40 Q26 30 30 30 Z"/><circle class="gr" cx="40" cy="48" r="4"/><rect class="am" x="132" y="24" width="18" height="8" rx="2"/><path class="rd" d="M84 76 q-8 8 -2 18" style="fill:none"/><path class="ac" d="M200 70 V140" marker-end="url(#mnarrow)" marker-start="url(#mnarrow)" style="fill:none;stroke-width:1.4"/><text class="st" x="204" y="108">C1</text><text class="st" x="204" y="120">95 mm</text><path class="ac" d="M132 14 H150" marker-end="url(#mnarrow)" marker-start="url(#mnarrow)" style="fill:none;stroke-width:1.4"/><text class="tm" x="141" y="10">C4 · 9 mm</text><path class="ac" d="M92 48 H141" marker-end="url(#mnarrow)" style="fill:none;stroke-width:1.2;stroke-dasharray:3 2"/><text class="tm" x="116" y="58">C3 · 40 mm</text><text class="tm" x="40" y="80">C5</text><text class="tm" x="40" y="92">LED 3 mm</text></svg>Foto marcada (aparelho fictício): cada cota numerada aparece igual na tabela.</aside>
+  <div class="cs-uso"><ul class="b">
+    <li>Instrumentos: <b>paquímetro</b> para larguras, espessuras e diâmetros pequenos; régua milimetrada ou trena para o resto; balança de cozinha para a massa. Escreva qual usou.</li>
+    <li>Meça cada dimensão três vezes e registre a mediana. Escreva tudo em mm, sem trocar de unidade no meio do texto.</li>
+    <li>Para a Lei de Fitts, D vai do ponto de partida (onde o dedo repousa) até o centro do alvo, e W é a largura do alvo na direção do movimento. Em alvo retangular, a NN/g lembra que dá para usar a menor dimensão (MacKenzie e Buxton, 1992).</li>
+    <li>Na foto: ponha uma régua ao lado do aparelho (ela vira escala), fotografe de frente para a face medida, desenhe as cotas com seta nas duas pontas e escreva o valor com a unidade sobre cada uma.</li>
+    <li>Numere as cotas (C1, C2…) e use o mesmo número na coluna de evidência da tabela. Assim o leitor acha a medida na foto sem procurar.</li>
+    <li>O que não dá para medir em casa (força do gatilho, intensidade da vibração) entra como observação descrita: "precisei apertar com dois dedos para disparar".</li>
+  </ul></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>"Uns 5 cm" de olho não conta como medida. Sem instrumento, chame de observação.</li>
+    <li>Foto inclinada encolhe a dimensão mais longe da câmera. Fotografe de frente e com a régua no mesmo plano.</li>
+  </ul></div>
+  <div class="cs-ponderada"><p>A ponderada pede ao menos duas medidas em mm e ao menos uma foto que mostre, com setas ou marcações, o que foi medido. A foto pesa no critério Clareza visual da entrega (1,0).</p></div>
+</section>
+
+<section class="cs" id="fitts" data-grupo="Medir e comparar" data-termos="erg-fitts,erg-id,erg-bit,erg-logaritmo,erg-tempo-movimento,erg-regressao,erg-throughput,erg-largura-efetiva">
+  <h2>Lei de Fitts: tamanho e distância do alvo</h2>
+  <p class="cs-def">A <b>Lei de Fitts</b> diz que o tempo para acertar um alvo depende do tamanho dele e da distância até ele. Alvo grande e perto custa pouco; alvo pequeno e longe custa caro. Vale para sites, apps, interfaces de aparelhos e painéis físicos.</p>
+  <aside class="mn loop" data-loop="fitts" data-ms="6000" data-still="0.8" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Mesmo polegar: o alvo maior e mais perto chega antes (tempos ilustrativos).</aside>
+  <div class="cs-formula"><div class="formula">MT = a + b · log₂(D/W + 1)</div><div class="formula">ID = log₂(D/W + 1) &nbsp;&nbsp;&nbsp; TP = ID / MT</div><p>MT é o <b>tempo de movimento</b>, em segundos. D é a distância até o centro do alvo e W é a largura do alvo na direção do movimento, os dois na mesma unidade. log₂(D/W + 1) é o <b>índice de dificuldade</b> (ID), em <b>bits</b>. a (em s) e b (em s por bit) são constantes medidas. TP é o <b>throughput</b>, em bits por segundo.</p></div>
+  <div class="cs-uso">
+    <details class="base" open>
+      <summary><span class="base-tag">Base</span> Logaritmo na base 2 em 2 minutos</summary>
+      <ul class="b">
+        <li>O <b>logaritmo na base 2</b> responde "2 elevado a quanto dá esse número?". log₂(4) = 2 porque 2² = 4; log₂(8) = 3 porque 2³ = 8.</li>
+        <li>log₂(5,44) fica entre 2 e 3, perto de 2,44. Na calculadora: ln(5,44) ÷ ln(2) ou log(5,44) ÷ log(2).</li>
+        <li>Por que "bits": Soukoreff e MacKenzie (2004) explicam que (D + W)/W conta quantas fatias do tamanho do alvo cabem no espaço do movimento, e o log₂ dessa contagem é a informação em bits. Cada bit a mais é o dobro de fatias.</li>
+      </ul>
+    </details>
+    <ul class="b">
+      <li>O modelo é do psicólogo Paul Fitts. Ele estudou cockpits na Segunda Guerra e, inspirado pela teoria da informação de Shannon, buscou a "largura de banda" do movimento humano; publicou a lei em 1954 (Budiu, NN/g).</li>
+      <li>A forma acima é a de Shannon, proposta por MacKenzie. Soukoreff e MacKenzie (2004), que apoiam o método da norma ISO 9241-9 para avaliar dispositivos de apontar, recomendam usá-la: ela ajusta melhor os dados e nunca dá ID negativo.</li>
+      <li>a e b não são universais. Dependem do dispositivo (mouse, dedo, polegar, caneta) e de quem usa, e saem de uma <b>regressão linear</b>: você mede MT para vários pares de D e W, calcula o ID de cada par e ajusta a reta MT = a + b · ID. b é a inclinação (segundos a mais por bit); a é onde a reta corta o eixo.</li>
+      <li>Throughput junta velocidade e precisão num número só. Na pesquisa, troca-se W pela <b>largura efetiva</b>: We = 4,133 × desvio padrão dos pontos onde as pessoas realmente tocaram. Depois tira-se a média dos TP de cada pessoa.</li>
+      <li>Por que log e não proporcional: o movimento tem uma fase rápida e grossa até perto do alvo e uma fase lenta de correção. A distância pesa na primeira; o tamanho, na segunda. Dobrar a distância aumenta o tempo, mas não o dobra (Budiu, NN/g, a partir do modelo de dois componentes de Woodworth).</li>
+      <li>Aplicações que Kane (NN/g) cita: botão de concluir perto dos campos ativos; ação importante maior; menus e listas mais curtos, como guia e não como regra absoluta.</li>
+      <li>Mais três, de Budiu (NN/g). Ícone com rótulo, com a área toda clicável, é um alvo maior que o ícone sozinho. Alvos colados demais fazem a pessoa acionar o vizinho; uma área ativa invisível em volta ajuda, mas quem não sabe dela ainda desacelera. Em menus, a distância média até um item cai do linear para o retangular e do retangular para o em pizza.</li>
+      <li>Conta passo a passo, no aparelho fictício (figura 1): D = 40 mm e W = 9 mm. D/W = 4,44; mais 1 dá 5,44; log₂(5,44) ≈ 2,44 bits. Com a = 0,2 s e b = 0,15 s/bit (valores inventados só para a conta), MT ≈ 0,2 + 0,15 × 2,44 ≈ 0,57 s.</li>
+      <li>Redesenho: botão de 18 mm a 30 mm. log₂(30/18 + 1) = log₂(2,67) ≈ 1,42 bits. O ID cai cerca de 1 bit; com os mesmos a e b, MT ≈ 0,41 s.</li>
+      <li>Leitura: sem experimento, o número que você consegue defender é o ID, que só depende de régua. O tempo em segundos depende de a e b medidos com aquele polegar e aquele aparelho.</li>
+    </ul>
+    <p>Recapitulando: meça D e W na mesma unidade, use log₂(D/W + 1), diga qual forma usou e trate a e b como medidos, nunca como dados gerais.</p>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>ln no lugar de log₂: ln(5,44) = 1,69. Parece um ID, mas está em outra unidade (nats). Confira sempre: 2 elevado ao ID tem de dar D/W + 1.</li>
+    <li>D em cm e W em mm: 4/9 + 1 dá 0,53 bits. A razão só faz sentido com as duas medidas na mesma unidade.</li>
+    <li>Três formas circulam (tabela abaixo). O artigo da NN/g (Budiu, 2022) mostra a de Fitts, com 2D/W. Diga sempre qual você usou.</li>
+    <li>Fitts vale para movimento rápido de apontar até um alvo. Não mede força, não mede ler a instrução e não vale para apertar sem deslocar o dedo.</li>
+    <li>Prever tempo com a e b fora da faixa de ID em que eles foram medidos não vale (Soukoreff e MacKenzie, 2004).</li>
+    <li>Em tela sensível ao toque, alvo na borda não tem a vantagem que tem com mouse: um estudo de Avrahami (2015), citado pela NN/g, achou toque mais lento na borda.</li>
+  </ul></div>
+  <div class="cs-ponderada"><p>Aplique a Lei de Fitts a ao menos um alvo: mostre D, W, a forma usada, o ID em bits e o que ele diz. Sem a e b medidos, compare IDs (antes e depois de uma mudança) em vez de prometer milissegundos.</p></div>
+  <div class="tbl prose"><table>
+    <thead><tr><th>Forma</th><th>Índice de dificuldade</th><th>Com D = 40 mm e W = 9 mm</th></tr></thead>
+    <tbody>
+      <tr><td>Fitts (1954)</td><td>log₂(2D/W)</td><td>3,15 bits</td></tr>
+      <tr><td>Welford (1960)</td><td>log₂(D/W + 0,5)</td><td>2,31 bits</td></tr>
+      <tr><td>Shannon (MacKenzie), a recomendada</td><td>log₂(D/W + 1)</td><td>2,44 bits</td></tr>
+    </tbody>
+  </table></div>
+  <figure class="fig" id="fig-fitts">
+    <div class="fig-head"><span class="fig-title">Figura 1 · O ID de um botão, passo a passo</span><div class="fig-tabs"></div></div>
+    <div class="fig-body">
+      <div class="fig-stage"><svg id="fitts-svg" viewBox="0 0 640 300"></svg></div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+</section>
+
+<!-- ================= Da análise ao projeto ================= -->
+<section class="cs" id="barreiras" data-grupo="Da análise ao projeto" data-termos="erg-estereotipo">
+  <h2>Da suposição à barreira, com evidência</h2>
+  <p class="cs-def">Uma suposição vira barreira quando a capacidade que ela exige falta a um grupo de pessoas. Para afirmar isso, você precisa de evidência: um dado, uma pesquisa ou uma observação registrada, com fonte. Um <b>estereótipo</b> é uma generalização sobre um grupo inteiro que ninguém mediu; ele parece evidência e não é.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="am" x="4" y="10" width="100" height="34" rx="6"/><text x="54" y="25">suposição</text><text class="tm" x="54" y="38">exige X</text><rect class="bl" x="136" y="10" width="100" height="34" rx="6"/><text x="186" y="25">condição</text><text class="tm" x="186" y="38">falta X (com fonte)</text><path class="s" d="M54 44 L110 80 M186 44 L130 80"/><rect class="rd" x="70" y="80" width="100" height="34" rx="6"/><text x="120" y="101">barreira</text><rect class="k" x="4" y="122" width="232" height="22" rx="4" style="stroke-dasharray:4 3"/><text class="tm" x="120" y="137">sem fonte: estereótipo, não barreira</text></svg>Barreira é o encontro de uma exigência com uma falta documentada.</aside>
+  <div class="cs-uso"><ul class="b">
+    <li>Molde: "Para pessoas com [condição], a suposição [S] vira barreira porque [dado], segundo [fonte]."</li>
+    <li>Evidência que serve: a pesquisa da semana 2 do grupo, artigo revisado por pares, relatório de organização de saúde, observação registrada (quem, quando, o que se viu). Evidência que não serve: "todo mundo sabe", impressão sua, frase de IA sem fonte.</li>
+    <li>Ligue a condição a uma capacidade, nunca à pessoa inteira. "Tremor nas mãos" diz algo sobre acertar alvo pequeno e manter firme; não diz nada sobre ouvir o bipe.</li>
+    <li>A mesma condição tem graus. Escreva "parte das pessoas" ou "pode", e se citar uma proporção, diga de onde ela vem.</li>
+    <li>Condições diferentes pesam em categorias diferentes: uma motora pesa em precisão e estabilidade; uma sensorial, nos canais disponíveis; uma cognitiva, em entender a sequência e o retorno do aparelho. As quatro categorias da tabela são físicas, mas a barreira pode estar na percepção do retorno ou na ordem das ações (<a href="#dominios">ergonomia cognitiva</a>).</li>
+    <li>Nem toda suposição vira barreira para a sua condição. Se o recorte do projeto preserva a motricidade, por exemplo, uma barreira motora precisa de outra justificativa com fonte (idade, outra condição associada). Sem fonte, diga que aquela suposição não é barreira para esse grupo.</li>
+    <li>Exemplo autoral, no aparelho fictício: para quem não ouve o bipe, sobra o LED de 3 mm, que fica fora do campo de visão enquanto a pessoa olha para o produto (observação em 10 leituras e medida C5). A suposição 5 vira barreira.</li>
+  </ul>
+  <p>Recapitulando: exigência do aparelho + falta documentada no grupo = barreira. Sem fonte, é palpite.</p></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>"Idosos não sabem usar tecnologia" é estereótipo: fala do grupo inteiro, sem capacidade, sem medida e sem fonte.</li>
+    <li>Simular a condição em você (luva grossa, venda) gera perguntas, não evidência sobre quem vive com ela.</li>
+    <li>Escreva a barreira como relação: "o botão de 9 mm exige uma precisão que…", e não "a pessoa não consegue".</li>
+  </ul></div>
+  <div class="cs-ponderada"><p>Cada barreira apontada precisa de justificativa com a pesquisa da semana 2 ou com referência citada. É o critério Barreiras para o perfil da condição (1,5).</p></div>
+</section>
+
+<section class="cs" id="design-ficcao" data-grupo="Da análise ao projeto" data-termos="erg-design-ficcao,erg-design-especulativo,erg-objeto-inteligente">
+  <h2>Uninvited Guests: quando o objeto decide pela pessoa</h2>
+  <p class="cs-def"><b>Design fiction</b> é usar uma história com objetos que ainda não existem para provocar perguntas sobre como queremos viver com eles. <i>Uninvited Guests</i> (Superflux, 2015) é um filme curto de <b>design especulativo</b> sobre um homem idoso e a casa cheia de <b>objetos inteligentes</b> que os filhos mandaram.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><path class="k" d="M20 70 L90 20 L160 70 V140 H20 Z"/><circle class="acf" cx="90" cy="96" r="12"/><text class="tm" x="90" y="128">Thomas, 70</text><rect class="am" x="34" y="80" width="18" height="14" rx="3"/><rect class="am" x="128" y="80" width="18" height="14" rx="3"/><rect class="am" x="82" y="50" width="16" height="12" rx="3"/><rect class="bl" x="186" y="40" width="50" height="30" rx="6"/><text class="tm" x="211" y="58">filhos</text><path class="s" d="M146 86 Q176 80 196 70 M98 56 Q150 30 188 48" style="fill:none;stroke-dasharray:3 3" marker-end="url(#mnarrow)"/><text class="tm" x="200" y="100">dieta</text><text class="tm" x="200" y="112">saúde</text><text class="tm" x="200" y="124">sono</text></svg>Os objetos registram e enviam; Thomas convive com as regras deles.</aside>
+  <div class="cs-uso"><ul class="b">
+    <li>A história, como a Superflux descreve: Thomas, 70 anos, mora sozinho desde que a mulher morreu, no ano anterior. Os filhos mandam dispositivos que acompanham à distância a dieta, a saúde e o sono dele. Thomas sempre foi muito independente e vive feliz numa bagunça organizada; ele sofre com a ordem e as regras impostas por objetos que deveriam facilitar a vida dele.</li>
+    <li>O projeto é da Superflux Lab para o ThingTank, um consórcio de pesquisa sobre objetos domésticos com autonomia suficiente para se comunicar e interpretar "necessidades" de quem está em casa. Equipe: Anab Jain, Jon Ardern, Jonathan Flint e Alexandra Fruhstorfer; ator: James Leahy.</li>
+    <li>Perguntas de partida: que relação formamos com objetos cada vez mais autônomos? Que papel sobra para a agência humana? Como esses objetos mudam nossos ritmos e rotinas, e nós as deles?</li>
+    <li>Três temas de pesquisa (The Neural Network, Objects with Attitude e Defiant Behaviours) geraram cenários entre o útil, o crítico e o desviante. O foco virou a casa conectada no cuidado de idosos e no monitoramento remoto, junto da discussão política sobre substituir cuidadores humanos por robôs e dispositivos.</li>
+    <li>A pergunta central do estúdio: que comportamentos humanos bagunçados, caprichosos e não previstos batem de frente com o cuidado "tamanho único" que muitos dispositivos entregam?</li>
+    <li>Os objetos coloridos do filme são marcadores de lugar ("insira o objeto inteligente aqui"): fantasmas do futuro que somem no ambiente e deixam só a auréola invisível de monitoramento.</li>
+    <li>Ligação com esta aula: "tamanho único" é uma pilha de suposições de habilidade e de rotina. E decidir quem monitora quem é ergonomia organizacional: os filhos escolheram, Thomas convive. Compare com a autonomia da <a href="/m8/ux/01-acessibilidade-desenho-universal">aula 01</a>.</li>
+  </ul></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Design fiction não é previsão nem produto. Use como pergunta ("quem decide a regra?"), não como evidência de barreira.</li>
+    <li>Monitorar não é apoiar. Um dispositivo pode cumprir o requisito técnico e ainda tirar da pessoa o controle da própria rotina.</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="requisitos" data-grupo="Da análise ao projeto" data-termos="erg-requisito,erg-criterio">
+  <h2>Requisito verificável: da barreira ao critério</h2>
+  <p class="cs-def">Um <b>requisito de projeto</b> é uma decisão que o sistema precisa cumprir, derivada de uma barreira. Ele é verificável quando traz um <b>critério de verificação</b> mensurável: um valor, uma faixa ou uma condição observável que permite a qualquer pessoa dizer "cumpre" ou "não cumpre".</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="rd" x="4" y="14" width="70" height="34" rx="6"/><text x="39" y="35">barreira</text><path class="s" d="M74 31 H84" marker-end="url(#mnarrow)"/><rect class="gr" x="86" y="14" width="70" height="34" rx="6"/><text x="121" y="29">requisito</text><text class="tm" x="121" y="42">o sistema deve</text><path class="s" d="M156 31 H166" marker-end="url(#mnarrow)"/><rect class="bl" x="168" y="14" width="68" height="34" rx="6"/><text x="202" y="29">critério</text><text class="tm" x="202" y="42">valor · faixa</text><path class="s" d="M202 48 V74" marker-end="url(#mnarrow)"/><rect class="k" x="132" y="76" width="104" height="34" rx="6"/><text x="184" y="91">teste</text><text class="tm" x="184" y="104">cumpre ou não</text><text class="tm" x="66" y="92">"ser ergonômico"</text><path class="rd" d="M20 86 L112 98" style="stroke-width:1.5"/><text class="tm" x="120" y="136">sem número, sem teste</text></svg>Cada requisito aponta para trás (barreira) e para a frente (teste).</aside>
+  <div class="cs-uso"><ul class="b">
+    <li>Molde: "R1. O dispositivo deve [decisão], para remover a barreira [B1]. Verificação: [como medir], resultado [valor ou faixa]."</li>
+    <li>Quatro testes rápidos. (1) Aponta para uma barreira da sua lista? (2) O sujeito da frase é o sistema? (3) Duas pessoas medindo chegariam ao mesmo veredito? (4) Dá para testar sem o grupo explicar o que quis dizer?</li>
+    <li>Na tabela abaixo, cada versão fraca vira uma verificável, no aparelho fictício. Repare que cada critério traz número e instrumento, e que cada um põe a mudança no sistema (princípio 2 do <a href="#design-habilidades">design baseado em habilidades</a>).</li>
+    <li>Faixa ajustável também é requisito: "o cabo deve regular de 80 a 100 mm" se verifica medindo os dois extremos.</li>
+    <li>A folga, o número de tentativas e o limiar de acerto são escolhas do grupo. Declare e justifique cada uma.</li>
+  </ul></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Requisito sem barreira de origem é palpite. A ponderada pede exatamente três, cada um derivado de uma barreira.</li>
+    <li>"95% dos usuários conseguem" sem dizer que população, que tarefa e como medir não é critério.</li>
+    <li>Critério que só o grupo consegue julgar ("ficou bom") não é mensurável.</li>
+  </ul></div>
+  <div class="cs-ponderada"><p>Exatamente três requisitos, cada um derivado de uma barreira e com critério mensurável. É o critério Requisitos verificáveis (1,5).</p></div>
+  <div class="tbl prose"><table>
+    <thead><tr><th>Fraco</th><th>Por que falha</th><th>Verificável (autoral)</th></tr></thead>
+    <tbody>
+      <tr><td>"O cabo deve ser ergonômico."</td><td>Ninguém mede "ergonômico"</td><td>O cabo deve ter ao menos 100 mm de comprimento útil (P95 masculino da largura da mão no ANSUR II, 96 mm, mais 4 mm de folga escolhidos pelo grupo). Verificação: paquímetro.</td></tr>
+      <tr><td>"O usuário deve treinar a mira."</td><td>Põe o peso na pessoa</td><td>O leitor deve aceitar o código em qualquer ponto de uma janela de 50 mm a 150 mm de distância. Verificação: 20 leituras em posições sorteadas, ao menos 19 aceitas.</td></tr>
+      <tr><td>"A confirmação deve ser clara."</td><td>"Clara" depende de quem lê</td><td>Toda leitura aceita deve ser confirmada por som e vibração ao mesmo tempo. Verificação: com o som desligado, 10 de 10 leituras confirmadas pela vibração, segundo quem testa.</td></tr>
+      <tr><td>"O botão de modo deve ser fácil de alcançar."</td><td>"Fácil" sem número</td><td>O botão de modo deve ter ao menos 18 mm na direção do movimento e ficar a no máximo 30 mm do repouso do polegar (ID ≤ 1,5 bits, forma de Shannon). Verificação: régua e conta.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="cs" id="verificar-ia" data-grupo="Da análise ao projeto" data-termos="erg-alucinacao,erg-fonte-primaria">
+  <h2>Conferir o que a IA produz</h2>
+  <p class="cs-def">IA generativa produz texto plausível, e plausível não quer dizer certo. Em dados antropométricos e fórmulas, o erro típico é a <b>alucinação</b>: número, fórmula ou fonte com cara de verdade que não está em lugar nenhum. A defesa é conferir na <b>fonte primária</b>, o documento que mediu ou definiu o dado.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="k" x="4" y="12" width="100" height="44" rx="6"/><text x="54" y="30">IA: "P5 =</text><text x="54" y="44">72 cm"</text><path class="s" d="M104 34 H130" marker-end="url(#mnarrow)"/><rect class="bl" x="132" y="12" width="104" height="44" rx="6"/><text x="184" y="30">relatório</text><text class="tm" x="184" y="44">medida 42: 7,2 cm</text><path class="s" d="M184 56 V80" marker-end="url(#mnarrow)"/><rect class="gr" x="132" y="82" width="104" height="40" rx="6"/><text x="184" y="98">usa 72 mm</text><text class="tm" x="184" y="112">e registra</text><text class="tm" x="54" y="80">unidade trocada</text><path class="rd" d="M20 88 L88 88" style="stroke-width:1.5"/></svg>Toda saída passa pela fonte antes de entrar no texto.</aside>
+  <div class="cs-uso"><ul class="b">
+    <li>Conferência em quatro perguntas: De onde vem (fonte primária aberta por você)? Quem foi medido? Em que unidade? A conta fecha quando você refaz?</li>
+    <li>A tabela abaixo lista os erros plausíveis mais comuns neste tipo de atividade e como pegar cada um.</li>
+    <li>Como declarar na seção Uso de IA: a ferramenta; a etapa (busca de fonte, revisão de texto, conta); e ao menos um exemplo com a saída, o que estava errado, como você conferiu (fonte ou critério) e o que fez (corrigiu ou descartou).</li>
+    <li>Exemplo de registro (autoral): "Pedi a largura da mão do P5 feminino. A IA respondeu 72 cm, citando 'ANSUR 2012'. Conferi no relatório (Gordon et al., 2014, medida 42): 7,2 cm, ou 72 mm. A IA trocou a unidade; usei 72 mm."</li>
+    <li>Se não usou IA, declare isso explicitamente.</li>
+  </ul></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Pedir para a IA conferir a própria resposta não é verificação. A conferência é na fonte.</li>
+    <li>Link que abre não basta: o número precisa estar na página ou tabela que você cita.</li>
+    <li>Um resumo da fonte (inclusive esta aula) não substitui a fonte na lista de referências.</li>
+  </ul></div>
+  <div class="cs-ponderada"><p>Declaração de uso de IA e curadoria crítica vale 2,0: ferramentas, etapas e ao menos um exemplo verificado, corrigido ou descartado, com motivo e fonte. A seção não conta no limite de palavras.</p></div>
+  <div class="tbl prose"><table>
+    <thead><tr><th>Erro plausível</th><th>Como aparece</th><th>Como conferir</th></tr></thead>
+    <tbody>
+      <tr><td>População trocada</td><td>"A largura média da mão é 8,8 cm", que é a de homens do Exército dos EUA, aplicada a idosos brasileiros</td><td>Ache na fonte quem foi medido: país, idade, sexo, ano. Se não bate com a condição, diga</td></tr>
+      <tr><td>Percentil confundido</td><td>"P95 quer dizer que 95% das pessoas cabem", numa população mista; ou P5 usado para folga</td><td>Percentil é de um grupo. Folga pelo P95 do grupo maior; alcance pelo P5 do grupo menor</td></tr>
+      <tr><td>cm × mm</td><td>"96 mm" vira "9,6 mm" ou "96 cm"</td><td>O relatório do ANSUR II está em cm; os dados públicos, em mm. Teste o absurdo: uma mão de 9,6 mm?</td></tr>
+      <tr><td>Medida com o mesmo nome</td><td>"Largura da mão" com polegar em uma fonte, sem polegar em outra</td><td>Leia a definição da medida na fonte e na ISO 7250-1</td></tr>
+      <tr><td>Variante errada de Fitts</td><td>Usa 2D/W ou + 0,5 sem dizer</td><td>Compare com a forma de Shannon (Soukoreff e MacKenzie, 2004) e diga qual usou</td></tr>
+      <tr><td>Log na base errada</td><td>Dá 1,69 bits para D/W + 1 = 5,44</td><td>2 elevado ao ID tem de dar D/W + 1. Como 2^1,69 ≈ 3,2, a base está errada</td></tr>
+      <tr><td>a e b sem origem</td><td>"a = 50 ms, b = 150 ms/bit" sem dizer de onde</td><td>a e b vêm de regressão com aquele dispositivo e aquelas pessoas. Sem medição, compare IDs</td></tr>
+      <tr><td>Fonte inexistente</td><td>Autor, ano e DOI que não abrem, ou página que não traz aquele número</td><td>Abra, ache a tabela ou página exata e anote. Não achou: descarte</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ================= Aplicar ================= -->
+<section class="cs" id="ponderada" data-grupo="Aplicar" data-termos="">
+  <h2>Roteiro da ponderada</h2>
+  <p class="cs-def">A ponderada examina um dispositivo físico real com as lentes da ergonomia física e do design baseado em habilidades e termina em três requisitos que põem no sistema o peso de se adaptar. O enunciado completo está em "Da aula", no fim da página.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><g><rect class="k" x="4" y="6" width="112" height="24" rx="5"/><text x="60" y="22">1 dispositivo</text><rect class="k" x="124" y="6" width="112" height="24" rx="5"/><text x="180" y="22">2 medir + foto</text><rect class="am" x="4" y="38" width="112" height="24" rx="5"/><text x="60" y="54">3 suposições</text><rect class="bl" x="124" y="38" width="112" height="24" rx="5"/><text x="180" y="54">4 antropometria</text><rect class="bl" x="4" y="70" width="112" height="24" rx="5"/><text x="60" y="86">5 Fitts</text><rect class="rd" x="124" y="70" width="112" height="24" rx="5"/><text x="180" y="86">6 barreiras</text><rect class="gr" x="4" y="102" width="112" height="24" rx="5"/><text x="60" y="118">7 requisitos</text><rect class="k" x="124" y="102" width="112" height="24" rx="5"/><text x="180" y="118">8 uso de IA</text></g><text class="tm" x="120" y="144">até 1.000 palavras · um PDF</text></svg>Oito blocos, nesta ordem.</aside>
+  <div class="cs-uso"><ol>
+    <li>Escolha um dispositivo com interação física a que você tenha acesso (de preferência do benchmark do grupo na semana 2) e descreva o uso em até 3 linhas.</li>
+    <li>Meça ao menos duas dimensões em mm e marque na foto: <a href="#medir-dispositivo">medir o dispositivo</a>.</li>
+    <li>Monte a tabela com cinco ou mais suposições, de três ou mais categorias: <a href="#suposicao">suposição de habilidade</a>.</li>
+    <li>Compare cada medida com uma fonte antropométrica, com população e percentil: <a href="#antropometria">antropometria</a>.</li>
+    <li>Aplique a Lei de Fitts a um alvo de acionamento: <a href="#fitts">Lei de Fitts</a>.</li>
+    <li>Diga quais suposições viram barreira para a condição do projeto do grupo, com fonte: <a href="#barreiras">barreiras</a>.</li>
+    <li>Escreva três requisitos com critério mensurável: <a href="#requisitos">requisitos</a>.</li>
+    <li>Feche com a seção Uso de IA: <a href="#verificar-ia">conferir a IA</a>.</li>
+  </ol></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>O leitor de código de barras desta aula é fictício e serve para treinar o raciocínio. Seus números saem do seu aparelho.</li>
+    <li>Tabela, fotos, referências e Uso de IA não contam nas 1.000 palavras. O resto conta.</li>
+    <li>O checklist pede "a referência obrigatória citada", mas o enunciado não diz qual é. Confirme com o professor.</li>
+  </ul></div>
+  <div class="cs-ponderada"><p>Os seis critérios e onde estudar cada um.</p><ul class="b">
+    <li>Mapeamento das suposições de habilidade (2,0): capacidades escritas do lado de quem usa. Estude <a href="#suposicao">suposição de habilidade</a> e <a href="#dominios">domínios</a>.</li>
+    <li>Fundamentação antropométrica e motora (2,0): medidas reais e dados sobre o corpo, não impressões. Estude <a href="#medir-dispositivo">medir</a>, <a href="#antropometria">antropometria</a> e <a href="#fitts">Lei de Fitts</a>.</li>
+    <li>Barreiras para o perfil da condição (1,5): evidência, não estereótipo. Estude <a href="#barreiras">barreiras</a>.</li>
+    <li>Requisitos verificáveis (1,5): decisões testáveis, com o sistema se adaptando. Estude <a href="#requisitos">requisitos</a> e <a href="#design-habilidades">design baseado em habilidades</a>.</li>
+    <li>Declaração de uso de IA e curadoria crítica (2,0): transparência e conferência, com atenção a dados antropométricos e fórmulas. Estude <a href="#verificar-ia">conferir a IA</a>.</li>
+    <li>Clareza visual da entrega (1,0): o leitor localiza e confere tudo sem esforço, inclusive o que foi medido na foto. Estude <a href="#medir-dispositivo">medir e marcar a foto</a>.</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="exercicios" data-grupo="Aplicar" data-termos="">
+  <h2>Treino: exercícios autorais</h2>
+  <p class="cs-def">Exercícios autorais com outros aparelhos, para treinar cada passo. Não são do professor; cada resposta é uma linha possível, não um gabarito.</p>
+  <div class="cs-uso">
+    <details><summary>1 · Reescreva como capacidade exigida</summary><p>Painel de elevador (medidas inventadas): botões redondos de 15 mm, o mais alto a 1.500 mm do chão, número do andar gravado em relevo baixo e sem contraste.</p><details><summary>Uma linha possível</summary><p>"Exige alcançar 1.500 mm de altura com a ponta do dedo" (antropométrica). "Exige acertar um alvo de 15 mm" (motora). "Exige ver o número gravado sem contraste ou sentir um relevo baixo" (sensorial). Cada uma vai para a tabela com a medida e o instrumento.</p></details></details>
+    <details><summary>2 · Que percentil você usaria?</summary><p>(a) Vão de uma alça que quatro dedos precisam abraçar. (b) Altura máxima do botão de um interfone. (c) Comprimento de uma alça regulável de mochila.</p><details><summary>Uma linha possível</summary><p>(a) Folga: o maior, por exemplo o P95 masculino da largura da mão no ANSUR II (9,6 cm), dizendo que a população é de militares americanos. (b) Alcance: o menor, P5 do grupo menor, de uma fonte com alcance e com a população do projeto. (c) Ajustável: uma faixa do P5 do grupo menor ao P95 do grupo maior.</p></details></details>
+    <details><summary>3 · Dobrar o botão divide o ID por dois?</summary><p>O dedo parte a 60 mm de um botão de 12 mm. Depois o botão passa a ter 24 mm, na mesma distância. Calcule os dois ID.</p><details><summary>Uma linha possível</summary><p>log₂(60/12 + 1) = log₂(6) ≈ 2,58 bits. log₂(60/24 + 1) = log₂(3,5) ≈ 1,81 bits. Caiu cerca de 0,78 bit, longe da metade: o log achata o efeito.</p></details></details>
+    <details><summary>4 · Ache o erro desta saída de IA</summary><p>"Com D = 120 mm e W = 15 mm, ID = ln(120/15 + 1) = 2,20 bits."</p><details><summary>Uma linha possível</summary><p>A base está errada: ln(9) ≈ 2,20 está em nats. Na base 2, log₂(9) ≈ 3,17 bits. Conferência: 2 elevado a 3,17 dá cerca de 9, que é D/W + 1.</p></details></details>
+    <details><summary>5 · Estereótipo ou evidência?</summary><p>(a) "Idosos têm dificuldade com botões pequenos." (b) "Em 3 sessões observadas pelo grupo, 2 de 5 participantes precisaram de duas tentativas para acertar o botão de 9 mm" (registro do grupo, com data; dado hipotético).</p><details><summary>Uma linha possível</summary><p>(a) é estereótipo: grupo inteiro, sem medida nem fonte. (b) é evidência: diz quem, quantos, que tarefa e de onde vem. Ainda assim é pequena; escreva "em nossa observação" e não generalize.</p></details></details>
+    <details><summary>6 · Transforme a barreira em requisito</summary><p>Barreira: no painel do elevador, o botão mais alto fica acima do alcance de pessoas sentadas, segundo uma fonte de alcance citada pelo grupo.</p><details><summary>Uma linha possível</summary><p>"Todos os botões de andar devem ficar entre duas alturas tiradas da fonte de alcance de pessoas sentadas (citando população e percentil). Verificação: trena; todos os botões dentro da faixa." O sujeito é o painel, o critério é uma faixa e a origem é a barreira.</p></details></details>
+  </div>
+  <div class="cs-pegadinhas">Copiar o leitor de código de barras para a sua entrega não serve: as medidas dele são inventadas. O treino vale pelo raciocínio.</div>
+</section>

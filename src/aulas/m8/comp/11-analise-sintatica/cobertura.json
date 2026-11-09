@@ -1,0 +1,1757 @@
+{
+  "aula": "m8/comp/11-analise-sintatica",
+  "data": "2026-11-09",
+  "criterio": "Conferência das três transcrições completas (blocos de 2 minutos) e dos capítulos de análise sintática do Mogensen e do Thain (página a página), lidos inteiros como substitutos, contra as seções do modo Consulta. Não equivale à leitura dos capítulos do livro indicado, que não foram acessados.",
+  "fontes": [
+    {
+      "id": "lucredio-aula05",
+      "url": "https://www.youtube.com/watch?v=5OAwf86vyhA",
+      "escopo": "Construção de Compiladores, Aula 05: Análise Sintática, Introdução, 85:48; unidades = blocos de 2 minutos da transcrição (1 = 0:00–2:00)",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube (youtube-transcript-api), lida inteira. Trechos com reconhecimento ruim foram interpretados pelo contexto, sem inventar conteúdo; as telas do vídeo não foram vistas.",
+      "totalUnidades": 43,
+      "unidades": [
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "Referências (dragão, Louden, Parr); vocabulário × gramática",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "papel"
+          ],
+          "evidencias": [
+            "vocabulario"
+          ]
+        },
+        {
+          "paginas": [
+            2,
+            3
+          ],
+          "assunto": "Análise sintática em português: santo de casa não faz milagre",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "papel"
+          ],
+          "evidencias": [
+            "santo de casa"
+          ]
+        },
+        {
+          "paginas": [
+            4
+          ],
+          "assunto": "Sintático recebe tokens e produz árvore; tabela de símbolos opcional; front-end; precisa de definição formal",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "papel"
+          ],
+          "evidencias": [
+            "tabela de simbolos",
+            "front-end"
+          ]
+        },
+        {
+          "paginas": [
+            5,
+            6
+          ],
+          "assunto": "Revisão de GLC: cabeça e corpo, quádrupla (V, T, P, S), terminais = tipos de token (var1 vira ID)",
+          "antes": "ja-coberto",
+          "justificativa": "GLC já está nas aulas 01 e 08; aqui ficam só os nomes do vídeo e o papel dos tokens.",
+          "consulta": [
+            "papel"
+          ],
+          "evidencias": [
+            "cabeca",
+            "var1"
+          ]
+        },
+        {
+          "paginas": [
+            7
+          ],
+          "assunto": "Não terminais são construções; alternativas com |",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "papel"
+          ],
+          "evidencias": [
+            "lista de comandos"
+          ]
+        },
+        {
+          "paginas": [
+            8
+          ],
+          "assunto": "Sub-regras com parênteses; inferência recursiva × derivação",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "papel",
+            "descendente-ascendente"
+          ],
+          "evidencias": [
+            "sub-regra",
+            "inferencia recursiva"
+          ]
+        },
+        {
+          "paginas": [
+            9,
+            10,
+            11,
+            12
+          ],
+          "assunto": "Inferência recursiva em a * (a + b00), montando a árvore de baixo para cima",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "descendente-ascendente"
+          ],
+          "evidencias": [
+            "b00"
+          ]
+        },
+        {
+          "paginas": [
+            13
+          ],
+          "assunto": "Derivação da mesma cadeia, árvore de cima para baixo",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "descendente-ascendente"
+          ],
+          "evidencias": [
+            "a * ( a + b00 )"
+          ]
+        },
+        {
+          "paginas": [
+            14
+          ],
+          "assunto": "Descendente × ascendente; ⇒ com asterisco; derivação mais à esquerda (lm)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "descendente-ascendente"
+          ],
+          "evidencias": [
+            "leftmost"
+          ]
+        },
+        {
+          "paginas": [
+            15
+          ],
+          "assunto": "Derivação mais à direita (rm); parse tree; árvore abstrata de a + b * (0 + 1)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "descendente-ascendente",
+            "papel"
+          ],
+          "evidencias": [
+            "rightmost",
+            "parse tree"
+          ]
+        },
+        {
+          "paginas": [
+            16,
+            17,
+            18
+          ],
+          "assunto": "Árvore concreta × abstrata: if 0 then x := 1 else x := 0; programa em Alguma; estrutura em classes",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "papel"
+          ],
+          "evidencias": [
+            "if 0 then",
+            "sobrinhos"
+          ]
+        },
+        {
+          "paginas": [
+            19,
+            20,
+            21
+          ],
+          "assunto": "Ambiguidade: armário de aço, cadeira sem braços; a + b * a com duas derivações mais à esquerda; G′; linguagem inerentemente ambígua",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "ambiguidade-tecnicas"
+          ],
+          "evidencias": [
+            "armario",
+            "a + b * a",
+            "inerentemente ambigua"
+          ]
+        },
+        {
+          "paginas": [
+            22
+          ],
+          "assunto": "Três técnicas; a primeira: precedência; recursão dos dois lados",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "ambiguidade-tecnicas"
+          ],
+          "evidencias": [
+            "recursao dos dois lados"
+          ]
+        },
+        {
+          "paginas": [
+            23,
+            24
+          ],
+          "assunto": "Tirar a recursão de um lado mantém a linguagem; expressão op termo",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "ambiguidade-tecnicas"
+          ],
+          "evidencias": [
+            "s → s α b | b"
+          ]
+        },
+        {
+          "paginas": [
+            25,
+            26
+          ],
+          "assunto": "Um nível só calcula 3 + 4 * 5 = 35; cascata de classes de operadores",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "ambiguidade-tecnicas"
+          ],
+          "evidencias": [
+            "35"
+          ]
+        },
+        {
+          "paginas": [
+            27
+          ],
+          "assunto": "Regra genérica: menor para maior precedência, recursão pelo lado da associatividade",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "ambiguidade-tecnicas"
+          ],
+          "evidencias": [
+            "associativo a esquerda vira recursao a esquerda"
+          ]
+        },
+        {
+          "paginas": [
+            28,
+            29,
+            30,
+            31,
+            32
+          ],
+          "assunto": "Exercício com + − * / % ^ (^ à direita) e a árvore de 3 * 2 ^ 4 ^ 5 + 3",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "ambiguidade-tecnicas"
+          ],
+          "evidencias": [
+            "op3 → ^",
+            "3 * 2 ^ 4 ^ 5 + 3"
+          ]
+        },
+        {
+          "paginas": [
+            33,
+            34
+          ],
+          "assunto": "Técnica 2: else pendente, gramática reescrita ruim, end if; recursão dupla indireta",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "ambiguidade-tecnicas"
+          ],
+          "evidencias": [
+            "end if"
+          ]
+        },
+        {
+          "paginas": [
+            35,
+            36
+          ],
+          "assunto": "Técnica 3: comportamento ganancioso; precedência e associatividade declaradas no Yacc",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "ambiguidade-tecnicas"
+          ],
+          "evidencias": [
+            "ganancioso",
+            "%left"
+          ]
+        },
+        {
+          "paginas": [
+            37
+          ],
+          "assunto": "Resumo da ambiguidade: conflitos no LR, ANTLR no LL; início da recursão à esquerda",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "ambiguidade-tecnicas",
+            "recursao-esquerda"
+          ],
+          "evidencias": [
+            "conflitos",
+            "recursao a esquerda"
+          ]
+        },
+        {
+          "paginas": [
+            38,
+            39
+          ],
+          "assunto": "Eliminação da recursão: A → βR, R → αR | ε; três tipos; uma e várias produções",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "recursao-esquerda"
+          ],
+          "evidencias": [
+            "nao imediata",
+            "| t | c"
+          ]
+        },
+        {
+          "paginas": [
+            40
+          ],
+          "assunto": "Recursão não imediata no livro do dragão; fatoração motivada pelo preditivo",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "recursao-esquerda",
+            "fatoracao"
+          ],
+          "evidencias": [
+            "livro do dragao",
+            "prefixo comum"
+          ]
+        },
+        {
+          "paginas": [
+            41
+          ],
+          "assunto": "Fatoração do if (comando else ou vazio); início da EBNF",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "fatoracao",
+            "recursao-esquerda"
+          ],
+          "evidencias": [
+            "cmd_else",
+            "ebnf"
+          ]
+        },
+        {
+          "paginas": [
+            42
+          ],
+          "assunto": "EBNF com ?, * e +; repetição como laço",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "recursao-esquerda"
+          ],
+          "evidencias": [
+            "laco"
+          ]
+        },
+        {
+          "paginas": [
+            43
+          ],
+          "assunto": "Encerramento e recapitulação",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "encontro"
+          ],
+          "evidencias": [
+            "recursao a esquerda"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lucredio-aula06",
+      "url": "https://www.youtube.com/watch?v=yan1Z1JItaM",
+      "escopo": "Construção de Compiladores, Aula 06: Análise Sintática Descendente, 77:06; unidades = blocos de 2 minutos da transcrição (1 = 0:00–2:00)",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube (youtube-transcript-api), lida inteira. Trechos com reconhecimento ruim foram interpretados pelo contexto, sem inventar conteúdo; as telas do vídeo não foram vistas. Esta transcrição tem reconhecimento de voz ruim em muitos trechos.",
+      "totalUnidades": 39,
+      "unidades": [
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "Referências (Parr, LL(*)); recapitulação; descendente usa derivação mais à esquerda e lê da esquerda para a direita",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "descendente-ascendente"
+          ],
+          "evidencias": [
+            "derivacao mais a esquerda"
+          ]
+        },
+        {
+          "paginas": [
+            2
+          ],
+          "assunto": "O problema: qual produção aplicar com o token atual",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "lookahead"
+          ],
+          "evidencias": [
+            "qual regra"
+          ]
+        },
+        {
+          "paginas": [
+            3,
+            4
+          ],
+          "assunto": "Labirinto: salas, portas, beco sem saída; tentativa e erro exponencial; abordagem preditiva",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "lookahead"
+          ],
+          "evidencias": [
+            "labirinto",
+            "exponencial"
+          ]
+        },
+        {
+          "paginas": [
+            5,
+            6,
+            7,
+            8
+          ],
+          "assunto": "Exemplo em que 1, 2 e 3 tokens não bastam e o quarto decide",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "lookahead"
+          ],
+          "evidencias": [
+            "quarto token"
+          ]
+        },
+        {
+          "paginas": [
+            9
+          ],
+          "assunto": "Propriedade do labirinto; LL(1) com pilha; LL(*) e ALL(*) do ANTLR",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "lookahead",
+            "llk-antlr"
+          ],
+          "evidencias": [
+            "ll(k)"
+          ]
+        },
+        {
+          "paginas": [
+            10,
+            11,
+            12,
+            13
+          ],
+          "assunto": "FIRST (primeiros): definição informal, exemplos, caso do vazio",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "first-follow"
+          ],
+          "evidencias": [
+            "conjunto primeiros"
+          ]
+        },
+        {
+          "paginas": [
+            14,
+            15
+          ],
+          "assunto": "FOLLOW (seguidores): forma sentencial, $ como fim de cadeia, símbolo inalcançável",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "first-follow"
+          ],
+          "evidencias": [
+            "inalcancavel",
+            "forma sentencial"
+          ]
+        },
+        {
+          "paginas": [
+            16
+          ],
+          "assunto": "LL(k): significado das letras; condições LL(1)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "ll1"
+          ],
+          "evidencias": [
+            "no maximo uma"
+          ]
+        },
+        {
+          "paginas": [
+            17,
+            18,
+            19
+          ],
+          "assunto": "Gramáticas que falham: if comum, expressão relacional, parte opcional com FIRST = FOLLOW",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "ll1"
+          ],
+          "evidencias": [
+            "comecam com if"
+          ]
+        },
+        {
+          "paginas": [
+            20,
+            21
+          ],
+          "assunto": "Tabela LL(1): construção com FIRST e FOLLOW; célula vazia é erro",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "ll1"
+          ],
+          "evidencias": [
+            "celula vazia"
+          ]
+        },
+        {
+          "paginas": [
+            22,
+            23,
+            24
+          ],
+          "assunto": "Tabela da gramática de expressões sem recursão à esquerda",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "ll1"
+          ],
+          "evidencias": [
+            "e′ → + t e′"
+          ]
+        },
+        {
+          "paginas": [
+            25
+          ],
+          "assunto": "Célula dupla no else pendente; indícios (ambiguidade, fatoração, recursão); gramáticas nunca LL(1)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "ll1"
+          ],
+          "evidencias": [
+            "m[s′, e]"
+          ]
+        },
+        {
+          "paginas": [
+            26,
+            27,
+            28,
+            29,
+            30
+          ],
+          "assunto": "Analisador preditivo com pilha: algoritmo, execução em id + id * id, árvore, erros (id + * id)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "ll1-pilha"
+          ],
+          "evidencias": [
+            "ao contrario",
+            "id + * id"
+          ]
+        },
+        {
+          "paginas": [
+            31
+          ],
+          "assunto": "Vantagens (fácil de seguir) e desvantagens (gramática artificial) do LL(1)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "ll1-pilha"
+          ],
+          "evidencias": [
+            "artificial"
+          ]
+        },
+        {
+          "paginas": [
+            32,
+            33
+          ],
+          "assunto": "LL(k) com tabela multidimensional; exemplo LL(2); declaração × definição de método, não LL(k)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "lookahead"
+          ],
+          "evidencias": [
+            "multidimensional",
+            "ll(2)"
+          ]
+        },
+        {
+          "paginas": [
+            34
+          ],
+          "assunto": "LR mais abrangente e mais chato; capa do livro do dragão",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "llk-antlr",
+            "variantes-lr"
+          ],
+          "evidencias": [
+            "mais facil de desenvolver",
+            "capa"
+          ]
+        },
+        {
+          "paginas": [
+            35,
+            36
+          ],
+          "assunto": "LL(*): modificadores, predicado sintático, macaco treinado, AFD de decisão",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "llk-antlr"
+          ],
+          "evidencias": [
+            "macaco",
+            "predicado sintatico"
+          ]
+        },
+        {
+          "paginas": [
+            37
+          ],
+          "assunto": "AFD com ciclos; analisadores descendentes recursivos (próxima aula); início do ALL(*)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto. A implementação do descendente recursivo é só anunciada no vídeo e fica para a aula 12 (m8/comp/12-descendente-recursiva).",
+          "consulta": [
+            "llk-antlr"
+          ],
+          "evidencias": [
+            "ciclo",
+            "aula 12"
+          ]
+        },
+        {
+          "paginas": [
+            38
+          ],
+          "assunto": "ALL(*): subanalisadores em paralelo, ambiguidade, recursão à esquerda reescrita",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "llk-antlr"
+          ],
+          "evidencias": [
+            "paralelo"
+          ]
+        },
+        {
+          "paginas": [
+            39
+          ],
+          "assunto": "Recapitulação: descendente, preditivo, algoritmos automatizáveis, ANTLR",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "llk-antlr"
+          ],
+          "evidencias": [
+            "antlr"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lucredio-aula07",
+      "url": "https://www.youtube.com/watch?v=DHM8aYzdcQ8",
+      "escopo": "Construção de Compiladores, Aula 07: Análise Sintática Ascendente, 51:22; unidades = blocos de 2 minutos da transcrição (1 = 0:00–2:00)",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube (youtube-transcript-api), lida inteira. Trechos com reconhecimento ruim foram interpretados pelo contexto, sem inventar conteúdo; as telas do vídeo não foram vistas.",
+      "totalUnidades": 26,
+      "unidades": [
+        {
+          "paginas": [
+            1,
+            2
+          ],
+          "assunto": "Recapitulação: inferência recursiva; árvore de a * b de baixo para cima",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "descendente-ascendente"
+          ],
+          "evidencias": [
+            "folhas para a raiz"
+          ]
+        },
+        {
+          "paginas": [
+            3
+          ],
+          "assunto": "Pilha no descendente × no ascendente; tabela ascendente",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "ascendente"
+          ],
+          "evidencias": [
+            "o que ja foi lido"
+          ]
+        },
+        {
+          "paginas": [
+            4
+          ],
+          "assunto": "Empilhamento (shift) e redução (reduce)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "ascendente"
+          ],
+          "evidencias": [
+            "shift"
+          ]
+        },
+        {
+          "paginas": [
+            5,
+            6
+          ],
+          "assunto": "Exemplo S → S + n | n com n + n",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "ascendente"
+          ],
+          "evidencias": [
+            "s → s + n | n"
+          ]
+        },
+        {
+          "paginas": [
+            7
+          ],
+          "assunto": "Árvore durante as reduções; handle (\"gancho\")",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "ascendente"
+          ],
+          "evidencias": [
+            "handle",
+            "gancho"
+          ]
+        },
+        {
+          "paginas": [
+            8
+          ],
+          "assunto": "Handle nem sempre aparece direto; condição de aceitação",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "ascendente"
+          ],
+          "evidencias": [
+            "em cima do $"
+          ]
+        },
+        {
+          "paginas": [
+            9
+          ],
+          "assunto": "Olhar mais fundo na pilha e k à frente; LR(k); Yacc",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "lr",
+            "ascendente"
+          ],
+          "evidencias": [
+            "mais fundo"
+          ]
+        },
+        {
+          "paginas": [
+            10
+          ],
+          "assunto": "Tabela de ação e de transição; s e r",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "lr"
+          ],
+          "evidencias": [
+            "tabela de acao"
+          ]
+        },
+        {
+          "paginas": [
+            11
+          ],
+          "assunto": "acc, célula vazia, regras numeradas",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "lr"
+          ],
+          "evidencias": [
+            "numeradas"
+          ]
+        },
+        {
+          "paginas": [
+            12
+          ],
+          "assunto": "Algoritmo LR",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "lr"
+          ],
+          "evidencias": [
+            "desempilha |β| estados"
+          ]
+        },
+        {
+          "paginas": [
+            13,
+            14,
+            15,
+            16
+          ],
+          "assunto": "Execução de id * id + id com a tabela do livro do dragão",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "lr"
+          ],
+          "evidencias": [
+            "id * id + id"
+          ]
+        },
+        {
+          "paginas": [
+            17
+          ],
+          "assunto": "Precedência respeitada; exercícios com parênteses",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "lr"
+          ],
+          "evidencias": [
+            "(id + id) * id"
+          ]
+        },
+        {
+          "paginas": [
+            18
+          ],
+          "assunto": "Erro: parêntese faltando, estado 8 com $",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "lr",
+            "erros-sintaticos"
+          ],
+          "evidencias": [
+            "estado 8"
+          ]
+        },
+        {
+          "paginas": [
+            19,
+            20,
+            21
+          ],
+          "assunto": "Conflitos shift-reduce e reduce-reduce; else pendente; sempre empilhar",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "conflitos"
+          ],
+          "evidencias": [
+            "na duvida, shift",
+            "var → id"
+          ]
+        },
+        {
+          "paginas": [
+            22,
+            23
+          ],
+          "assunto": "Regras de precedência e associatividade fora da gramática (Yacc)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "conflitos"
+          ],
+          "evidencias": [
+            "operador mais forte"
+          ]
+        },
+        {
+          "paginas": [
+            24
+          ],
+          "assunto": "Reduce-reduce sem regra simples; editar a tabela à mão",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "conflitos"
+          ],
+          "evidencias": [
+            "editar a celula"
+          ]
+        },
+        {
+          "paginas": [
+            25
+          ],
+          "assunto": "SLR, LR(1) canônica e LALR",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "variantes-lr"
+          ],
+          "evidencias": [
+            "lr(1) analisa"
+          ]
+        },
+        {
+          "paginas": [
+            26
+          ],
+          "assunto": "LALR na capa do dragão; estudar o algoritmo e a tabela",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da leitura completa do bloco.",
+          "consulta": [
+            "variantes-lr",
+            "lr"
+          ],
+          "evidencias": [
+            "espada"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mogensen-cap3",
+      "url": "http://hjemmesider.diku.dk/~torbenm/Basics/basics_lulu2.pdf",
+      "escopo": "Mogensen, Basics of Compiler Design, edição de 20/08/2010, cap. 3 Syntax Analysis, p. 53–112 do livro = p. 65–124 do PDF; unidade n = página n + 52 do livro. Substituto do livro do autoestudo, nunca o próprio.",
+      "acesso": "integral",
+      "metodo": "PDF gratuito do autor (permite cópia para uso pessoal). O servidor da DIKU recusou a conexão; o arquivo veio da cópia do Internet Archive da mesma URL (snapshot de 30/08/2026). Texto extraído com PyMuPDF e lido página por página; árvores e tabelas conferidas pelo texto extraído.",
+      "totalUnidades": 60,
+      "unidades": [
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "Introdução: árvore sintática, rejeitar textos inválidos com erro sintático, LL(1) e SLR",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "papel",
+            "erros-sintaticos"
+          ],
+          "evidencias": [
+            "erro sintatico"
+          ]
+        },
+        {
+          "paginas": [
+            2,
+            3,
+            4
+          ],
+          "assunto": "Definição de GLC, regra vazia, expressão regular → GLC, gramática de expressões",
+          "antes": "ja-coberto",
+          "justificativa": "GLC já está nas aulas 01 e 08; a conversão de expressão regular reaparece na eliminação da recursão.",
+          "consulta": [
+            "papel"
+          ],
+          "evidencias": [
+            "cabeca"
+          ]
+        },
+        {
+          "paginas": [
+            5
+          ],
+          "assunto": "Categorias sintáticas (expressões, comandos, declarações)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "papel"
+          ],
+          "evidencias": [
+            "construcoes da linguagem"
+          ]
+        },
+        {
+          "paginas": [
+            6,
+            7
+          ],
+          "assunto": "Derivação formal; derivação mais à esquerda e mais à direita",
+          "antes": "ja-coberto",
+          "justificativa": "Derivação já está na aula 01; aqui só o uso na análise.",
+          "consulta": [
+            "descendente-ascendente"
+          ],
+          "evidencias": [
+            "derivacao mais a esquerda"
+          ]
+        },
+        {
+          "paginas": [
+            8,
+            9,
+            10
+          ],
+          "assunto": "Árvore sintática, ambiguidade indecidível, N → NαN ambígua, construção do analisador prova não ambiguidade, equivalência",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "ambiguidade-tecnicas",
+            "ll1"
+          ],
+          "evidencias": [
+            "n → n α n"
+          ]
+        },
+        {
+          "paginas": [
+            11,
+            12
+          ],
+          "assunto": "Precedência; associativo à esquerda, à direita e não associativo; reescrita",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "ambiguidade-tecnicas"
+          ],
+          "evidencias": [
+            "nao associativo"
+          ]
+        },
+        {
+          "paginas": [
+            13,
+            14
+          ],
+          "assunto": "Associatividade à direita e não associativa; mesmo nível, mesma associatividade; gramática 3.11",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "ambiguidade-tecnicas"
+          ],
+          "evidencias": [
+            "mesma associatividade"
+          ]
+        },
+        {
+          "paginas": [
+            15,
+            16
+          ],
+          "assunto": "Else pendente com comando casado e não casado; analisadores preditivos e ascendentes",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "ambiguidade-tecnicas",
+            "descendente-ascendente"
+          ],
+          "evidencias": [
+            "casado"
+          ]
+        },
+        {
+          "paginas": [
+            17
+          ],
+          "assunto": "Análise preditiva; introdução a Nullable e FIRST",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "first-follow",
+            "lookahead"
+          ],
+          "evidencias": [
+            "anulavel"
+          ]
+        },
+        {
+          "paginas": [
+            18,
+            19,
+            20
+          ],
+          "assunto": "Algoritmos de Nullable e FIRST por ponto fixo (figuras 3.14 e 3.15)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "first-follow"
+          ],
+          "evidencias": [
+            "ponto fixo"
+          ]
+        },
+        {
+          "paginas": [
+            21,
+            22
+          ],
+          "assunto": "Preditivo revisitado; definição de FOLLOW",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "first-follow"
+          ],
+          "evidencias": [
+            "follow"
+          ]
+        },
+        {
+          "paginas": [
+            23,
+            24
+          ],
+          "assunto": "FOLLOW por restrições com S′ → S $; exemplo T → R | aTc",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "first-follow"
+          ],
+          "evidencias": [
+            "s′ → s $",
+            "restricoes"
+          ]
+        },
+        {
+          "paginas": [
+            25,
+            26,
+            27
+          ],
+          "assunto": "Exemplo maior (cadeias que não são ww); início do LL(1)",
+          "antes": "superficial",
+          "justificativa": "O método é o mesmo da seção; o exemplo maior não foi reproduzido.",
+          "consulta": [
+            "first-follow"
+          ],
+          "evidencias": [
+            "ponto fixo"
+          ]
+        },
+        {
+          "paginas": [
+            28,
+            29
+          ],
+          "assunto": "LL(1); descendente recursivo (figura 3.16)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "O descendente recursivo como implementação é da aula 12; aqui fica uma linha com link.",
+          "consulta": [
+            "ll1",
+            "ll1-pilha"
+          ],
+          "evidencias": [
+            "descendente recursivo"
+          ]
+        },
+        {
+          "paginas": [
+            30,
+            31
+          ],
+          "assunto": "Preditivo com tabela e pilha (figuras 3.17 a 3.19); conflitos; linguagem não LL(1)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "ll1",
+            "ll1-pilha"
+          ],
+          "evidencias": [
+            "linguagem nao ll(1)"
+          ]
+        },
+        {
+          "paginas": [
+            32,
+            33
+          ],
+          "assunto": "Eliminação da recursão à esquerda como expressão regular; árvore reestruturada",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "recursao-esquerda"
+          ],
+          "evidencias": [
+            "expressao regular"
+          ]
+        },
+        {
+          "paginas": [
+            34
+          ],
+          "assunto": "Recursão indireta (inclusive com prefixo anulável); fatoração à esquerda",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "recursao-esquerda",
+            "fatoracao"
+          ],
+          "evidencias": [
+            "anulavel"
+          ]
+        },
+        {
+          "paginas": [
+            35
+          ],
+          "assunto": "Else pendente no LL(1) resolvido apagando a regra vazia; roteiro de construção em 6 passos",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "ll1"
+          ],
+          "evidencias": [
+            "apaga-se",
+            "roteiro completo"
+          ]
+        },
+        {
+          "paginas": [
+            36,
+            37
+          ],
+          "assunto": "SLR: shift e reduce, AFD que lê a pilha, estados guardados na pilha",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "ascendente",
+            "lr"
+          ],
+          "evidencias": [
+            "afd que le a pilha"
+          ]
+        },
+        {
+          "paginas": [
+            38,
+            39
+          ],
+          "assunto": "Tabela SLR da gramática 3.9, algoritmo e execução",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "lr",
+            "slr"
+          ],
+          "evidencias": [
+            "tabela de acao"
+          ]
+        },
+        {
+          "paginas": [
+            40,
+            41,
+            42
+          ],
+          "assunto": "Construção SLR: AFN por regra, transições ε, subconjuntos, reduces em FOLLOW",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "slr"
+          ],
+          "evidencias": [
+            "construcao de subconjuntos"
+          ]
+        },
+        {
+          "paginas": [
+            43
+          ],
+          "assunto": "Conflitos na tabela SLR; resumo da construção em 7 passos",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "slr",
+            "conflitos"
+          ],
+          "evidencias": [
+            "meio arte"
+          ]
+        },
+        {
+          "paginas": [
+            44,
+            45,
+            46
+          ],
+          "assunto": "Regras de precedência na tabela LR (operadores, associatividade, não associativo, else); LALR(1) nos geradores",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "conflitos",
+            "variantes-lr"
+          ],
+          "evidencias": [
+            "as duas saem",
+            "lalr(1)"
+          ]
+        },
+        {
+          "paginas": [
+            47
+          ],
+          "assunto": "Declarações e ações; sintaxe abstrata",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "A árvore abstrata está na aula 09; as ações semânticas são da aula 12.",
+          "consulta": [
+            "papel"
+          ],
+          "evidencias": [
+            "arvore abstrata"
+          ]
+        },
+        {
+          "paginas": [
+            48,
+            49,
+            50
+          ],
+          "assunto": "Montar a árvore abstrata depois de eliminar a recursão à esquerda (árvores com buraco)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Uma linha com link: construir a AST durante a descida é da aula 12.",
+          "consulta": [
+            "recursao-esquerda"
+          ],
+          "evidencias": [
+            "estrutura da gramatica original"
+          ]
+        },
+        {
+          "paginas": [
+            51
+          ],
+          "assunto": "Conflitos em geradores: estados como itens; aceitar linguagem maior e filtrar depois",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "slr",
+            "conflitos"
+          ],
+          "evidencias": [
+            "linguagem um pouco maior"
+          ]
+        },
+        {
+          "paginas": [
+            52
+          ],
+          "assunto": "Precedência definida pelo usuário; propriedades das livres do contexto (determinísticas, fechamento)",
+          "antes": "ja-coberto",
+          "justificativa": "Fechamento e limites das LLC estão nas aulas 01 e 08; aqui fica só o LR para LLC determinísticas.",
+          "consulta": [
+            "variantes-lr"
+          ],
+          "evidencias": [
+            "deterministicas"
+          ]
+        },
+        {
+          "paginas": [
+            53
+          ],
+          "assunto": "Leituras: Pascal para LL(1), C para LALR(1), ANTLR; exercícios 3.1 e 3.2",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "variantes-lr"
+          ],
+          "evidencias": [
+            "pascal"
+          ]
+        },
+        {
+          "paginas": [
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60
+          ],
+          "assunto": "Exercícios 3.3 a 3.22 (a p. 112 está em branco)",
+          "antes": "exercicios-inventariados",
+          "justificativa": "Inventariados; três viraram treino adaptado (3.6, 3.14, 3.21), com resposta própria.",
+          "consulta": [
+            "treino"
+          ],
+          "evidencias": [
+            "mogensen"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "thain-cap4",
+      "url": "https://dthain.github.io/books/compiler/chapter4.pdf",
+      "escopo": "Thain, Introduction to Compilers and Language Design, 2ª ed. (revisão de 28/07/2026), cap. 4 Parsing, 35 páginas do PDF do capítulo (p. 35–68 do livro; a 1ª é o copyright). Substituto do livro do autoestudo.",
+      "acesso": "integral",
+      "metodo": "PDF gratuito do site do autor (uso pessoal e acadêmico permitido). Texto extraído com PyMuPDF e lido inteiro; o autômato LR(0) e a tabela SLR foram reconstruídos do texto extraído.",
+      "totalUnidades": 35,
+      "unidades": [
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "Página de copyright do capítulo",
+          "antes": "estrutural",
+          "justificativa": "Sem conteúdo de aula.",
+          "consulta": [
+            "papel"
+          ],
+          "evidencias": []
+        },
+        {
+          "paginas": [
+            2
+          ],
+          "assunto": "Visão geral: CFG, LL(1) e LR(1)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "papel",
+            "descendente-ascendente"
+          ],
+          "evidencias": [
+            "ll"
+          ]
+        },
+        {
+          "paginas": [
+            3,
+            4
+          ],
+          "assunto": "Terminal, não terminal, forma sentencial; derivação top-down e bottom-up",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "descendente-ascendente"
+          ],
+          "evidencias": [
+            "top-down"
+          ]
+        },
+        {
+          "paginas": [
+            5,
+            6,
+            7
+          ],
+          "assunto": "Ambiguidade (hello55); G3 e G4; else pendente; passos para LL(1)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "ambiguidade-tecnicas",
+            "ll1"
+          ],
+          "evidencias": [
+            "else pendente"
+          ]
+        },
+        {
+          "paginas": [
+            8
+          ],
+          "assunto": "Eliminação da recursão à esquerda; aviso sobre E → T + E",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "recursao-esquerda"
+          ],
+          "evidencias": [
+            "e → t + e"
+          ]
+        },
+        {
+          "paginas": [
+            9
+          ],
+          "assunto": "Prefixos comuns (id, id [ E ], id ( E ))",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "fatoracao"
+          ],
+          "evidencias": [
+            "id [ e ]"
+          ]
+        },
+        {
+          "paginas": [
+            10,
+            11
+          ],
+          "assunto": "Algoritmos de FIRST e FOLLOW; conjuntos da gramática G9",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "first-follow"
+          ],
+          "evidencias": [
+            "thain"
+          ]
+        },
+        {
+          "paginas": [
+            12,
+            13
+          ],
+          "assunto": "Descendente recursivo (figura 4.2)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Uma linha com link: a implementação é da aula 12.",
+          "consulta": [
+            "ll1-pilha"
+          ],
+          "evidencias": [
+            "aula 12"
+          ]
+        },
+        {
+          "paginas": [
+            14,
+            15
+          ],
+          "assunto": "Construção da tabela LL(1) e algoritmo com pilha; execução de int * int",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "ll1",
+            "ll1-pilha"
+          ],
+          "evidencias": [
+            "inclusive $"
+          ]
+        },
+        {
+          "paginas": [
+            16,
+            17
+          ],
+          "assunto": "Gramáticas LR(1); shift-reduce em id ( id + id )",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "ascendente",
+            "slr"
+          ],
+          "evidencias": [
+            "t → id ( e ) | id"
+          ]
+        },
+        {
+          "paginas": [
+            18,
+            19,
+            20,
+            21
+          ],
+          "assunto": "Autômato LR(0): núcleo, fechamento, transições; conflitos shift-reduce e reduce-reduce",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "slr",
+            "conflitos"
+          ],
+          "evidencias": [
+            "fechamento"
+          ]
+        },
+        {
+          "paginas": [
+            22,
+            23,
+            24
+          ],
+          "assunto": "Tabela SLR (GOTO e ACTION), algoritmo e execução",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "slr"
+          ],
+          "evidencias": [
+            "follow(t) = { +, ), $ }"
+          ]
+        },
+        {
+          "paginas": [
+            25
+          ],
+          "assunto": "G11: gramática não ambígua que não é SLR",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "variantes-lr"
+          ],
+          "evidencias": [
+            "s → v = e | id"
+          ]
+        },
+        {
+          "paginas": [
+            26,
+            27,
+            28
+          ],
+          "assunto": "LR(1): itens com lookahead; autômato LR(1) de G10",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "variantes-lr"
+          ],
+          "evidencias": [
+            "v → id · {=}"
+          ]
+        },
+        {
+          "paginas": [
+            29
+          ],
+          "assunto": "LALR: junta estados com o mesmo núcleo; classes de gramáticas",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Complemento identificado (substituto do livro): capítulo lido inteiro.",
+          "consulta": [
+            "variantes-lr"
+          ],
+          "evidencias": [
+            "mesmos itens"
+          ]
+        },
+        {
+          "paginas": [
+            30,
+            31
+          ],
+          "assunto": "LR(k), LALR, SLR, LL(k) revisitados; hierarquia de Chomsky",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "A hierarquia de Chomsky está na aula 01.",
+          "consulta": [
+            "variantes-lr"
+          ],
+          "evidencias": [
+            "ll(1) ⊂ slr"
+          ]
+        },
+        {
+          "paginas": [
+            32,
+            33
+          ],
+          "assunto": "Exercícios 1 a 11",
+          "antes": "exercicios-inventariados",
+          "justificativa": "Inventariados; nenhum reproduzido. O treino tem exercícios autorais do mesmo tipo.",
+          "consulta": [
+            "treino"
+          ],
+          "evidencias": []
+        },
+        {
+          "paginas": [
+            34,
+            35
+          ],
+          "assunto": "Leituras complementares e página em branco",
+          "antes": "estrutural",
+          "justificativa": "Sem conteúdo de aula.",
+          "consulta": [
+            "treino"
+          ],
+          "evidencias": []
+        }
+      ]
+    },
+    {
+      "id": "leitura-cap3",
+      "url": "sem URL: livro indicado no roteiro de autoestudo",
+      "escopo": "Capítulo 3, Gramáticas livres de contexto e análise sintática, p. 95–140 (provavelmente Louden, Compiladores: princípios e práticas; não confirmado)",
+      "acesso": "indisponivel",
+      "limitacao": "A dona não tem o livro e não se buscou cópia não autorizada. Nada da aula vem dele; não declarar cobertura nem equivalência."
+    },
+    {
+      "id": "leitura-cap4",
+      "url": "sem URL: livro indicado no roteiro de autoestudo",
+      "escopo": "Análise sintática descendente (capítulo 4), p. 157–166 (provavelmente Louden; não confirmado)",
+      "acesso": "indisponivel",
+      "limitacao": "Mesma situação do capítulo 3."
+    },
+    {
+      "id": "resina-slide-aula01",
+      "url": "src/aulas/m8/comp/01-conceitos/notas/slides-conceitos-m8.pdf",
+      "escopo": "Slides da aula 01: roteiro das ponderadas",
+      "acesso": "parcial",
+      "limitacao": "Usado só o roteiro (semana 7: análises léxica e sintática). Não há slides do encontro de 12/11."
+    }
+  ]
+}

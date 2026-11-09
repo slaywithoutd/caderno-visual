@@ -5,7 +5,7 @@
 <!-- ================= Base ================= -->
 <section class="cs" id="encontro" data-grupo="Resumo" data-termos="" data-leitura="encontro">
   <h2>Resumo</h2>
-  <p class="cs-def">O essencial de gerência de recursos em poucas linhas.</p>
+  <p class="cs-def">O SO reparte CPU, memória, armazenamento e dispositivos, e cada regra escolhe entre a média e o pior caso.</p>
   <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 104">
 <line class="s" x1="18" y1="62" x2="222" y2="62"/><text class="tm" x="18" y="74">0</text><text class="tm" x="220" y="74">1</text>
 <rect class="acf" x="18" y="34" width="194" height="20" rx="3"/><text x="96" y="44" style="font-size:12px">U = 0,97</text>
@@ -13,7 +13,7 @@
 <line class="gr" x1="220" y1="22" x2="220" y2="66"/><text class="tm" x="220" y="86">EDF: 1</text>
 <text class="tm st" x="4" y="98">(C=2, T=5) e (C=4, T=7)</text></svg>Duas tarefas: o rate monotonic não garante, o EDF garante.</aside>
   <ul class="b"><li>Escalonar começa pelo critério: a média (espera, throughput) ou o pior caso (prazo).</li><li>Em tempo real, C é o pior caso, e o teste de utilização só vale com preempção.</li><li>Memória virtual troca previsibilidade por espaço; sem MMU, você ganha previsibilidade e perde a compactação.</li><li>Flash e EEPROM se gastam por gravação: vida útil = ciclos ÷ gravações por dia no mesmo lugar.</li><li>Polling, interrupção e DMA se escolhem pela conta: custo por evento × eventos por segundo, mais o pior caso de latência.</li></ul>
-  <div class="cs-pegadinhas"><ul class="b"><li>Tempo real é cumprir prazo, não ser rápido.</li><li>C no teste de utilização é o pior caso, nunca a média.</li><li>FIFO com mais molduras pode dar mais page faults (anomalia de Belady).</li><li>Sem MMU não dá para compactar o heap: mover um bloco quebra os ponteiros para ele.</li></ul></div>
+  <div class="cs-pegadinhas"><ul class="b"><li>Tempo real é cumprir prazo, não ser rápido.</li><li>C no teste de utilização é o pior caso, nunca a média.</li><li>FIFO com mais molduras pode dar mais page faults (anomalia de Belady).</li><li>Nenhum malloc compacta o heap, nem com MMU: em C não dá para achar os ponteiros para um bloco.</li></ul></div>
 </section>
 
 <section class="cs" id="gerente" data-grupo="Base" data-termos="" data-leitura="antes">
@@ -52,7 +52,7 @@
   <p class="cs-def">Com multiprogramação, vários processos ficam prontos ao mesmo tempo e só um usa cada CPU. Escalonamento é a política que decide qual deles roda agora.</p>
   <ul class="b">
     <li>O escalonador (<a href="/m8/comp/04-processos-threads">aula 04</a>) aplica a política; o dispatcher (<a href="/m8/comp/04-processos-threads">aula 04</a>) faz a troca de contexto e entrega a CPU ao escolhido.</li>
-    <li>O tempo que o dispatcher gasta é a latência de despacho, puro overhead.</li>
+    <li>O tempo que o dispatcher gasta é a latência de despacho, puro overhead. Somado, escalonar pesa: nos datacenters do Google, cerca de 5% de toda a CPU (estudo citado no OSTEP, cap. 9).</li>
     <li>Todo processo alterna fases: usa a CPU, pede E/S e espera, usa a CPU de novo. Cada fase de uso contínuo da CPU é um surto de CPU (CPU burst).</li>
     <li>Processos cpu-bound têm surtos longos; io-bound, surtos curtos.</li>
   </ul>
@@ -166,6 +166,7 @@
   <p class="cs-def">SRTF (shortest remaining time first): a cada chegada, compara o surto do recém-chegado com o que ainda falta para o processo atual. Se o novo for menor, preempta.</p>
   <ul class="b">
     <li>O starvation do SJF fica pior: um processo longo pode ser interrompido sem parar.</li>
+    <li>O OSTEP (cap. 7) chama o mesmo algoritmo de STCF (shortest time-to-completion first) ou PSJF.</li>
   </ul>
   <div class="cs-uso">
     <ul class="b">
@@ -201,6 +202,7 @@
     <li>Pensado para sistemas de tempo compartilhado.</li>
     <li>Quantum grande demais: quase ninguém é interrompido e o round-robin vira FCFS (no exemplo, q = 8 dá exatamente a escala do FCFS).</li>
     <li>Quantum pequeno demais: a CPU passa boa parte do tempo trocando de contexto.</li>
+    <li>O quantum é um múltiplo do período da interrupção do relógio: com interrupção a cada 10 ms, o quantum é 10, 20, 30 ms (OSTEP, cap. 7). No FreeRTOS, esse período é o <a href="#freertos">tick</a>.</li>
   </ul>
   <div class="cs-formula">
     <div class="formula">espera para voltar à CPU ≤ (n − 1) × q + n × s     ·     overhead = s / (q + s)</div>
@@ -223,6 +225,7 @@
   <div data-ref-tbl="tbl-comparacao"></div>
   <ul class="b">
     <li>Prioridade é a pior média aqui porque o critério dela é outro: a ordem de importância, que nada tem a ver com o tamanho dos surtos.</li>
+    <li>Round-robin é o melhor em resposta e quase o pior em turnaround, porque estica todo mundo: três processos de 5 s com q = 1 s terminam em 13, 14 e 15 s, média 14 (OSTEP, cap. 7).</li>
     <li>Na figura, escolha a aba para rodar cada algoritmo sobre o mesmo conjunto; no round-robin, mude o quantum e veja as médias mudarem.</li>
   </ul>
   <p class="prova">SJF (não preemptivo) e SRTF (preemptivo) minimizam o tempo médio de espera, mas exigem estimar o surto e causam starvation de processos longos. FCFS sofre efeito comboio. No round-robin, quantum grande vira FCFS e quantum pequeno vira overhead de troca de contexto.</p>
@@ -241,16 +244,23 @@
   <div data-ref-mn="mn-filas"></div>
 </section>
 
-<section class="cs" id="mlfq" data-grupo="Processador" data-termos="mlfq" data-leitura="filas">
+<section class="cs" id="mlfq" data-grupo="Processador" data-termos="mlfq,priority-boost" data-leitura="filas">
   <h2>Múltiplas filas com realimentação (MLFQ)</h2>
   <p class="cs-def">Nas múltiplas filas com realimentação (multilevel feedback queue), o processo muda de fila conforme o comportamento. O SO aprende quem é cpu-bound e quem é io-bound sem ninguém avisar.</p>
   <ul class="b">
     <li>Todo processo novo entra na fila de cima, de maior prioridade e quantum pequeno (8 ms, por exemplo).</li>
-    <li>Gastou o quantum inteiro sem bloquear? Comportamento de cpu-bound: desce uma fila. As filas de baixo têm prioridade menor e quantum maior (16 ms, 32 ms…); a última costuma ser FCFS.</li>
-    <li>Bloqueou para E/S antes do fim do quantum? Comportamento de io-bound: fica na fila em que está (ou sobe).</li>
+    <li>Gastou o quantum inteiro sem bloquear? Comportamento de cpu-bound: desce uma fila. As filas de baixo têm prioridade menor e quantum maior (16 ms, 32 ms…); a última roda round-robin com quantum longo (OSTEP, cap. 8).</li>
+    <li>Bloqueou para E/S antes do fim do quantum? Comportamento de io-bound: fica na fila em que está. Subir é papel do aging ou do priority boost.</li>
     <li>Resultado: io-bound e interativos ficam em cima, com resposta rápida; cpu-bound descem e rodam com quantum maior, com menos troca de contexto.</li>
     <li>Contra starvation lá embaixo: <a href="#prioridade">aging</a>, quem espera demais sobe.</li>
+    <li>Priority boost, a versão do OSTEP (cap. 8): a cada período S, todos os processos voltam para a fila de cima. Resolve o starvation e também o processo que era cpu-bound e virou interativo, que de outro jeito ficaria preso embaixo. O período S é difícil de acertar: grande demais, os longos passam fome; pequeno demais, os interativos perdem a vantagem.</li>
+    <li>Sistemas reais: BSD, Solaris e Windows NT usam alguma forma de MLFQ. O Solaris tem 60 filas, fatias que crescem de 20 ms a algumas centenas de ms, e boost a cada 1 s, mais ou menos (OSTEP, cap. 8).</li>
   </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Errado: "bloqueou antes do fim do quantum, então é interativo". Certo: um programa pode gastar 99% do quantum e pedir uma E/S inútil logo antes do fim; pela regra, fica na fila de cima e quase monopoliza a CPU (OSTEP, cap. 8). O conserto conta o tempo total gasto em cada fila: gastou a cota daquela fila, desce, bloqueando ou não.</li>
+    </ul>
+  </div>
   <div data-ref-loop="mlfq"></div>
 </section>
 
@@ -347,7 +357,7 @@
   </ul>
   <div class="cs-formula">
     <div class="formula">físico = base + lógico, se lógico &lt; limite</div>
-    <ul class="b"><li>Senão, a MMU gera uma interrupção de erro e o SO mata o processo.</li></ul>
+    <ul class="b"><li>Senão, a CPU levanta uma exceção (causada pela própria instrução, não por um dispositivo) e o SO mata o processo.</li><li>Toda busca de instrução também passa pela tradução, e todo ponteiro que um programa imprime é lógico (OSTEP, caps. 13 e 15).</li></ul>
   </div>
   <div class="cs-uso">
     <ul class="b"><li>Base = 30 000 e limite = 12 000. O lógico 5 000 vira 35 000. O lógico 13 000 passa do limite: acesso proibido.</li></ul>
@@ -357,9 +367,10 @@
 
 <section class="cs" id="relocacao" data-grupo="Memória principal" data-termos="relocacao" data-leitura="memoria">
   <h2>Relocação</h2>
-  <p class="cs-def">Relocação dinâmica: trocar o processo de lugar sem reescrever o programa. Mover o processo na memória é só mudar o <a href="#mmu">registrador base</a>.</p>
+  <p class="cs-def">Relocação dinâmica: trocar o processo de lugar sem reescrever o programa. O SO tira o processo da CPU, copia a memória dele para o lugar novo e muda o <a href="#mmu">registrador base</a> salvo no PCB.</p>
   <ul class="b">
-    <li>Sem ela, os endereços teriam de ser corrigidos no programa (relocação estática, na carga) ou fixados na compilação (código absoluto).</li>
+    <li>Sem ela, os endereços teriam de ser corrigidos no programa (relocação estática, na carga) ou fixados na compilação (código absoluto). A relocação estática não protege: sem base e limite no hardware, um processo alcança a memória de outro (OSTEP, cap. 15).</li>
+    <li>Base e limite são salvos no PCB a cada troca de contexto, e mudar esses registradores exige instrução privilegiada, só do kernel.</li>
   </ul>
 </section>
 
@@ -393,20 +404,21 @@
   <p class="cs-def">Em partições variáveis (alocação particionada dinâmica), cada processo recebe exatamente o tamanho que pede. Acaba a fragmentação interna.</p>
   <ul class="b">
     <li>Quando processos terminam, ficam buracos de tamanhos variados espalhados entre os ocupados. Com o tempo aparece a fragmentação externa: há memória livre suficiente no total, mas em pedaços pequenos demais para o próximo pedido.</li>
-    <li>Saída 1: juntar buracos vizinhos quando um processo termina (coalescência).</li>
+    <li>Saída 1: juntar buracos vizinhos quando um processo termina (coalescência). O caminho inverso é dividir (splitting): um pedido menor que o buraco usa o começo e devolve a sobra à lista de livres.</li>
     <li>Saída 2: a compactação, mover os processos para um lado e juntar todo o espaço livre num bloco só. Exige <a href="#relocacao">relocação dinâmica</a> e para tudo enquanto copia.</li>
     <li>Qual buraco escolher para um pedido: <a href="#fits">first, best ou worst-fit</a>.</li>
   </ul>
   <p class="prova">Fragmentação interna: espaço perdido dentro da área dada ao processo (partições fixas, última página na paginação). Fragmentação externa: memória livre total suficiente, mas espalhada em buracos que não servem (partições variáveis, segmentação, alocação contígua de arquivos). Compactação resolve a externa.</p>
 </section>
 
-<section class="cs" id="fits" data-grupo="Memória principal" data-termos="first-fit,best-fit,worst-fit" data-leitura="memoria">
+<section class="cs" id="fits" data-grupo="Memória principal" data-termos="first-fit,best-fit,worst-fit,buddy" data-leitura="memoria">
   <h2>First-fit, best-fit e worst-fit</h2>
   <p class="cs-def">Quando um pedido cabe em vários buracos, a estratégia escolhe qual usar: o primeiro (first-fit), o menor (best-fit) ou o maior (worst-fit).</p>
   <ul class="b">
     <li>First-fit: o primeiro buraco, a partir do início da memória, em que o pedido cabe. Rápido, porque para de procurar cedo.</li>
     <li>Best-fit: o menor buraco em que cabe. Deixa a menor sobra. Precisa olhar a lista inteira.</li>
     <li>Worst-fit: o maior buraco. A ideia é que a sobra seja grande o bastante para servir a outro pedido.</li>
+    <li>Buddy (OSTEP, cap. 17): a memória se divide ao meio até a menor potência de 2 em que o pedido cabe; ao liberar, o bloco se junta ao "irmão" se ele estiver livre. Coalescer fica barato, ao preço de fragmentação interna: um pedido de 7 KB ocupa 8 KB.</li>
   </ul>
   <div class="cs-uso">
     <ul class="b">
@@ -430,6 +442,7 @@
     <li>Em geral volta para outro endereço: por isso precisa de <a href="#relocacao">relocação dinâmica</a>.</li>
     <li>Os candidatos a sair são os processos em espera, que não vão usar a CPU tão cedo.</li>
     <li>O espaço no disco usado para isso é a área de swap (arquivo ou partição de swap).</li>
+    <li>Com <a href="#paginacao">paginação</a>, o swap passa a ser de páginas, uma a uma, e não do processo inteiro (OSTEP, cap. 21).</li>
   </ul>
   <div class="cs-uso">
     <ul class="b"><li>É caro. Um processo de 100 MB com disco de 200 MB/s leva 100 / 200 = 0,5 s para sair e 0,5 s para voltar: 1 s inteiro só de cópia.</li></ul>
@@ -438,7 +451,7 @@
 </section>
 
 <!-- ================= Memória virtual ================= -->
-<section class="cs" id="paginacao" data-grupo="Memória virtual" data-termos="paginacao,moldura,bit-referencia" data-leitura="paginacao">
+<section class="cs" id="paginacao" data-grupo="Memória virtual" data-termos="paginacao,moldura,bit-referencia,bit-presenca" data-leitura="paginacao">
   <h2>Paginação: páginas, molduras e bits da tabela</h2>
   <p class="cs-def">A paginação divide o espaço de endereçamento do processo em páginas de tamanho fixo (4 KB, por exemplo) e a memória física em molduras (frames, páginas reais) do mesmo tamanho. Qualquer página cabe em qualquer moldura.</p>
   <ul class="b">
@@ -448,7 +461,8 @@
     <li>Cada processo tem sua tabela de páginas (<a href="/m8/comp/02-fundamentos-memoria">aula 02</a>). Cada entrada guarda o número da moldura e bits de controle:</li>
   </ul>
   <ul class="b">
-    <li>Bit de validade: 1 se a página está na memória, 0 se está no disco (ou não existe). É o bit que dispara o <a href="#page-fault">page fault</a>.</li>
+    <li>Bit de validade: aqui, como em vários livros, 1 se a página está na memória e 0 se está no disco (ou não existe). É o bit que dispara o <a href="#page-fault">page fault</a>.</li>
+    <li>O OSTEP (caps. 18 e 21) separa em dois bits: válido (a página pertence ao processo) e de presença (a página está na memória). Válida e ausente dá page fault, e o SO busca no disco; inválida dá segmentation fault, e o SO mata o processo. No x86 os dois viram um bit só.</li>
     <li>Bit de referência: o hardware liga quando a página é acessada. Os algoritmos de substituição usam para saber quem foi usado recentemente.</li>
     <li>Bit de modificação: o dirty bit da <a href="/m8/comp/02-fundamentos-memoria">aula 02</a>. Ligado quando a página foi escrita; aí ela precisa ser gravada no disco antes de sair da memória.</li>
     <li>Bits de proteção: leitura, escrita, execução. Uma página de código marcada só-leitura pode ser compartilhada por vários processos (bibliotecas, editores abertos várias vezes).</li>
@@ -464,7 +478,7 @@
   <p class="cs-def">Todo endereço virtual se parte em dois: o número da página virtual e o deslocamento (offset), a posição do byte dentro da página. Só o número da página é trocado; o deslocamento passa direto.</p>
   <div class="cs-formula">
     <div class="formula">página = endereço div tamanho     ·     deslocamento = endereço mod tamanho     ·     físico = moldura × tamanho + deslocamento</div>
-    <ul class="b"><li>Com páginas de 4 KB = 2¹² bytes, em binário: os 12 bits de baixo são o deslocamento e o resto é a página.</li></ul>
+    <ul class="b"><li>Com páginas de 4 KB = 2¹² bytes, em binário: os 12 bits de baixo são o deslocamento e o resto é a página.</li><li>A tabela fica na memória, e um registrador guarda onde ela começa. Sem TLB, cada acesso do programa vira dois: um à tabela e outro ao dado (OSTEP, cap. 18).</li></ul>
   </div>
   <div class="cs-uso">
     <ul class="b">
@@ -478,9 +492,10 @@
 
 <section class="cs" id="page-fault" data-grupo="Memória virtual" data-termos="page-fault" data-leitura="paginacao">
   <h2>Page fault</h2>
-  <p class="cs-def">O processo tentou acessar uma página que não está na memória. A MMU vê bit de validade 0 na entrada da tabela de páginas e gera uma interrupção: o page fault.</p>
+  <p class="cs-def">O processo tentou acessar uma página que não está na memória. A MMU vê bit de validade 0 na entrada da tabela de páginas e levanta uma exceção: o page fault.</p>
   <ul class="b">
     <li>A instrução não pode continuar. O SO trata o page fault: carrega a página do disco numa moldura, atualiza a tabela e manda reexecutar a instrução que falhou.</li>
+    <li>Enquanto o disco busca a página, o processo fica bloqueado e o SO roda outro. Onde a página mora no disco costuma ficar anotado na própria entrada da tabela (OSTEP, cap. 21).</li>
     <li>Acompanhe na figura a tradução do endereço 20 500, com o page fault no meio.</li>
   </ul>
   <div data-ref="fig-trad"></div>
@@ -514,18 +529,21 @@
   </div>
 </section>
 
-<section class="cs" id="tabela-niveis" data-grupo="Memória virtual" data-termos="tabela-multinivel" data-leitura="paginacao">
+<section class="cs" id="tabela-niveis" data-grupo="Memória virtual" data-termos="tabela-multinivel,tabela-invertida" data-leitura="paginacao">
   <h2>Tamanho da página e tabelas em níveis</h2>
   <aside class="mn" data-vis="tabela-niveis" aria-hidden="true"><svg viewBox="0 0 240 150"><text class="tm" x="120" y="8">endereço de 32 bits</text><rect class="bl" x="20" y="13" width="60" height="22"/><text x="50" y="24">10</text><rect class="am" x="80" y="13" width="60" height="22"/><text x="110" y="24">10</text><rect class="k" x="140" y="13" width="80" height="22"/><text x="180" y="24">12</text><text class="tm" x="50" y="44">diretório</text><text class="tm" x="110" y="44">tabela</text><text class="tm" x="180" y="44">deslocamento</text><path class="s" d="M50,52 V68" marker-end="url(#mnarrow)"/><path class="s" d="M110,52 V68" marker-end="url(#mnarrow)"/><path class="s" d="M210,52 V78" marker-end="url(#mnarrow)"/><rect class="bl" x="20" y="70" width="60" height="56"/><text x="50" y="92" style="font-size:12px">1 024</text><text class="tm" x="50" y="108">entradas</text><rect class="am" x="110" y="70" width="60" height="56"/><text x="140" y="92" style="font-size:12px">1 024</text><text class="tm" x="140" y="108">entradas</text><path class="s" d="M80,98 H108" marker-end="url(#mnarrow)"/><path class="s" d="M170,98 H188" marker-end="url(#mnarrow)"/><rect class="gr" x="190" y="80" width="40" height="36"/><text x="210" y="98" style="font-size:11px">pág.</text><text class="tm" x="120" y="142">tabela única: 2²⁰ × 4 B = 4 MB</text></svg>Os 20 bits de página viram 10 + 10: um índice no diretório, outro na tabela de segundo nível.</aside>
   <p class="cs-def">A tabela de páginas em níveis quebra a tabela em pedaços: um diretório aponta para tabelas de segundo nível, e as de regiões não usadas nem existem.</p>
   <ul class="b">
     <li>Página grande: tabela menor e menos page faults, mas mais fragmentação interna e mais lixo trazido junto. Página pequena: o contrário. 4 KB é o tamanho mais comum hoje.</li>
     <li>O preço dos níveis são mais acessos à memória por tradução (um por nível). A TLB (<a href="/m8/comp/02-fundamentos-memoria">aula 02</a>) esconde isso: com hit rate alto, quase nenhuma tradução precisa percorrer os níveis.</li>
+    <li>Cada pedaço da tabela tem de caber numa página, e é isso que decide quantos níveis. Com endereço de 30 bits e páginas de 512 bytes, sobram 21 bits de página e cabem 7 bits de índice por pedaço: 3 níveis (OSTEP, cap. 20). De bônus, a tabela não precisa ser contígua na memória.</li>
+    <li>Na troca de contexto, a TLB guarda traduções do processo anterior: ou o SO a esvazia (flush), ou cada entrada leva um identificador do processo (ASID). Se o programa usa mais páginas do que cabem na TLB, os misses disparam; páginas grandes aumentam o alcance dela (OSTEP, cap. 19).</li>
   </ul>
   <div class="cs-uso">
     <ul class="b">
       <li>Por que a tabela pode ficar enorme: endereço de 32 bits com páginas de 4 KB dá 32 − 12 = 20 bits de página, ou seja 2²⁰ ≈ 1 milhão de entradas. Com 4 bytes cada: 4 MB de tabela por processo, quase toda vazia.</li>
       <li>Em dois níveis, os 20 bits viram 10 + 10: os primeiros escolhem uma entrada num diretório de 1 024 posições, que aponta para uma tabela de segundo nível de 1 024 entradas.</li>
+      <li>Tabela de páginas invertida, a outra saída que o OSTEP mostra (cap. 20): uma tabela só para o sistema inteiro, com uma entrada por moldura, dizendo qual processo e qual página virtual estão ali. Com 256 MB de memória física e molduras de 4 KB, são 2²⁸ / 2¹² = 65 536 entradas para todos os processos juntos. O preço é procurar a entrada a cada tradução; para não varrer a tabela, monta-se uma tabela hash por cima (o PowerPC faz isso).</li>
     </ul>
   </div>
 </section>
@@ -537,10 +555,13 @@
     <li>A tabela de segmentos guarda base e limite de cada um: a MMU de <a href="#mmu">base e limite</a>, só que um par por segmento.</li>
     <li>Vantagem: proteção e compartilhamento fazem sentido por segmento (código só-leitura e compartilhado, dados privados).</li>
     <li>Desvantagem: segmentos de tamanho variável trazem de volta a fragmentação externa e o problema de escolher buraco (<a href="#fits">first/best/worst-fit</a>).</li>
-    <li>Segmentação com paginação: cada segmento é paginado. Fica a visão lógica dos segmentos sem a fragmentação externa.</li>
+    <li>Segmentação com paginação: cada segmento é paginado. Os dados não fragmentam mais, mas as tabelas de páginas, de tamanho variável, trazem a fragmentação externa de volta (OSTEP, cap. 20).</li>
   </ul>
   <div class="cs-formula">
     <div class="formula">segmentação: endereço = (segmento, deslocamento)     ·     com paginação: endereço = (segmento, página, deslocamento)</div>
+  </div>
+  <div class="cs-uso">
+    <ul class="b"><li>Exemplo do OSTEP (cap. 16): espaço de 16 KB, os 2 bits de cima escolhem o segmento. O endereço 4 200 cai no heap (segmento 01), deslocamento 4 200 − 4 096 = 104. Heap com base 34 KB = 34 816: físico = 34 816 + 104 = 34 920. Somar 4 200 direto à base daria 39 016, errado.</li></ul>
   </div>
   <div data-ref-mn="mn-segmentacao"></div>
 </section>
@@ -551,6 +572,7 @@
   <ul class="b">
     <li>No page fault da <a href="#page-fault">figura da tradução</a> havia uma moldura livre; aqui não há.</li>
     <li>Se o bit de modificação da vítima estiver ligado, ela é gravada no disco antes; se não, basta descartar (o disco já tem uma cópia igual). Trocar uma página suja custa duas operações de disco.</li>
+    <li>Na prática o SO não espera a memória encher (OSTEP, cap. 21): uma thread de fundo (swap daemon) acorda quando sobram menos molduras livres que um mínimo e despeja páginas até chegar a um máximo, gravando várias de uma vez.</li>
     <li>Alocação fixa: cada processo tem um número fixo de molduras. Alocação variável: o número muda conforme a necessidade.</li>
     <li>Substituição local: a vítima sai das molduras do próprio processo que deu page fault. Substituição global: pode sair de qualquer processo. A global aproveita melhor a memória; a local isola um processo guloso dos outros.</li>
     <li>Para comparar algoritmos, usa-se uma string de referências: a lista das páginas acessadas, em ordem. Conta-se quantos page faults cada algoritmo gera com um certo número de molduras.</li>
@@ -567,7 +589,9 @@
     <li>Algoritmo do relógio (segunda chance): aproximação barata do LRU. As molduras formam um círculo com um ponteiro. No page fault, olha o bit de referência da página apontada: se for 1, zera e dá uma segunda chance (avança); se for 0, essa é a vítima.</li>
     <li>NRU (not recently used): separa as páginas em quatro classes pelos bits de referência e de modificação (não usada e limpa, não usada e suja, usada e limpa, usada e suja) e tira uma da classe mais baixa.</li>
     <li>LFU (least frequently used): tira a menos acessada no total. Defeito: uma página muito usada no começo e nunca mais fica com contagem alta e não sai.</li>
-    <li>Aleatório: escolhe qualquer uma. Não gasta nada para decidir, e é a referência de "pior razoável".</li>
+    <li>Aleatório: escolhe qualquer uma. Não gasta nada para decidir e não tem caso patológico.</li>
+    <li>Quem ganha depende da carga (OSTEP, cap. 22). Sem localidade, todos empatam e só o tamanho da memória conta. Com 80% dos acessos em 20% das páginas, o LRU fica perto do ótimo. Num laço que percorre 50 páginas com 49 molduras, LRU e FIFO erram todo acesso, e o aleatório acerta uma parte.</li>
+    <li>LRU exato é inviável: com 4 GB em páginas de 4 KB, achar a menos usada seria olhar 1 milhão de entradas a cada page fault. Por isso o relógio.</li>
     <li>O livro ainda cita o FIFO com buffer de páginas: as vítimas vão para uma lista e, se forem acessadas de novo logo, voltam sem ir ao disco.</li>
   </ul>
   <div class="cs-uso">
@@ -604,7 +628,7 @@
   <p class="cs-def">O sistema em thrashing passa mais tempo trocando páginas com o disco do que executando. A CPU fica ociosa esperando o disco.</p>
   <ul class="b">
     <li>Começa num processo com menos molduras do que as páginas que usa o tempo todo: ele dá page fault, tira uma página que vai precisar já, dá outro page fault, e assim por diante. Com muitos processos assim, o sistema entra em thrashing.</li>
-    <li>Solução: reduzir a multiprogramação, suspendendo processos inteiros (<a href="#swapping">swapping</a>) até sobrar memória para os que ficam (critério: <a href="#working-set">working set</a>).</li>
+    <li>Solução: reduzir a multiprogramação, suspendendo processos inteiros (<a href="#swapping">swapping</a>) até sobrar memória para os que ficam (critério: <a href="#working-set">working set</a>). O OSTEP chama isso de admission control. O Linux às vezes faz algo mais drástico: o OOM killer mata um processo que gasta muita memória.</li>
   </ul>
   <div class="cs-pegadinhas">
     <ul class="b"><li>A armadilha: o SO vê a CPU ociosa e pensa "cabe mais um processo". Coloca mais um, que rouba molduras dos outros, e piora tudo.</li></ul>
@@ -641,7 +665,9 @@
     <li>Sem MMU: nada de tabela de páginas, TLB (<a href="/m8/comp/02-fundamentos-memoria">aula 02</a>), <a href="#page-fault">page fault</a> ou <a href="#swapping">swap</a>. O código pode ficar na flash, lido por XIP.</li>
     <li>O Cortex-M0+ do RP2040 tem uma MPU de 8 regiões: proíbe ler, escrever ou executar por região, sem traduzir endereço.</li>
     <li>Arduino Uno (ATmega328P): 2 KB de SRAM, com heap e pilha de execução crescendo um na direção do outro.</li>
-    <li>Sem <a href="#relocacao">relocação dinâmica</a> não há <a href="#particao-variavel">compactação</a>: mover um bloco quebraria os ponteiros para ele. A fragmentação externa do heap fica até reiniciar.</li>
+    <li>Nenhum <code>malloc</code> compacta o heap, nem no Linux: em C não dá para achar todos os ponteiros para um bloco (OSTEP, cap. 17). A <a href="#particao-variavel">compactação</a> é do SO, que move processos inteiros com <a href="#relocacao">relocação dinâmica</a>, e sem MMU nem isso. A fragmentação externa do heap fica até reiniciar.</li>
+    <li>Cada bloco do heap leva um cabeçalho com o tamanho, logo antes do endereço entregue; é por ele que <code>free</code> sabe quanto liberar. Um pedido de 100 bytes ocupa 108 com cabeçalho de 8 (OSTEP, cap. 17). Pools de blocos de tamanho fixo (listas segregadas) não fragmentam e não procuram buraco.</li>
+    <li>Erros de heap que compilam e rodam (OSTEP, cap. 14): escrever além do bloco, usar depois do <code>free</code>, <code>free</code> duas vezes, não testar o <code>NULL</code> que <code>malloc</code> devolve na falha. Vazamento num firmware que nunca termina só acaba no reinício, porque não há SO para devolver a memória quando o programa sai.</li>
     <li>Alocação estática: filas, buffers e pilhas das tarefas em variáveis globais ou <code>static</code>; se não cabe, o linker avisa na compilação. Heap (<code>malloc</code>, <code>pvPortMalloc</code>): flexível, pode falhar, fragmentar e variar de tempo.</li>
     <li>Heaps do FreeRTOS: heap_1 só aloca (não fragmenta, tempo previsível); heap_2 libera sem juntar vizinhos (fragmenta); heap_3 usa o <code>malloc</code> da biblioteca; heap_4 é <a href="#fits">first-fit</a> com coalescência; heap_5 é o heap_4 em várias regiões. Há versões estáticas dos objetos, como <code>xTaskCreateStatic</code>.</li>
     <li>Cada tarefa tem pilha própria de tamanho fixo. Sem MMU (e sem programar a MPU), um estouro escreve por cima da memória vizinha sem aviso; <code>configCHECK_FOR_STACK_OVERFLOW</code> ajuda a detectar, sem garantir.</li>
@@ -649,7 +675,7 @@
   <div class="cs-uso">
     <ul class="b">
       <li>Heap de 16 KB com quatro rotinas de 4 KB (A, B, C, D). Apagam A e C: 8 KB livres em dois buracos de 4 KB.</li>
-      <li>Chega uma rotina de 6 KB: não cabe em buraco nenhum, e sem MMU ninguém move B para juntar os buracos.</li>
+      <li>Chega uma rotina de 6 KB: não cabe em buraco nenhum, e ninguém move B para juntar os buracos.</li>
     </ul>
   </div>
   <div class="cs-pegadinhas">
@@ -662,7 +688,7 @@
 </section>
 
 <!-- ================= Arquivos ================= -->
-<section class="cs" id="sistema-arquivos" data-grupo="Arquivos" data-termos="sistema-arquivos,arquivo" data-leitura="arquivos">
+<section class="cs" id="sistema-arquivos" data-grupo="Arquivos" data-termos="sistema-arquivos,arquivo,descritor-arquivo" data-leitura="arquivos">
   <h2>Sistema de arquivos e arquivos</h2>
   <p class="cs-def">A memória principal perde o conteúdo quando a energia acaba (não na hora: veja o <a href="#cold-boot">cold boot</a>); o que precisa durar fica no disco, uma sequência enorme de blocos numerados. O sistema de arquivos é a parte do SO que transforma esses blocos em arquivos com nome, pastas e permissões.</p>
   <ul class="b">
@@ -670,6 +696,7 @@
     <li>Atributos que o SO guarda junto: tamanho, dono, proteção, datas de criação e de último acesso e modificação, localização no disco.</li>
     <li>Operações, todas por syscalls: criar, abrir, ler, gravar, posicionar, fechar, apagar, renomear.</li>
     <li>"Abrir" busca os atributos uma vez e guarda numa tabela de arquivos abertos, para as próximas leituras não precisarem procurar de novo.</li>
+    <li>No Unix, <code>open</code> devolve um descritor de arquivo: um inteiro, só do processo, que aponta para uma entrada dessa tabela, onde fica a posição atual (offset). Os descritores 0, 1 e 2 (entrada, saída e erro) já vêm abertos, então o primeiro <code>open</code> devolve 3. Depois de um <code>fork</code> (<a href="/m8/comp/04-processos-threads">aula 04</a>), pai e filho dividem a mesma entrada: se um anda o offset, o outro vê (OSTEP, cap. 39).</li>
   </ul>
 </section>
 
@@ -700,7 +727,7 @@
   <div data-ref-mn="mn-diretorio"></div>
 </section>
 
-<section class="cs" id="alocacao-arquivos" data-grupo="Arquivos" data-termos="bloco-disco,alocacao-encadeada,fat,alocacao-indexada" data-leitura="arquivos">
+<section class="cs" id="alocacao-arquivos" data-grupo="Arquivos" data-termos="bloco-disco,alocacao-encadeada,fat,alocacao-indexada,superbloco" data-leitura="arquivos">
   <h2>Alocação de espaço no disco: contígua, encadeada, FAT e indexada</h2>
   <p class="cs-def">O disco é dividido em blocos de tamanho fixo (4 KB, por exemplo). A alocação decide em quais blocos o arquivo vai e como o SO lembra disso.</p>
   <ul class="b">
@@ -709,6 +736,7 @@
     <li>Alocação encadeada: cada bloco guarda, no fim, o número do próximo bloco do arquivo. O diretório guarda o primeiro (e o último). Qualquer bloco livre serve: sem fragmentação externa, e o arquivo cresce à vontade.</li>
     <li>Defeitos da encadeada: só serve bem para acesso sequencial. Para ler o bloco 100, é preciso ler os 99 anteriores para seguir a corrente. Se um ponteiro se corromper, o resto do arquivo se perde. E parte de cada bloco vai para o ponteiro.</li>
     <li>FAT (file allocation table, do MS-DOS e dos pen drives): variante famosa da encadeada. Os ponteiros saem dos blocos e vão para uma tabela única, que fica na memória. Seguir a corrente passa a ser consultar a tabela, sem ler o disco.</li>
+    <li>Como o disco fica organizado (OSTEP, cap. 40): superbloco (tamanho, quantos i-nodes, onde começa cada parte; é o primeiro que o SO lê ao montar), vetor de bits dos i-nodes, vetor de bits dos blocos, tabela de i-nodes e, no resto, os blocos de dados. O número de i-nodes é o máximo de arquivos. O FFS e o ext2/3/4 repetem esse arranjo em grupos espalhados pelo disco e põem o i-node, os blocos do arquivo e o diretório no mesmo grupo, para o braço andar pouco (cap. 41).</li>
     <li>Alocação indexada: os ponteiros de todos os blocos do arquivo ficam juntos num bloco de índice. Acesso direto rápido (o índice diz onde está o bloco n) e sem fragmentação externa. Custo: o espaço do índice, mesmo para arquivos minúsculos. A versão do Unix é o <a href="#i-node">i-node</a>.</li>
   </ul>
   <div class="cs-uso">
@@ -718,7 +746,7 @@
   <div data-ref-loop="arquivos"></div>
 </section>
 
-<section class="cs" id="i-node" data-grupo="Arquivos" data-termos="i-node" data-leitura="arquivos">
+<section class="cs" id="i-node" data-grupo="Arquivos" data-termos="i-node,hard-link,link-simbolico" data-leitura="arquivos">
   <h2>I-node</h2>
   <aside class="mn" data-vis="i-node" aria-hidden="true"><svg viewBox="0 0 240 156"><text class="tm" x="44" y="8">i-node</text><rect class="k" x="8" y="12" width="72" height="122"/><line class="s" x1="8" y1="44" x2="80" y2="44"/><line class="s" x1="8" y1="74" x2="80" y2="74"/><line class="s" x1="8" y1="104" x2="80" y2="104"/><text class="tm" x="44" y="28">12 diretos</text><text class="tm" x="44" y="59">simples</text><text class="tm" x="44" y="89">duplo</text><text class="tm" x="44" y="119">triplo</text><path class="s" d="M80,28 H90" marker-end="url(#mnarrow)"/><rect class="gr" x="92" y="22" width="12" height="12"/><rect class="gr" x="108" y="22" width="12" height="12"/><rect class="gr" x="124" y="22" width="12" height="12"/><text class="tm" x="146" y="28">…</text><text class="tm" x="215" y="28">48 KB</text><path class="s" d="M80,59 H90" marker-end="url(#mnarrow)"/><rect class="bl" x="92" y="51" width="16" height="16"/><path class="s" d="M108,59 H118" marker-end="url(#mnarrow)"/><rect class="gr" x="120" y="53" width="12" height="12"/><text class="tm" x="215" y="59">4 MB</text><path class="s" d="M80,89 H90" marker-end="url(#mnarrow)"/><rect class="bl" x="92" y="81" width="16" height="16"/><path class="s" d="M108,89 H118" marker-end="url(#mnarrow)"/><rect class="bl" x="120" y="81" width="16" height="16"/><path class="s" d="M136,89 H146" marker-end="url(#mnarrow)"/><rect class="gr" x="148" y="83" width="12" height="12"/><text class="tm" x="215" y="89">4 GB</text><path class="s" d="M80,119 H90" marker-end="url(#mnarrow)"/><rect class="bl" x="92" y="111" width="16" height="16"/><path class="s" d="M108,119 H118" marker-end="url(#mnarrow)"/><rect class="bl" x="120" y="111" width="16" height="16"/><path class="s" d="M136,119 H146" marker-end="url(#mnarrow)"/><rect class="bl" x="148" y="111" width="16" height="16"/><path class="s" d="M164,119 H174" marker-end="url(#mnarrow)"/><rect class="gr" x="176" y="113" width="12" height="12"/><text class="tm" x="215" y="119">4 TB</text><text class="tm" x="120" y="148">1 024 ponteiros por bloco de 4 KB</text></svg>Azul é bloco de ponteiros, verde é bloco de dados: cada nível de indireção multiplica o alcance por 1 024.</aside>
   <p class="cs-def">No Unix e no Linux cada arquivo tem uma ficha, o i-node (index node), com todos os atributos e os ponteiros para os blocos. O diretório só associa o nome ao número do i-node.</p>
@@ -738,6 +766,13 @@
       <li>Indireto triplo: 1 024³ × 4 KB = 2⁴² bytes = 4 TB.</li>
       <li>Total ≈ 4 TB pelos ponteiros (outros campos do sistema de arquivos podem limitar antes). Arquivo pequeno com acesso rápido, arquivo enorme possível: é por isso que o desenho é assimétrico.</li>
     </ul>
+    <p>Como o nome mora no diretório e o arquivo mora no i-node, um arquivo pode ter mais de um nome (OSTEP, cap. 39):</p>
+    <ul class="b">
+      <li>Hard link: outra entrada de diretório com o mesmo número de i-node. O i-node conta quantos nomes apontam para ele, e o arquivo só some quando a contagem chega a 0. Por isso a syscall de apagar no Unix se chama <code>unlink</code>.</li>
+      <li>Hard link não vale para diretório (criaria ciclos na árvore) nem para outra partição (os números de i-node são de cada sistema de arquivos).</li>
+      <li>Quanto custa achar um arquivo (OSTEP, cap. 40): abrir <code>/foo/bar</code> lê o i-node da raiz, o bloco da raiz, o i-node de <code>foo</code>, o bloco de <code>foo</code> e o i-node de <code>bar</code>: 5 leituras. Cada <code>read</code> de um bloco lê o i-node, lê o bloco e grava o i-node (a data de acesso). Abrir e ler 3 blocos: 5 + 3 × 3 = 14 operações de disco. O buffer cache é o que evita repetir isso.</li>
+      <li>Link simbólico: um arquivo pequeno que guarda só um caminho. Pode apontar para diretório e para outra partição, mas fica quebrado se o alvo sumir. É o link que o ataque TOCTOU da <a href="/m8/comp/05-sincronizacao-deadlocks">aula 05</a> troca no meio do caminho.</li>
+    </ul>
   </div>
 </section>
 
@@ -754,17 +789,31 @@
   </div>
 </section>
 
-<section class="cs" id="protecao-arquivos" data-grupo="Arquivos" data-termos="acl,buffer-cache" data-leitura="arquivos">
-  <h2>Proteção de acesso (ACL) e buffer cache</h2>
-  <p class="cs-def">A proteção diz quem pode fazer o quê com cada arquivo. O buffer cache é a área da memória onde o SO guarda os blocos de disco usados recentemente.</p>
+<section class="cs" id="protecao-arquivos" data-grupo="Arquivos" data-termos="acl,buffer-cache,journaling" data-leitura="arquivos">
+  <h2>Proteção de acesso (ACL), buffer cache e queda de energia</h2>
+  <p class="cs-def">A proteção diz quem pode fazer o quê com cada arquivo. O buffer cache é a área da memória onde o SO guarda os blocos de disco usados recentemente. O journaling deixa o sistema de arquivos consistente mesmo se a energia cair no meio de uma gravação.</p>
   <ul class="b">
     <li>Proteção, do mais simples ao mais fino: senha por arquivo; grupos de usuários (no Unix, permissões de leitura, escrita e execução para dono, grupo e outros, o <code>rwxr-x---</code>); e a lista de controle de acesso (ACL), que diz para cada usuário ou grupo o que ele pode fazer com aquele arquivo.</li>
-    <li>Buffer cache: uma leitura repetida não vai ao disco.</li>
+    <li>Buffer cache: uma leitura repetida não vai ao disco. Nos SOs de hoje ela divide a memória com as páginas dos processos (page cache unificada), em vez de ter um tamanho fixo (OSTEP, cap. 40).</li>
     <li>Na escrita, o mesmo dilema da cache da <a href="/m8/comp/02-fundamentos-memoria">aula 02</a>: gravar logo no disco (seguro, lento) ou só depois (rápido, mas uma queda de energia perde o que estava só na memória). Por isso existe "remover o pen drive com segurança".</li>
+    <li>Atrasar 5 a 30 s deixa o SO juntar e ordenar as escritas, ou nem fazê-las (um arquivo criado e apagado logo). Quem não aceita perder chama <code>fsync</code>, que só volta depois de o dado estar no disco. Para trocar um arquivo inteiro sem risco: grave um temporário, faça <code>fsync</code> e use <code>rename</code>, que é atômico e troca o nome de uma vez (OSTEP, caps. 39 e 40).</li>
   </ul>
+  <div class="cs-uso">
+    <p>Queda de energia no meio de uma gravação (OSTEP, cap. 42). Acrescentar um bloco a um arquivo mexe em três estruturas no disco:</p>
+    <ul class="b">
+      <li>o vetor de bits (o bloco passa a ocupado), o i-node (ganha o ponteiro novo) e o próprio bloco de dados.</li>
+      <li>O disco grava uma de cada vez, e o estrago depende de qual chegou. Só o bloco de dados: nada inconsistente, o dado só se perde. I-node sem o vetor de bits, ou o contrário: inconsistente (bloco marcado como ocupado que ninguém usa, ou bloco usado que pode ser dado a outro). I-node sem o bloco de dados: o arquivo aponta para lixo.</li>
+      <li>Saída antiga, o fsck: ao religar, confere o disco inteiro e conserta os metadados. O tempo cresce com o tamanho do disco, e ele não percebe um i-node que aponta para lixo, porque os metadados batem.</li>
+      <li>Journaling (write-ahead logging, a ideia veio dos bancos de dados): antes de mexer nas estruturas, grava num diário (o journal) a transação: um bloco de começo (TxB), o que vai mudar e um bloco de fim (TxE). Ao religar, refaz só as transações com TxE e ignora o resto; o tempo cresce com o tamanho do diário.</li>
+      <li>A ordem importa: o TxE só é gravado depois que o resto da transação chegou ao disco. O TxE cabe em 512 bytes, e o disco garante que 512 bytes são gravados inteiros ou nada. Depois, o checkpoint copia as mudanças para o lugar definitivo, e o espaço do diário é reaproveitado em círculo.</li>
+      <li>Journaling de metadados (ordered): o dado vai direto para o lugar definitivo antes, e só os metadados passam pelo diário. Regra: grave o que é apontado antes de quem aponta. É o mais usado (NTFS, XFS, o modo ordered do ext3); guardar também os dados no diário (data journaling) grava tudo duas vezes.</li>
+      <li>Armadilha: o disco tem cache de escrita e pode avisar "gravado" antes de gravar, desfazendo a ordem. Por isso o SO usa barreiras de escrita, que esperam o disco esvaziar a cache.</li>
+      <li>Terceira saída, citada no mesmo capítulo: nunca sobrescrever no lugar (copy-on-write, como no ZFS) e, no fim, trocar de uma vez a raiz para a versão nova. É a do <a href="#flash-desgaste">LittleFS</a>.</li>
+    </ul>
+  </div>
 </section>
 
-<section class="cs" id="flash-desgaste" data-grupo="Arquivos" data-termos="desgaste-flash,wear-leveling,littlefs" data-leitura="flash">
+<section class="cs" id="flash-desgaste" data-grupo="Arquivos" data-termos="desgaste-flash,wear-leveling,littlefs,ftl,write-amplification,trim" data-leitura="flash">
   <h2>Flash, EEPROM, desgaste e wear leveling</h2>
   <p class="cs-def">Sem disco, o que sobrevive ao desligar vai para a flash ou a EEPROM, e cada ciclo de apagar e gravar gasta a posição usada (desgaste). Wear leveling espalha as gravações para nenhuma posição gastar antes das outras.</p>
   <ul class="b">
@@ -775,6 +824,11 @@
     <li>EEPROM do ATmega328P (1 KB): grava byte a byte, sem setor, 3,3 ms por gravação.</li>
     <li>Na flash, acrescente registros num setor e só apague quando ele encher; dois setores revezando protegem o último registro bom.</li>
     <li>LittleFS: sistema de arquivos para microcontrolador que nunca sobrescreve no lugar (copy-on-write), espalha o desgaste e volta ao último estado bom se a energia cair. Aplica a <a href="#alocacao-arquivos">alocação</a> e o <a href="#espaco-livre">espaço livre</a> com a regra do desgaste.</li>
+    <li>Tempos e ciclos por tipo de célula (OSTEP, cap. 44): SLC (1 bit por célula) lê em 25 µs, programa em 200 a 300 µs, apaga em 1,5 a 2 ms e aguenta 100 000 ciclos; MLC (2 bits) lê em 50 µs, programa em 600 a 900 µs, apaga em cerca de 3 ms e aguenta 10 000 ciclos. Apagar é a operação lenta, como na W25Q16JV.</li>
+    <li>Ler ou programar uma página pode inverter bits das vizinhas (read disturb, program disturb); por isso as páginas de um bloco são programadas em ordem.</li>
+    <li>Em SSD, pen drive e cartão SD, o wear leveling fica dentro do aparelho, no FTL (flash translation layer, OSTEP cap. 44): um firmware que traduz o bloco lógico que o SO pede para uma página física, grava sempre numa página já apagada e, de tempos em tempos, faz a coleta de lixo (copia as páginas ainda válidas de um bloco e apaga o bloco). O SO não sabe onde o dado mora de fato.</li>
+    <li>Write amplification: bytes que o FTL grava de fato ÷ bytes que o SO pediu. A coleta de lixo e o wear leveling aumentam esse número. Com o comando trim, o SO avisa que um bloco não serve mais, e a coleta de lixo deixa de copiá-lo; sem trim, o dado velho segue no chip até ser coletado.</li>
+    <li>O FTL é herdeiro do sistema de arquivos log-structured (LFS, cap. 43): tudo é gravado em sequência, nada é sobrescrito, e um limpador junta os blocos ainda vivos para liberar segmentos inteiros. O LFS guarda o ponto de partida em duas cópias alternadas, com data no começo e no fim, a mesma ideia dos dois setores revezando abaixo.</li>
   </ul>
   <div class="cs-formula">
     <div class="formula">vida útil = ciclos garantidos ÷ gravações por dia na mesma posição</div>
@@ -798,13 +852,14 @@
 </section>
 
 <!-- ================= E/S e discos ================= -->
-<section class="cs" id="camadas-es" data-grupo="E/S e discos" data-termos="subsistema-es,driver,controlador" data-leitura="es">
+<section class="cs" id="camadas-es" data-grupo="E/S e discos" data-termos="subsistema-es,driver,controlador,e-s-mapeada" data-leitura="es">
   <h2>As camadas de E/S: subsistema, driver e controlador</h2>
   <p class="cs-def">O SO esconde a variedade dos dispositivos atrás de camadas (processo → subsistema de E/S → driver → controlador → dispositivo), para o programa só chamar <code>read</code> e <code>write</code>.</p>
   <ul class="b">
     <li>Cada dispositivo é de um jeito: teclado manda um caractere de vez em quando, disco manda blocos de 4 KB, sensor manda uma leitura por período.</li>
     <li>Subsistema de E/S: a parte do kernel independente de dispositivo. Dá nomes uniformes, controla quem pode usar o quê, mantém buffers e cache, trata erros comuns.</li>
-    <li>Driver (device driver): o código que sabe falar com um modelo específico de dispositivo. Traduz "ler bloco 512" nos comandos e registradores daquele controlador. Roda no kernel, por isso um driver com defeito derruba o sistema todo.</li>
+    <li>Driver (device driver): o código que sabe falar com um modelo específico de dispositivo. Traduz "ler bloco 512" nos comandos e registradores daquele controlador. Roda no kernel, por isso um driver com defeito derruba o sistema todo. No Linux, mais de 70% do código é de drivers, e eles são a maior fonte de falhas (OSTEP, cap. 36).</li>
+    <li>Dois jeitos de falar com os registradores do controlador: instruções de E/S próprias (<code>in</code> e <code>out</code> no x86, privilegiadas, só do kernel) ou E/S mapeada em memória, em que os registradores têm endereço e a CPU usa load e store comuns.</li>
     <li>Controlador: o hardware que fica entre o barramento e o dispositivo (a placa controladora de disco, o chip do Bluetooth). Tem registradores de comando, de status e de dados, e às vezes um buffer próprio.</li>
     <li>Dispositivo: o aparelho em si (o disco, o teclado, o sensor).</li>
   </ul>
@@ -828,6 +883,7 @@
     <li>E/S dirigida por interrupção: a CPU manda o comando e vai rodar outro processo. Quando o dispositivo termina, o controlador gera uma interrupção (<a href="/m8/comp/04-processos-threads">aula 04</a>) e o SO trata. A CPU só trabalha no começo e no fim. Mas se o dispositivo transfere muitos dados, cada palavra ainda gera uma interrupção e passa pela CPU.</li>
     <li>DMA (direct memory access, acesso direto à memória): um controlador de DMA copia o bloco inteiro entre o dispositivo e a memória sozinho, sem a CPU. A CPU só diz "copie 4 KB do dispositivo para o endereço X" e recebe uma única interrupção no fim.</li>
     <li>Enquanto o DMA copia, CPU e DMA disputam o barramento de memória de vez em quando (o DMA "rouba ciclos"), mas a CPU segue trabalhando.</li>
+    <li>Interrupção demais vira problema (OSTEP, cap. 36): numa enxurrada de pacotes, o SO pode passar o tempo todo tratando interrupções e não fazer mais nada (livelock). Saídas: trocar para polling enquanto a carga está alta, começar com polling e passar para interrupção se demorar, ou juntar várias interrupções numa só (coalescing), trocando um pouco de latência por menos custo.</li>
   </ul>
   <div class="cs-uso">
     <ul class="b">
@@ -887,7 +943,7 @@
   <p class="cs-def">Um ou mais pratos giram juntos, a 5 400, 7 200 ou 15 000 rotações por minuto (rpm). Cada face tem círculos concêntricos, as trilhas, cortadas em setores (512 bytes ou 4 KB), a menor unidade que o disco lê ou grava.</p>
   <ul class="b">
     <li>O disco magnético é o dispositivo em que a ordem dos pedidos mais pesa no desempenho, porque uma parte do custo é mecânica: mexer um braço.</li>
-    <li>Um braço leva uma cabeça de leitura por face. As cabeças se movem juntas, então as trilhas na mesma posição de todos os pratos formam um cilindro. Os pedidos ao disco são identificados pelo cilindro.</li>
+    <li>Um braço leva uma cabeça de leitura por face. As cabeças se movem juntas, então as trilhas na mesma posição de todos os pratos formam um cilindro. No modelo dos livros, os pedidos são identificados pelo cilindro. Discos de hoje só mostram ao SO números de bloco e escondem a geometria (OSTEP, cap. 37).</li>
   </ul>
   <div data-ref-mn="mn-disco"></div>
 </section>
@@ -908,12 +964,13 @@
     <ul class="b">
       <li>Disco de 7 200 rpm. Uma volta: 60 s / 7 200 = 0,00833 s = 8,33 ms. Latência média = meia volta = 4,17 ms.</li>
       <li>Seek médio de 5 ms e transferência de 4 KB a 200 MB/s (4 / 200 000 s = 0,02 ms): o acesso leva 5 + 4,17 + 0,02 ≈ 9,2 ms. Isso é 92 mil vezes um acesso à memória de 100 ns.</li>
-      <li>Seek e latência são quase tudo; reduzir o seek é o que o <a href="#escalonamento-disco">escalonamento de disco</a> consegue fazer.</li>
+      <li>Seek e latência são quase tudo; o <a href="#escalonamento-disco">escalonamento de disco</a> ataca os dois.</li>
+      <li>Aleatório contra sequencial (OSTEP, cap. 37), em pedidos de 4 KB. Cheetah 15K.5 (15 000 rpm, seek de 4 ms): cerca de 6 ms por pedido, 0,66 MB/s. Barracuda (7 200 rpm, seek de 9 ms): 13,2 ms, 0,31 MB/s. Lendo 100 MB seguidos, os dois chegam perto do pico, 125 e 105 MB/s: cerca de 190 e 340 vezes mais. Por isso o sistema de arquivos tenta pôr junto o que é lido junto.</li>
     </ul>
   </div>
 </section>
 
-<section class="cs" id="escalonamento-disco" data-grupo="E/S e discos" data-termos="escalonamento-disco,sstf,scan,c-scan" data-leitura="discos">
+<section class="cs" id="escalonamento-disco" data-grupo="E/S e discos" data-termos="escalonamento-disco,sstf,scan,c-scan,sptf" data-leitura="discos">
   <h2>Escalonamento de disco: FCFS, SSTF, SCAN e C-SCAN</h2>
   <p class="cs-def">Vários processos pedem cilindros diferentes ao mesmo tempo. O escalonamento de disco escolhe a ordem de atendimento para reduzir a distância total que o braço percorre.</p>
   <ul class="b">
@@ -922,6 +979,7 @@
     <li>SCAN (algoritmo do elevador): o braço vai até a ponta numa direção atendendo tudo no caminho, depois inverte. Sem starvation, mas os cilindros do meio são visitados duas vezes por ida e volta, e os das pontas, uma: quem está na ponta espera mais.</li>
     <li>C-SCAN (SCAN circular): atende só subindo; ao chegar na ponta, volta direto para o cilindro 0 sem atender ninguém e recomeça. A espera fica mais uniforme entre os cilindros.</li>
     <li>Variações comuns: LOOK e C-LOOK, que fazem o mesmo que SCAN e C-SCAN mas só vão até o último pedido de cada lado, sem ir até a ponta do disco.</li>
+    <li>SPTF (shortest positioning time first, OSTEP cap. 37): atende o pedido com menor seek + rotação. Num disco de hoje as duas parcelas pesam parecido, e às vezes vale ir mais longe para pegar um setor que já vai passar. Como o SO não conhece a geometria, ele ordena por número de bloco e manda vários pedidos de uma vez; o escalonamento fino acontece dentro do disco. O SO ainda junta pedidos vizinhos num só (merging).</li>
     <li>Em SSD (disco de estado sólido, memória flash sem partes móveis) não há seek nem latência rotacional. Os algoritmos que reordenam por cilindro perdem o sentido, e o SO usa algo próximo de FCFS.</li>
   </ul>
   <div class="cs-uso">
@@ -958,6 +1016,7 @@
   <div data-ref-tbl="tbl-reais"></div>
   <ul class="b">
     <li>Linux: EEVDF para tarefas comuns desde o kernel 6.6; SCHED_FIFO e SCHED_RR com prioridade fixa de 1 a 99 para tempo real.</li>
+    <li>Antes do EEVDF, o CFS (OSTEP, cap. 9): roda o processo com o menor tempo de CPU já usado (vruntime), pesado pelo nice, que vai de −20 a +19. A fatia é 48 ms divididos pelo número de prontos, nunca abaixo de 6 ms: com 4 prontos, 12 ms. Quem dormiu muito volta com o vruntime do menor da fila, senão monopolizaria a CPU.</li>
     <li>Menos SO, menos coisa escondida no pior caso (sem page fault, sem troca de contexto), e garantir o pior caso vira trabalho seu.</li>
   </ul>
 </section>
@@ -999,13 +1058,16 @@
 </section>
 
 <!-- ================= Treino ================= -->
-<section class="cs" id="treino" data-grupo="Treino para o encontro" data-termos="" data-leitura="encontro,exercicios,projeto">
-  <h2>Treino para o encontro</h2>
-  <p class="cs-def">Quiz, exercícios e decisão de projeto autorais, no formato dos encontros, com os mesmos números do modo Leitura.</p>
+<section class="cs" id="treino" data-grupo="Treino (autoral)" data-termos="" data-leitura="encontro,exercicios,projeto">
+  <h2>Treino</h2>
+  <p class="cs-def">Exercícios e decisão de projeto autorais, com valores de exemplo; não são questões do professor. Os exercícios 4 a 6 adaptam perguntas de homework do OSTEP para resolver à mão.</p>
   <div class="cs-uso">
     <details class="treino"><summary><span class="q">Exercício 1</span> Som (1, 5), botão (1, 10), piscar (2, 20), cuidador (20, 100), em ms, no FreeRTOS</summary><p>U = 0,2 + 0,1 + 0,1 + 0,2 = 0,6 ≤ 0,757 (n = 4): garantido. Prioridades no FreeRTOS: som 4, botão 3, piscar 2, cuidador 1. Apagar um setor com interrupções desligadas (até 400 ms) derruba até 80 prazos do som: apague só entre rotinas e junte o log na SRAM. Leitura: o pior caso vem do bloqueio, não da utilização.</p></details>
     <details class="treino"><summary><span class="q">Exercício 2</span> Progresso de 4 bytes a cada aperto, 40 por dia: EEPROM ou flash?</summary><p>Mesmo endereço: 2 500 dias ≈ 6,8 anos. Anel de 256: 640 000 dias. Flash com registros de 16 B: 1 apagamento a cada 6,4 dias, 640 000 dias. Salvar o tempo a cada segundo no mesmo byte (≈ 4 840 por dia): ≈ 21 dias. Leitura: conta quantas vezes você grava no mesmo lugar.</p></details>
     <details class="treino"><summary><span class="q">Exercício 3</span> Botão e som no RP2040 a 125 MHz</summary><p>Polling: 0,008%, pior caso 20 ms com confirmação. Interrupção: 120 ns até o tratador; bounce de 10 bordas sem filtro: 2 150 ciclos = 17,2 µs. Som: 0,64% por amostra contra 0,0025% com DMA. Escolha: interrupção com debounce e som por DMA. Leitura: decide a energia e o pior caso com a flash ocupada.</p></details>
+    <details class="treino"><summary><span class="q">Exercício 4</span> A partir do homework do OSTEP, cap. 7: três processos de 1, 2 e 3 unidades chegam em t = 0. Compare SJF e round-robin com q = 1 (sem custo de troca) em turnaround e resposta.</summary><p>SJF: 0–1, 1–3, 3–6. Turnaround médio = (1 + 3 + 6) / 3 ≈ 3,33; resposta média = (0 + 1 + 3) / 3 ≈ 1,33. Round-robin: A B C B C C, término em 1, 4 e 6. Turnaround médio = 11 / 3 ≈ 3,67; resposta média = (0 + 1 + 2) / 3 = 1. Leitura: o round-robin troca turnaround por resposta.</p></details>
+    <details class="treino"><summary><span class="q">Exercício 5</span> A partir do homework do OSTEP, cap. 18: espaço de 16 KB, páginas de 1 KB, memória física de 32 KB. Tabela: página 3 inválida, página 10 na moldura 19, página 15 na moldura 0. Traduza 0x2A3F, 0x0C80 e 0x3FFF.</summary><p>16 páginas: 4 bits de página e 10 de deslocamento; 32 molduras: 5 bits de moldura. 0x2A3F = 10 815 = página 10, deslocamento 575: 19 × 1 024 + 575 = 20 031 = 0x4E3F. 0x0C80 = 3 200 = página 3, inválida: exceção. 0x3FFF = página 15, deslocamento 1 023: 0 × 1 024 + 1 023 = 0x3FF. Leitura: em hexadecimal, com páginas de 1 KB, os 10 bits de baixo passam direto.</p></details>
+    <details class="treino"><summary><span class="q">Exercício 6</span> A partir do homework do OSTEP, cap. 44: FTL log-structured com 3 blocos de 4 páginas, todos apagados; apagar 1 000 µs, programar 40 µs, ler 10 µs. O SO grava os blocos lógicos 10, 11, 12, 13 e depois regrava 10 e 11. Em seguida o FTL limpa o bloco 0. Quanto tempo e qual a write amplification?</summary><p>10 a 13 vão para o bloco 0 (apagado antes: 1 apagamento, 4 programs). 10 e 11 regravados vão para o bloco 1 (1 apagamento, 2 programs); no bloco 0, as páginas de 10 e 11 viram lixo. A limpeza lê 12 e 13 (2 reads), grava no bloco 1 (2 programs) e apaga o bloco 0. Total: 3 × 1 000 + 8 × 40 + 2 × 10 = 3 340 µs. Write amplification = 8 páginas gravadas ÷ 6 pedidas ≈ 1,33. Com um trim do 12 antes da limpeza, só o 13 é copiado: 3 290 µs e 7/6 ≈ 1,17. Leitura: apagar domina o tempo, e o trim tira trabalho da limpeza.</p></details>
     <details class="treino"><summary><span class="q">Projeto</span> Vocês são o SO do módulo: decisão em quatro partes</summary><p>Exemplo: FreeRTOS no RP2040, botão por interrupção com debounce, rotinas na flash com LittleFS e nenhuma gravação durante a rotina. Abre mão da simplicidade do laço único (a equipe sente). Número: apagar um setor leva até 400 ms, 80 prazos do som. Mudaria se cada paciente usasse uma ou duas rotinas fixas: Uno com EEPROM e laço único.</p></details>
   </div>
 </section>

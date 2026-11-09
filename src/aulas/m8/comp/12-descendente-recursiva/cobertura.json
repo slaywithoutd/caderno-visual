@@ -1,0 +1,2232 @@
+{
+  "aula": "m8/comp/12-descendente-recursiva",
+  "data": "2026-11-09",
+  "criterio": "Conferência das transcrições completas dos dois vídeos do Lucrédio (lidas diretamente), dos três primeiros vídeos das playlists e de seis vídeos das playlists sobre o tema (inventário bloco a bloco por leitura integral, com conferência por amostragem), e dos capítulos 5, 6 e 8 de Crafting Interpreters lidos inteiros, contra as seções do modo Consulta. Os capítulos do Barbosa e do Louden não foram acessados; não há equivalência declarada a eles.",
+  "fontes": [
+    {
+      "id": "lucredio-aula08",
+      "url": "https://www.youtube.com/watch?v=tfIQzjUMKXA",
+      "escopo": "D. Lucrédio, Construção de Compiladores, Aula 08: Análise Sintática Conclusão, parte 1, 68:56; unidades = blocos de 2 minutos da transcrição (1 = 0:00–2:00)",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube (youtube-transcript-api), lida inteira. Trechos com reconhecimento ruim foram interpretados pelo contexto, sem inventar conteúdo; a tela do vídeo não foi vista.",
+      "totalUnidades": 35,
+      "unidades": [
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "Recapitulação da análise ascendente (LALR): poder, eficiência, conflitos; introdução ao ALL(*)",
+          "antes": "ja-coberto",
+          "justificativa": "Ascendente é da aula 11; aqui só o contraste na seção do ANTLR.",
+          "consulta": [
+            "antlr"
+          ],
+          "evidencias": [
+            "ascendente"
+          ]
+        },
+        {
+          "paginas": [
+            2
+          ],
+          "assunto": "Vantagens do ALL(*) do ANTLR; recursão à esquerda indireta não resolvida; descendente recursivo: uma função por não-terminal",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "antlr",
+            "uma-funcao"
+          ],
+          "evidencias": [
+            "recursao a esquerda indireta",
+            "uma funcao por regra"
+          ]
+        },
+        {
+          "paginas": [
+            3,
+            4
+          ],
+          "assunto": "Métodos match e lookahead(k); regra sem alternativa vira sequência; alternativas viram if pelo próximo token",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "match",
+            "decisao"
+          ],
+          "evidencias": [
+            "lookahead(k)",
+            "alternativa"
+          ]
+        },
+        {
+          "paginas": [
+            5
+          ],
+          "assunto": "Sequência de chamadas corresponde às derivações e à árvore; início da implementação em Java para a Alguma",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "pilha"
+          ],
+          "evidencias": [
+            "corresponde as derivacoes"
+          ]
+        },
+        {
+          "paginas": [
+            6,
+            7,
+            8
+          ],
+          "assunto": "Projeto, dependência do léxico, gramática da Alguma com precedência e associatividade; ambiguidade do senão",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "uma-funcao",
+            "precedencia",
+            "decisao"
+          ],
+          "evidencias": [
+            "declaracoes",
+            "de proposito",
+            "senao pendurado"
+          ]
+        },
+        {
+          "paginas": [
+            9,
+            10,
+            11,
+            12
+          ],
+          "assunto": "Buffer de 10 tokens, lerToken, lookahead(k) com proteção, match e erroSintatico com lista de esperados",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "match",
+            "erros"
+          ],
+          "evidencias": [
+            "buffer",
+            "errosintatico"
+          ]
+        },
+        {
+          "paginas": [
+            13,
+            14
+          ],
+          "assunto": "Regra programa traduzida; listaDeclaracoes decidida com lookahead(4) em vez de fatorar",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "uma-funcao",
+            "decisao"
+          ],
+          "evidencias": [
+            "seis linhas",
+            "lookahead(4)"
+          ]
+        },
+        {
+          "paginas": [
+            15,
+            16
+          ],
+          "assunto": "Mensagem de erro esperado; declaração; regra tipo com mensagem INT ou REAL; testar duas vezes é padrão",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "decisao",
+            "match"
+          ],
+          "evidencias": [
+            "esperava int ou real",
+            "de proposito"
+          ]
+        },
+        {
+          "paginas": [
+            17,
+            18
+          ],
+          "assunto": "Recursão à esquerda em expressaoAritmetica: FIRST iguais e laço infinito mesmo decidindo certo",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "repeticao"
+          ],
+          "evidencias": [
+            "mesma resposta"
+          ]
+        },
+        {
+          "paginas": [
+            19,
+            20,
+            21,
+            22
+          ],
+          "assunto": "Fatoração e eliminação da recursão: expressaoAritmetica2, sub-regra e alternativa vazia (else sem erro)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "repeticao",
+            "decisao"
+          ],
+          "evidencias": [
+            "expressaoaritmetica2",
+            "nao fazer nada"
+          ]
+        },
+        {
+          "paginas": [
+            23,
+            24
+          ],
+          "assunto": "Termo e fator pelo mesmo padrão; expressão relacional sem fatorar",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "precedencia",
+            "decisao"
+          ],
+          "evidencias": [
+            "fator"
+          ]
+        },
+        {
+          "paginas": [
+            25,
+            26
+          ],
+          "assunto": "Conflito dos parênteses entre expressão relacional e aritmética (FIRST em comum); linguagem simplificada",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "decisao"
+          ],
+          "evidencias": [
+            "tira os parenteses"
+          ]
+        },
+        {
+          "paginas": [
+            27,
+            28,
+            29
+          ],
+          "assunto": "Operadores relacional e booleano; lista de comandos fatorada, vazio decidido pelo que começa um comando",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "decisao"
+          ],
+          "evidencias": [
+            "follow"
+          ]
+        },
+        {
+          "paginas": [
+            30,
+            31
+          ],
+          "assunto": "Correções, main, primeiro teste: erro numa declaração correta causado pelo léxico",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "erros"
+          ],
+          "evidencias": [
+            "palavra-chave escrita errada"
+          ]
+        },
+        {
+          "paginas": [
+            32,
+            33
+          ],
+          "assunto": "Teste com erro (esperando ENTAO); lixo no fim do programa não é detectado",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "erros"
+          ],
+          "evidencias": [
+            "esperando entao",
+            "variavel solta"
+          ]
+        },
+        {
+          "paginas": [
+            34,
+            35
+          ],
+          "assunto": "match(FIM) obrigatório; processo automatizável; FIRST e FOLLOW aparecem no código; geradores",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "erros",
+            "uma-funcao",
+            "decisao"
+          ],
+          "evidencias": [
+            "match(fim)",
+            "quase automatico"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lucredio-aula09",
+      "url": "https://www.youtube.com/watch?v=WD2DWsvIO10",
+      "escopo": "D. Lucrédio, Construção de Compiladores, Aula 09: Análise Sintática Conclusão, parte 2, 39:55; unidades = blocos de 2 minutos da transcrição",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube (youtube-transcript-api), lida inteira. Trechos com reconhecimento ruim foram interpretados pelo contexto, sem inventar conteúdo; a tela do vídeo não foi vista.",
+      "totalUnidades": 20,
+      "unidades": [
+        {
+          "paginas": [
+            1,
+            2,
+            3
+          ],
+          "assunto": "Projeto Maven com plugin do ANTLR 4, diretórios, gramática com regras léxicas, sem transformar a gramática",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "antlr"
+          ],
+          "evidencias": [
+            "maven",
+            "nao transforma nada"
+          ]
+        },
+        {
+          "paginas": [
+            4
+          ],
+          "assunto": "ALL(*) resolve o conflito dos parênteses por predição adaptativa; geração e erro na gramática",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "antlr"
+          ],
+          "evidencias": [
+            "predicao adaptativa"
+          ]
+        },
+        {
+          "paginas": [
+            5,
+            6
+          ],
+          "assunto": "Código gerado parecido com o manual: match, chamadas, switch sobre adaptivePredict; depuração",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "antlr"
+          ],
+          "evidencias": [
+            "adaptivepredict"
+          ]
+        },
+        {
+          "paginas": [
+            7,
+            8
+          ],
+          "assunto": "main com CharStreams, léxico gerado, CommonTokenStream e parser.programa(); execução",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "antlr"
+          ],
+          "evidencias": [
+            "commontokenstream"
+          ]
+        },
+        {
+          "paginas": [
+            9,
+            10,
+            11
+          ],
+          "assunto": "no viable alternative: depuração imprimindo tokens; regra de VARIAVEL antes dos operadores E e OU",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "erros"
+          ],
+          "evidencias": [
+            "no viable alternative"
+          ]
+        },
+        {
+          "paginas": [
+            12
+          ],
+          "assunto": "EOF obrigatório no fim da regra programa",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "antlr"
+          ],
+          "evidencias": [
+            "eof"
+          ]
+        },
+        {
+          "paginas": [
+            13
+          ],
+          "assunto": "comando+ gera laço no lugar da recursão",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "repeticao",
+            "antlr"
+          ],
+          "evidencias": [
+            "comando+"
+          ]
+        },
+        {
+          "paginas": [
+            14,
+            15,
+            16
+          ],
+          "assunto": "Ações semânticas entre chaves, $VARIAVEL.text, posição da ação, erro de digitação Java no gerado",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "antlr"
+          ],
+          "evidencias": [
+            "$variavel.text",
+            "a posicao importa"
+          ]
+        },
+        {
+          "paginas": [
+            17,
+            18,
+            19
+          ],
+          "assunto": "returns, comunicação entre regras, contagem de comandos, rótulos cmd1 e cmd2",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "antlr"
+          ],
+          "evidencias": [
+            "returns [string tipo]",
+            "cmd1=comando"
+          ]
+        },
+        {
+          "paginas": [
+            20
+          ],
+          "assunto": "Por que entender a implementação manual: depurar; em ferramentas LR a associação regra-código é invertida",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "antlr"
+          ],
+          "evidencias": [
+            "para depurar"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "isidro-aula0",
+      "url": "https://www.youtube.com/watch?v=gxlxHYv-9oo&list=PLjcmNukBom6--0we1zrpoUE2GuRD-Me6W",
+      "escopo": "Professor Isidro, Compiladores - Curso Completo - Aula 0 (primeiro vídeo da playlist indicada), cerca de 76 min; unidades = blocos de 2 minutos",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube (youtube-transcript-api). Inventário bloco a bloco feito por leitura integral da transcrição (subagente), com conferência por amostragem de trechos literais. A tela do vídeo não foi vista.",
+      "totalUnidades": 39,
+      "unidades": [
+        {
+          "paginas": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "assunto": "Apresentação, objetivo do curso, roteiro, bibliografia e logística",
+          "antes": "fora do escopo",
+          "justificativa": "Logística do curso de outra instituição; nada para a aula.",
+          "consulta": [
+            "uma-funcao"
+          ],
+          "evidencias": [
+            "playlists"
+          ]
+        },
+        {
+          "paginas": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33
+          ],
+          "assunto": "O que é compilador e transpilador, análise e síntese, AST, história, fases, tabela de símbolos, erros por fase, exemplo x := x + y * 2, interpretadores",
+          "antes": "ja-coberto",
+          "justificativa": "Conteúdo da aula 07 (fases, erros, tabela de símbolos); aqui só o link na caixa Base.",
+          "consulta": [
+            "uma-funcao"
+          ],
+          "evidencias": [
+            "fases do compilador"
+          ]
+        },
+        {
+          "paginas": [
+            34,
+            35,
+            36,
+            37,
+            38,
+            39
+          ],
+          "assunto": "Perguntas sobre tipagem e JIT, anúncio da próxima aula, logística, encerramento",
+          "antes": "fora do escopo",
+          "justificativa": "Sem conteúdo de análise sintática.",
+          "consulta": [
+            "uma-funcao"
+          ],
+          "evidencias": [
+            "playlists"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "judson-apresentacao",
+      "url": "https://www.youtube.com/watch?v=jgI711CrnnY&list=PLX6Nyaq0ebfhI396WlWN6WlBm-tp7vDtV",
+      "escopo": "Judson Santiago, Apresentação do Curso | Compiladores (primeiro vídeo da playlist indicada), cerca de 68 min; unidades = blocos de 2 minutos",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube (youtube-transcript-api). Inventário bloco a bloco feito por leitura integral da transcrição (subagente), com conferência por amostragem de trechos literais. A tela do vídeo não foi vista.",
+      "totalUnidades": 35,
+      "unidades": [
+        {
+          "paginas": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35
+          ],
+          "assunto": "Objetivos, cronograma (cita First Follow, descendente e ascendente só como itens), avaliação, ferramentas, bibliografia, pré-requisitos e contatos",
+          "antes": "fora do escopo",
+          "justificativa": "Vídeo de logística; nenhum bloco explica análise sintática.",
+          "consulta": [
+            "uma-funcao"
+          ],
+          "evidencias": [
+            "playlists"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aulascomp-1",
+      "url": "https://www.youtube.com/watch?v=8rB8Dvczc1g&list=PL0Z-gyL9saMcajYH26KWKQG0nH2C2fsMQ",
+      "escopo": "Aulas de Computação, Compiladores 1 - Introdução aos Compiladores e fases do compilador (primeiro vídeo da playlist indicada), 42 min; unidades = blocos de 2 minutos",
+      "acesso": "integral",
+      "metodo": "A trilha manual pt-BR do vídeo está vazia; lida inteira a trilha automática en-US (provável tradução da fala). Inventário por subagente com conferência por amostragem.",
+      "totalUnidades": 22,
+      "unidades": [
+        {
+          "paginas": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "assunto": "Bibliografia (Aho, Louden), processador de linguagem, pré-processador, montador, ligador, interpretação, as seis fases, tokens",
+          "antes": "ja-coberto",
+          "justificativa": "Conteúdo da aula 07; link na caixa Base.",
+          "consulta": [
+            "uma-funcao"
+          ],
+          "evidencias": [
+            "fases do compilador"
+          ]
+        },
+        {
+          "paginas": [
+            15,
+            16,
+            17
+          ],
+          "assunto": "Árvore de position = initial + rate * 60 com gramática E → E + T | T, T → T * F | F; precedência na gramática",
+          "antes": "ja-coberto",
+          "justificativa": "Precedência na gramática é da aula 08.",
+          "consulta": [
+            "precedencia"
+          ],
+          "evidencias": [
+            "aula 08"
+          ]
+        },
+        {
+          "paginas": [
+            18,
+            19,
+            20,
+            21,
+            22
+          ],
+          "assunto": "Semântica, coerção, código de três endereços, otimização, assembly; ferramentas Lex, JFlex, Yacc, CUP",
+          "antes": "ja-coberto",
+          "justificativa": "Conteúdo da aula 07.",
+          "consulta": [
+            "uma-funcao"
+          ],
+          "evidencias": [
+            "fases do compilador"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aulascomp-6",
+      "url": "https://www.youtube.com/watch?v=P2IhETKYM7U",
+      "escopo": "Aulas de Computação, Compiladores 6 - Algoritmo de análise sintática Descendente Recursivo (complemento da playlist), 16:48; unidades = blocos de 2 minutos",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube (youtube-transcript-api), lida inteira. Trechos com reconhecimento ruim foram interpretados pelo contexto, sem inventar conteúdo; a tela do vídeo não foi vista.",
+      "totalUnidades": 9,
+      "unidades": [
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "Descendente recursivo; algoritmos com backtracking × preditivos; restrições (sem recursão à esquerda, sem ambiguidade); gramática de somas",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "backtracking",
+            "decisao"
+          ],
+          "evidencias": [
+            "backtracking",
+            "gramatica so de somas"
+          ]
+        },
+        {
+          "paginas": [
+            2,
+            3
+          ],
+          "assunto": "Uma função por variável, função match com ponteiro global; custo de muitas chamadas em gramáticas grandes",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "uma-funcao",
+            "match"
+          ],
+          "evidencias": [
+            "match"
+          ]
+        },
+        {
+          "paginas": [
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "assunto": "Execução com a pilha de chamadas e linhas de retorno; E′ devolve vazio quando não vem +",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "pilha",
+            "decisao"
+          ],
+          "evidencias": [
+            "desenha essa pilha",
+            "retorna vazio"
+          ]
+        },
+        {
+          "paginas": [
+            9
+          ],
+          "assunto": "Conclusão: uma função por variável, árvore implícita",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "pilha"
+          ],
+          "evidencias": [
+            "linha para onde cada chamada volta"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "isidro-aula5",
+      "url": "https://www.youtube.com/watch?v=zrTDTwzWEOA",
+      "escopo": "Professor Isidro, Aula 5 - Análise Sintática Preditiva (complemento da playlist), 76 min; unidades = blocos de 2 minutos",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube (youtube-transcript-api). Inventário bloco a bloco feito por leitura integral da transcrição (subagente), com conferência por amostragem de trechos literais. A tela do vídeo não foi vista.",
+      "totalUnidades": 38,
+      "unidades": [
+        {
+          "paginas": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "assunto": "Vinheta, recapitulação do léxico, fases, scanner × parser, erro sintático como sequência errada de tokens",
+          "antes": "ja-coberto",
+          "justificativa": "Fases e erro sintático em geral: aulas 07 e 11.",
+          "consulta": [
+            "uma-funcao"
+          ],
+          "evidencias": [
+            "fases do compilador"
+          ]
+        },
+        {
+          "paginas": [
+            7,
+            8,
+            9
+          ],
+          "assunto": "GLC, gramática E/T/F, derivações à esquerda e à direita, ambiguidade",
+          "antes": "ja-coberto",
+          "justificativa": "Aula 08. O vídeo define ambiguidade por derivação à esquerda × à direita, o que é impreciso; a definição certa (duas árvores) está na aula 08.",
+          "consulta": [
+            "precedencia"
+          ],
+          "evidencias": [
+            "aula 08"
+          ]
+        },
+        {
+          "paginas": [
+            10,
+            11,
+            12
+          ],
+          "assunto": "Ascendente × descendente, exemplo S → aS | c com aac",
+          "antes": "ja-coberto",
+          "justificativa": "Conceito da aula 11 (dono combinado); aqui só o link e o uso no código.",
+          "consulta": [
+            "uma-funcao"
+          ],
+          "evidencias": [
+            "descendente quer dizer"
+          ]
+        },
+        {
+          "paginas": [
+            13,
+            14,
+            15
+          ],
+          "assunto": "Descendente com retrocesso × preditivo; labirinto; exemplo do Louden com 37 passos",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "backtracking"
+          ],
+          "evidencias": [
+            "labirinto",
+            "37 passos"
+          ]
+        },
+        {
+          "paginas": [
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "assunto": "Recursão à esquerda e laço; restrições; gramática prefixa com + a * b a; cada não-terminal é uma função; stack overflow",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "repeticao",
+            "backtracking"
+          ],
+          "evidencias": [
+            "stack overflow",
+            "+ a * b a"
+          ]
+        },
+        {
+          "paginas": [
+            21,
+            22,
+            23,
+            24
+          ],
+          "assunto": "FIRST disjuntos, aparte sobre complexidade, LL(1) e LL(2)",
+          "antes": "ja-coberto",
+          "justificativa": "Conceito da aula 11 (dono combinado); aqui só o link e o uso no código.",
+          "consulta": [
+            "decisao"
+          ],
+          "evidencias": [
+            "first"
+          ]
+        },
+        {
+          "paginas": [
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ],
+          "assunto": "Eliminação da recursão à esquerda, fatoração, if/else, exercício",
+          "antes": "ja-coberto",
+          "justificativa": "Conceito da aula 11 (dono combinado); aqui só o link e o uso no código.",
+          "consulta": [
+            "repeticao",
+            "decisao"
+          ],
+          "evidencias": [
+            "aula 11",
+            "fatorar"
+          ]
+        },
+        {
+          "paginas": [
+            31,
+            32,
+            33,
+            34,
+            35
+          ],
+          "assunto": "Descendente recursivo: grafo sintático, procedimentos de S → a A d, A* vira while, padrões de código, procedimento principal confere fim de arquivo",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "uma-funcao",
+            "erros"
+          ],
+          "evidencias": [
+            "grafo sintatico",
+            "s → a a d",
+            "fim de arquivo"
+          ]
+        },
+        {
+          "paginas": [
+            36,
+            37,
+            38
+          ],
+          "assunto": "Créditos, recapitulação (preditiva é a eficiente), encerramento",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "backtracking"
+          ],
+          "evidencias": [
+            "preditivo"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "isidro-aula6",
+      "url": "https://www.youtube.com/watch?v=bOxx2c9QLpM",
+      "escopo": "Professor Isidro, Aula 6 - Implementando Análise Sintática (complemento da playlist), 66 min; unidades = blocos de 2 minutos",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube (youtube-transcript-api). Inventário bloco a bloco feito por leitura integral da transcrição (subagente), com conferência por amostragem de trechos literais. A tela do vídeo não foi vista.",
+      "totalUnidades": 33,
+      "unidades": [
+        {
+          "paginas": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "assunto": "Abertura, motivação, melhorias no IsiScanner",
+          "antes": "fora do escopo",
+          "justificativa": "Logística e léxico do curso.",
+          "consulta": [
+            "erros"
+          ],
+          "evidencias": [
+            "isidro"
+          ]
+        },
+        {
+          "paginas": [
+            5,
+            6,
+            7,
+            8
+          ],
+          "assunto": "Gramática E → E OP T | T, OP com quatro operadores num nível, eliminação da recursão; aparte sobre yacc, bison e ANTLR",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto. O vídeo diz que o bison seria o lexer; isso está errado (bison gera parser) e não foi reproduzido.",
+          "consulta": [
+            "precedencia",
+            "repeticao"
+          ],
+          "evidencias": [
+            "num nivel so",
+            "el()"
+          ]
+        },
+        {
+          "paginas": [
+            9,
+            10,
+            11,
+            12
+          ],
+          "assunto": "Grafos sintáticos e cada não-terminal como método da classe parser; demonstração do léxico",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "uma-funcao"
+          ],
+          "evidencias": [
+            "grafo sintatico"
+          ]
+        },
+        {
+          "paginas": [
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19
+          ],
+          "assunto": "IsiParser: construtor com o scanner, token atual com nextToken, métodos E, El, T, OP, IsiSyntaxException, main com try/catch",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "match",
+            "erros"
+          ],
+          "evidencias": [
+            "scanner.nexttoken()",
+            "isisyntaxexception"
+          ]
+        },
+        {
+          "paginas": [
+            20,
+            21,
+            22
+          ],
+          "assunto": "Depuração passo a passo, bug de || no lugar de &&, Compilation successful",
+          "antes": "omitido",
+          "justificativa": "Detalhe de depuração do código do vídeo; o padrão de leitura de token está na seção match.",
+          "consulta": [
+            "match"
+          ],
+          "evidencias": [
+            "isidro nao tem match"
+          ]
+        },
+        {
+          "paginas": [
+            23,
+            24,
+            25,
+            26,
+            27,
+            28
+          ],
+          "assunto": "Mensagens expected/found com TK_TEXT; linha e coluna no token e na mensagem",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "erros"
+          ],
+          "evidencias": [
+            "linha e coluna"
+          ]
+        },
+        {
+          "paginas": [
+            29,
+            30,
+            31,
+            32,
+            33
+          ],
+          "assunto": "Recapitulação, próxima aula com ANTLR, README e git, encerramento",
+          "antes": "fora do escopo",
+          "justificativa": "Logística.",
+          "consulta": [
+            "erros"
+          ],
+          "evidencias": [
+            "isidro"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "judson-aula04",
+      "url": "https://www.youtube.com/watch?v=FE5QwYEADak",
+      "escopo": "Judson Santiago, Aula 04 - Análise Sintática Descendente, Analisador Preditivo, FIRST (complemento da playlist), 97 min; unidades = blocos de 2 minutos",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube (youtube-transcript-api). Inventário bloco a bloco feito por leitura integral da transcrição (subagente), com conferência por amostragem de trechos literais. A tela do vídeo não foi vista.",
+      "totalUnidades": 49,
+      "unidades": [
+        {
+          "paginas": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "assunto": "Abertura (Rosetta 2), recapitulação de tradução dirigida por sintaxe e esquema de tradução",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "ast"
+          ],
+          "evidencias": [
+            "acoes semanticas"
+          ]
+        },
+        {
+          "paginas": [
+            5,
+            6
+          ],
+          "assunto": "À mão ou com ferramenta; O(n³) para qualquer GLC, O(n) na prática",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "backtracking"
+          ],
+          "evidencias": [
+            "proporcao do numero de tokens"
+          ]
+        },
+        {
+          "paginas": [
+            7
+          ],
+          "assunto": "Descendente × ascendente pela ordem de construção dos nós",
+          "antes": "ja-coberto",
+          "justificativa": "Conceito da aula 11 (dono combinado); aqui só o link e o uso no código.",
+          "consulta": [
+            "uma-funcao"
+          ],
+          "evidencias": [
+            "descendente quer dizer"
+          ]
+        },
+        {
+          "paginas": [
+            8,
+            9
+          ],
+          "assunto": "Gramática inst/optexpr com expr como terminal",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "decisao"
+          ],
+          "evidencias": [
+            "optexpr"
+          ]
+        },
+        {
+          "paginas": [
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "assunto": "Construção descendente da árvore com lookahead em for ( ; expr ; expr ) expr ; ; símbolo inicial",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "decisao"
+          ],
+          "evidencias": [
+            "a entrada nao anda"
+          ]
+        },
+        {
+          "paginas": [
+            19
+          ],
+          "assunto": "Tentativa e erro com dois for (range-for do C++)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "backtracking"
+          ],
+          "evidencias": [
+            "for ( x : c )"
+          ]
+        },
+        {
+          "paginas": [
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28
+          ],
+          "assunto": "Preditivo como descendente recursivo: inst com switch, optexpr com if e ε, match, lookahead global, sequência de chamadas define a árvore",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "decisao",
+            "match",
+            "ast"
+          ],
+          "evidencias": [
+            "switch",
+            "variavel global",
+            "inst, optexpr, optexpr, optexpr, inst"
+          ]
+        },
+        {
+          "paginas": [
+            29
+          ],
+          "assunto": "A árvore pode ser montada nas funções, mas o tradutor não precisa dela",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "ast"
+          ],
+          "evidencias": [
+            "sem montar nada"
+          ]
+        },
+        {
+          "paginas": [
+            30,
+            31,
+            32,
+            33
+          ],
+          "assunto": "Limite do preditivo e FIRST",
+          "antes": "ja-coberto",
+          "justificativa": "Conceito da aula 11 (dono combinado); aqui só o link e o uso no código.",
+          "consulta": [
+            "backtracking"
+          ],
+          "evidencias": [
+            "se voce nao consegue prever"
+          ]
+        },
+        {
+          "paginas": [
+            34,
+            35
+          ],
+          "assunto": "Ações semânticas no código na mesma posição da regra",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "ast"
+          ],
+          "evidencias": [
+            "depois da chamada de x"
+          ]
+        },
+        {
+          "paginas": [
+            36,
+            37,
+            38,
+            39
+          ],
+          "assunto": "Recursão à esquerda gera laço infinito; eliminação A → βR",
+          "antes": "ja-coberto",
+          "justificativa": "Transformação: aula 11. A consequência no código está aqui.",
+          "consulta": [
+            "repeticao"
+          ],
+          "evidencias": [
+            "laco infinito"
+          ]
+        },
+        {
+          "paginas": [
+            40,
+            41,
+            42,
+            43
+          ],
+          "assunto": "Duas restrições e exercícios S → + S S | − S S | a e S → ( S ) S | ε",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "decisao"
+          ],
+          "evidencias": [
+            "s → ( s ) s | ε"
+          ]
+        },
+        {
+          "paginas": [
+            44,
+            45,
+            46,
+            47,
+            48
+          ],
+          "assunto": "Laboratório 4, dúvida da atividade anterior, avaliador de pós-fixa com pilha em C++",
+          "antes": "fora do escopo",
+          "justificativa": "Atividade e avaliador do curso de origem; a pós-fixa entra pelo tradutor da aula 05.",
+          "consulta": [
+            "ast"
+          ],
+          "evidencias": [
+            "pos-fixa"
+          ]
+        },
+        {
+          "paginas": [
+            49
+          ],
+          "assunto": "Encerramento: o trabalho terá recursão à esquerda",
+          "antes": "fora do escopo",
+          "justificativa": "Logística.",
+          "consulta": [
+            "repeticao"
+          ],
+          "evidencias": [
+            "recursao a esquerda"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "judson-aula05",
+      "url": "https://www.youtube.com/watch?v=OOx6f8jD4_k",
+      "escopo": "Judson Santiago, Aula 05 - Construção do Tradutor (complemento da playlist), 81 min; unidades = blocos de 2 minutos",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube (youtube-transcript-api). Inventário bloco a bloco feito por leitura integral da transcrição (subagente), com conferência por amostragem de trechos literais. A tela do vídeo não foi vista.",
+      "totalUnidades": 41,
+      "unidades": [
+        {
+          "paginas": [
+            1,
+            2,
+            3
+          ],
+          "assunto": "Logística e recapitulação: preditivo, lookahead basta, restrições",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "backtracking"
+          ],
+          "evidencias": [
+            "preditivo"
+          ]
+        },
+        {
+          "paginas": [
+            4,
+            5,
+            6
+          ],
+          "assunto": "Eliminar recursão à esquerda num esquema com ações; ações copiadas como terminais; R vira oper",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "ast"
+          ],
+          "evidencias": [
+            "copiadas como se fossem terminais"
+          ]
+        },
+        {
+          "paginas": [
+            7,
+            8
+          ],
+          "assunto": "Árvore de 9 − 5 + 2 com a gramática nova; perde a leitura fácil",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "precedencia"
+          ],
+          "evidencias": [
+            "9 5 − 2 +"
+          ]
+        },
+        {
+          "paginas": [
+            9,
+            10,
+            11
+          ],
+          "assunto": "Funções expr, oper e term; print na posição da ação; guarda o dígito em t",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "repeticao",
+            "match"
+          ],
+          "evidencias": [
+            "oper → + term",
+            "guarda o digito em t"
+          ]
+        },
+        {
+          "paginas": [
+            12,
+            13,
+            14,
+            15
+          ],
+          "assunto": "Recursão de cauda vira laço; while true, break e continue; inline de oper em expr",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "repeticao"
+          ],
+          "evidencias": [
+            "inline"
+          ]
+        },
+        {
+          "paginas": [
+            16,
+            17
+          ],
+          "assunto": "Projeto no VS Code com CMake",
+          "antes": "fora do escopo",
+          "justificativa": "Ambiente de build do curso.",
+          "consulta": [
+            "repeticao"
+          ],
+          "evidencias": [
+            "judson"
+          ]
+        },
+        {
+          "paginas": [
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25
+          ],
+          "assunto": "parser.h e parser.cpp: SyntaxError, lookahead char, match com cin.get, start confere \\n; main com try/catch",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "erros",
+            "match"
+          ],
+          "evidencias": [
+            "syntaxerror",
+            "cin.get()"
+          ]
+        },
+        {
+          "paginas": [
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33
+          ],
+          "assunto": "Testes, depuração, erro que aparece antes do lugar real; ponto e vírgula acusado na linha de baixo",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "ast",
+            "erros"
+          ],
+          "evidencias": [
+            "2++4−3",
+            "linha de baixo"
+          ]
+        },
+        {
+          "paginas": [
+            34,
+            35,
+            36
+          ],
+          "assunto": "O léxico deve ler a entrada; match pede o próximo token ao léxico",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "match"
+          ],
+          "evidencias": [
+            "os dois andam juntos"
+          ]
+        },
+        {
+          "paginas": [
+            37,
+            38,
+            39,
+            40,
+            41
+          ],
+          "assunto": "Resumo, limites (espaços, números de mais de um dígito) e laboratório pré-fixa → pós-fixa",
+          "antes": "omitido",
+          "justificativa": "O laboratório do curso de origem não foi reproduzido; o treino 8 trabalha pós-fixa a partir da AST.",
+          "consulta": [
+            "ast"
+          ],
+          "evidencias": [
+            "pos-fixa"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "judson-aula21",
+      "url": "https://www.youtube.com/watch?v=smoczWyJQsU",
+      "escopo": "Judson Santiago, Aula 21 - Análise Descendente, Descida Recursiva, FIRST e FOLLOW (complemento da playlist), 76 min; unidades = blocos de 2 minutos",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube (youtube-transcript-api). Inventário bloco a bloco feito por leitura integral da transcrição (subagente), com conferência por amostragem de trechos literais. A tela do vídeo não foi vista. Reconhecimento muito ruim nos trechos de FIRST e FOLLOW.",
+      "totalUnidades": 39,
+      "unidades": [
+        {
+          "paginas": [
+            1,
+            2
+          ],
+          "assunto": "Roteiro e pergunta sobre paradigmas",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "backtracking"
+          ],
+          "evidencias": [
+            "judson (aula 21)"
+          ]
+        },
+        {
+          "paginas": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "assunto": "Construção descendente com expr/plus/term/multi/fact; o preditivo recursivo pode estourar a pilha",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "pilha"
+          ],
+          "evidencias": [
+            "pode estourar a pilha"
+          ]
+        },
+        {
+          "paginas": [
+            7
+          ],
+          "assunto": "Derivação mais à esquerda; decidir e casar terminais",
+          "antes": "ja-coberto",
+          "justificativa": "Conceito da aula 11 (dono combinado); aqui só o link e o uso no código.",
+          "consulta": [
+            "uma-funcao"
+          ],
+          "evidencias": [
+            "descendente quer dizer"
+          ]
+        },
+        {
+          "paginas": [
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "assunto": "Descida recursiva geral com backtracking; exemplo S → c A d, A → a b | a com cad",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "backtracking"
+          ],
+          "evidencias": [
+            "guarda onde a entrada estava",
+            "s → c a d"
+          ]
+        },
+        {
+          "paginas": [
+            13,
+            14
+          ],
+          "assunto": "FIRST e FOLLOW servem para escolher e para tokens de sincronização no modo pânico",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "recuperacao"
+          ],
+          "evidencias": [
+            "tokens de sincronizacao"
+          ]
+        },
+        {
+          "paginas": [
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34
+          ],
+          "assunto": "Definição e cálculo de FIRST e FOLLOW, exemplos",
+          "antes": "ja-coberto",
+          "justificativa": "Conceito da aula 11 (dono combinado); aqui só o link e o uso no código.",
+          "consulta": [
+            "decisao"
+          ],
+          "evidencias": [
+            "first"
+          ]
+        },
+        {
+          "paginas": [
+            35,
+            36,
+            37,
+            38,
+            39
+          ],
+          "assunto": "Exercício, laboratório e resumo: preditivo recursivo ou com tabela e pilha",
+          "antes": "ja-coberto",
+          "justificativa": "Conceito da aula 11 (dono combinado); aqui só o link e o uso no código.",
+          "consulta": [
+            "repeticao"
+          ],
+          "evidencias": [
+            "tabela e pilha propria"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "crafting-cap5",
+      "url": "https://craftinginterpreters.com/representing-code.html",
+      "escopo": "Robert Nystrom, Crafting Interpreters, cap. 5, Representing Code; complemento no lugar dos livros do autoestudo. Unidades: 1 abertura, 2 5.1, 3 5.1.1, 4 5.1.2, 5 5.1.3, 6 5.2, 7 5.2.1, 8 5.2.2, 9 5.3, 10 5.3.1, 11 5.3.2, 12 5.3.3, 13 5.4, 14 desafios",
+      "acesso": "integral",
+      "metodo": "Capítulo lido inteiro (HTML do site oficial, gratuito). Unidades = seções do capítulo.",
+      "totalUnidades": 14,
+      "unidades": [
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "Árvore como representação; avaliação em pós-ordem",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "ast"
+          ],
+          "evidencias": [
+            "pos-ordem"
+          ]
+        },
+        {
+          "paginas": [
+            2
+          ],
+          "assunto": "GLC; gramática léxica × sintática (caracteres × tokens)",
+          "antes": "ja-coberto",
+          "justificativa": "GLC é das aulas 01 e 08; a tabela léxico × sintático entra na Base.",
+          "consulta": [
+            "uma-funcao"
+          ],
+          "evidencias": [
+            "na gramatica lexica"
+          ]
+        },
+        {
+          "paginas": [
+            3
+          ],
+          "assunto": "Regras, produções, cabeça e corpo, terminal e não-terminal, derivação",
+          "antes": "ja-coberto",
+          "justificativa": "Aula 01; link na Base.",
+          "consulta": [
+            "uma-funcao"
+          ],
+          "evidencias": [
+            "producao"
+          ]
+        },
+        {
+          "paginas": [
+            4
+          ],
+          "assunto": "Notação: |, grupos, *, + e ?",
+          "antes": "ja-coberto",
+          "justificativa": "EBNF é da aula 09; a notação do livro é citada na Base.",
+          "consulta": [
+            "uma-funcao"
+          ],
+          "evidencias": [
+            "x+"
+          ]
+        },
+        {
+          "paginas": [
+            5
+          ],
+          "assunto": "Gramática de expressões do Lox (ambígua)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "precedencia"
+          ],
+          "evidencias": [
+            "gramatica ambigua"
+          ]
+        },
+        {
+          "paginas": [
+            6
+          ],
+          "assunto": "Classes da árvore: Expr e Binary",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "ast"
+          ],
+          "evidencias": [
+            "binary(left, operator, right)"
+          ]
+        },
+        {
+          "paginas": [
+            7
+          ],
+          "assunto": "Nós sem comportamento, ligando parser e interpretador",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "ast"
+          ],
+          "evidencias": [
+            "so guardam dados"
+          ]
+        },
+        {
+          "paginas": [
+            8
+          ],
+          "assunto": "Script que gera as classes da árvore (GenerateAst)",
+          "antes": "fora do escopo",
+          "justificativa": "Detalhe de Java; a Mini usa tuplas.",
+          "consulta": [
+            "ast"
+          ],
+          "evidencias": [
+            "crafting"
+          ]
+        },
+        {
+          "paginas": [
+            9
+          ],
+          "assunto": "Trabalhando com árvores: várias operações por tipo de nó",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "ast"
+          ],
+          "evidencias": [
+            "varias operacoes"
+          ]
+        },
+        {
+          "paginas": [
+            10
+          ],
+          "assunto": "O problema da expressão (linhas × colunas)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "ast"
+          ],
+          "evidencias": [
+            "cada operacao fica num lugar so"
+          ]
+        },
+        {
+          "paginas": [
+            11
+          ],
+          "assunto": "Padrão Visitor",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "ast"
+          ],
+          "evidencias": [
+            "visitor"
+          ]
+        },
+        {
+          "paginas": [
+            12
+          ],
+          "assunto": "Visitor para expressões com retorno genérico",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "ast"
+          ],
+          "evidencias": [
+            "visitor"
+          ]
+        },
+        {
+          "paginas": [
+            13
+          ],
+          "assunto": "AstPrinter: árvore com todos os parênteses, estilo Lisp",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "ast"
+          ],
+          "evidencias": [
+            "estilo lisp"
+          ]
+        },
+        {
+          "paginas": [
+            14
+          ],
+          "assunto": "Desafios: tirar o açúcar da notação, padrão complementar em linguagem funcional, visitor para RPN",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "treino"
+          ],
+          "evidencias": [
+            "rpn",
+            "sem ebnf"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "crafting-cap6",
+      "url": "https://craftinginterpreters.com/parsing-expressions.html",
+      "escopo": "Robert Nystrom, Crafting Interpreters, cap. 6, Parsing Expressions; complemento no lugar dos livros do autoestudo. Unidades: 1 abertura, 2 6.1, 3 6.2, 4 6.2.1, 5 6.3, 6 6.3.1, 7 6.3.2, 8 6.3.3, 9 6.4, 10 desafios, 11 nota de projeto",
+      "acesso": "integral",
+      "metodo": "Capítulo lido inteiro (HTML do site oficial, gratuito). Unidades = seções do capítulo.",
+      "totalUnidades": 11,
+      "unidades": [
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "Abertura: o primeiro parser do livro",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "uma-funcao"
+          ],
+          "evidencias": [
+            "crafting"
+          ]
+        },
+        {
+          "paginas": [
+            2
+          ],
+          "assunto": "Ambiguidade, precedência e associatividade, tabela do C, uma regra por nível, regra com * no lugar da recursão à esquerda",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "precedencia",
+            "repeticao"
+          ],
+          "evidencias": [
+            "6 / 3 − 1",
+            "a = (b = c)",
+            "e a forma do"
+          ]
+        },
+        {
+          "paginas": [
+            3
+          ],
+          "assunto": "Descida recursiva: outras técnicas, quem usa, tabela gramática → código, por que recursiva",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "uma-funcao"
+          ],
+          "evidencias": [
+            "roslyn",
+            "earley"
+          ]
+        },
+        {
+          "paginas": [
+            4
+          ],
+          "assunto": "Classe Parser: expression, equality, match, check, advance, peek, previous, unary, primary",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "match",
+            "precedencia"
+          ],
+          "evidencias": [
+            "advance",
+            "unary"
+          ]
+        },
+        {
+          "paginas": [
+            5
+          ],
+          "assunto": "Erros sintáticos: dois trabalhos do parser, requisitos, erros em cascata, recuperação",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "erros"
+          ],
+          "evidencias": [
+            "roda de novo a cada tecla",
+            "nunca travar"
+          ]
+        },
+        {
+          "paginas": [
+            6
+          ],
+          "assunto": "Modo pânico e sincronização",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "recuperacao"
+          ],
+          "evidencias": [
+            "modo panico"
+          ]
+        },
+        {
+          "paginas": [
+            7
+          ],
+          "assunto": "consume, error que devolve a exceção, ParseError, mensagem at end",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "erros",
+            "recuperacao"
+          ],
+          "evidencias": [
+            "at end",
+            "devolve a excecao em vez de lancar"
+          ]
+        },
+        {
+          "paginas": [
+            8
+          ],
+          "assunto": "Sincronizar na descida recursiva: pilha de chamadas, exceção, synchronize com ; e palavras-chave",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "recuperacao"
+          ],
+          "evidencias": [
+            "desempilha",
+            "class"
+          ]
+        },
+        {
+          "paginas": [
+            9
+          ],
+          "assunto": "Erro em primary, parse() devolve null, hadError",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "erros"
+          ],
+          "evidencias": [
+            "haderror"
+          ]
+        },
+        {
+          "paginas": [
+            10
+          ],
+          "assunto": "Desafios: vírgula, ternário, produções de erro",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "recuperacao",
+            "treino"
+          ],
+          "evidencias": [
+            "producoes de erro",
+            "ternario"
+          ]
+        },
+        {
+          "paginas": [
+            11
+          ],
+          "assunto": "Nota de projeto: precedência de & e | no C",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "precedencia"
+          ],
+          "evidencias": [
+            "erro historico"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "crafting-cap8",
+      "url": "https://craftinginterpreters.com/statements-and-state.html",
+      "escopo": "Robert Nystrom, Crafting Interpreters, cap. 8, Statements and State; complemento no lugar dos livros do autoestudo. Unidades: 1 abertura, 2 8.1, 3 8.1.1, 4 8.1.2, 5 8.1.3, 6 8.2, 7 8.2.1, 8 8.2.2, 9 8.3, 10 8.3.1, 11 8.4, 12 8.4.1, 13 8.4.2, 14 8.5, 15 8.5.1, 16 8.5.2, 17 desafios, 18 nota de projeto",
+      "acesso": "integral",
+      "metodo": "Capítulo lido inteiro (HTML do site oficial, gratuito). Unidades = seções do capítulo.",
+      "totalUnidades": 18,
+      "unidades": [
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "Comandos e estado, efeitos colaterais",
+          "antes": "fora do escopo",
+          "justificativa": "Semântica e execução; citado como próximo passo.",
+          "consulta": [
+            "projeto"
+          ],
+          "evidencias": [
+            "ambiente"
+          ]
+        },
+        {
+          "paginas": [
+            2
+          ],
+          "assunto": "program → statement* EOF: o EOF obrigatório evita ignorar lixo no fim",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "erros"
+          ],
+          "evidencias": [
+            "fim do arquivo"
+          ]
+        },
+        {
+          "paginas": [
+            3
+          ],
+          "assunto": "Árvores de comando separadas das de expressão",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "ast"
+          ],
+          "evidencias": [
+            "duas familias"
+          ]
+        },
+        {
+          "paginas": [
+            4
+          ],
+          "assunto": "statement(): decide pelo token, comando de expressão como último caso",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "decisao"
+          ],
+          "evidencias": [
+            "ultimo caso"
+          ]
+        },
+        {
+          "paginas": [
+            5
+          ],
+          "assunto": "Executar comandos (interpretador)",
+          "antes": "fora do escopo",
+          "justificativa": "Execução; fica para depois.",
+          "consulta": [
+            "projeto"
+          ],
+          "evidencias": [
+            "execucao da ast"
+          ]
+        },
+        {
+          "paginas": [
+            6
+          ],
+          "assunto": "Variáveis globais: declaração e uso",
+          "antes": "fora do escopo",
+          "justificativa": "Semântica.",
+          "consulta": [
+            "projeto"
+          ],
+          "evidencias": [
+            "ambiente"
+          ]
+        },
+        {
+          "paginas": [
+            7
+          ],
+          "assunto": "declaration × statement: dois níveis de comando na gramática",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "projeto"
+          ],
+          "evidencias": [
+            "declaration"
+          ]
+        },
+        {
+          "paginas": [
+            8
+          ],
+          "assunto": "Parsing de variáveis; declaration() com try e synchronize; inicializador opcional",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "recuperacao"
+          ],
+          "evidencias": [
+            "declaration()"
+          ]
+        },
+        {
+          "paginas": [
+            9,
+            10,
+            11
+          ],
+          "assunto": "Ambientes, interpretar variáveis globais, introdução à atribuição",
+          "antes": "fora do escopo",
+          "justificativa": "Semântica e execução.",
+          "consulta": [
+            "projeto"
+          ],
+          "evidencias": [
+            "ambiente"
+          ]
+        },
+        {
+          "paginas": [
+            12
+          ],
+          "assunto": "Sintaxe da atribuição: l-value, truque de analisar como expressão, associatividade à direita, Invalid assignment target",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "decisao",
+            "precedencia"
+          ],
+          "evidencias": [
+            "invalid assignment target",
+            "a = (b = c)"
+          ]
+        },
+        {
+          "paginas": [
+            13,
+            14,
+            15
+          ],
+          "assunto": "Semântica da atribuição, escopo, aninhamento e sombreamento",
+          "antes": "fora do escopo",
+          "justificativa": "Semântica e execução.",
+          "consulta": [
+            "projeto"
+          ],
+          "evidencias": [
+            "escopo"
+          ]
+        },
+        {
+          "paginas": [
+            16
+          ],
+          "assunto": "Sintaxe de bloco: laço com check de } e isAtEnd para não travar; execução do bloco",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto a partir da transcrição completa do bloco.",
+          "consulta": [
+            "recuperacao"
+          ],
+          "evidencias": [
+            "trava o analisador"
+          ]
+        },
+        {
+          "paginas": [
+            17,
+            18
+          ],
+          "assunto": "Desafios (REPL, variável não inicializada, escopo) e nota sobre declaração implícita",
+          "antes": "fora do escopo",
+          "justificativa": "Semântica.",
+          "consulta": [
+            "projeto"
+          ],
+          "evidencias": [
+            "escopo"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "thain-compilerbook",
+      "url": "https://www3.nd.edu/~dthain/compilerbook/",
+      "escopo": "Douglas Thain, Introduction to Compilers and Language Design, parte de recursive descent",
+      "acesso": "indisponivel",
+      "limitacao": "O site respondeu 403 (acesso negado) nesta sessão; não foi feita outra tentativa de contornar o bloqueio. Nada da aula vem dele."
+    },
+    {
+      "id": "barbosa-87-106",
+      "url": "sem URL: livro indicado no roteiro de autoestudo",
+      "escopo": "Capítulo Análise Sintática, p. 87–106 (provavelmente Barbosa et al., Compiladores)",
+      "acesso": "indisponivel",
+      "limitacao": "A dona não tem o livro e nenhuma cópia autorizada foi encontrada em Downloads, Desktop ou Documents. Nada da aula vem dele; o Crafting Interpreters entra como substituto, sem equivalência garantida."
+    },
+    {
+      "id": "louden-cap4",
+      "url": "sem URL: livro indicado no roteiro de autoestudo",
+      "escopo": "Capítulo 4, Análise Sintática Descendente, p. 143–152 (provavelmente Louden, Compiladores: princípios e práticas; edição não confirmada)",
+      "acesso": "indisponivel",
+      "limitacao": "A dona não tem o livro. Nada da aula vem dele; o exemplo do Louden citado na seção backtracking vem do vídeo do Isidro."
+    },
+    {
+      "id": "resina-slides",
+      "url": "sem URL: ainda não há slides do encontro de 13/11",
+      "escopo": "Slides do encontro de 13/11/2026 (prof. Resina)",
+      "acesso": "indisponivel",
+      "limitacao": "O encontro ainda não aconteceu; notas/ só tem .gitkeep. Integrar com integrar-notas depois."
+    }
+  ]
+}

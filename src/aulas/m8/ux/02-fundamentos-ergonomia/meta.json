@@ -1,0 +1,98 @@
+{
+  "numero": "02",
+  "data": "2026-11-10",
+  "titulo": "Fundamentos da ergonomia",
+  "tema": "Design para participação",
+  "modos": [
+    "consulta"
+  ],
+  "resumo": "O que um dispositivo supõe sobre o corpo de quem usa: ergonomia pela IEA, suposições de habilidade e design baseado em habilidades, antropometria com percentis, Lei de Fitts, barreiras com evidência, requisitos verificáveis e como conferir o que a IA produz.",
+  "topicos": [
+    "Ergonomia e seus três domínios",
+    "Suposições de habilidade",
+    "Design baseado em habilidades",
+    "Antropometria e percentis",
+    "Lei de Fitts",
+    "Barreiras e requisitos verificáveis",
+    "Conferir saídas de IA"
+  ],
+  "secoes": [],
+  "fontes": [
+    {
+      "tipo": "Página",
+      "titulo": "IEA · What Is Ergonomics (HFE)?",
+      "url": "https://iea.cc/about/what-is-ergonomics/",
+      "nota": "Autoestudo. Página lida por inteiro.",
+      "secao": "ergonomia"
+    },
+    {
+      "tipo": "Vídeo",
+      "titulo": "NN/g · Fitts's Law (Lexie Kane, 2019, cerca de 2 min)",
+      "url": "https://www.nngroup.com/videos/fittss-law/",
+      "nota": "Autoestudo. Transcrição em inglês do YouTube lida por inteiro. A equação mostrada na tela não está na transcrição e não foi vista.",
+      "secao": "fitts"
+    },
+    {
+      "tipo": "PDF",
+      "titulo": "Arquivo do Google Drive indicado no autoestudo",
+      "url": "https://drive.google.com/file/d/16Z8U7LPeQ4IZ1AUflmsqZaDjODe7ZiJ2/view",
+      "nota": "Autoestudo. O Drive pediu login e nenhum PDF com nome parecido foi achado no computador. Conteúdo não acessado; nada desta aula é atribuído a ele."
+    },
+    {
+      "tipo": "Design fiction",
+      "titulo": "Superflux · Uninvited Guests (2015)",
+      "url": "https://superflux.in/index.php/work/uninvited-guests/",
+      "nota": "Autoestudo. Texto da página lido por inteiro. O filme (4 min 43 s, Vimeo) não foi assistido e não tem transcrição; nenhuma cena é descrita.",
+      "secao": "design-ficcao"
+    },
+    {
+      "tipo": "Artigo",
+      "titulo": "Wobbrock, Kane, Gajos, Harada e Froehlich · Ability-Based Design: Concept, Principles and Examples (ACM TACCESS 3(3), 2011)",
+      "url": "https://faculty.washington.edu/wobbrock/pubs/taccess-11.pdf",
+      "nota": "Complemento. Seções 1 a 4 lidas (conceito, abordagens anteriores, sete princípios); projetos da seção 5 só pelo índice e pelo SUPPLE.",
+      "secao": "design-habilidades"
+    },
+    {
+      "tipo": "Artigo",
+      "titulo": "Wobbrock, Gajos, Kane e Vanderheiden · Ability-Based Design (Communications of the ACM 61(6), 2018)",
+      "url": "https://faculty.washington.edu/wobbrock/pubs/cacm-18.pdf",
+      "nota": "Complemento. Lidos os trechos sobre suposições de habilidade, quiosque, cockpits e estratégias.",
+      "secao": "suposicao"
+    },
+    {
+      "tipo": "Relatório e dados",
+      "titulo": "Gordon et al. · 2012 Anthropometric Survey of U.S. Army Personnel: Methods and Summary Statistics (NATICK/TR-15/007, dez. 2014) e dados públicos do ANSUR II",
+      "url": "https://www.openlab.psu.edu/ansur2/",
+      "nota": "Complemento. Conferidos amostra, período e as páginas de largura e comprimento da mão do relatório; percentis recalculados a partir dos CSV públicos.",
+      "secao": "antropometria"
+    },
+    {
+      "tipo": "Artigo",
+      "titulo": "Soukoreff e MacKenzie · Towards a standard for pointing device evaluation (IJHCS 61, 2004)",
+      "url": "https://www.yorku.ca/mack/ijhcs2004.pdf",
+      "nota": "Complemento. Recomendações, forma de Shannon, largura efetiva, throughput e limites da regressão.",
+      "secao": "fitts"
+    },
+    {
+      "tipo": "Artigo",
+      "titulo": "MacKenzie · A Note on the Validity of the Shannon Formulation for Fitts' Index of Difficulty (Open Journal of Applied Sciences, 2013)",
+      "url": "https://www.yorku.ca/mack/ojas2013.pdf",
+      "nota": "Complemento. Usado para as formas de Fitts, Welford e Shannon.",
+      "secao": "fitts"
+    },
+    {
+      "tipo": "Artigo",
+      "titulo": "Raluca Budiu · Fitts's Law and Its Applications in UX (NN/g, 2022)",
+      "url": "https://www.nngroup.com/articles/fitts-law/",
+      "nota": "Artigo relacionado ao vídeo, lido por inteiro. Usa a forma de Fitts (2D/W).",
+      "secao": "fitts"
+    },
+    {
+      "tipo": "Referências citadas",
+      "titulo": "Pheasant e Haslegrave, Bodyspace, 3ª ed. (CRC Press, 2006); ISO 7250-1:2017; Iida e Guimarães, Ergonomia: projeto e produção, 3ª ed. (Blucher, 2016)",
+      "nota": "Só edição, editora e escopo conferidos em catálogo. Nenhum valor desses livros e da norma é usado na aula.",
+      "secao": "antropometria"
+    }
+  ],
+  "observacao": "O PDF do Drive indicado no autoestudo não foi acessado (exige login) e o filme da Superflux não foi assistido; a equação mostrada no vídeo da NN/g não aparece na transcrição. A aula se apoia na página da IEA, na transcrição do vídeo, na página da Superflux e em complementos identificados. As quatro categorias de suposição vêm do enunciado da ponderada. O leitor de código de barras dos exemplos é fictício: as medidas do aparelho e os valores de a e b são inventados para as contas; os dados do corpo são do ANSUR II, que mede militares americanos de 17 a 58 anos e não representa outras populações. Exemplos, tabelas autorais e exercícios não são do professor."
+}

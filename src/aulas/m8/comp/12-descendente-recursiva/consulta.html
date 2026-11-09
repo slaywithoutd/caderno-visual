@@ -1,0 +1,665 @@
+<!-- Aula 12 · Análise sintática descendente recursiva. Aula somente Consulta: figuras, loops e desenhos estão aqui mesmo.
+     Um conceito por seção, na ordem das dependências. Gramática, árvore, precedência e o esboço de descida recursiva
+     moram nas aulas 01 e 08; EBNF, AST e a Mini, na 09; papel do sintático, lookahead, FIRST/FOLLOW, LL(1),
+     recursão à esquerda (a transformação) e análise ascendente, na 11. Aqui são só link.
+     O bloco de código da seção "analisador" é o arquivo Python testado; os ids usados por figuras.js e loops.js estão nesta página. -->
+
+<!-- ================= Resumo ================= -->
+<section class="cs" id="encontro" data-grupo="Resumo" data-termos="">
+  <h2>Resumo</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 170"><rect class="bl" x="4" y="6" width="232" height="30" rx="6"/><text class="st" x="12" y="21" style="font-size:10px">soma = termo { OPSOMA termo } ;</text><path class="s" d="M120 38 V54" marker-end="url(#mnarrow)"/><rect class="k" x="4" y="56" width="232" height="84" rx="6"/><text class="st" x="12" y="72" style="font-size:10px">def soma():</text><text class="st" x="24" y="88" style="font-size:10px">esq = termo()</text><text class="st" x="24" y="104" style="font-size:10px">while atual == OPSOMA:</text><text class="st" x="36" y="120" style="font-size:10px">match(OPSOMA); termo()</text><text class="st" x="24" y="134" style="font-size:10px">return esq</text><text class="tm" x="120" y="160">a regra vira função; { } vira while</text></svg>O corpo da função copia o corpo da regra.</aside>
+  <p class="cs-def">Descida recursiva é escrever o analisador sintático à mão, com uma função por regra da gramática. Esta aula mostra como cada pedaço de uma regra vira código, como escolher a alternativa sem voltar atrás, como montar a árvore durante a descida e como reportar erros e continuar depois deles.</p>
+  <ul class="b">
+    <li>Terminal vira <code>match</code>, que confere o tipo do token e consome. Variável vira chamada. <code>|</code> vira um if que olha o próximo token, <code>{ }</code> vira while e <code>[ ]</code> vira if.</li>
+    <li>O analisador preditivo escolhe pelo próximo token e nunca volta. O de backtracking tenta, falha, volta o ponteiro e tenta de novo, e o número de passos explode.</li>
+    <li>Regra com recursão à esquerda faz a função chamar a si mesma sem consumir nada: laço infinito. Reescreva a regra ou use repetição.</li>
+    <li>Uma função por nível de precedência. O while monta a conta associativa à esquerda; a recursão à direita, associativa à direita.</li>
+    <li>Cada função devolve o nó da sua regra, e a AST fica pronta quando a função da variável inicial retorna.</li>
+    <li>Mensagem de erro boa diz o que esperava, o que encontrou, a linha e a coluna. No modo pânico, o analisador descarta tokens até um ponto de sincronização e continua.</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Sem conferir o fim do arquivo, o analisador aceita um começo certo e ignora o lixo do final.</li>
+      <li>Trocar <code>E → E − T</code> por <code>E → T − E</code> tira a recursão à esquerda e muda a conta: 5 − 3 − 1 vira 5 − (3 − 1) = 3.</li>
+      <li>Em <code>E′ → + T E′ | ε</code>, o ε não é erro: se o próximo token não é <code>+</code>, a função só retorna.</li>
+      <li>"No viable alternative" no sintático pode ser bug do léxico: uma palavra-chave que virou identificador.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= Da gramática ao código ================= -->
+<section class="cs" id="uma-funcao" data-grupo="Da gramática ao código" data-termos="grafo-sintatico">
+  <h2>Uma função por regra</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><text class="tm st" x="4" y="12">grafo sintático de S → a A d</text><circle class="k" cx="40" cy="50" r="15"/><text x="40" y="50">a</text><rect class="bl" x="92" y="36" width="44" height="28" rx="4"/><text class="tb" x="114" y="50">A</text><circle class="k" cx="190" cy="50" r="15"/><text x="190" y="50">d</text><path class="s" d="M4 50 H23" marker-end="url(#mnarrow)"/><path class="s" d="M55 50 H90" marker-end="url(#mnarrow)"/><path class="s" d="M136 50 H173" marker-end="url(#mnarrow)"/><path class="s" d="M205 50 H236" marker-end="url(#mnarrow)"/><text class="tm" x="40" y="86">terminal:</text><text class="tm" x="40" y="100">match</text><text class="tm" x="114" y="86">variável:</text><text class="tm" x="114" y="100">chama A()</text><text class="tm" x="190" y="86">terminal:</text><text class="tm" x="190" y="100">match</text><text class="tm" x="120" y="132">def S(): match('a'); A(); match('d')</text></svg>Cada forma do grafo vira uma linha de código.</aside>
+  <p class="cs-def">Na descida recursiva, cada variável da gramática vira uma função com o mesmo nome, e o corpo da função copia o lado direito da regra, símbolo por símbolo, da esquerda para a direita. Para analisar um programa, você chama a função da variável inicial.</p>
+  <details class="base" open>
+    <summary><span class="base-tag">Base</span> O que já está no caderno</summary>
+    <ul class="b">
+      <li>O analisador sintático recebe os tokens do <a href="/m8/comp/07-analise-lexica/consulta#proximo-token">léxico, um por vez</a>, e é a segunda das <a href="/m8/comp/07-analise-lexica/consulta#fases">fases do compilador</a>. O papel dele está na <a href="/m8/comp/11-analise-sintatica/consulta#papel">aula 11</a>. Os primeiros vídeos das três playlists repetem o que é compilador e quais são as fases: é o conteúdo da aula 07.</li>
+      <li>A aula 08 já esboçou a ideia com <code>fator()</code> e <code>termo()</code> (<a href="/m8/comp/08-gramaticas-livres-contexto/consulta#sintatico">descida recursiva</a>). Aqui ela vira um analisador inteiro.</li>
+      <li>Descendente quer dizer que a árvore é montada da raiz para as folhas; a comparação com o ascendente está na <a href="/m8/comp/11-analise-sintatica/consulta#descendente-ascendente">aula 11</a>.</li>
+      <li>As regras desta aula usam a <a href="/m8/comp/09-especificacao-linguagem/consulta#especificacao">EBNF da aula 09</a>: <code>{ x }</code> repete, <code>[ x ]</code> é opcional, maiúsculas são tipos de token. O <i>Crafting Interpreters</i> escreve <code>x*</code>, <code>x+</code> e <code>x?</code>, como nas expressões regulares.</li>
+      <li>Regra, produção, terminal e variável (não terminal) são os da <a href="/m8/comp/01-conceitos/consulta#gramatica">aula 01</a>. Na gramática léxica, o alfabeto são caracteres e cada palavra é um lexema; na sintática, o alfabeto são tokens e cada palavra é um programa (ou uma expressão). O léxico implementa a primeira; o parser, a segunda.</li>
+    </ul>
+  </details>
+  <ul class="b">
+    <li>Terminal no corpo: confira se o próximo token é dele e consuma (<a href="#match">match</a>). Diferente, é erro de sintaxe.</li>
+    <li>Variável no corpo: chame a função dela. Quando ela voltar, os tokens que ela gera já foram consumidos.</li>
+    <li>Regra com alternativas: um if (ou switch) que olha o próximo token e escolhe o caminho (<a href="#decisao">decisão</a>).</li>
+    <li>"Recursiva" porque uma regra que cita a si mesma, direta ou indiretamente, vira uma função que chama a si mesma. Em <code>fator → ( expr )</code>, fator chama expr, que acaba chamando fator de novo.</li>
+    <li>Terminou a função inicial sem erro e a entrada acabou: o programa está sintaticamente certo. A sequência de chamadas é a árvore (<a href="#pilha">pilha de chamadas</a>).</li>
+    <li>O Isidro desenha antes um grafo sintático por regra: elipse para terminal, retângulo para variável, ramos para alternativas e um caminho que volta para repetição. Depois traduz o grafo para código, como se faz com autômato e expressão regular no léxico.</li>
+    <li>O Lucrédio cola a gramática como comentário no código e traduz regra por regra. Ele chama o processo de sistemático e quase automático.</li>
+    <li>Há muitas outras técnicas de parsing (LL(k), LR(1), LALR, Earley, shunting yard, packrat, combinadores de parser). O <i>Crafting</i> escolhe a descida recursiva para o primeiro interpretador porque basta código escrito à mão.</li>
+    <li>É o jeito mais simples de escrever um parser e não depende de ferramenta. Segundo o <i>Crafting Interpreters</i>, o GCC, o V8 (o motor de JavaScript do Chrome) e o Roslyn (o compilador de C#) usam descida recursiva.</li>
+  </ul>
+  <div class="cs-formula">
+    <div class="formula">terminal t   →  match(t)<br>variável A   →  A()<br>α | β   →  if / switch pelo próximo token<br>{ α }   →  while<br>[ α ]   →  if</div>
+    <ul class="b"><li>α e β são pedaços quaisquer do lado direito de uma regra. A tabela é a do <i>Crafting Interpreters</i>, cap. 6; o Judson diz o mesmo com outras palavras: "as funções imitam o corpo de uma produção".</li></ul>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Na linguagem Alguma do Lucrédio, <code>programa : ':' 'DECLARACOES' listaDeclaracoes ':' 'ALGORITMO' listaComandos</code> vira seis linhas: match, match, chamada, match, match, chamada. A regra não tem alternativa, então não há nada para decidir.</li>
+      <li>No exemplo do Isidro, <code>S → a A d</code>, <code>A → c A | e B</code>, <code>B → f | g</code> viram três procedimentos. S pede um token; se é <code>a</code>, chama A; na volta exige <code>d</code>. A consome <code>c</code> e chama A de novo, ou consome <code>e</code> e chama B. Qualquer outro token é erro.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b"><li>Esquecer que a função da variável consome tokens. Depois de <code>expr()</code>, o próximo token já é o que vem depois da expressão inteira.</li></ul>
+  </div>
+</section>
+
+<section class="cs" id="match" data-grupo="Da gramática ao código" data-termos="match">
+  <h2>match e o token atual</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 140"><rect class="gr" x="6" y="30" width="40" height="26" rx="5"/><text class="tm" x="26" y="43">x</text><rect class="gr" x="50" y="30" width="40" height="26" rx="5"/><text class="tm" x="70" y="43">=</text><rect class="am" x="94" y="30" width="40" height="26" rx="5"/><text x="114" y="43">2</text><rect class="k" x="138" y="30" width="40" height="26" rx="5"/><text class="tm" x="158" y="43">+</text><rect class="k" x="182" y="30" width="40" height="26" rx="5"/><text class="tm" x="202" y="43">3</text><path class="s" d="M114 84 V60" marker-end="url(#mnarrow)"/><text class="tam" x="114" y="96">atual</text><text class="tm" x="48" y="16">consumidos</text><text class="tm" x="160" y="16">ainda não lidos</text><text class="tm" x="120" y="120">match('INTEIRO') confere o 2 e anda uma casa</text></svg>Só o token atual decide; o resto espera.</aside>
+  <p class="cs-def">O analisador guarda o token atual, o próximo ainda não consumido. A função <code>match(tipo)</code> confere se ele é do tipo esperado: se é, consome e passa ao seguinte; se não é, acusa erro de sintaxe.</p>
+  <ul class="b">
+    <li>Olhar o token atual sem consumir é espiar o <a href="/m8/comp/11-analise-sintatica/consulta#lookahead">lookahead</a>. É com ele que o código escolhe a alternativa.</li>
+    <li>Judson: <code>match(t)</code> faz <code>lookahead = próximo terminal</code> se <code>t</code> é igual ao lookahead, senão erro. O lookahead pode ser variável global ou atributo da classe do analisador.</li>
+    <li>Lucrédio monta dois métodos: <code>match(tipo)</code> e <code>lookahead(k)</code>, que espia o k-ésimo token à frente sem consumir. Por baixo, um buffer guarda até 10 tokens pedidos ao léxico com <code>proximoToken()</code>.</li>
+    <li>Isidro não tem <code>match</code>: cada método pede <code>scanner.nextToken()</code> quando precisa e confere o tipo ali mesmo. Funciona, mas a regra "quem consome" fica espalhada pelo código.</li>
+    <li>No começo, o analisador lê o primeiro token antes de chamar a função inicial. Na versão do Judson sem léxico, cada caractere é um token e o match chama <code>cin.get()</code>; com léxico, o match pede o próximo token a ele, e os dois andam juntos.</li>
+    <li>Se você precisa do lexema depois de consumir, guarde antes ou use o que o match devolve. O Judson guarda o dígito em <code>t</code> antes do <code>match</code> porque o match avança o lookahead.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Na Mini (<a href="#analisador">analisador completo</a>), <code>atual()</code> espia e <code>match(tipo)</code> confere, avança <code>self.i</code> e devolve o token consumido. Assim <code>nome = self.match('IDENT').lexema</code> confere e guarda numa linha só.</li>
+      <li>O <i>Crafting Interpreters</i> separa em <code>check</code> (só olha), <code>advance</code> (consome), <code>match</code> (consome se casar e devolve verdadeiro ou falso) e <code>consume</code> (consome ou dá erro).</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>O nome muda de autor para autor. No Crafting, <code>match</code> é opcional (não casou, devolve falso) e <code>consume</code> é o obrigatório. No Lucrédio, no Judson e nesta aula, <code>match</code> é o obrigatório.</li>
+      <li>Testar o token com um if e depois chamar <code>match</code> confere duas vezes. O Lucrédio faz isso de propósito: fica repetitivo, mas é sempre o mesmo padrão, e o match ainda protege contra engano.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="decisao" data-grupo="Da gramática ao código" data-termos="">
+  <h2>Escolhendo a alternativa pelo próximo token</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><text class="tm st" x="4" y="12">inst → expr ; | if ( … ) inst | for ( … ) inst</text><rect class="am" x="84" y="26" width="72" height="26" rx="13"/><text x="120" y="39">atual?</text><path class="s" d="M96 52 L40 86" marker-end="url(#mnarrow)"/><path class="s" d="M120 52 V86" marker-end="url(#mnarrow)"/><path class="s" d="M144 52 L200 86" marker-end="url(#mnarrow)"/><text class="tm" x="52" y="66">expr</text><text class="tm" x="130" y="72">if</text><text class="tm" x="190" y="66">for</text><rect class="k" x="6" y="88" width="68" height="26" rx="5"/><text class="tm" x="40" y="101">expr ;</text><rect class="k" x="86" y="88" width="68" height="26" rx="5"/><text class="tm" x="120" y="101">if (…) inst</text><rect class="k" x="166" y="88" width="68" height="26" rx="5"/><text class="tm" x="200" y="101">for (…) inst</text><text class="tm" x="120" y="136">outro token: erro de sintaxe</text></svg>Cada alternativa começa com um token diferente.</aside>
+  <p class="cs-def">Quando a regra tem alternativas, a função olha o token atual e escolhe a única alternativa que pode começar com ele. Se nenhuma serve e a regra não tem alternativa vazia, é erro; se tem, a função simplesmente retorna.</p>
+  <ul class="b">
+    <li>Para isso dar certo, as alternativas precisam começar com tokens diferentes. O conjunto de tokens que podem começar cada uma é o FIRST, da <a href="/m8/comp/11-analise-sintatica/consulta#first-follow">aula 11</a>; FIRST disjuntos é a condição do Judson e do Isidro.</li>
+    <li>Alternativa vazia (ε): escolher ε é não fazer nada. A função volta sem consumir, e quem chamou continua com o mesmo token.</li>
+    <li>Quando escolher ε? Quando o token atual não começa nenhuma outra alternativa. O Lucrédio mostra que o token que deve aparecer ali é o que pode vir depois da variável: no caso da lista de declarações, o <code>:</code> de <code>:ALGORITMO</code>. É o FOLLOW da aula 11 aparecendo no código.</li>
+    <li>Sem alternativa vazia, o <code>else</code> final é o erro, e a mensagem pode listar o que era esperado.</li>
+    <li>Quando duas alternativas começam igual, há duas saídas: fatorar a regra (<a href="/m8/comp/11-analise-sintatica/consulta#fatoracao">aula 11</a>) ou olhar mais longe. O Lucrédio, na lista de declarações, usa <code>lookahead(4)</code>: toda declaração tem três tokens (variável, <code>:</code>, tipo), então o quarto diz se vem outra.</li>
+    <li>No Isidro, sem token de fim, o vazio de <code>E′</code> é escolhido quando o léxico devolve <code>null</code>.</li>
+    <li>A regra do <code>se</code> do Lucrédio tem a ambiguidade do senão pendurado (<a href="/m8/comp/08-gramaticas-livres-contexto/consulta#catalogo">aula 08</a>): <code>se … então se … então … senão …</code>. Na descida, o if de <code>[ senao … ]</code> consome o <code>senao</code> assim que o vê, então ele fica com o <code>se</code> mais próximo. Na Mini, as chaves evitam a dúvida.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Judson, <code>inst → expr ; | if ( expr ) inst | for ( optexpr ; optexpr ; optexpr ) inst</code> e <code>optexpr → expr | ε</code>, com <code>expr</code> fazendo papel de terminal. <code>inst()</code> é um switch: case <code>expr</code>, case <code>if</code>, case <code>for</code>, default erro. <code>optexpr()</code> é um if: se o atual é <code>expr</code>, match; senão, nada.</li>
+      <li>Com <code>for ( ; expr ; expr ) expr ;</code>, o primeiro <code>optexpr</code> vê <code>;</code>, que não é <code>expr</code>, e escolhe ε. A entrada não anda.</li>
+      <li>Exercícios do Judson: <code>S → + S S | − S S | a</code> vira um switch com default erro; <code>S → ( S ) S | ε</code> vira <code>if atual == '(': match('('); S(); match(')'); S()</code> e mais nada.</li>
+      <li>Vídeo 6 da playlist Aulas de Computação: <code>E → i E′</code>, <code>E′ → + i E′ | ε</code>, uma gramática só de somas. <code>E′</code> confere se o atual é <code>+</code>; se não é, retorna vazio.</li>
+      <li>Lucrédio, regra <code>tipo</code>: <code>if atual == INT: match(INT) elif atual == REAL: match(REAL) else: erro("esperava INT ou REAL")</code>. Com <code>else: match(REAL)</code>, o código funcionaria, mas a mensagem diria só "esperava REAL".</li>
+      <li>Na Mini, <code>comando()</code> decide por IDENT, <code>se</code>, <code>enquanto</code> ou <code>escreva</code>, e <code>[ "senao" bloco ]</code> vira <code>if atual == 'senao'</code>.</li>
+      <li>Crafting, <code>statement()</code>: se o atual é <code>print</code>, é comando de impressão; se é <code>{</code>, é bloco; se não é nada conhecido, cai no comando de expressão (<code>expressão ;</code>). Expressão é difícil de reconhecer pelo primeiro token, então ela fica como último caso.</li>
+      <li>Quando um token não basta: no Crafting a atribuição é uma expressão, e em <code>a = 1</code> o analisador só descobre que <code>a</code> é o alvo ao ver o <code>=</code>. O truque: analisar o lado esquerdo como expressão comum e, ao achar o <code>=</code>, conferir se ela é uma variável e trocar pelo nó de atribuição. <code>a + b = c</code> dá "Invalid assignment target", sem backtracking. Na Mini o problema não aparece: comando começando com IDENT é sempre atribuição.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Tratar a ausência de token como erro na regra que tem ε. Em <code>optexpr</code>, ver <code>;</code> é o caso normal.</li>
+      <li>Conflito escondido: na Alguma, uma expressão relacional pode começar com <code>(</code> e uma aritmética também. Com FIRST em comum, o if não sabe qual escolher. O Lucrédio tira os parênteses das relacionais da linguagem para conseguir implementar; o ANTLR resolve sozinho (<a href="#antlr">ANTLR</a>).</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="backtracking" data-grupo="Da gramática ao código" data-termos="descida-backtracking">
+  <h2>Preditivo ou com backtracking</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><circle class="bl" cx="120" cy="16" r="12"/><text x="120" y="16">A</text><path class="s" d="M112 26 L60 60"/><path class="s" d="M128 26 L180 60"/><rect class="rd" x="22" y="62" width="76" height="26" rx="5"/><text x="60" y="75">a b ✗</text><rect class="gr" x="142" y="62" width="76" height="26" rx="5"/><text x="180" y="75">a ✓</text><text class="tm" x="60" y="104">tenta 1º</text><text class="tm" x="180" y="104">volta e tenta</text><path class="s" d="M98 75 Q120 118 142 82" marker-end="url(#mnarrow)"/><text class="tm" x="120" y="138">entrada c a d: o b não aparece, volta</text></svg>Cada volta relê tokens que já tinham sido lidos.</aside>
+  <p class="cs-def">Há dois jeitos de escolher a alternativa. A descida com backtracking tenta uma, e se der errado volta o ponteiro da entrada e tenta a próxima. O analisador preditivo olha o próximo token e já sabe qual é a certa, sem nunca voltar.</p>
+  <ul class="b">
+    <li>Judson (aula 21) dá o algoritmo geral: escolha uma regra <code>A → X₁…Xₖ</code>; para cada Xᵢ, chame se é variável, compare e avance se é terminal. Uma falha não para tudo: volta e tenta a próxima regra. Erro só quando nenhuma serve. Por isso a função guarda onde a entrada estava quando começou.</li>
+    <li>Isidro compara com um robô num labirinto: tentativa e erro. Num exemplo do livro do Louden, reconhecer <code>a*b</code> com backtracking leva 37 passos. Em outro exemplo, com uma gramática em que cada alternativa começa por um token diferente, a versão preditiva reconhece <code>+ a * b a</code> em menos de 12.</li>
+    <li>O preditivo é um caso particular da descida recursiva (Judson, aula 04): o que muda é como a alternativa é escolhida. "Se você não consegue prever, acabou o método."</li>
+    <li>As condições do preditivo: sem recursão à esquerda e com as alternativas começando por tokens diferentes, uma leitura da esquerda para a direita, sem voltar. O tempo cresce na proporção do número de tokens.</li>
+    <li>Judson mostra um caso real em que um token não basta: em C++, <code>for ( x : c )</code> e <code>for ( a ; b ; c )</code> começam igual. Só depois do <code>x</code> dá para saber qual é.</li>
+    <li>O ANTLR usa uma técnica que espia à frente só quando precisa (<a href="#antlr">ALL(*)</a>), e o Lucrédio diz que na maioria dos casos ela não precisa voltar.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Judson, aula 21: <code>S → c A d</code>, <code>A → a b | a</code>, entrada <code>cad</code>. O <code>c</code> casa; para A, tenta <code>a b</code>: o <code>a</code> casa, o <code>b</code> não (vem <code>d</code>). A entrada volta para antes do <code>a</code>, A tenta <code>a</code>, depois o <code>d</code> casa. A Figura 1 mostra cada passo.</li>
+      <li>A mesma linguagem num preditivo: fatore <code>A → a A′</code>, <code>A′ → b | ε</code>. Agora A consome o <code>a</code> e A′ olha o próximo: <code>b</code> ou qualquer outra coisa (ε).</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Backtracking dá a resposta certa; o problema é o custo. Numa gramática grande, cada falha refaz trabalho, e o pior caso cresce muito.</li>
+      <li>Backtracking nesta aula é voltar na lista de tokens. O <a href="/m8/comp/07-analise-lexica/consulta#diagramas">retroceder</a> da aula 07 devolve um caractere ao léxico: outra coisa.</li>
+    </ul>
+  </div>
+  <figure class="fig" id="fig-backtrack">
+    <div class="fig-head"><span class="fig-title">Figura 1 · Descida com backtracking em c a d</span></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <div class="lbl">entrada</div>
+        <div class="tks chips" id="bt-tks"></div>
+        <div class="lbl">regras tentadas</div>
+        <div class="tks chips fases" id="bt-regras"></div>
+        <div class="lbl">pilha de chamadas (topo em cima)</div>
+        <div class="tks chips fases" id="bt-pilha" style="flex-direction:column-reverse;align-items:flex-start"></div>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+</section>
+
+<!-- ================= Formas da gramática no código ================= -->
+<section class="cs" id="repeticao" data-grupo="Formas da gramática no código" data-termos="recursao-cauda">
+  <h2>Recursão à esquerda, recursão de cauda e o while</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><text class="st" x="4" y="14" style="font-size:10px">def expr():</text><text class="st" x="16" y="30" style="font-size:10px">expr()   ← nada consumido</text><path class="rd" d="M150 26 C220 10 220 60 150 44" style="fill:none" marker-end="url(#mnarrow)"/><text class="tam" x="200" y="66">de novo</text><text class="st" x="4" y="92" style="font-size:10px">def expr():</text><text class="st" x="16" y="108" style="font-size:10px">termo()</text><text class="st" x="16" y="124" style="font-size:10px">while atual == '+': …</text><text class="tm" x="120" y="146">a repetição virou laço</text></svg>Em cima, a pilha enche; embaixo, cada volta consome um +.</aside>
+  <p class="cs-def">Uma regra com recursão à esquerda, como <code>expr → expr + termo</code>, vira uma função cuja primeira linha chama a si mesma sem consumir token: ela nunca sai do lugar. Por isso a gramática é reescrita sem recursão à esquerda, e a repetição que sobra vira um while.</p>
+  <ul class="b">
+    <li>Lucrédio: mesmo decidindo certo, <code>expressaoAritmetica()</code> chama <code>expressaoAritmetica()</code>, que faz a mesma pergunta e recebe a mesma resposta: laço infinito. Isidro: "você vai ter um stack overflow".</li>
+    <li>A transformação da gramática está na <a href="/m8/comp/11-analise-sintatica/consulta#recursao-esquerda">aula 11</a>: <code>E → E + T | T</code> vira <code>E → T E′</code>, <code>E′ → + T E′ | ε</code>. A linguagem é a mesma.</li>
+    <li>No código, <code>E′</code> termina chamando a si mesma: é recursão de cauda. Judson troca essa chamada por um while e, como só <code>E</code> chama <code>E′</code>, cola o laço dentro de <code>E</code> (um inline feito à mão). Num compilador, ele diz, desempenho vem antes.</li>
+    <li>Com EBNF você pula a volta: <code>E = T { + T }</code> já diz "um T e depois zero ou mais + T", que é um while direto. É a forma do <i>Crafting Interpreters</i> e da Mini.</li>
+    <li>Lucrédio, no ANTLR, troca a lista recursiva <code>listaComandos : comando listaComandos | comando</code> por <code>comando+</code>, e o código gerado passa a ter um laço no lugar da recursão, mais eficiente.</li>
+    <li>Recursão em outro lugar não atrapalha. <code>fator → ( expr )</code> chama expr só depois de consumir o <code>(</code>, então sempre anda.</li>
+  </ul>
+  <div class="cs-formula">
+    <div class="formula">{ α }   →  while atual pode começar α: α<br>[ α ]   →  if atual pode começar α: α<br>α +     →  α; while atual pode começar α: α</div>
+    <ul class="b"><li><code>α +</code> é "uma ou mais vezes", a notação do ANTLR. Na EBNF da aula 09 ela se escreve <code>α { α }</code>.</li></ul>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Judson, aula 05: <code>expr → term oper</code>, <code>oper → + term {print('+')} oper | − term {print('−')} oper | ε</code>. A função final é <code>term(); while true: if '+': match; term(); print('+') elif '−': … else return</code>.</li>
+      <li>Isidro, aula 6: <code>E → T E′</code>, <code>E′ → OP T E′ | ε</code>, <code>T → id | num</code> e <code>OP → + | − | * | /</code>. <code>E′</code> continua recursiva no código: <code>OP(); T(); El()</code>.</li>
+      <li>Lucrédio, aritmética: depois de fatorar e tirar a recursão, ficam <code>expressaoAritmetica</code>, <code>expressaoAritmetica2</code> (com o vazio) e uma sub-regra para <code>+ termo</code> ou <code>− termo</code>. Três funções para uma regra.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Recursão à direita resolve o laço infinito, mas não é só uma questão de código: a árvore muda, e a associatividade pode mudar junto (<a href="#precedencia">próxima seção</a>).</li>
+      <li>Descida recursiva muito funda pode estourar a pilha mesmo sem recursão à esquerda. Para isso existe o preditivo com tabela e pilha própria (<a href="/m8/comp/11-analise-sintatica/consulta#ll1">aula 11</a>).</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="precedencia" data-grupo="Formas da gramática no código" data-termos="">
+  <h2>Precedência e associatividade no código</h2>
+  <aside class="mn loop" data-loop="esquerda" data-ms="9000" data-still="0.9" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>2 − 1 − 1: a cada volta do while, a árvore que existe vira o filho da esquerda.</aside>
+  <p class="cs-def">Cada nível de precedência vira uma função, e a de nível mais baixo chama a do nível de cima: quem é chamado mais fundo fica mais embaixo na árvore e é calculado primeiro. A associatividade sai de como a função repete: com while, à esquerda; com recursão à direita, à direita.</p>
+  <ul class="b">
+    <li>A gramática já precisa ter os níveis da <a href="/m8/comp/08-gramaticas-livres-contexto/consulta#precedencia">aula 08</a>. O Lucrédio escreve a dele assim de propósito: <code>+</code> e <code>−</code> num nível, <code>*</code> e <code>/</code> no de cima.</li>
+    <li>O Crafting começa com uma gramática ambígua, <code>binary → expression operator expression</code>, em que <code>6 / 3 − 1</code> tem duas árvores, e resolve como a aula 08: uma regra por nível de precedência.</li>
+    <li>No Crafting, a escada é <code>expression → equality → comparison → term → factor → unary → primary</code>. Cada regra só casa expressões do seu nível ou de cima.</li>
+    <li>À esquerda: <code>esq = termo(); while atual == '−': esq = ('−', esq, termo())</code>. A árvore que já existe vira o filho da esquerda, então 2 − 1 − 1 é (2 − 1) − 1.</li>
+    <li>À direita: a função chama a si mesma para o lado direito. No Crafting, <code>assignment → IDENT "=" assignment | equality</code>, e <code>a = b = c</code> é <code>a = (b = c)</code>. O menos unário, <code>unary → ( "!" | "−" ) unary | primary</code>, também.</li>
+    <li>Com a gramática transformada <code>E → T E′</code>, a árvore da gramática pende para a direita, mas o código pode montar a conta para a esquerda. O tradutor do Judson imprime <code>9 5 − 2 +</code> para <code>9 − 5 + 2</code>, que é (9 − 5) + 2.</li>
+  </ul>
+  <div class="cs-formula">
+    <div class="formula">soma = termo { OPSOMA termo }<br>termo = fator { OPMUL fator }<br>fator = ( expr ) | IDENT | INTEIRO</div>
+    <ul class="b"><li>Os três níveis da Mini (<a href="/m8/comp/09-especificacao-linguagem/consulta#nova-linguagem">aula 09</a>). OPSOMA é + ou −; OPMUL é * ou /.</li></ul>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li><code>2 + 3 * y</code>: soma chama termo, que devolve 2; vê <code>+</code>, chama termo de novo, e esse termo engole <code>3 * y</code> inteiro antes de voltar. Resultado: <code>(+ 2 (* 3 y))</code>.</li>
+      <li><code>(2 + 3) * y</code>: o parêntese faz fator chamar expr lá de cima. Resultado: <code>(* (+ 2 3) y)</code>.</li>
+      <li>Precedência do Crafting, do mais baixo ao mais alto: <code>== !=</code>, <code>&gt; &gt;= &lt; &lt;=</code>, <code>− +</code>, <code>/ *</code>, e os unários <code>! −</code>. Todos à esquerda, menos os unários.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>O Isidro troca <code>E → E op T</code> por <code>E → T op E</code> para tirar a recursão à esquerda. A linguagem é a mesma, mas a árvore de 5 − 3 − 1 vira 5 − (3 − 1) = 3, e o certo é 1.</li>
+      <li>A tabela de precedência é escolha de projeto. O C pôs <code>&amp;</code> e <code>|</code> abaixo de <code>==</code>, e testar um bit exige parênteses: <code>(x &amp; 1) == 1</code>. O Crafting cita isso como erro histórico copiado por várias linguagens.</li>
+      <li>No vídeo de implementação do Isidro, os quatro operadores ficam num nível só. Para só conferir a sintaxe, serve; para calcular, 2 + 3 * 4 viraria (2 + 3) * 4.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="ast" data-grupo="Formas da gramática no código" data-termos="acao-semantica">
+  <h2>Montando a árvore durante a descida</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><circle class="bl" cx="120" cy="16" r="13"/><text x="120" y="16">=</text><circle class="k" cx="70" cy="58" r="12"/><text x="70" y="58">x</text><circle class="bl" cx="170" cy="58" r="13"/><text x="170" y="58">+</text><circle class="k" cx="136" cy="102" r="12"/><text x="136" y="102">2</text><circle class="bl" cx="204" cy="102" r="13"/><text x="204" y="102">*</text><line class="s" x1="111" y1="25" x2="78" y2="48"/><line class="s" x1="129" y1="25" x2="162" y2="47"/><line class="s" x1="162" y1="68" x2="142" y2="91"/><line class="s" x1="178" y1="68" x2="198" y2="90"/><text class="tm" x="40" y="96">atribuicao()</text><text class="tm" x="40" y="110">devolve isto</text><text class="tm" x="120" y="140">sem ( ), sem ; , sem nó para termo</text></svg>Cada função devolve a subárvore da sua regra.</aside>
+  <p class="cs-def">Cada função, além de conferir a sua regra, devolve o nó da AST correspondente. Quem chamou recebe a subárvore e a encaixa no nó dele; quando a função da variável inicial retorna, a árvore inteira está pronta.</p>
+  <ul class="b">
+    <li>A AST é a <a href="/m8/comp/09-especificacao-linguagem/consulta#concreta-abstrata">sintaxe abstrata da aula 09</a>: só o que tem significado. Parênteses, <code>;</code> e as variáveis intermediárias (termo, fator) não viram nó.</li>
+    <li>Judson: a sequência de chamadas já define a árvore de derivação, sem montar nada. Para a entrada do for, <code>inst, optexpr, optexpr, optexpr, inst</code>. Os nós podem ser criados dentro das funções quando você precisar deles.</li>
+    <li>Um tipo de nó por tipo de construção: no Crafting, <code>Binary(left, operator, right)</code>, <code>Unary(operator, right)</code>, <code>Grouping(expression)</code> e <code>Literal(value)</code> para expressões, e outra família para comandos (<code>Print</code>, <code>Var</code>, <code>Block</code>). As duas famílias são separadas porque, na gramática, nenhum lugar aceita expressão e comando ao mesmo tempo.</li>
+    <li>Os nós só guardam dados, sem comportamento: o parser cria, as fases seguintes leem. Como há várias operações sobre a mesma árvore (imprimir, conferir tipos, interpretar), cada operação fica num lugar só. Em Java, o Crafting usa o padrão Visitor; na Mini, uma função Python com um if por tipo de nó faz o mesmo papel (<code>texto()</code>).</li>
+    <li>Para conferir a precedência, imprima a árvore com todos os parênteses, no estilo Lisp: <code>(* (- 123) (group 45.67))</code> no Crafting, <code>(+ 2 (* 3 y))</code> na Mini. Imprimir <code>2 + 3 * y</code> de volta não mostraria quem ficou em cima.</li>
+    <li>Calcular uma árvore é percorrê-la em pós-ordem: os filhos primeiro, depois o nó. É por isso que quem fica embaixo é calculado antes.</li>
+    <li>Sem AST, o analisador só responde "certo" ou "errado". É o que o Lucrédio monta à mão: passar por todas as funções sem erro prova que o programa segue a gramática, mas nenhuma árvore fica guardada.</li>
+    <li>Outra saída é agir durante a descida, com ações semânticas no meio da regra. A ação entra na função no mesmo lugar em que está na regra: depois de X na regra, depois da chamada de X no código.</li>
+    <li>No ANTLR, a ação vai entre chaves na gramática e é copiada para o parser gerado (<a href="#antlr">ANTLR</a>).</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Mini: <code>soma()</code> faz <code>esq = (op, esq, self.termo())</code>; <code>fator()</code> devolve a expressão de dentro dos parênteses sem criar nó; <code>atribuicao()</code> devolve <code>('=', nome, valor)</code>. Para <code>x = 2 + 3 * y;</code> sai <code>(= x (+ 2 (* 3 y)))</code>.</li>
+      <li>Judson, tradutor de infixa para pós-fixa: <code>expr → expr + term {print('+')} | expr − term {print('−')} | term</code>, <code>term → 0 {print('0')} | … | 9 {print('9')}</code>. Na transformação, as ações são copiadas como se fossem terminais. <code>9 − 5 + 2</code> sai <code>95−2+</code>.</li>
+      <li>No mesmo tradutor, <code>2++4−3</code> dá erro de sintaxe no segundo <code>+</code>, mas a saída já tinha impresso <code>2</code> e ainda não o <code>+</code>: o erro parece aparecer antes do lugar real. É o mesmo efeito do ponto e vírgula esquecido que o compilador acusa na linha de baixo.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Ação na posição errada muda a saída. Em <code>+ term {print('+')}</code>, o print depois de <code>term()</code> dá pós-fixa; antes, daria pré-fixa.</li>
+      <li>O Crafting guarda um nó <code>Grouping</code> para os parênteses; a Mini descarta, porque a forma da árvore já registra o agrupamento. As duas escolhas funcionam; o que não pode é a árvore perder a ordem das contas.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= Erros ================= -->
+<section class="cs" id="erros" data-grupo="Erros" data-termos="">
+  <h2>Mensagens de erro e o fim do arquivo</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 130"><rect class="rd" x="4" y="10" width="232" height="56" rx="6"/><text class="st" x="12" y="28" style="font-size:10px">linha 2, coluna 11:</text><text class="st" x="12" y="44" style="font-size:10px">esperava ')', encontrei 'y'</text><text class="st" x="12" y="58" style="font-size:9px">escreva(x y);</text><path class="s" d="M60 84 L40 68" marker-end="url(#mnarrow)"/><text class="tm" x="66" y="94">onde</text><path class="s" d="M140 84 L120 50" marker-end="url(#mnarrow)"/><text class="tm" x="150" y="94">esperado × encontrado</text><text class="tm" x="120" y="120">as três coisas que ajudam a corrigir</text></svg>A mensagem sai do match que falhou.</aside>
+  <p class="cs-def">Um erro sintático aparece quando o token atual não é nenhum dos que a função esperava naquele ponto. A mensagem útil diz o que era esperado, o que foi encontrado e em que linha e coluna. E o analisador só aceita o programa se, no fim, a entrada também acabou.</p>
+  <ul class="b">
+    <li>Lucrédio: <code>erroSintatico(esperados…)</code> monta "erro sintático: esperando um destes, mas foi encontrado X" e encerra o programa. O <code>match</code> chama essa função quando falha.</li>
+    <li>Isidro: uma exceção própria, <code>IsiSyntaxException</code>, com mensagens como "ID or Number expected, found identifier (abc)". Depois, a pedido de um aluno, ele põe linha e coluna em cada token e na mensagem. O <code>main</code> separa erro léxico de erro sintático.</li>
+    <li>Judson: <code>throw</code> de uma classe <code>SyntaxError</code> vazia e um <code>catch</code> no <code>main</code>. O <i>Crafting</i> faz igual e escreve "at end" quando o erro é no fim do arquivo.</li>
+    <li>Os tipos de erro e as estratégias de recuperação em geral estão na <a href="/m8/comp/11-analise-sintatica/consulta#erros-sintaticos">aula 11</a>; aqui fica como implementar na descida recursiva.</li>
+    <li>Fim do arquivo: depois da função inicial, exija o token de <a href="/m8/comp/07-analise-lexica/consulta#alguma">fim</a>. O Judson confere se sobrou algo além do <code>\n</code>; o Isidro, no procedimento principal, confere se chegou ao fim de arquivo.</li>
+    <li>No Crafting, depois de um erro sintático o <code>parse()</code> não entrega árvore utilizável, e as fases seguintes não rodam (<code>hadError</code>).</li>
+    <li>Num editor ou IDE, o parser roda de novo a cada tecla, sobre código pela metade. Por isso o Crafting trata a mensagem de erro como parte da interface da linguagem.</li>
+    <li>O <i>Crafting</i> lista o que o parser precisa: detectar e reportar o erro, nunca travar nem entrar em laço; e o que é bom ter: ser rápido, achar o máximo de erros diferentes e evitar <a href="/m8/comp/07-analise-lexica/consulta#erros">erros em cascata</a>. As duas últimas brigam, e a <a href="#recuperacao">recuperação</a> é o meio-termo.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Lucrédio põe <code>se numero1 &gt; numero2 &lt;</code> no programa e recebe "esperando ENTAO, mas foi encontrado &lt;". Exatamente o lugar do erro.</li>
+      <li>Depois ele acrescenta, depois do último comando, uma variável solta, e nenhum erro aparece: a regra programa termina na lista de comandos e não diz o que vem depois. Com <code>match(FIM)</code> no fim de <code>programa</code>, sai "esperando FIM, mas foi encontrado" a variável.</li>
+      <li>No primeiro teste dele, o sintático acusa erro numa declaração correta. O culpado era o léxico: uma palavra-chave escrita errada, e o tipo virava variável. No ANTLR, a mesma coisa: "no viable alternative" numa linha certa, porque a regra das variáveis vinha antes da dos operadores <code>E</code> e <code>OU</code> e engolia as palavras (<a href="/m8/comp/07-analise-lexica/consulta#desempate">aula 07</a>).</li>
+      <li>Na Mini, <code>erro()</code> registra "linha 1, coluna 9: esperava uma expressão, encontrei ';'" e devolve a exceção para quem chamou lançar.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Erro na linha de baixo não quer dizer código errado na linha de baixo. Quem esquece o <code>;</code> só é descoberto no primeiro token da linha seguinte.</li>
+      <li>Antes de caçar o erro na gramática, imprima os tokens. O Lucrédio faz isso duas vezes, e nas duas o problema era do léxico.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="recuperacao" data-grupo="Erros" data-termos="modo-panico,token-sincronizacao">
+  <h2>Recuperação de erros: modo pânico e sincronização</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 130"><rect class="k" x="4" y="30" width="26" height="24" rx="4"/><text class="tm" x="17" y="42">x</text><rect class="k" x="32" y="30" width="26" height="24" rx="4"/><text class="tm" x="45" y="42">=</text><rect class="k" x="60" y="30" width="26" height="24" rx="4"/><text class="tm" x="73" y="42">3</text><rect class="k" x="88" y="30" width="26" height="24" rx="4"/><text class="tm" x="101" y="42">+</text><rect class="rd" x="116" y="30" width="26" height="24" rx="4"/><text x="129" y="42">;</text><rect class="gr" x="150" y="30" width="86" height="24" rx="4"/><text x="193" y="42">escreva …</text><text class="tam" x="129" y="20">erro</text><path class="s" d="M129 64 Q140 92 160 64" marker-end="url(#mnarrow)"/><text class="tm" x="150" y="100">descarta até o ;</text><text class="tm" x="120" y="122">e recomeça no próximo comando</text></svg>Os tokens entre o erro e o ponto seguro são jogados fora.</aside>
+  <p class="cs-def">Em vez de parar no primeiro erro, o analisador entra em modo pânico: registra o erro, sai das funções em que estava e descarta tokens até achar um token de sincronização, um ponto em que sabe recomeçar. Aí continua e pode achar os próximos erros.</p>
+  <ul class="b">
+    <li>Os vídeos do Lucrédio, do Isidro e do Judson param no primeiro erro. O Judson só anuncia, na aula 21, que FIRST e FOLLOW também servem para escolher os tokens de sincronização. A técnica vem do <i>Crafting Interpreters</i>, cap. 6 e 8.</li>
+    <li>Na descida recursiva, o estado do analisador são as funções em andamento na <a href="#pilha">pilha de chamadas</a>. Lançar uma exceção desempilha todas até a que vai capturar.</li>
+    <li>O lugar clássico para sincronizar é o comando. A função que analisa um comando (no Crafting, <code>declaration()</code>) envolve a análise num <code>try</code>; no <code>except</code>, chama <code>sincronizar()</code>.</li>
+    <li><code>sincronizar()</code> descarta tokens até passar por um <code>;</code> ou até ver uma palavra que começa comando (<code>se</code>, <code>enquanto</code>, <code>escreva</code>; no Crafting, <code>class</code>, <code>fun</code>, <code>var</code>, <code>for</code>, <code>if</code>…).</li>
+    <li>O preço: um erro real escondido nos tokens descartados não aparece. O ganho: os erros falsos, efeito só da confusão do primeiro, também não.</li>
+    <li>Nem todo erro precisa de pânico. O Crafting reporta "argumentos demais" ou "Invalid assignment target" e segue analisando, porque ali o analisador não se perde. Por isso a função de erro devolve a exceção em vez de lançar: quem chama decide. A Mini faz igual (<code>raise self.erro(…)</code>).</li>
+    <li>Laços que leem até um token de fechamento também conferem o fim do arquivo: <code>while not '}' and not EOF</code>. Sem isso, um <code>}</code> esquecido trava o analisador.</li>
+    <li>Outra técnica, proposta como desafio no Crafting: produções de erro. A gramática ganha uma regra para um erro comum, como um operador binário sem o lado esquerdo (<code>* 3</code>); o analisador reconhece, reporta e consome o operando, sem entrar em pânico.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Mini, entrada <code>x = 3 + ;</code>, <code>escreva(x y);</code>, <code>escreva(2);</code>. Saem dois erros, "linha 1, coluna 9: esperava uma expressão, encontrei ';'" e "linha 2, coluna 11: esperava ')', encontrei 'y'", e a AST <code>(programa [(escreva 2)])</code>. A Figura 3 mostra o que é descartado.</li>
+      <li>Na Mini, quem captura é <code>lista_comandos()</code>, usada no programa e em cada bloco. Um erro dentro de um bloco sincroniza ali dentro, e o <code>}</code> é token de sincronização para o bloco poder fechar.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Se o erro foi no primeiro token do comando e a sincronização para nele mesmo, o analisador tenta o mesmo comando para sempre. Por isso a Mini descarta um token quando nada foi consumido.</li>
+      <li>Na Mini, IDENT não é token de sincronização porque aparece no meio das expressões. O efeito colateral: depois de um erro, uma atribuição pode ser engolida sem aviso até o próximo <code>;</code>.</li>
+    </ul>
+  </div>
+  <figure class="fig" id="fig-panico">
+    <div class="fig-head"><span class="fig-title">Figura 3 · Modo pânico na Mini: dois erros, uma AST</span></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <div class="lbl">tokens (verde: aceito; riscado: descartado; vermelho: onde o erro apareceu)</div>
+        <div class="tks chips" id="pa-tks"></div>
+        <div class="lbl">pilha de chamadas (topo em cima)</div>
+        <div class="tks chips fases" id="pa-pilha" style="flex-direction:column-reverse;align-items:flex-start"></div>
+        <div class="lbl">erros registrados</div>
+        <pre class="code" id="pa-erros"></pre>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+</section>
+
+<!-- ================= Na prática ================= -->
+<section class="cs" id="analisador" data-grupo="Na prática" data-termos="">
+  <h2>Um analisador completo em Python para a Mini</h2>
+  <p class="cs-def">Um analisador descendente recursivo inteiro, autoral desta aula, para a <a href="/m8/comp/09-especificacao-linguagem/consulta#nova-linguagem">linguagem Mini da aula 09</a>: léxico curto, uma função por regra da EBNF, AST em tuplas, mensagens com linha e coluna e modo pânico. São cerca de 180 linhas, testadas com Python 3.13.</p>
+  <ul class="b">
+    <li>O léxico é uma versão curta do da <a href="/m8/comp/07-analise-lexica/consulta#antlr">aula 07</a>: uma expressão regular por tipo de token, palavras-chave separadas dos identificadores e um token <code>EOF</code> no fim.</li>
+    <li>Palavra-chave e pontuação usam o próprio texto como tipo (<code>'se'</code>, <code>';'</code>), então <code>match(';')</code> lê como a regra.</li>
+    <li>Cada função de regra tem a regra em EBNF no comentário de cima.</li>
+    <li>A AST usa tuplas: <code>('=', nome, valor)</code>, <code>('+', esq, dir)</code>, <code>('se', cond, entao, senao)</code>. Nome de variável fica como texto; número, como int; <code>verdadeiro</code> e <code>falso</code>, como bool.</li>
+  </ul>
+  <div class="prose"><pre class="code">import re
+from collections import namedtuple
+
+# ---------- léxico: uma versão curta do analisador da aula 07 ----------
+Token = namedtuple('Token', 'tipo lexema linha coluna')
+PALAVRAS = {'se', 'senao', 'enquanto', 'escreva', 'verdadeiro', 'falso'}
+PADRAO = re.compile(r'''(?P&lt;ESPACO&gt;\s+|//[^\n]*)
+  |(?P&lt;INTEIRO&gt;\d+)  |(?P&lt;IDENT&gt;[a-z][a-z0-9_]*)
+  |(?P&lt;OPREL&gt;==|!=|&lt;=|&gt;=|&lt;|&gt;)  |(?P&lt;SIMBOLO&gt;[=(){};])
+  |(?P&lt;OPSOMA&gt;[+-])  |(?P&lt;OPMUL&gt;[*/])''', re.VERBOSE)
+
+def lexico(fonte):
+    tokens, pos, linha, inicio_linha = [], 0, 1, 0
+    while pos &lt; len(fonte):
+        m = PADRAO.match(fonte, pos)
+        if not m:
+            raise SyntaxError(f'linha {linha}: erro léxico em {fonte[pos]!r}')
+        tipo, lex = m.lastgroup, m.group()
+        if (tipo == 'IDENT' and lex in PALAVRAS) or tipo == 'SIMBOLO':
+            tipo = lex                     # palavra-chave e pontuação: o tipo é o próprio texto
+        if tipo != 'ESPACO':
+            tokens.append(Token(tipo, lex, linha, pos - inicio_linha + 1))
+        for i, c in enumerate(lex):        # conta linhas para as mensagens de erro
+            if c == '\n':
+                linha, inicio_linha = linha + 1, pos + i + 1
+        pos = m.end()
+    tokens.append(Token('EOF', '', linha, pos - inicio_linha + 1))
+    return tokens
+
+# ---------- sintático: descida recursiva, uma função por regra ----------
+class ErroSintatico(Exception):
+    pass
+
+INICIO_COMANDO = {'IDENT', 'se', 'enquanto', 'escreva'}
+
+class Parser:
+    def __init__(self, tokens):
+        self.tokens, self.i, self.erros = tokens, 0, []
+
+    def atual(self):                       # espia o próximo token, sem consumir
+        return self.tokens[self.i]
+
+    def match(self, tipo):                 # confere o tipo e consome
+        if self.atual().tipo != tipo:
+            raise self.erro(f'esperava {tipo!r}')
+        self.i += 1
+        return self.tokens[self.i - 1]
+
+    def erro(self, esperado):              # registra e devolve a exceção
+        tk = self.atual()
+        achou = repr(tk.lexema) if tk.lexema else 'o fim do arquivo'
+        self.erros.append(f'linha {tk.linha}, coluna {tk.coluna}: {esperado}, encontrei {achou}')
+        return ErroSintatico()
+
+    # programa = { comando } EOF ;
+    def programa(self):
+        comandos = self.lista_comandos(fim='EOF')
+        self.match('EOF')
+        return ('programa', comandos)
+
+    def lista_comandos(self, fim):         # { comando } vira um while
+        comandos = []
+        while self.atual().tipo not in (fim, 'EOF'):
+            inicio = self.i
+            try:
+                comandos.append(self.comando())
+            except ErroSintatico:          # modo pânico
+                if self.i == inicio:
+                    self.i += 1            # nada foi consumido: descarta o token do erro
+                self.sincronizar()
+        return comandos
+
+    def sincronizar(self):                 # descarta até depois de ';' ou até um começo seguro
+        while self.atual().tipo not in ('se', 'enquanto', 'escreva', '}', 'EOF'):
+            self.i += 1
+            if self.tokens[self.i - 1].tipo == ';':
+                return
+
+    # comando = atribuicao | se | enquanto | escreva ;
+    def comando(self):
+        tipo = self.atual().tipo           # o lookahead escolhe a alternativa
+        if tipo == 'IDENT':    return self.atribuicao()
+        if tipo == 'se':       return self.se()
+        if tipo == 'enquanto': return self.enquanto()
+        if tipo == 'escreva':  return self.escreva()
+        raise self.erro('esperava um comando')
+
+    # atribuicao = IDENT "=" expr ";" ;
+    def atribuicao(self):
+        nome = self.match('IDENT').lexema
+        self.match('=')
+        valor = self.expr()
+        self.match(';')
+        return ('=', nome, valor)
+
+    # se = "se" "(" expr ")" bloco [ "senao" bloco ] ;
+    def se(self):
+        self.match('se'); self.match('(')
+        cond = self.expr()
+        self.match(')')
+        entao, senao = self.bloco(), None
+        if self.atual().tipo == 'senao':   # [ ... ] vira um if
+            self.match('senao')
+            senao = self.bloco()
+        return ('se', cond, entao, senao)
+
+    # enquanto = "enquanto" "(" expr ")" bloco ;
+    def enquanto(self):
+        self.match('enquanto'); self.match('(')
+        cond = self.expr()
+        self.match(')')
+        return ('enquanto', cond, self.bloco())
+
+    # escreva = "escreva" "(" expr ")" ";" ;
+    def escreva(self):
+        self.match('escreva'); self.match('(')
+        valor = self.expr()
+        self.match(')'); self.match(';')
+        return ('escreva', valor)
+
+    # bloco = "{" { comando } "}" ;
+    def bloco(self):
+        self.match('{')
+        comandos = self.lista_comandos(fim='}')
+        self.match('}')
+        return comandos
+
+    # expr = soma [ OPREL soma ] ;
+    def expr(self):
+        esq = self.soma()
+        if self.atual().tipo == 'OPREL':
+            op = self.match('OPREL').lexema
+            esq = (op, esq, self.soma())
+        return esq
+
+    # soma = termo { OPSOMA termo } ;
+    def soma(self):
+        esq = self.termo()
+        while self.atual().tipo == 'OPSOMA':
+            op = self.match('OPSOMA').lexema
+            esq = (op, esq, self.termo())  # o que já existe vira o filho da esquerda
+        return esq
+
+    # termo = fator { OPMUL fator } ;
+    def termo(self):
+        esq = self.fator()
+        while self.atual().tipo == 'OPMUL':
+            op = self.match('OPMUL').lexema
+            esq = (op, esq, self.fator())
+        return esq
+
+    # fator = "(" expr ")" | IDENT | INTEIRO | "verdadeiro" | "falso" ;
+    def fator(self):
+        tipo = self.atual().tipo
+        if tipo == '(':
+            self.match('(')
+            dentro = self.expr()
+            self.match(')')
+            return dentro                  # os parênteses não viram nó
+        if tipo == 'IDENT':   return self.match('IDENT').lexema
+        if tipo == 'INTEIRO': return int(self.match('INTEIRO').lexema)
+        if tipo in ('verdadeiro', 'falso'):
+            return self.match(tipo).tipo == 'verdadeiro'
+        raise self.erro('esperava uma expressão')
+
+def texto(no):                             # AST em uma linha: (+ 2 (* 3 y))
+    if isinstance(no, tuple):
+        return '(' + ' '.join(texto(f) for f in no if f is not None) + ')'
+    if isinstance(no, list):
+        return '[' + ' '.join(texto(f) for f in no) + ']'
+    if isinstance(no, bool):
+        return 'verdadeiro' if no else 'falso'
+    return str(no)
+
+def analisar(fonte):
+    p = Parser(lexico(fonte))
+    arvore = p.programa()
+    return arvore, p.erros
+
+if __name__ == '__main__':
+    arvore, erros = analisar('x = 2 + 3 * y;')
+    print(texto(arvore))
+    arvore, erros = analisar('x = 3 + ;\nescreva(x y);\nescreva(2);')
+    print(texto(arvore))
+    print('\n'.join(erros))</pre></div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Rodando o arquivo, sai <code>(programa [(= x (+ 2 (* 3 y)))])</code> para <code>x = 2 + 3 * y;</code>. Para a entrada com erros, sai <code>(programa [(escreva 2)])</code> e as duas mensagens da <a href="#recuperacao">recuperação</a>.</li>
+      <li>O fatorial da aula 09, <code>n = 5; f = 1; enquanto (n &gt; 1) { f = f * n; n = n - 1; } escreva(f);</code>, dá <code>(programa [(= n 5) (= f 1) (enquanto (&gt; n 1) [(= f (* f n)) (= n (- n 1))]) (escreva f)])</code>, sem erros.</li>
+      <li><code>x = 2 @ 3;</code> nem chega ao sintático: o léxico levanta "erro léxico em '@'".</li>
+      <li><code>escreva(1 &lt; 2 &lt; 3);</code> dá erro no segundo <code>&lt;</code>: em <code>expr = soma [ OPREL soma ]</code> a comparação aparece no máximo uma vez.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>A gramática aceita <code>se (1 + 2) { … }</code>. Conferir que a condição é booleana é trabalho da semântica, como diz a especificação da Mini.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="pilha" data-grupo="Na prática" data-termos="">
+  <h2>A pilha de chamadas é a árvore</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 160"><rect class="k" x="10" y="130" width="96" height="20" rx="4"/><text class="tm" x="58" y="140">programa</text><rect class="k" x="10" y="108" width="96" height="20" rx="4"/><text class="tm" x="58" y="118">atribuicao</text><rect class="k" x="10" y="86" width="96" height="20" rx="4"/><text class="tm" x="58" y="96">expr</text><rect class="k" x="10" y="64" width="96" height="20" rx="4"/><text class="tm" x="58" y="74">soma</text><rect class="k" x="10" y="42" width="96" height="20" rx="4"/><text class="tm" x="58" y="52">termo</text><rect class="am" x="10" y="20" width="96" height="20" rx="4"/><text x="58" y="30">fator</text><text class="tm" x="58" y="10">topo</text><path class="s" d="M112 30 H140" marker-end="url(#mnarrow)"/><text class="st" x="146" y="26" style="font-size:10px">caminho da raiz</text><text class="st" x="146" y="40" style="font-size:10px">até o nó atual</text><text class="st" x="146" y="70" style="font-size:9px">cada quadro guarda</text><text class="st" x="146" y="84" style="font-size:9px">onde voltar</text></svg>Em qualquer instante, a pilha é um caminho da árvore.</aside>
+  <p class="cs-def">Enquanto o analisador trabalha, as funções em andamento formam uma pilha: a da variável inicial embaixo, a que está consumindo tokens no topo. Em cada instante a pilha é o caminho da raiz da árvore até o nó que está sendo montado, e a ordem das chamadas percorre a árvore inteira.</p>
+  <ul class="b">
+    <li>É a <a href="/m8/comp/04-processos-threads/consulta#pilha-execucao">pilha de execução</a> da aula 04: cada chamada empilha um quadro com as variáveis locais e o endereço de volta. O analisador não precisa de pilha própria.</li>
+    <li>No vídeo 6 da playlist Aulas de Computação, o professor desenha essa pilha à mão, com a linha para onde cada chamada volta, para a entrada da gramática de somas.</li>
+    <li>Lucrédio: a sequência de chamadas recursivas corresponde às derivações e à árvore de análise sintática.</li>
+    <li>Ela também é o "estado" do analisador: em que regra ele está e o que falta da regra. É por isso que uma exceção basta para reiniciar o estado na <a href="#recuperacao">recuperação</a>.</li>
+    <li>A altura máxima da pilha acompanha a altura da árvore. Expressões muito aninhadas, como <code>((((1))))</code>, empilham fundo, e é isso que pode estourar a pilha (Judson, aula 21).</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b"><li>A Figura 2 roda a Mini em <code>x = 2 + 3 * y;</code>. Repare que nenhum token é consumido enquanto a pilha cresce de <code>atribuicao</code> até <code>fator</code>, e que o <code>+</code> é consumido por <code>soma</code>, lá embaixo, depois que termo e fator já voltaram.</li></ul>
+  </div>
+  <figure class="fig" id="fig-pilha">
+    <div class="fig-head"><span class="fig-title">Figura 2 · A pilha de chamadas da Mini em x = 2 + 3 * y;</span></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <div class="lbl">tokens (verde: consumido; amarelo: atual)</div>
+        <div class="tks chips" id="pi-tks"></div>
+        <div class="lbl">pilha de chamadas (topo em cima)</div>
+        <div class="tks chips fases" id="pi-pilha" style="flex-direction:column-reverse;align-items:flex-start"></div>
+        <div class="lbl">último valor devolvido</div>
+        <pre class="code" id="pi-ret"></pre>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+</section>
+
+<section class="cs" id="antlr" data-grupo="Na prática" data-termos="">
+  <h2>O mesmo analisador gerado pelo ANTLR</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 140"><rect class="bl" x="6" y="10" width="80" height="40" rx="8"/><text class="tb" x="46" y="30">Alguma.g4</text><path class="s" d="M88 30 H150" marker-end="url(#mnarrow)"/><text class="tm" x="119" y="22">ANTLR</text><rect class="gr" x="152" y="10" width="82" height="40" rx="8"/><text class="tm" x="193" y="24">AlgumaParser</text><text class="tm" x="193" y="38">.java</text><text class="st" x="10" y="74" style="font-size:9.5px">programa() {</text><text class="st" x="20" y="88" style="font-size:9.5px">match(T0); listaDeclaracoes();</text><text class="st" x="20" y="102" style="font-size:9.5px">switch (adaptivePredict(…)) …</text><text class="st" x="10" y="116" style="font-size:9.5px">}</text><text class="tm" x="120" y="134">o gerado parece o feito à mão</text></svg>match, chamadas e um switch para decidir.</aside>
+  <p class="cs-def">O ANTLR lê a gramática num arquivo <code>.g4</code> e gera um analisador descendente recursivo: uma função por regra, <code>match</code> para os terminais e um switch para escolher a alternativa. A diferença é como ele decide: o ALL(*) espia à frente o quanto precisar (<a href="/m8/comp/11-analise-sintatica/consulta#llk-antlr">aula 11</a>).</p>
+  <ul class="b">
+    <li>No vídeo 09, o Lucrédio usa a mesma gramática da Alguma do vídeo 08, agora com as regras léxicas no mesmo arquivo, e não transforma nada: o ANTLR aceita a recursão à esquerda direta e reescreve sozinho.</li>
+    <li>O conflito dos parênteses (expressão relacional e aritmética começando com <code>(</code>) também deixa de ser problema: a predição adaptativa experimenta à frente até achar a alternativa certa.</li>
+    <li>O código gerado tem <code>match</code>, chamadas para as outras regras e, onde há decisão, um switch sobre <code>adaptivePredict</code>. Dá para depurar passo a passo como o feito à mão.</li>
+    <li>Recursão à esquerda indireta, passando por outra regra, o ANTLR não resolve (Lucrédio, vídeo 08).</li>
+    <li>Ações semânticas: código Java entre <code>{ }</code> no meio de uma regra é copiado para o parser gerado e roda naquele ponto. <code>$VARIAVEL.text</code> é o texto do token; <code>returns [String tipo]</code> faz a regra devolver um valor; rótulos como <code>cmd1=comando cmd2=comando</code> separam duas ocorrências da mesma regra.</li>
+    <li>Ação que lê um valor antes de a regra que o produz ter sido analisada não funciona: a posição importa, como na <a href="#ast">montagem da árvore</a>.</li>
+    <li>Por que aprender a versão à mão, se o ANTLR faz tudo? Para depurar: entender a chamada recursiva, o match e a decisão, que é onde costuma estar o problema. Num gerador ascendente (<a href="/m8/comp/11-analise-sintatica/consulta#ascendente">aula 11</a>), regra e código não se correspondem assim, e depurar é mais difícil.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>No <code>main</code>: <code>CharStreams.fromFileName</code>, o léxico gerado, <code>CommonTokenStream</code> (o buffer de tokens que o Lucrédio fez à mão) e <code>parser.programa()</code>, a regra inicial.</li>
+      <li>Para exigir o arquivo inteiro, a regra <code>programa</code> termina com <code>EOF</code>, como no manual.</li>
+      <li>Com <code>listaComandos : comando+</code>, o gerado troca a chamada recursiva por um laço.</li>
+      <li>O projeto usa Maven com o plugin do ANTLR 4 e o assembly para gerar um jar com as dependências; a gramática fica em <code>src/main/antlr4/</code>, nos diretórios do pacote.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b"><li>Erro de digitação Java dentro de uma ação só aparece ao compilar o parser gerado, numa linha do arquivo gerado, não da gramática.</li></ul>
+  </div>
+</section>
+
+<section class="cs" id="projeto" data-grupo="Na prática" data-termos="">
+  <h2>No projeto da nova linguagem</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 160"><rect class="gr" x="6" y="6" width="228" height="24" rx="5"/><text class="st" x="14" y="18" style="font-size:10px">1. EBNF da especificação (aula 09)</text><rect class="bl" x="6" y="34" width="228" height="24" rx="5"/><text class="st" x="14" y="46" style="font-size:10px">2. sem recursão à esquerda, FIRST disjuntos</text><rect class="bl" x="6" y="62" width="228" height="24" rx="5"/><text class="st" x="14" y="74" style="font-size:10px">3. uma função por regra, um nível por função</text><rect class="am" x="6" y="90" width="228" height="24" rx="5"/><text class="st" x="14" y="102" style="font-size:10px">4. AST, mensagens e sincronização</text><rect class="k" x="6" y="118" width="228" height="24" rx="5"/><text class="st" x="14" y="130" style="font-size:10px">5. os exemplos da especificação viram testes</text><text class="tm" x="120" y="154">da especificação ao analisador</text></svg>Cada passo usa uma seção desta aula.</aside>
+  <p class="cs-def">Para o projeto, o analisador sintático da nova linguagem sai da especificação da <a href="/m8/comp/09-especificacao-linguagem/consulta#especificacao">aula 09</a>: a gramática em EBNF vira o roteiro das funções, os tokens vêm do léxico da aula 07 e os exemplos válidos e inválidos viram testes.</p>
+  <ul class="b">
+    <li>Antes de escrever código, confira a gramática: nenhuma recursão à esquerda e, em cada regra com alternativas, tokens iniciais diferentes (<a href="/m8/comp/11-analise-sintatica/consulta#ll1">aula 11</a>). O que não passar, reescreva ou use lookahead maior onde for pontual.</li>
+    <li>Expressões: um nível por função, na ordem da especificação. Decida a associatividade de cada operador e confira com uma conta como 5 − 3 − 1.</li>
+    <li>A AST é a sintaxe abstrata da especificação. A fase seguinte, a semântica, trabalha em cima dela.</li>
+    <li>Decida onde cada comando pode aparecer. O Crafting separa <code>declaration</code> (com <code>var</code>) de <code>statement</code>: <code>if (x) var y = 1;</code> é proibido, porque ninguém saberia o escopo de <code>y</code>. Na gramática, isso é um nível de "precedência" entre comandos.</li>
+    <li>Defina onde sincronizar: em geral no <code>;</code>, nas palavras que começam comando e no fecha-bloco.</li>
+    <li>Com os exemplos da especificação: cada válido tem de passar sem erro; cada um com erro sintático tem de gerar a mensagem com linha e coluna certas.</li>
+    <li>Depois do parser vem a semântica e, num interpretador, a execução da AST: guardar o valor das variáveis num ambiente e criar um ambiente novo para cada bloco (escopo). É a segunda metade do cap. 8 do Crafting e fica para as próximas aulas.</li>
+    <li>O slide da aula 01 do prof. Resina já diz que o sintático do projeto usa recursão e monta a árvore sintática (<a href="/m8/comp/08-gramaticas-livres-contexto/consulta#sintatico">aula 08</a>).</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b"><li>Começar pelo código e acertar a gramática depois. Cada mudança de regra muda funções e mensagens; com a gramática conferida antes, a tradução é mecânica.</li></ul>
+  </div>
+</section>
+
+<!-- ================= Treino ================= -->
+<section class="cs" id="treino" data-grupo="Treino" data-termos="">
+  <h2>Treino: exercícios autorais</h2>
+  <p class="cs-def">Exercícios autorais, não do professor, sobre os vídeos e o analisador da Mini. Resolva antes de abrir a resposta; ela é uma solução possível, não a única.</p>
+  <div class="cs-uso">
+    <details><summary>1 · Escreva a função de <code>lista = item { "," item } ;</code>, com <code>item = IDENT</code>, devolvendo a lista de nomes.</summary>
+      <details><summary>Uma resposta</summary><p><code>def lista(self): nomes = [self.match('IDENT').lexema]; while self.atual().tipo == ',': self.match(','); nomes.append(self.match('IDENT').lexema); return nomes</code>. O <code>{ }</code> virou while, e a condição é o token que começa o que se repete.</p></details>
+    </details>
+    <details><summary>2 · A regra <code>L → L , id | id</code> pode virar função direto? Se não, reescreva e escreva o código.</summary>
+      <details><summary>Uma resposta</summary><p>Não: <code>L()</code> chamaria <code>L()</code> na primeira linha. Reescreva <code>L → id L′</code>, <code>L′ → , id L′ | ε</code>, ou em EBNF <code>L = id { "," id }</code>, que é o exercício 1.</p></details>
+    </details>
+    <details><summary>3 · Desenhe a árvore de 5 − 3 − 1 com <code>E → T − E | T</code> e com o while da Mini. Qual conta cada uma dá?</summary>
+      <details><summary>Uma resposta</summary><p><code>E → T − E</code>: o E da direita pega <code>3 − 1</code>, então 5 − (3 − 1) = 3. O while da Mini: <code>(- (- 5 3) 1)</code> = 1, que é o certo para o menos.</p></details>
+    </details>
+    <details><summary>4 · Acrescente à Mini o menos unário (<code>-x</code>, <code>--x</code>). Onde entra na gramática, qual a associatividade e como fica o código?</summary>
+      <details><summary>Uma resposta</summary><p>Um nível acima de fator: <code>termo = unario { OPMUL unario }</code>, <code>unario = "-" unario | fator</code>. Associativo à direita, por recursão: <code>if self.atual().lexema == '-': self.match('OPSOMA'); return ('neg', self.unario())</code>, senão <code>return self.fator()</code>. Repare que o <code>-</code> chega como OPSOMA.</p></details>
+    </details>
+    <details><summary>5 · Na gramática <code>A → a b | a c | a</code>, conte as tentativas de uma descida com backtracking para <code>a</code>, e escreva a versão preditiva.</summary>
+      <details><summary>Uma resposta</summary><p>Tenta <code>a b</code> (o a casa, falta b), volta, tenta <code>a c</code> (falha igual), volta, tenta <code>a</code>: três tentativas e o <code>a</code> lido três vezes. Preditiva: <code>A → a A′</code>, <code>A′ → b | c | ε</code>, com <code>A′</code> olhando o token depois do <code>a</code>.</p></details>
+    </details>
+    <details><summary>6 · Na Mini, <code>} ) x = 1;</code> gera um erro só e a AST sai vazia. Por que a atribuição sumiu, e como evitar?</summary>
+      <details><summary>Uma resposta</summary><p>O erro é no <code>}</code>. Nada foi consumido, então o <code>}</code> é descartado, e <code>sincronizar()</code> pula <code>) x = 1</code> até o <code>;</code>, porque IDENT não é token de sincronização. Uma saída: parar também em IDENT quando o token seguinte for <code>=</code> (olhando dois à frente), que só acontece no começo de uma atribuição.</p></details>
+    </details>
+    <details><summary>7 · Quantos quadros a pilha tem, no máximo, para <code>x = ((1));</code> na Mini?</summary>
+      <details><summary>Uma resposta</summary><p>programa, lista_comandos, comando, atribuicao, e então expr, soma, termo, fator três vezes (um por par de parênteses e o do 1): 4 + 3 × 4 = 16 quadros, sem contar o <code>match</code>.</p></details>
+    </details>
+    <details><summary>8 · Escreva <code>rpn(no)</code>, que transforma uma expressão da AST da Mini em notação pós-fixa (<code>(1 + 2) * (4 - 3)</code> vira <code>1 2 + 4 3 - *</code>).</summary>
+      <details><summary>Uma resposta</summary><p><code>def rpn(no): if isinstance(no, tuple): op, esq, dir = no; return f'{rpn(esq)} {rpn(dir)} {op}'</code> e, para folhas, <code>return texto(no)</code>. É um percurso em pós-ordem: os dois filhos, depois o operador. Para <code>9 - 5 + 2</code> sai <code>9 5 - 2 +</code>, a mesma saída do tradutor do Judson, agora a partir da árvore.</p></details>
+    </details>
+    <details><summary>9 · Reescreva <code>bloco = "{" { comando } "}"</code> sem EBNF, só com regras de GLC.</summary>
+      <details><summary>Uma resposta</summary><p><code>B → { L }</code>, <code>L → C L | ε</code>. A repetição virou uma variável nova recursiva à direita, que pode sumir. Por isso a EBNF é só uma forma mais curta.</p></details>
+    </details>
+    <details><summary>10 · Acrescente à Mini o operador ternário <code>c ? a : b</code>. Em que nível de precedência ele entra, com que associatividade, e o que pode ficar entre o <code>?</code> e o <code>:</code>?</summary>
+      <details><summary>Uma resposta</summary><p>Abaixo da comparação, como em C: <code>cond = expr [ "?" cond ":" cond ]</code>, e quem usava <code>expr</code> passa a usar <code>cond</code>. Associativo à direita, por recursão: <code>a ? b : c ? d : e</code> é <code>a ? b : (c ? d : e)</code>. Entre o <code>?</code> e o <code>:</code> cabe qualquer expressão, porque os dois tokens cercam o meio como parênteses. O código: <code>c = self.expr(); if atual == '?': match; a = self.cond(); match(':'); b = self.cond(); return ('?', c, a, b)</code>.</p></details>
+    </details>
+    <details><summary>11 · O ANTLR acusa "no viable alternative at input" numa linha que você jura estar certa. O que conferir primeiro?</summary>
+      <details><summary>Uma resposta</summary><p>Os tokens: imprima a lista que o léxico gerou para aquela linha. Nos dois vídeos do Lucrédio, uma palavra-chave estava virando identificador (escrita errada, ou com a regra de VARIAVEL antes dela). Só depois olhe a gramática.</p></details>
+    </details>
+  </div>
+  <div class="cs-pegadinhas">Uma boa resposta traz o código ou a gramática e uma linha dizendo qual token decide cada escolha.</div>
+</section>

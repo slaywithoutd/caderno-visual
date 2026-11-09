@@ -1,0 +1,702 @@
+<!-- Aula 11 · Análise sintática. Aula somente Consulta: figuras, loops e desenhos estão aqui mesmo.
+     Um conceito por seção, na ordem das dependências. GLC, derivação, árvore, ambiguidade e precedência
+     moram nas aulas 01 e 08; fases do compilador e tokens na 07; EBNF e sintaxe abstrata na 09.
+     O descendente recursivo como implementação é da aula 12. -->
+
+<!-- ================= Resumo ================= -->
+<section class="cs" id="encontro" data-grupo="Resumo" data-termos="">
+  <h2>Resumo</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 170"><rect class="k" x="4" y="6" width="232" height="26" rx="6"/><text class="tm" x="38" y="19">tokens</text><text x="140" y="19" style="font-size:11px">id  +  id  *  id  $</text><text class="tam" x="60" y="48">LL: de cima</text><text class="tam" x="180" y="48">LR: de baixo</text><circle class="bl" cx="60" cy="70" r="11"/><text x="60" y="70" style="font-size:10px">E</text><circle class="k" cx="36" cy="106" r="10"/><circle class="k" cx="84" cy="106" r="10"/><line class="s" x1="54" y1="79" x2="40" y2="97"/><line class="s" x1="66" y1="79" x2="80" y2="97"/><path class="s" d="M60 120 V146" marker-end="url(#mnarrow)"/><text class="tm" x="60" y="160">derivação</text><circle class="k" cx="156" cy="70" r="10"/><circle class="k" cx="204" cy="70" r="10"/><circle class="gr" cx="180" cy="106" r="11"/><text x="180" y="106" style="font-size:10px">E</text><line class="s" x1="160" y1="79" x2="174" y2="97"/><line class="s" x1="200" y1="79" x2="186" y2="97"/><path class="s" d="M180 146 V122" marker-end="url(#mnarrow)"/><text class="tm" x="180" y="160">redução</text></svg>A mesma árvore, montada em sentidos opostos.</aside>
+  <p class="cs-def">O analisador sintático recebe os tokens do léxico e monta a árvore do programa. Esta aula mostra os dois jeitos de montar essa árvore, de cima para baixo (LL) e de baixo para cima (LR), e o que a gramática precisa ter para cada um funcionar sem chutar.</p>
+  <ul class="b">
+    <li>Descendente parte da variável inicial e deriva sempre pela esquerda; ascendente parte dos tokens e reduz até a inicial.</li>
+    <li>O descendente preditivo escolhe a regra olhando k tokens à frente. Com uma gramática LL(1), um token basta e não há tentativa e erro.</li>
+    <li>Para chegar a LL(1): tire a ambiguidade, elimine a recursão à esquerda (A → Aα | β vira A → βA′, A′ → αA′ | ε) e fatore os prefixos comuns.</li>
+    <li>FIRST(α) são os terminais que podem começar α; FOLLOW(A), os que podem vir logo depois de A. Com eles você preenche a tabela LL(1); célula com duas regras quer dizer que a gramática não é LL(1).</li>
+    <li>O ascendente faz shift (empilha o token) e reduce (troca um handle, o corpo de uma regra no topo da pilha, pela cabeça). A tabela LR diz qual dos dois fazer, e recursão à esquerda não atrapalha.</li>
+    <li>Conflitos shift-reduce e reduce-reduce são a célula dupla do LR. O else pendente se resolve empilhando; a precedência, com regras extras como as do Yacc. SLR, LR(1) e LALR diferem só na tabela.</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Recursão à esquerda não é ambiguidade: E → E + T é recursiva à esquerda e tem uma árvore só por cadeia.</li>
+      <li>FIRST pode conter ε; FOLLOW nunca contém ε, mas pode conter $.</li>
+      <li>No preditivo com pilha, o corpo da regra entra ao contrário: o primeiro símbolo fica no topo.</li>
+      <li>No reduce do LR, você desempilha tantos estados quantos símbolos o corpo tem, sem olhar quais são, e depois consulta a transição.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= O analisador sintático ================= -->
+<section class="cs" id="papel" data-grupo="O analisador sintático" data-termos="cabeca-corpo">
+  <h2>O que o analisador sintático faz</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="k" x="4" y="8" width="62" height="30" rx="6"/><text class="tm" x="35" y="23">caracteres</text><path class="s" d="M66 23 H80" marker-end="url(#mnarrow)"/><rect class="gr" x="82" y="8" width="56" height="30" rx="6"/><text x="110" y="23" style="font-size:11px">léxico</text><path class="s" d="M138 23 H152" marker-end="url(#mnarrow)"/><rect class="k" x="154" y="8" width="82" height="30" rx="6"/><text class="tm" x="195" y="23">ID = ID + INT</text><path class="s" d="M195 40 V56" marker-end="url(#mnarrow)"/><rect class="bl" x="140" y="58" width="96" height="30" rx="6"/><text class="tb" x="188" y="73">sintático</text><path class="s" d="M140 73 H112" marker-end="url(#mnarrow)"/><circle class="bl" cx="78" cy="64" r="9"/><circle class="k" cx="56" cy="92" r="7"/><circle class="k" cx="78" cy="92" r="7"/><circle class="k" cx="100" cy="92" r="7"/><line class="s" x1="74" y1="72" x2="59" y2="86"/><line class="s" x1="78" y1="73" x2="78" y2="85"/><line class="s" x1="82" y1="72" x2="97" y2="86"/><path class="s" d="M78 102 V118" marker-end="url(#mnarrow)"/><rect class="am" x="30" y="120" width="96" height="26" rx="6"/><text x="78" y="133" style="font-size:11px">semântico</text><text class="tm" x="186" y="112">usa só o tipo</text><text class="tm" x="186" y="126">do token</text></svg>Entre o léxico e o semântico, no front-end.</aside>
+  <p class="cs-def">O analisador sintático é a fase que recebe a fila de tokens do léxico, confere se ela sai da gramática e devolve uma árvore sintática do programa para o semântico. Ele fica na análise, o front-end das <a href="/m8/comp/07-analise-lexica/consulta#fases">fases do compilador</a>.</p>
+  <ul class="b">
+    <li>A divisão do vídeo: vocabulário é o léxico (as palavras); gramática é o sintático (como as palavras se juntam em conceitos e ações, como "eu vou ao mercado hoje").</li>
+    <li>Você já faz análise sintática desde a escola: "santo de casa não faz milagre" vira uma árvore com oração, sujeito simples (núcleo santo, adjunto "de casa") e predicado (faz, não, milagre). O compilador precisa de um algoritmo para fazer o mesmo com o programa.</li>
+    <li>Os terminais da gramática são os tipos de token. De um token (ID, var1), o sintático usa só ID; o nome var1 fica para depois, porque nomes quebram a liberdade de contexto (<a href="/m8/comp/07-analise-lexica/consulta#sintaxe">aula 07</a>).</li>
+    <li>Os não terminais são as construções da linguagem: programa, lista de comandos, comando if, atribuição.</li>
+    <li>O sintático pode ir preenchendo a tabela de símbolos, mas não confere nada que dependa de contexto.</li>
+    <li>Nomes do vídeo: cabeça é o lado esquerdo de uma regra (uma variável só); corpo é o lado direito (zero ou mais símbolos). A quádrupla é (V, T, P, S), como na <a href="/m8/comp/01-conceitos/consulta#gramatica">aula 01</a>, e em geral basta escrever P.</li>
+    <li>Atalhos de escrita: | separa alternativas da mesma cabeça; parênteses criam uma sub-regra sem nome, como em <code>CMD → (CMD_IF | ATRIB)</code>.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>A árvore que sai da análise é a concreta (parse tree): um nó para cada regra usada, inclusive parênteses e palavras como <code>then</code>. Depois ela pode virar a <a href="/m8/comp/09-especificacao-linguagem/consulta#concreta-abstrata">árvore abstrata</a>, que guarda só o que tem significado e simplifica o semântico e a geração de código.</li>
+      <li>Exemplo do vídeo: <code>if 0 then x := 1 else x := 0</code> tem uma árvore concreta cheia de nós (CMD, CMD_IF, os parênteses, o then); a abstrata é um nó If com três filhos: a condição 0 e as duas atribuições.</li>
+      <li>Na linguagem Alguma, <code>LISTA → CMD LISTA | CMD</code> deixa três comandos pendurados um embaixo do outro, "sobrinhos" em vez de irmãos. A versão abstrata é uma classe Programa com uma lista de declarações (nome, tipo) e uma lista de comandos (tipo, variável).</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b"><li>Achar que o sintático olha o nome do identificador: <code>var1</code> e <code>total</code> são o mesmo terminal, ID.</li></ul>
+  </div>
+</section>
+
+<section class="cs" id="descendente-ascendente" data-grupo="O analisador sintático" data-termos="inferencia-recursiva,analise-descendente,analise-ascendente">
+  <h2>Descendente e ascendente: dois sentidos para a mesma árvore</h2>
+  <aside class="mn loop" data-loop="direcoes" data-ms="9000" data-still="0.55" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>À esquerda a árvore desce da raiz; à direita, sobe das folhas.</aside>
+  <p class="cs-def">Há dois jeitos de ligar uma cadeia à gramática. A derivação troca cabeça por corpo, a partir da variável inicial, e monta a árvore da raiz para as folhas: é a análise descendente (top-down). A inferência recursiva troca corpo por cabeça, a partir da cadeia, e monta a árvore das folhas para a raiz: é a análise ascendente (bottom-up).</p>
+  <ul class="b">
+    <li>Os dois chegam à mesma árvore. Muda a ordem em que os nós nascem.</li>
+    <li>Toda troca, nos dois sentidos, precisa de uma regra que a justifique, e cada troca cria uma relação pai e filho na árvore.</li>
+    <li>O descendente usa a <a href="/m8/comp/01-conceitos/consulta#derivacao">derivação mais à esquerda</a> (lm, leftmost). O ascendente produz a <a href="/m8/comp/08-gramaticas-livres-contexto/consulta#uma-arvore">derivação mais à direita</a> (rm, rightmost) de trás para frente. Trocar uma variável do meio não é nem lm nem rm.</li>
+    <li>Daí os nomes das famílias: LL e LR. O primeiro L é ler os tokens da esquerda para a direita; a segunda letra é a derivação (left ou right).</li>
+    <li>O vídeo escreve ⇒ com um * em cima para vários passos: é o ⇒* da <a href="/m8/comp/08-gramaticas-livres-contexto/consulta#convencoes">aula 08</a>.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Gramática do vídeo: <code>E → I | E + E | E * E | ( E )</code> e <code>I → a | b | Ia | Ib | I0 | I1</code>. Cadeia: <code>a * ( a + b00 )</code>.</li>
+      <li>Inferência (corpo → cabeça): b vira I; I0 vira I, duas vezes; I vira E; o a de dentro vira I e depois E; E + E vira E; ( E ) vira E; o primeiro a vira I e depois E; E * E vira E, a inicial. Fim.</li>
+      <li>Derivação (cabeça → corpo), sempre pela esquerda: E ⇒ E * E ⇒ I * E ⇒ a * E ⇒ a * ( E ) ⇒ a * ( E + E ) ⇒ a * ( I + E ) ⇒ a * ( a + E ) ⇒ a * ( a + I ) ⇒ a * ( a + I0 ) ⇒ a * ( a + I00 ) ⇒ a * ( a + b00 ).</li>
+      <li>Desenhe as duas: dá a mesma árvore, com E * E na raiz.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b"><li>Inferência recursiva não é recursão no código: é o nome do processo de reduzir corpo a cabeça.</li></ul>
+  </div>
+</section>
+
+<!-- ================= Preparando a gramática ================= -->
+<section class="cs" id="ambiguidade-tecnicas" data-grupo="Preparando a gramática" data-termos="associatividade,else-pendente,yacc">
+  <h2>Ambiguidade na prática: três técnicas</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><text class="tm st" x="4" y="14">if E then if E then S else S</text><path class="s" d="M150 22 Q120 50 96 22" marker-end="url(#mnarrow)"/><text class="tam" x="122" y="54">do de dentro?</text><path class="s" d="M150 22 Q80 86 20 22" marker-end="url(#mnarrow)"/><text class="tm" x="66" y="78">ou do de fora?</text><rect class="bl" x="4" y="96" width="74" height="44" rx="6"/><text class="tm" x="41" y="110">reescrever</text><text x="41" y="126" style="font-size:10px">níveis</text><rect class="am" x="83" y="96" width="74" height="44" rx="6"/><text class="tm" x="120" y="110">mudar a</text><text x="120" y="126" style="font-size:10px">end if</text><rect class="gr" x="162" y="96" width="74" height="44" rx="6"/><text class="tm" x="199" y="110">analisador</text><text x="199" y="126" style="font-size:10px">decide</text></svg>O else pendente e as três saídas.</aside>
+  <p class="cs-def">Uma gramática <a href="/m8/comp/01-conceitos/consulta#arvore">ambígua</a> atrapalha o compilador porque cada árvore é um significado. Não existe algoritmo que remova a ambiguidade, mas três técnicas resolvem os casos clássicos: reescrever as expressões em níveis, mudar a linguagem ou deixar o analisador decidir sempre do mesmo jeito.</p>
+  <ul class="b">
+    <li>Em português: "armário para funcionário de aço", "cadeira para gerente sem braços". Você adivinha pelo sentido das palavras; um algoritmo, não.</li>
+    <li>Para provar a ambiguidade: duas derivações sempre mais à esquerda (sem misturar com outras ordens) ou duas árvores para a mesma cadeia. Em <code>a + b * a</code>, uma derivação começa por E ⇒ E + E e a outra por E ⇒ E * E: contas diferentes.</li>
+    <li>Às vezes dá para trocar G por uma G′ equivalente sem ambiguidade. Às vezes não, e se a linguagem é <a href="/m8/comp/08-gramaticas-livres-contexto/consulta#ambigua">inerentemente ambígua</a>, nenhuma gramática resolve.</li>
+  </ul>
+  <h3>Técnica 1 · precedência e associatividade nas expressões</h3>
+  <ul class="b">
+    <li>A ambiguidade de E → E op E vem da recursão dos dois lados (S → S α S). Tirando a recursão de um lado (S → S α B | B) ela some, e a linguagem é a mesma.</li>
+    <li>Só que com um nível só, <code>3 + 4 * 5</code> vira (3 + 4) * 5 = 35, e não 23. A saída é a cascata da <a href="/m8/comp/08-gramaticas-livres-contexto/consulta#precedencia">aula 08</a>: uma classe de operadores por nível de precedência, do menos para o mais forte.</li>
+    <li>A associatividade diz como agrupar o mesmo operador: <code>2 + 3 + 4</code> é (2 + 3) + 4, à esquerda; <code>2 ^ 3 ^ 4</code> é 2 ^ (3 ^ 4), à direita. Na regra, associativo à esquerda vira recursão à esquerda, e à direita vira recursão à direita.</li>
+    <li>Do Mogensen (cap. 3): um operador não associativo, como o &lt; do Pascal, ganha regra sem recursão, <code>E → E′ &lt; E′ | E′</code>. Aí <code>2 &lt; 3 &lt; 4</code> vira erro sintático: essa troca muda a linguagem.</li>
+    <li>Operadores do mesmo nível precisam ter a mesma associatividade. Misturar recursão à esquerda e à direita na mesma variável deixa a gramática ambígua.</li>
+    <li>Atalho para desconfiar: toda regra da forma N → N α N é ambígua (Mogensen).</li>
+  </ul>
+  <div class="cs-formula">
+    <div class="formula">expr → expr op1 termo | termo<br>termo → termo op2 fator | fator<br>fator → num op3 fator | num<br>op1 → + | −    op2 → * | / | %    op3 → ^</div>
+    <ul class="b"><li>O exercício do vídeo: + e − são os mais fracos, depois * / %, e ^ é o mais forte. Todos associativos à esquerda, menos ^. Por isso só a regra de fator tem a recursão à direita. Sem parênteses nem variáveis: só números.</li></ul>
+  </div>
+  <h3>Técnica 2 · mudar a linguagem</h3>
+  <ul class="b">
+    <li>O else pendente: com S → if E then S | if E then S else S | outro, a cadeia <code>if E then if E then outro else outro</code> tem duas árvores.</li>
+    <li>Dá para reescrever sem ambiguidade, mas as regras se repetem e a gramática fica ruim. A ideia, do Mogensen: entre um if e o else que casa com ele, todo if também tem else. Daí duas variáveis, comando casado e não casado: <code>CASADO → if E then CASADO else CASADO | outro</code>; <code>NAOCASADO → if E then CASADO else NAOCASADO | if E then S</code>.</li>
+    <li>Mais simples: exigir <code>end if</code>. A posição do end if diz de qual if é o else.</li>
+  </ul>
+  <h3>Técnica 3 · deixar o analisador decidir</h3>
+  <ul class="b">
+    <li>Comportamento ganancioso: na dúvida, consumir o máximo de tokens antes de fechar a regra. O else fica com o if mais próximo, como em C e Java. ANTLR e Yacc já fazem isso.</li>
+    <li>No Yacc, declarações fora das regras dizem a precedência e a associatividade. A gramática continua ambígua e curta, e o resultado sai sem ambiguidade:</li>
+  </ul>
+  <div class="prose"><pre class="code">%left '+' '-'      /* linha de cima: menor precedência   */
+%left '*' '/'      /* linha de baixo: maior precedência  */
+%right '^'         /* left/right: associatividade        */
+%%
+expr : expr '+' expr | expr '-' expr | expr '*' expr
+     | expr '/' expr | expr '^' expr | NUM ;</pre></div>
+  <ul class="b"><li>Gramática simples facilita o semântico e a geração de código. Como cada técnica de análise trata isso por dentro está em <a href="#conflitos">conflitos</a>.</li></ul>
+  <div class="cs-uso">
+    <ul class="b"><li>A Figura 1 monta, de cima para baixo, a árvore de <code>3 * 2 ^ 4 ^ 5 + 3</code> na gramática acima. Em cada passo só uma regra serve, e a árvore sai com 4 ^ 5 embaixo de tudo: calculado primeiro.</li></ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Tirar a ambiguidade não basta: E → E op T, com todos os operadores num nível só, não é ambígua e calcula 3 + 4 * 5 errado.</li>
+      <li>Potência com recursão à esquerda (fator → fator op3 num) faria 2 ^ 3 ^ 4 virar (2 ^ 3) ^ 4.</li>
+    </ul>
+  </div>
+  <figure class="fig" id="fig-cascata">
+    <div class="fig-head"><span class="fig-title">Figura 1 · A árvore de 3 * 2 ^ 4 ^ 5 + 3, de cima para baixo</span></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <div class="rules" id="cas-regras"></div>
+        <svg id="cas-svg" role="img" aria-label="Árvore sintática de 3 * 2 ^ 4 ^ 5 + 3"></svg>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+</section>
+
+<section class="cs" id="lookahead" data-grupo="Descendente: escolher a regra" data-termos="lookahead,preditivo,llk">
+  <h2>O problema do descendente: qual regra usar?</h2>
+  <aside class="mn loop" data-loop="espiar" data-ms="9000" data-still="0.85" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>A lente cresce até um token separar as duas portas.</aside>
+  <p class="cs-def">No descendente, a cada passo há uma variável para trocar e você precisa escolher uma das regras dela. Ou tenta uma e volta se der errado (<a href="/m8/comp/01-conceitos/consulta#simulacao">backtracking</a>), ou espia os próximos k tokens (lookahead) e escolhe certo de primeira: a análise preditiva.</p>
+  <ul class="b">
+    <li>O labirinto do vídeo: cada sala é uma variável, cada porta é uma regra e cada porta abre com um terminal. Os tokens são uma lista de palavras que você só lê de cima para baixo.</li>
+    <li>Se o token atual abre três portas, é um ponto de não determinismo. Escolher ao acaso e voltar quando der em beco sem saída funciona, mas o tempo pode crescer exponencialmente.</li>
+    <li>Preditivo: espie os tokens seguintes antes de entrar. Se k tokens sempre bastam, a gramática é LL(k): lê da esquerda (L), deriva mais à esquerda (L), olha k à frente.</li>
+    <li>Com k &gt; 1 a tabela de decisão fica multidimensional (pares, trios de tokens) e cara. Na prática se usa k = 1.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>No exemplo do vídeo, as duas regras de E começam com T, e T consome <code>a * b</code>. Com 1, 2 ou 3 tokens à frente as duas portas continuam abertas; só o quarto token, + ou o fim, separa. Aquele pedaço da gramática precisa de k = 4.</li>
+      <li>LL(2) do vídeo: <code>stat → ID = expr | ID : stat</code>. O primeiro token é ID nas duas; o segundo, = ou :, decide. No código: se LA(1) = ID e LA(2) = '=', é a primeira regra.</li>
+      <li>Há gramáticas que não são LL(k) para nenhum k: declarar um método (cabeçalho e ;) e defini-lo (cabeçalho e { corpo }). Os argumentos têm tamanho qualquer, então nenhum k fixo alcança o ; ou a {. <a href="#fatoracao">Fatorar</a> resolve a sintaxe, mas junta numa regra só duas coisas de significado diferente.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b"><li>Aumentar k não resolve recursão à esquerda: E → E + T não é LL(k) para k nenhum.</li></ul>
+  </div>
+</section>
+
+<section class="cs" id="recursao-esquerda" data-grupo="Descendente: escolher a regra" data-termos="recursao-indireta,eliminacao-recursao">
+  <h2>Eliminando a recursão à esquerda</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 160"><text class="tm" x="58" y="10">A → Aα | β</text><circle class="bl" cx="80" cy="30" r="10"/><text x="80" y="30" style="font-size:10px">A</text><circle class="bl" cx="60" cy="60" r="10"/><text x="60" y="60" style="font-size:10px">A</text><circle class="bl" cx="40" cy="90" r="10"/><text x="40" y="90" style="font-size:10px">A</text><text x="22" y="122" style="font-size:11px">β</text><text x="60" y="122" style="font-size:11px">α</text><text x="100" y="122" style="font-size:11px">α</text><line class="s" x1="74" y1="38" x2="65" y2="51"/><line class="s" x1="85" y1="39" x2="98" y2="112"/><line class="s" x1="54" y1="68" x2="45" y2="81"/><line class="s" x1="65" y1="69" x2="60" y2="112"/><line class="s" x1="36" y1="99" x2="25" y2="112"/><text class="tm" x="182" y="10">A → βA′</text><circle class="gr" cx="160" cy="30" r="10"/><text x="160" y="30" style="font-size:10px">A</text><circle class="gr" cx="182" cy="60" r="10"/><text x="182" y="60" style="font-size:9px">A′</text><circle class="gr" cx="204" cy="90" r="10"/><text x="204" y="90" style="font-size:9px">A′</text><text x="142" y="122" style="font-size:11px">β</text><text x="180" y="122" style="font-size:11px">α</text><text x="214" y="122" style="font-size:11px">α ε</text><line class="s" x1="155" y1="39" x2="144" y2="112"/><line class="s" x1="166" y1="38" x2="176" y2="51"/><line class="s" x1="179" y1="70" x2="180" y2="112"/><line class="s" x1="188" y1="68" x2="198" y2="81"/><line class="s" x1="206" y1="100" x2="212" y2="112"/><text class="tm" x="120" y="146">mesma cadeia βαα, árvore tombada para o outro lado</text></svg>A recursão passa da esquerda para a direita.</aside>
+  <p class="cs-def">Uma variável A tem <a href="/m8/comp/08-gramaticas-livres-contexto/consulta#sintatico">recursão à esquerda</a> quando dá para derivar dela uma cadeia que começa com A de novo, em um passo ou em vários (A ⇒⁺ Aα). Algoritmos descendentes travam nela, e a troca de A → Aα | β por A → βA′ e A′ → αA′ | ε tira a recursão sem mudar a linguagem.</p>
+  <ul class="b">
+    <li>Por que trava: tudo o que A gera começa como β, então Aα e β começam com os mesmos tokens e um token à frente não decide. E uma função que começa chamando a si mesma não sai do lugar.</li>
+    <li>A ideia da troca: A → Aα | β gera β, βα, βαα… A versão nova gera o β primeiro e depois uma cauda de α, que A′ produz até escolher ε.</li>
+    <li>Três casos: imediata numa produção (A → Aα | β); imediata em várias (A → Aα₁ | Aα₂ | β₁ | β₂); e não imediata, ou indireta (A → Bγ, B → Cδ, C → Aε, sempre como primeiro símbolo do corpo). O vídeo deixa o algoritmo da indireta para o livro do dragão.</li>
+    <li>A troca cria recursão à direita. Tudo bem: o problema dos descendentes é só a da esquerda.</li>
+    <li>Mas a árvore muda de forma: a de <code>1 + 2 + 3</code> deixa de pender para a esquerda. Para o semântico, a árvore abstrata tem de voltar à estrutura da gramática original (Mogensen); como fazer isso durante a descida é assunto da <a href="/m8/comp/12-descendente-recursiva">aula 12</a>.</li>
+    <li>Pelo Mogensen, A → Aα₁ | … | β₁ | … é a mesma coisa que a expressão regular (β₁ | … | βₙ)(α₁ | … | αₘ)*: um β e depois quantos α você quiser. A troca é só escrever essa expressão como GLC.</li>
+    <li>Recursão indireta também nasce de A → α A β com α anulável (α pode sumir).</li>
+    <li>A <a href="/m8/comp/09-especificacao-linguagem/consulta#especificacao">EBNF</a> escreve a mesma lista sem recursão nenhuma: <code>expr → termo (op1 termo)*</code>, com ? para opcional, * para zero ou mais e + para um ou mais. O analisador pode tratar a repetição com um laço, mais barato que a recursão (<a href="/m8/comp/12-descendente-recursiva">aula 12</a>).</li>
+  </ul>
+  <div class="cs-formula">
+    <div class="formula">A → Aα₁ | … | Aαₘ | β₁ | … | βₙ<br>⟹  A → β₁A′ | … | βₙA′<br>     A′ → α₁A′ | … | αₘA′ | ε</div>
+    <ul class="b"><li>αᵢ é o que vem depois do A nas regras recursivas; βⱼ são as alternativas que não começam com A; A′ é uma variável nova (o vídeo a chama de R ou de expressão2).</li></ul>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Uma produção: <code>E → E + T | T</code>. Aqui α = + T e β = T. Vira <code>E → T E′</code> e <code>E′ → + T E′ | ε</code>.</li>
+      <li>Várias, o exemplo do vídeo: <code>E → E + T | E − T | T | c</code> vira <code>E → T E₂ | c E₂</code> e <code>E₂ → + T E₂ | − T E₂ | ε</code>.</li>
+      <li>A gramática de expressões inteira: <code>T → T * F | F</code> vira <code>T → F T′</code> e <code>T′ → * F T′ | ε</code>. O resultado é a gramática usada em <a href="#first-follow">FIRST e FOLLOW</a> e no <a href="#ll1">LL(1)</a>.</li>
+    </ul>
+  </div>
+  <p class="prova">Eliminar recursão à esquerda: A → Aα | β vira A → βA′ e A′ → αA′ | ε. Recursão à esquerda não é a mesma coisa que ambiguidade.</p>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Trocar E → E + T por E → T + E: tira a recursão, mas o + passa a ser associativo à direita e surge um prefixo comum (E → T + E | T).</li>
+      <li>Esquecer o ε em A′: sem ele a cauda nunca acaba e a linguagem fica vazia.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="fatoracao" data-grupo="Descendente: escolher a regra" data-termos="fatoracao">
+  <h2>Fatoração à esquerda</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 130"><rect class="am" x="4" y="8" width="96" height="24" rx="5"/><text x="52" y="20" style="font-size:10px">if E then CMD</text><rect class="k" x="104" y="8" width="76" height="24" rx="5"/><text x="142" y="20" style="font-size:10px">else CMD</text><rect class="am" x="4" y="38" width="96" height="24" rx="5"/><text x="52" y="50" style="font-size:10px">if E then CMD</text><text class="tm" x="210" y="20">regra 1</text><text class="tm" x="210" y="50">regra 2</text><path class="s" d="M52 66 V84" marker-end="url(#mnarrow)"/><rect class="am" x="4" y="88" width="96" height="24" rx="5"/><text x="52" y="100" style="font-size:10px">if E then CMD</text><rect class="bl" x="104" y="88" width="76" height="24" rx="5"/><text class="tb" x="142" y="100" style="font-size:10px">CMD_ELSE</text><text class="tm" x="120" y="126">o prefixo comum fica uma vez só</text></svg>A escolha vai para depois do prefixo.</aside>
+  <p class="cs-def">Quando duas regras da mesma variável começam igual (A → αβ₁ | αβ₂), o preditivo que olha um token só não sabe qual escolher. Fatorar põe o prefixo comum numa regra só e manda o que muda para uma variável nova: A → αA′ e A′ → β₁ | β₂.</p>
+  <ul class="b">
+    <li>A linguagem não muda. A decisão fica para o ponto em que as alternativas se separam.</li>
+    <li>Se uma alternativa é o prefixo inteiro, sobra ε em A′.</li>
+  </ul>
+  <div class="cs-formula">
+    <div class="formula">A → αβ₁ | αβ₂ | …   ⟹   A → αA′ ,   A′ → β₁ | β₂ | …</div>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>O if do vídeo: <code>CMD → if E then CMD else CMD | if E then CMD</code>. Com um token à frente, os dois começam com if. Fatorado: <code>CMD → if E then CMD CMD_ELSE</code> e <code>CMD_ELSE → else CMD | ε</code>. Em EBNF: <code>CMD → if E then CMD (else CMD)?</code>.</li>
+      <li>Do Thain (complemento): <code>E → id | id [ E ] | id ( E )</code>, variável, vetor e chamada, vira <code>E → id E′</code> e <code>E′ → [ E ] | ( E ) | ε</code>. Depois do id, o próximo token decide.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b"><li>Fatorar o if não tira a ambiguidade do else pendente: a tabela LL(1) continua com duas regras numa célula (veja <a href="#ll1">LL(1)</a>).</li></ul>
+  </div>
+</section>
+
+<section class="cs" id="first-follow" data-grupo="Descendente: escolher a regra" data-termos="nullable,first,follow">
+  <h2>FIRST e FOLLOW</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 120"><text class="tm st" x="4" y="14">FIRST(T E′): quem pode abrir</text><rect class="am" x="4" y="22" width="30" height="24" rx="5"/><text x="19" y="34">(</text><rect class="am" x="38" y="22" width="30" height="24" rx="5"/><text x="53" y="34" style="font-size:10px">id</text><rect class="k" x="72" y="22" width="98" height="24" rx="5"/><text class="tm" x="121" y="34">… resto …</text><text class="tm st" x="4" y="70">FOLLOW(T): quem pode vir depois</text><rect class="bl" x="4" y="78" width="62" height="24" rx="5"/><text class="tb" x="35" y="90">… T</text><rect class="am" x="70" y="78" width="26" height="24" rx="5"/><text x="83" y="90">+</text><rect class="am" x="100" y="78" width="26" height="24" rx="5"/><text x="113" y="90">)</text><rect class="am" x="130" y="78" width="26" height="24" rx="5"/><text x="143" y="90">$</text></svg>Um olha para o começo, o outro para depois.</aside>
+  <p class="cs-def">FIRST(α) é o conjunto de terminais que podem começar uma cadeia derivada de α, mais ε se α pode sumir. FOLLOW(A) é o conjunto de terminais que podem aparecer logo depois da variável A em alguma forma sentencial, mais $ se A pode ficar no fim. Os dois dizem ao analisador qual regra escolher.</p>
+  <ul class="b">
+    <li>FIRST vale para qualquer cadeia α, de terminais e variáveis; FOLLOW, só para uma variável.</li>
+    <li>FIRST de um terminal é ele mesmo. Uma cadeia que começa com terminal, como a B c, tem FIRST = {a}.</li>
+    <li>Forma sentencial é a cadeia que aparece numa derivação a partir da variável inicial (<a href="/m8/comp/01-conceitos/consulta#derivacao">aula 01</a>). FOLLOW só conta essas.</li>
+    <li>$ é o fim da cadeia, o <a href="/m8/comp/07-analise-lexica/consulta#alguma">EOF</a> que o léxico entrega. FOLLOW da variável inicial sempre tem $.</li>
+    <li>Uma variável que nunca aparece numa derivação a partir da inicial (inalcançável) tem FOLLOW vazio.</li>
+    <li>O vídeo chama os dois de conjunto primeiros e conjunto seguidores. Eles servem tanto ao descendente quanto ao ascendente (a tabela <a href="#slr">SLR</a> usa FOLLOW).</li>
+    <li>Antes do FIRST vem uma pergunta mais simples: a cadeia pode sumir? Uma cadeia é anulável (Nullable) se deriva ε. ε é anulável; um terminal nunca é; αβ é anulável se as duas partes são; uma variável é anulável se algum corpo dela é.</li>
+    <li>Duas convenções, mesmo resultado: o vídeo e o Thain põem ε dentro do FIRST; o Mogensen guarda Nullable à parte e deixa o FIRST só com terminais.</li>
+    <li>Para o $ aparecer sozinho no FOLLOW, o Mogensen acrescenta uma regra nova S′ → S $: assim, "A pode ficar no fim" vira "A pode vir antes do $".</li>
+    <li>As definições se chamam umas às outras (FIRST(T) depende de FIRST(R), que pode depender de T). Por isso o cálculo é um ponto fixo: comece tudo vazio (ou falso), aplique as regras de novo e de novo, e pare quando uma volta inteira não mudar nada.</li>
+  </ul>
+  <div class="cs-formula">
+    <div class="formula">FIRST: para cada regra X → Y₁Y₂…Yₖ<br>  FIRST(Y₁) − {ε} entra em FIRST(X);<br>  se Y₁ ⇒* ε, FIRST(Y₂) − {ε} também; e assim por diante;<br>  se todos os Yᵢ ⇒* ε, ε entra em FIRST(X).<br><br>FOLLOW: $ entra em FOLLOW(S);<br>  para cada regra A → αBβ: FIRST(β) − {ε} entra em FOLLOW(B);<br>  se A → αB, ou β ⇒* ε: FOLLOW(A) entra em FOLLOW(B).<br>Repita tudo até nada mudar.</div>
+    <ul class="b"><li>α e β são cadeias quaisquer, inclusive vazias; B é a variável cujo FOLLOW você está montando. "Entra em" quer dizer: junte ao conjunto. As regras escritas assim são do Thain e batem com as definições do vídeo.</li></ul>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>A Figura 2 calcula os dois para a gramática de expressões sem recursão à esquerda: <code>E → T E′</code>, <code>E′ → + T E′ | ε</code>, <code>T → F T′</code>, <code>T′ → * F T′ | ε</code>, <code>F → ( E ) | id</code>.</li>
+      <li>Resultado: FIRST(E) = FIRST(T) = FIRST(F) = { (, id }; FIRST(E′) = { +, ε }; FIRST(T′) = { *, ε }. FOLLOW(E) = FOLLOW(E′) = { ), $ }; FOLLOW(T) = FOLLOW(T′) = { +, ), $ }; FOLLOW(F) = { *, +, ), $ }.</li>
+      <li>FOLLOW como restrições, no jeito do Mogensen, com <code>T → R | a T c</code> e <code>R → ε | b R</code>. Acrescente T′ → T $. Cada lugar em que uma variável aparece num corpo gera uma restrição: T′ → T $ dá {$} ⊆ FOLLOW(T); T → a T c dá {c} ⊆ FOLLOW(T); T → R, com R no fim, dá FOLLOW(T) ⊆ FOLLOW(R); R → b R dá FOLLOW(R) ⊆ FOLLOW(R), que não acrescenta nada.</li>
+      <li>Resolvendo: FOLLOW(T) = {$, c}; como FOLLOW(T) ⊆ FOLLOW(R), FOLLOW(R) = {$, c}. Nullable(R) é verdadeiro (R → ε), então Nullable(T) também (T → R); FIRST(R) = {b} e FIRST(T) = {a, b}.</li>
+    </ul>
+  </div>
+  <p class="prova">FIRST tem terminais e talvez ε; FOLLOW tem terminais e talvez $, nunca ε. Calcule os dois antes de montar a tabela LL(1).</p>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Pôr ε em FOLLOW.</li>
+      <li>Parar em Y₁ quando Y₁ pode sumir: FIRST(T′ E′) tem *, + e ε.</li>
+      <li>Procurar FOLLOW(A) nas regras de A. Ele vem das regras em que A aparece no corpo.</li>
+    </ul>
+  </div>
+  <figure class="fig" id="fig-ff">
+    <div class="fig-head"><span class="fig-title">Figura 2 · Calculando FIRST e FOLLOW</span></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <div class="rules" id="ff-regras"></div>
+        <div class="tbl prose" style="margin:0"><table id="ff-tab"></table></div>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+</section>
+
+<section class="cs" id="ll1" data-grupo="Descendente: escolher a regra" data-termos="ll1,tabela-ll1">
+  <h2>Gramática LL(1) e a tabela LL(1)</h2>
+  <p class="cs-def">Uma gramática é LL(1) quando, para toda variável, um token à frente basta para escolher a regra. A tabela LL(1) guarda essa escolha: linha é variável, coluna é token, célula é a regra a aplicar. Se alguma célula recebe duas regras, a gramática não é LL(1).</p>
+  <ul class="b">
+    <li>Para cada par de regras A → α | β: (1) FIRST(α) e FIRST(β) não têm terminal em comum; (2) no máximo uma das duas deriva ε; (3) se β ⇒* ε, FIRST(α) não tem terminal em comum com FOLLOW(A), e vice-versa.</li>
+    <li>Antes de testar: tire a ambiguidade, a recursão à esquerda e os prefixos comuns. Gramática ambígua nunca é LL(1).</li>
+    <li>Exemplos do vídeo que falham: dois tipos de comando que começam com if (falha a condição 1) e uma parte opcional cujo FIRST coincide com o FOLLOW de quem a contém (falha a 3).</li>
+    <li>Célula com duas regras indica ambiguidade, falta de fatoração ou recursão à esquerda. Se fatorar e eliminar a recursão não resolve, desconfie de ambiguidade: é um teste prático, diferente de procurar duas árvores.</li>
+    <li>Célula vazia é <a href="#erros-sintaticos">erro sintático</a>.</li>
+    <li>Gramática não LL(1) é diferente de linguagem não LL(1). A gramática de expressões em níveis não é LL(1), mas a linguagem é: depois da eliminação da recursão, há uma gramática LL(1) para ela. Já algumas linguagens não têm nenhuma gramática LL(1).</li>
+    <li>Conseguir montar a tabela sem conflito prova que a gramática não é ambígua. Não conseguir não prova que é: há gramáticas não ambíguas com conflito (Mogensen).</li>
+    <li>O roteiro completo, do Mogensen: (1) tire a ambiguidade; (2) elimine a recursão à esquerda; (3) fatore onde precisar; (4) acrescente S′ → S $; (5) calcule Nullable e FIRST de cada corpo e FOLLOW de cada variável; (6) escolha A → α no token c se c ∈ FIRST(α), ou se α é anulável e c ∈ FOLLOW(A). A escolha vai para uma tabela ou para um programa descendente recursivo.</li>
+  </ul>
+  <div class="cs-formula">
+    <div class="formula">para cada regra A → α:<br>  para cada terminal a em FIRST(α):  M[A, a] = A → α<br>  se ε está em FIRST(α):<br>    para cada b em FOLLOW(A), inclusive $:  M[A, b] = A → α</div>
+    <ul class="b"><li>M[A, a] é a célula da linha A, coluna a. Toda célula que sobrar vazia é erro.</li></ul>
+  </div>
+  <div class="cs-uso">
+    <ul class="b"><li>Tabela da gramática de expressões, com os conjuntos da <a href="#first-follow">seção anterior</a>. E′ → ε entra nas colunas ) e $, que são o FOLLOW(E′); T′ → ε, em +, ) e $.</li></ul>
+    <div class="tbl prose">
+      <table>
+        <thead><tr><th></th><th>id</th><th>+</th><th>*</th><th>(</th><th>)</th><th>$</th></tr></thead>
+        <tbody>
+          <tr><th>E</th><td>E → T E′</td><td></td><td></td><td>E → T E′</td><td></td><td></td></tr>
+          <tr><th>E′</th><td></td><td>E′ → + T E′</td><td></td><td></td><td>E′ → ε</td><td>E′ → ε</td></tr>
+          <tr><th>T</th><td>T → F T′</td><td></td><td></td><td>T → F T′</td><td></td><td></td></tr>
+          <tr><th>T′</th><td></td><td>T′ → ε</td><td>T′ → * F T′</td><td></td><td>T′ → ε</td><td>T′ → ε</td></tr>
+          <tr><th>F</th><td>F → id</td><td></td><td></td><td>F → ( E )</td><td></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="b">
+      <li>O exercício do vídeo que dá errado, o else pendente fatorado: <code>S → i E t S S′ | a</code>, <code>S′ → e S | ε</code>, <code>E → b</code> (i = if, t = then, e = else, a = outro comando, b = condição).</li>
+      <li>FIRST(e S) = {e} põe S′ → e S em M[S′, e]. FOLLOW(S′) = FOLLOW(S) = {e, $}, então S′ → ε também cai em M[S′, e]. Duas regras na mesma célula: não é LL(1), por causa da ambiguidade.</li>
+      <li>Na prática (Mogensen), apaga-se S′ → ε dessa célula: sobra S′ → e S, e o else fica com o if mais próximo. Esse truque quase nunca funciona com outras ambiguidades; a de precedência, por exemplo, não sai apagando células da tabela LL(1).</li>
+      <li>Outro exemplo do Mogensen: <code>T → R | a T c</code>, <code>R → ε | R b R</code>. FIRST(R b R) = {b} e FOLLOW(R) = {$, c, b}: as duas regras de R caem em M[R, b]. É a forma N → N α N, ambígua.</li>
+      <li>Confira suas tabelas no widget abaixo: escreva uma gramática, uma regra por linha, e ele mostra FIRST, FOLLOW, a tabela e as células com conflito.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Célula dupla nem sempre é ambiguidade: pode faltar fatorar ou eliminar a recursão à esquerda.</li>
+      <li>Esquecer a coluna $: é nela que as regras com ε entram quando a variável pode fechar o programa.</li>
+    </ul>
+  </div>
+  <div class="widget prose" id="llw">
+    <div class="wrow"><span class="lbl">gramática</span><select id="llw-sel" aria-label="Gramática de exemplo"></select></div>
+    <textarea id="llw-txt" rows="7" spellcheck="false" aria-label="Regras da gramática, uma por linha"></textarea>
+    <div class="answer" style="font-size:.8rem">Uma regra por linha: <code>A -&gt; α | β</code> (ou →). Símbolos separados por espaço; quem aparece à esquerda é variável; ε ou alternativa vazia é a cadeia vazia; a primeira linha é a inicial.</div>
+    <div id="llw-ff"></div>
+    <div id="llw-tab"></div>
+    <div class="verdict" id="llw-ver"></div>
+  </div>
+</section>
+
+<section class="cs" id="ll1-pilha" data-grupo="Descendente: escolher a regra" data-termos="">
+  <h2>O analisador preditivo com pilha</h2>
+  <p class="cs-def">Com a tabela pronta, um <a href="/m8/comp/01-conceitos/consulta#ap">autômato com pilha</a> faz a análise LL(1) sem backtracking. A pilha guarda o que ainda falta derivar; a cada passo, o topo e o token atual decidem entre casar um terminal ou trocar uma variável pelo corpo de uma regra.</p>
+  <ul class="b">
+    <li>As regras aplicadas, na ordem, formam a derivação mais à esquerda. Pondo um nó por regra, sai a árvore.</li>
+    <li>Só há dois erros possíveis: terminal no topo diferente do token, ou célula vazia.</li>
+    <li>Vantagem: dá para acompanhar cada passo e entender o que o analisador fez. Desvantagem: a gramática tem de ser LL(1) e fica artificial (E′, T′, regras com ε), longe da linguagem que você imaginou.</li>
+    <li>O mesmo LL(1) também se escreve sem tabela nem pilha explícita, com uma função por variável: é o <a href="/m8/comp/12-descendente-recursiva">descendente recursivo da aula 12</a>.</li>
+  </ul>
+  <div class="cs-formula">
+    <div class="formula">entrada: w$     pilha: S em cima de $<br>enquanto o topo X ≠ $:<br>  a = token atual<br>  se X = a: desempilha X e avança (casa)<br>  senão, se X é terminal: erro<br>  senão, se M[X, a] está vazia: erro<br>  senão, M[X, a] = X → Y₁Y₂…Yₖ: desempilha X, empilha Yₖ … Y₂ Y₁ (Y₁ no topo) e anota a regra<br>aceita se a entrada também chegou ao $</div>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>A Figura 3 roda o algoritmo em <code>id + id * id</code>, com a tabela da seção anterior. Repare que * só é casado depois de T′ → * F T′, embaixo do + na árvore.</li>
+      <li>A segunda aba é o exercício do vídeo com erro: em <code>id + * id</code>, depois de casar o +, o topo é T e o token é *. M[T, *] está vazia.</li>
+    </ul>
+  </div>
+  <p class="prova">Preditivo LL(1): se o topo é o terminal igual ao token, casa; se é variável, consulta M[topo, token] e empilha o corpo ao contrário. Erro: terminal diferente no topo ou célula vazia.</p>
+  <div class="cs-pegadinhas">
+    <ul class="b"><li>Empilhar o corpo na ordem em que está escrito: aí o último símbolo fica no topo e a análise casa tudo de trás para frente.</li></ul>
+  </div>
+  <figure class="fig" id="fig-ll">
+    <div class="fig-head"><span class="fig-title">Figura 3 · O preditivo LL(1) com pilha</span><div class="fig-tabs"></div></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <div class="lbl">entrada</div>
+        <div class="tape" id="ll-fita"></div>
+        <div class="pda-row">
+          <div class="tbl prose" style="margin:0"><table id="ll-tab"></table></div>
+          <div class="stack"><div class="lbl">pilha</div><div class="well" id="ll-pilha"></div></div>
+        </div>
+        <div class="cfg" id="ll-acao"></div>
+        <div class="chain" id="ll-regras"></div>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+</section>
+
+<section class="cs" id="llk-antlr" data-grupo="Descendente: escolher a regra" data-termos="ll-estrela,all-estrela">
+  <h2>Além do LL(1): LL(*) e ALL(*), do ANTLR</h2>
+  <p class="cs-def">LL(*) é uma análise descendente com lookahead de tamanho variável: em cada decisão, um <a href="/m8/comp/01-conceitos/consulta#afd">AFD</a> percorre os tokens à frente até achar o que separa as alternativas. ALL(*), a versão do <a href="/m8/comp/07-analise-lexica/consulta#antlr">ANTLR</a> 4, monta essas decisões durante a execução e aceita quase qualquer gramática.</p>
+  <ul class="b">
+    <li>O problema que resolve: com k fixo, um prefixo de tamanho qualquer não se decide. Exemplo do vídeo: <code>modificador* class …</code> e <code>modificador* interface …</code>. Fatorar juntaria classe e interface numa regra só.</li>
+    <li>A saída à mão seria um predicado sintático: um olhar à frente escrito por você, parecido com backtracking. O LL(*) gera esse olhar à frente sozinho, sem montar árvore enquanto espia.</li>
+    <li>Analogia do vídeo: antes de escolher a porta, você manda um macaco treinado na frente pelo labirinto; ele é bem mais rápido, volta e diz qual porta dá na saída.</li>
+    <li>O AFD de decisão do LL(k) não tem ciclo (no máximo k passos); o do LL(*) pode ter, como ficar lendo modificadores até aparecer class ou interface.</li>
+    <li>ALL(*) (adaptive LL(*)): a cada decisão, lança um subanalisador por alternativa, em paralelo, e guarda o AFD que aprendeu. Em ambiguidade, fica com a primeira alternativa (ou segue um predicado semântico). Reescreve sozinho a recursão à esquerda direta: <code>E → E + E | id</code> funciona.</li>
+    <li>O ANTLR gera analisadores descendentes recursivos (<a href="/m8/comp/12-descendente-recursiva">aula 12</a>): fáceis de ler, de depurar, de dar boas mensagens de erro e de receber ações semânticas. É a ferramenta do curso, a mesma do léxico.</li>
+    <li>O vídeo resume a comparação: LL é mais fácil de desenvolver e de depurar; LR reconhece mais gramáticas, mas é mais chato de usar (conflitos). LL(*) e ALL(*) tiram boa parte da vantagem do LR sem perder a facilidade.</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b"><li>O ANTLR aceitar E → E + E não quer dizer que a gramática seja LL(1). No papel, para a tabela LL(1), a recursão ainda tem de sair.</li></ul>
+  </div>
+</section>
+
+<!-- ================= Ascendente ================= -->
+<section class="cs" id="ascendente" data-grupo="Ascendente: empilhar e reduzir" data-termos="shift-reduce,handle">
+  <h2>Análise ascendente: shift e reduce</h2>
+  <aside class="mn loop" data-loop="shiftreduce" data-ms="10000" data-still="0.95" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>S → S + n | n lendo n + n: shift, reduce, shift, shift, reduce.</aside>
+  <p class="cs-def">A análise ascendente lê os tokens da esquerda para a direita e, com uma pilha, faz duas coisas: shift (empilhar o próximo token) e reduce (trocar o corpo de uma regra que está no topo da pilha pela cabeça). Termina bem quando a entrada acabou e só a variável inicial sobrou na pilha, em cima do $.</p>
+  <ul class="b">
+    <li>Comparando com o descendente: lá a pilha guarda o que falta derivar e um símbolo vira vários; aqui a pilha guarda o que já foi lido e vários símbolos viram um.</li>
+    <li>Handle (o vídeo chama de "gancho"): o corpo de uma regra que aparece no topo da pilha na hora certa de reduzir. Detectar os handles é todo o problema do ascendente.</li>
+    <li>Nem todo corpo no topo é handle. Às vezes o corpo não aparece pronto e outra redução tem de vir antes; às vezes reduzir cedo trava. No exemplo do Thain, com <code>T → id ( E ) | id</code>, reduzir o id a T antes de ler o ( deixa a pilha com T (, e nenhuma regra começa assim.</li>
+    <li>Para decidir, o analisador precisa olhar mais fundo na pilha, não só o topo, e k tokens à frente.</li>
+    <li>Cada reduce cria um nó pai para os símbolos reduzidos: a árvore nasce das folhas.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b"><li>O exemplo do vídeo, <code>S → S + n | n</code> com a entrada <code>n + n</code>:</li></ul>
+    <div class="tbl prose">
+      <table>
+        <thead><tr><th>pilha</th><th>entrada</th><th>ação</th></tr></thead>
+        <tbody>
+          <tr><td>$</td><td>n + n $</td><td>shift</td></tr>
+          <tr><td>$ n</td><td>+ n $</td><td>reduce S → n (handle: n)</td></tr>
+          <tr><td>$ S</td><td>+ n $</td><td>shift (S sozinho não é handle aqui)</td></tr>
+          <tr><td>$ S +</td><td>n $</td><td>shift (nenhum corpo é S +)</td></tr>
+          <tr><td>$ S + n</td><td>$</td><td>reduce S → S + n</td></tr>
+          <tr><td>$ S</td><td>$</td><td>aceita</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Ler a pilha de cima para baixo ao procurar o corpo: S + n está na pilha com o S embaixo e o n no topo.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="lr" data-grupo="Ascendente: empilhar e reduzir" data-termos="lr,tabela-lr">
+  <h2>O analisador LR: tabela de ação e de transição</h2>
+  <p class="cs-def">LR(k) lê da esquerda para a direita (L), produz a derivação mais à direita ao contrário (R) e olha k tokens à frente. A pilha guarda estados, e a tabela LR diz, para o estado do topo e o token atual, se é shift, reduce, aceitar ou erro.</p>
+  <ul class="b">
+    <li>Cada estado resume vários símbolos do topo da pilha. É assim que o LR "olha mais fundo" consultando só o topo.</li>
+    <li>De onde vêm os estados (Mogensen): imagine um AFD que lê a pilha inteira, do fundo ao topo, e diz o que fazer. Reler tudo a cada passo seria caro, então cada elemento da pilha guarda o estado em que o AFD estava ao lê-lo. Basta olhar o estado do topo; os símbolos nem precisam ficar na pilha.</li>
+    <li>Tabela de ação, por terminal: sN = shift e empilha o estado N; rJ = reduce pela regra J; acc = aceita; vazia = erro sintático.</li>
+    <li>Tabela de transição (goto), por variável: depois de um reduce, diz qual estado entra.</li>
+    <li>As regras são numeradas uma a uma: E → E + T | T vira as regras 1 e 2.</li>
+    <li>Recursão à esquerda não atrapalha: a gramática de expressões entra como está, sem E′ nem T′.</li>
+    <li>k = 1 é o comum; k maior muda pouco o poder e custa muito. Construir a tabela é trabalhoso: o vídeo manda ao livro do dragão; a seção <a href="#slr">tabela SLR</a> mostra a construção mais simples.</li>
+    <li>Na pilha do LR o último símbolo do corpo fica no topo; na do LL, o primeiro.</li>
+  </ul>
+  <div class="cs-formula">
+    <div class="formula">entrada: w$     pilha: 0<br>repita:  s = estado do topo,  a = token atual<br>  ação[s, a] = shift t:  empilha t e avança<br>  ação[s, a] = reduce A → β:  desempilha |β| estados;  t = novo topo;<br>                empilha transição[t, A] e anota A → β<br>  ação[s, a] = aceita:  w está na linguagem<br>  célula vazia:  erro sintático</div>
+    <ul class="b"><li>|β| é o comprimento do corpo: quantos símbolos ele tem. Você desempilha essa quantidade de estados sem conferir quais são.</li></ul>
+  </div>
+  <div class="cs-uso">
+    <ul class="b"><li>Gramática e tabela do vídeo (a do livro do dragão): (1) E → E + T, (2) E → T, (3) T → T * F, (4) T → F, (5) F → ( E ), (6) F → id.</li></ul>
+    <div class="tbl prose">
+      <table>
+        <thead><tr><th>estado</th><th>id</th><th>+</th><th>*</th><th>(</th><th>)</th><th>$</th><th>E</th><th>T</th><th>F</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td>s5</td><td></td><td></td><td>s4</td><td></td><td></td><td>1</td><td>2</td><td>3</td></tr>
+          <tr><td>1</td><td></td><td>s6</td><td></td><td></td><td></td><td>acc</td><td></td><td></td><td></td></tr>
+          <tr><td>2</td><td></td><td>r2</td><td>s7</td><td></td><td>r2</td><td>r2</td><td></td><td></td><td></td></tr>
+          <tr><td>3</td><td></td><td>r4</td><td>r4</td><td></td><td>r4</td><td>r4</td><td></td><td></td><td></td></tr>
+          <tr><td>4</td><td>s5</td><td></td><td></td><td>s4</td><td></td><td></td><td>8</td><td>2</td><td>3</td></tr>
+          <tr><td>5</td><td></td><td>r6</td><td>r6</td><td></td><td>r6</td><td>r6</td><td></td><td></td><td></td></tr>
+          <tr><td>6</td><td>s5</td><td></td><td></td><td>s4</td><td></td><td></td><td></td><td>9</td><td>3</td></tr>
+          <tr><td>7</td><td>s5</td><td></td><td></td><td>s4</td><td></td><td></td><td></td><td></td><td>10</td></tr>
+          <tr><td>8</td><td></td><td>s6</td><td></td><td></td><td>s11</td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>9</td><td></td><td>r1</td><td>s7</td><td></td><td>r1</td><td>r1</td><td></td><td></td><td></td></tr>
+          <tr><td>10</td><td></td><td>r3</td><td>r3</td><td></td><td>r3</td><td>r3</td><td></td><td></td><td></td></tr>
+          <tr><td>11</td><td></td><td>r5</td><td>r5</td><td></td><td>r5</td><td>r5</td><td></td><td></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="b">
+      <li>As colunas id a $ são a tabela de ação; E, T e F, a de transição.</li>
+      <li>A Figura 4 roda <code>id * id + id</code>, o exemplo do vídeo. O T * F é reduzido a T antes de o + entrar: a multiplicação fica embaixo na árvore, como a precedência manda.</li>
+      <li>A segunda aba é o exercício do vídeo com erro: em <code>( id</code> falta o ). O analisador chega ao estado 8 com $ na entrada, e a célula está vazia.</li>
+      <li>Para treinar, como o vídeo pede: <code>(id + id) * id</code> e <code>id + id * id</code>.</li>
+    </ul>
+  </div>
+  <p class="prova">LR: sN empilha o estado N e avança; rJ desempilha |corpo| estados e empilha transição[novo topo, cabeça]; acc aceita; célula vazia é erro.</p>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>No reduce, avançar na entrada. O token atual continua o mesmo; só a pilha muda.</li>
+      <li>Confundir o 10 da pilha (o estado dez) com um 1 e um 0.</li>
+    </ul>
+  </div>
+  <figure class="fig" id="fig-lr">
+    <div class="fig-head"><span class="fig-title">Figura 4 · O analisador LR com a tabela</span><div class="fig-tabs"></div></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <div class="lbl">entrada</div>
+        <div class="tape" id="lr-fita"></div>
+        <div class="out-grid" id="lr-pilha"></div>
+        <div class="tbl prose" style="margin:0"><table id="lr-tab"></table></div>
+        <div class="cfg" id="lr-acao"></div>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+</section>
+
+<section class="cs" id="slr" data-grupo="Ascendente: empilhar e reduzir" data-termos="item-lr,slr">
+  <h2>Montando a tabela SLR: itens e autômato LR(0)</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="k" x="4" y="6" width="150" height="62" rx="6"/><text class="tm st" x="12" y="20">estado 4</text><text class="st" x="12" y="38" style="font-size:11px">T → id · ( E )</text><text class="st" x="12" y="56" style="font-size:11px">T → id ·</text><text class="tam" x="196" y="38">( : shift</text><text class="tam" x="196" y="56">reduce?</text><rect class="am" x="4" y="80" width="232" height="56" rx="6"/><text class="tm st" x="12" y="96">SLR: reduz se o token ∈ FOLLOW(T)</text><text class="st" x="12" y="114" style="font-size:11px">FOLLOW(T) = { +, ), $ }</text><text class="tm st" x="12" y="130">( não está: sem conflito</text></svg>O ponto marca até onde o analisador já leu.</aside>
+  <p class="cs-def">A tabela SLR sai de um autômato cujos estados são conjuntos de itens LR(0): regras com um ponto marcando até onde o analisador já leu. Transições por terminal viram shift, por variável viram a tabela de transição, e um item com o ponto no fim vira reduce, mas só nos tokens do FOLLOW da cabeça.</p>
+  <ul class="b">
+    <li>Complemento, fora do autoestudo: os vídeos não constroem a tabela (mandam ao livro do dragão). O roteiro abaixo é o do Thain (cap. 4) e do Mogensen (cap. 3, seção 3.15).</li>
+    <li>Item: <code>E → E · + T</code> quer dizer "já tenho E na pilha, espero + T". <code>A → α ·</code>, com o ponto no fim, quer dizer "o corpo inteiro está no topo": um reduce possível.</li>
+    <li>Acrescente uma regra inicial nova, P → E. O estado 0 começa com o item <code>P → · E</code> (o núcleo do estado).</li>
+    <li>Fechamento: se o ponto está antes de uma variável X, entram os itens <code>X → · γ</code> de todas as regras de X, e assim por diante até nada novo entrar.</li>
+    <li>Transição: de um estado, para cada símbolo logo depois de um ponto, ande o ponto por cima dele nos itens que o têm e feche de novo. Se o conjunto já existe, a seta vai para o estado que já existe.</li>
+    <li>O Mogensen chega ao mesmo autômato por outro caminho: um AFN por regra, transições ε de cada "antes de X" para o começo das regras de X, e a construção de subconjuntos (AFN → AFD). Cada estado do AFN é uma posição numa regra, ou seja, um item.</li>
+  </ul>
+  <div class="cs-formula">
+    <div class="formula">1. acrescente S′ → S  (a regra 0)<br>2. monte os estados: fechamento do núcleo S′ → · S, depois as transições<br>3. transição por terminal a até o estado t:  ação[s, a] = shift t<br>4. transição por variável A até t:  transição[s, A] = t<br>5. item A → α · no estado s:  ação[s, b] = reduce A → α  para todo b em FOLLOW(A)<br>6. item S′ → S · :  ação[s, $] = aceita<br>7. o resto é erro; célula com duas ações é conflito</div>
+  </div>
+  <div class="cs-uso">
+    <ul class="b"><li>Gramática do Thain: (1) P → E, (2) E → E + T, (3) E → T, (4) T → id ( E ), (5) T → id. FOLLOW(E) = FOLLOW(T) = { +, ), $ }. A Figura 5 monta os nove estados; a tabela abaixo é o resultado (gN = transição para N).</li></ul>
+    <div class="tbl prose">
+      <table>
+        <thead><tr><th>estado</th><th>itens</th><th>id</th><th>(</th><th>)</th><th>+</th><th>$</th><th>E</th><th>T</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td>P → ·E, E → ·E+T, E → ·T, T → ·id(E), T → ·id</td><td>s4</td><td></td><td></td><td></td><td></td><td>g1</td><td>g8</td></tr>
+          <tr><td>1</td><td>P → E·, E → E·+T</td><td></td><td></td><td></td><td>s2</td><td>acc</td><td></td><td></td></tr>
+          <tr><td>2</td><td>E → E+·T, T → ·id(E), T → ·id</td><td>s4</td><td></td><td></td><td></td><td></td><td></td><td>g3</td></tr>
+          <tr><td>3</td><td>E → E+T·</td><td></td><td></td><td>r2</td><td>r2</td><td>r2</td><td></td><td></td></tr>
+          <tr><td>4</td><td>T → id·(E), T → id·</td><td></td><td>s5</td><td>r5</td><td>r5</td><td>r5</td><td></td><td></td></tr>
+          <tr><td>5</td><td>T → id(·E), E → ·E+T, E → ·T, T → ·id(E), T → ·id</td><td>s4</td><td></td><td></td><td></td><td></td><td>g6</td><td>g8</td></tr>
+          <tr><td>6</td><td>T → id(E·), E → E·+T</td><td></td><td></td><td>s7</td><td>s2</td><td></td><td></td><td></td></tr>
+          <tr><td>7</td><td>T → id(E)·</td><td></td><td></td><td>r4</td><td>r4</td><td>r4</td><td></td><td></td></tr>
+          <tr><td>8</td><td>E → T·</td><td></td><td></td><td>r3</td><td>r3</td><td>r3</td><td></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="b">
+      <li>Repare no estado 4: o item T → id · ( E ) pede shift no (, e T → id · pede reduce. No LR(0) puro seria um conflito shift-reduce; a SLR só reduz em FOLLOW(T) = { +, ), $ }, e o ( fica para o shift.</li>
+      <li>Rodando <code>id ( id + id )</code>: shift 4, shift 5, shift 4; reduce T → id (sai o 4, transição[5, T] = 8); reduce E → T (transição[5, E] = 6); shift 2, shift 4; reduce T → id (transição[2, T] = 3); reduce E → E + T (sai 6 2 3, transição[5, E] = 6); shift 7; reduce T → id ( E ) (sai 4 5 6 7, transição[0, T] = 8); reduce E → T (transição[0, E] = 1); aceita.</li>
+      <li>Quando um gerador LR acusa um conflito, ele mostra o estado assim, como lista de itens com o ponto (<code>R -&gt; b . R</code>). Ler os itens diz qual regra brigou com qual.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Pôr o reduce em todas as colunas do estado. Na SLR, só nas colunas do FOLLOW da cabeça.</li>
+      <li>Esquecer o fechamento depois de andar o ponto: no estado 5, o ponto antes de E puxa as regras de E, e o ponto antes de T puxa as de T.</li>
+    </ul>
+  </div>
+  <figure class="fig" id="fig-slr">
+    <div class="fig-head"><span class="fig-title">Figura 5 · O autômato LR(0), estado por estado</span></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <div class="rules" id="slr-regras"></div>
+        <div id="slr-estados" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px"></div>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+</section>
+
+<section class="cs" id="conflitos" data-grupo="Ascendente: empilhar e reduzir" data-termos="conflito-sr,conflito-rr">
+  <h2>Conflitos shift-reduce e reduce-reduce</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><text class="tm st" x="4" y="12">pilha</text><rect class="k" x="4" y="18" width="150" height="26" rx="5"/><text x="79" y="31" style="font-size:10px">… if ( E ) S</text><text class="tm st" x="168" y="12">entrada</text><rect class="am" x="166" y="18" width="70" height="26" rx="5"/><text x="201" y="31" style="font-size:10px">else …</text><path class="s" d="M60 48 L36 80" marker-end="url(#mnarrow)"/><path class="s" d="M120 48 L170 80" marker-end="url(#mnarrow)"/><rect class="rd" x="4" y="82" width="104" height="40" rx="6"/><text class="tm" x="56" y="96">reduce</text><text x="56" y="112" style="font-size:9px">if sem else</text><rect class="gr" x="132" y="82" width="104" height="40" rx="6"/><text class="tm" x="184" y="96">shift</text><text x="184" y="112" style="font-size:9px">else do if de perto</text><text class="tm" x="120" y="142">padrão: na dúvida, shift</text></svg>Duas ações, uma célula.</aside>
+  <p class="cs-def">Um conflito acontece quando a construção da tabela LR põe duas ações na mesma célula: um shift e um reduce (conflito shift-reduce) ou dois reduces por regras diferentes (conflito reduce-reduce). É o equivalente LR da célula dupla da tabela LL(1), e em geral vem de ambiguidade.</p>
+  <ul class="b">
+    <li>Shift-reduce no else pendente: com <code>if ( E ) S</code> na pilha e else na entrada, reduzir agora fecha o if sem else; empilhar guarda o else para esse if.</li>
+    <li>Solução padrão: na dúvida, shift. É o comportamento ganancioso: reduzir depois, com mais símbolos, em vez de agora. O else fica com o if mais próximo, como em C e Java.</li>
+    <li>Nas expressões ambíguas (E → E + E | E * E | id), com E + E na pilha: se o token é *, empilhar dá a precedência certa; se é +, reduzir dá a associatividade à esquerda. "Sempre empilhar" erra o segundo caso.</li>
+    <li>Regras de precedência, como as do Yacc, apagam uma das duas ações da célula. O operador do reduce é o da regra reduzida (o último com precedência declarada, se houver vários); o do shift é o token.</li>
+    <li>Precedências diferentes: fica a ação do operador mais forte. Em <code>a + b * c</code>, com E + E na pilha e * na entrada, fica o shift; em <code>a * b + c</code>, com E * E na pilha e + na entrada, fica o reduce.</li>
+    <li>Mesma precedência: associativo à esquerda, fica o reduce; à direita, fica o shift; não associativo, as duas saem e a cadeia vira erro (Mogensen).</li>
+    <li>O else pendente também sai assim: dar ao else mais precedência que ao then faz o shift ganhar.</li>
+    <li>Reduce-reduce: o mesmo corpo serve a duas regras, como <code>VAR → id</code> e <code>EXPR → id</code>, ou uma chamada de função que é comando e também expressão (<code>S → id ( E )</code> e <code>E → id ( E )</code>, no Thain). Não há regra simples: reescreva a gramática.</li>
+    <li>Gramática não ambígua também pode ter conflito na SLR (exemplo em <a href="#variantes-lr">LR(1) e LALR</a>). Reescrever para tirar o conflito é meio arte; às vezes trocar recursão à esquerda por à direita ajuda.</li>
+    <li>Último recurso: editar a célula da tabela à mão, apagando uma das ações. Só se você entende tudo o que aquele estado representa; senão aparece um caso que você não previu.</li>
+    <li>Se nada passa no gerador, o Mogensen sugere aceitar uma linguagem um pouco maior e rejeitar os casos indevidos depois, junto com a checagem de tipos.</li>
+    <li>O ganho: com essas regras o LR tolera a gramática ambígua e curta. Ela é mais fácil de ler, gera tabela menor e faz menos reduces do tipo T → F.</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>"Sempre empilhar" resolve o else pendente, mas não a precedência das expressões.</li>
+      <li>Conflito reduce-reduce não se resolve empilhando: não há shift na célula.</li>
+      <li>Acrescentar regras de precedência até o gerador parar de reclamar: você pode estar proibindo cadeias que deviam passar.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="variantes-lr" data-grupo="Ascendente: empilhar e reduzir" data-termos="lr1-canonico,lalr">
+  <h2>SLR, LR(1) e LALR</h2>
+  <p class="cs-def">As variantes do LR usam o mesmo algoritmo e diferem na tabela. A SLR é a mais simples e gera conflitos à toa; a LR(1) canônica tem menos conflitos e uma tabela enorme; a LALR junta estados da LR(1), fica do tamanho da SLR e quase tão poderosa quanto a LR(1). É a do Yacc.</p>
+  <ul class="b">
+    <li>Do vídeo: a SLR gera conflitos que não vêm de problema na gramática, só de a técnica não analisar os estados a fundo. A LR(1) analisa um token à frente por combinação. A LALR simplifica a LR(1) em tempo e espaço; é a espada do cavaleiro que mata o dragão na capa do livro do dragão. As três se constroem automaticamente.</li>
+    <li>Onde a SLR falha (exemplo do Thain): <code>S → V = E | id</code>, <code>V → id | id [ E ]</code>, <code>E → V</code>. Depois de ler id, o estado tem S → id · e V → id ·, e $ está em FOLLOW(S) e em FOLLOW(V): conflito reduce-reduce, embora a gramática não seja ambígua.</li>
+    <li>LR(1): cada item carrega os tokens que podem vir depois dele naquele ponto, um subconjunto do FOLLOW. Ali ficam S → id · {$} e V → id · {=}, e o conflito some. O preço: estados com os mesmos itens e tokens diferentes viram estados diferentes.</li>
+    <li>LALR: junta os estados da LR(1) que têm os mesmos itens, unindo os tokens. Fica com o número de estados da LR(0).</li>
+    <li>Do Mogensen: quase todo gerador LR usa LALR(1); se a gramática é SLR, a tabela LALR(1) é a mesma; e entender SLR basta para consertar uma gramática que o gerador recusou.</li>
+    <li>Classes de gramáticas (Thain): LL(1) ⊂ SLR ⊂ LALR ⊂ LR(1) ⊂ GLC. Quase toda construção real cabe em LR(1). O LR reconhece as <a href="/m8/comp/01-conceitos/consulta#projeto-ap">livres do contexto determinísticas</a>, as de um autômato com pilha determinístico.</li>
+    <li>Linguagens já foram desenhadas para uma técnica: Pascal para LL(1), C para LALR(1) (o C perdeu isso nas versões seguintes).</li>
+  </ul>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th></th><th>LL (descendente)</th><th>LR (ascendente)</th></tr></thead>
+      <tbody>
+        <tr><td>árvore</td><td>da raiz para as folhas</td><td>das folhas para a raiz</td></tr>
+        <tr><td>recursão à esquerda</td><td>não (o ALL(*) reescreve a direta)</td><td>sim</td></tr>
+        <tr><td>prefixo comum</td><td>precisa fatorar (no LL(1))</td><td>sem problema</td></tr>
+        <tr><td>gramática ambígua</td><td>célula dupla; ANTLR fica com a 1ª alternativa</td><td>conflito; shift padrão e regras de precedência</td></tr>
+        <tr><td>entender e depurar</td><td>mais fácil</td><td>mais difícil (conflitos)</td></tr>
+        <tr><td>ferramenta</td><td>ANTLR (ALL(*))</td><td>Yacc (LALR)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Conflito na tabela SLR não prova que a gramática é ambígua: a LR(1) pode não ter conflito nenhum.</li>
+      <li>A LALR tem o número de estados da LR(0), não o da LR(1).</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= Erros ================= -->
+<section class="cs" id="erros-sintaticos" data-grupo="Erros" data-termos="erro-sintatico">
+  <h2>Erros sintáticos: onde cada técnica os encontra</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 110"><rect class="gr" x="4" y="10" width="30" height="26" rx="5"/><text x="19" y="23" style="font-size:10px">id</text><rect class="gr" x="38" y="10" width="30" height="26" rx="5"/><text x="53" y="23">+</text><rect class="rd" x="72" y="10" width="30" height="26" rx="5"/><text x="87" y="23">*</text><rect class="k" x="106" y="10" width="30" height="26" rx="5"/><text x="121" y="23" style="font-size:10px">id</text><rect class="k" x="140" y="10" width="30" height="26" rx="5"/><text x="155" y="23">$</text><path class="s" d="M87 40 V58" marker-end="url(#mnarrow)"/><text class="tm" x="87" y="72">M[T, *] vazia</text><text class="tm" x="120" y="96">todo token é válido; a ordem, não</text></svg>O erro aparece no primeiro token sem saída.</aside>
+  <p class="cs-def">Erro sintático é uma sequência de tokens válidos que não sai da gramática: <code>x = 3 + ;</code> só tem tokens válidos e a estrutura errada. Os analisadores desta aula o encontram no primeiro token para o qual a tabela não tem saída.</p>
+  <ul class="b">
+    <li>LL(1): terminal no topo da pilha diferente do token, ou célula vazia M[X, a]. Em <code>id + * id</code>, M[T, *] está vazia.</li>
+    <li>LR: célula de ação vazia. Em <code>( id</code>, o estado 8 com $ não tem ação: faltou o ).</li>
+    <li><code>whilee</code> não é <a href="/m8/comp/07-analise-lexica/consulta#erro-lexico">erro léxico</a>: vira ID, e o erro aparece aqui.</li>
+    <li>Erro sintático não é erro semântico: <code>se (3) { … }</code> na <a href="/m8/comp/09-especificacao-linguagem/consulta#nova-linguagem">Mini</a> passa pelo sintático, e é o semântico que reclama.</li>
+    <li>O que fazer depois de achar o erro (mensagem útil, continuar analisando, evitar <a href="/m8/comp/07-analise-lexica/consulta#erros">erros em cascata</a>) é a recuperação de erros, da <a href="/m8/comp/12-descendente-recursiva">aula 12</a>.</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b"><li>Achar que o analisador só descobre o erro no fim do arquivo. Ele para no primeiro token impossível.</li></ul>
+  </div>
+</section>
+
+<!-- ================= Projeto ================= -->
+<section class="cs" id="projeto" data-grupo="No projeto" data-termos="">
+  <h2>A gramática do projeto é LL(1)?</h2>
+  <p class="cs-def">Exercício autoral, não do professor: passar a gramática de expressões da <a href="/m8/comp/08-gramaticas-livres-contexto/consulta#sintatico">aula 08</a> pelo roteiro desta aula. Ela tem recursão à esquerda e prefixos comuns; depois das duas transformações, é LL(1).</p>
+  <ul class="b">
+    <li>Original: <code>PROG → CMD PROG | CMD</code> (prefixo comum CMD); <code>EXPR → SOMA OPREL SOMA | SOMA</code> (prefixo comum SOMA); <code>SOMA → SOMA OPSOMA TERMO | TERMO</code> e <code>TERMO → TERMO OPMUL FATOR | FATOR</code> (recursão à esquerda).</li>
+    <li>Fatorando PROG e EXPR e eliminando a recursão de SOMA e TERMO, sai a gramática abaixo. A linguagem é a mesma.</li>
+  </ul>
+  <div class="cs-formula">
+    <div class="formula">PROG → CMD PROG′          PROG′ → PROG | ε<br>CMD → IDENTIFICADOR ATRIBUICAO EXPR PONTOVIRGULA<br>EXPR → SOMA EXPR′         EXPR′ → OPREL SOMA | ε<br>SOMA → TERMO SOMA′        SOMA′ → OPSOMA TERMO SOMA′ | ε<br>TERMO → FATOR TERMO′      TERMO′ → OPMUL FATOR TERMO′ | ε<br>FATOR → ABREPAR EXPR FECHAPAR | IDENTIFICADOR | INTEIRO</div>
+    <ul class="b"><li>As maiúsculas longas sem ′ que não aparecem à esquerda são tipos de token, como na aula 08.</li></ul>
+  </div>
+  <div class="cs-uso">
+    <div class="tbl prose">
+      <table>
+        <thead><tr><th>variável</th><th>FIRST</th><th>FOLLOW</th></tr></thead>
+        <tbody>
+          <tr><td>PROG</td><td>IDENTIFICADOR</td><td>$</td></tr>
+          <tr><td>PROG′</td><td>IDENTIFICADOR, ε</td><td>$</td></tr>
+          <tr><td>CMD</td><td>IDENTIFICADOR</td><td>IDENTIFICADOR, $</td></tr>
+          <tr><td>EXPR, SOMA, TERMO, FATOR</td><td>ABREPAR, IDENTIFICADOR, INTEIRO</td><td>veja abaixo</td></tr>
+          <tr><td>EXPR, EXPR′</td><td>EXPR′: OPREL, ε</td><td>PONTOVIRGULA, FECHAPAR</td></tr>
+          <tr><td>SOMA, SOMA′</td><td>SOMA′: OPSOMA, ε</td><td>OPREL, PONTOVIRGULA, FECHAPAR</td></tr>
+          <tr><td>TERMO, TERMO′</td><td>TERMO′: OPMUL, ε</td><td>OPSOMA, OPREL, PONTOVIRGULA, FECHAPAR</td></tr>
+          <tr><td>FATOR</td><td></td><td>OPMUL, OPSOMA, OPREL, PONTOVIRGULA, FECHAPAR</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="b">
+      <li>Teste das regras com ε: PROG′ tem FIRST(PROG) = {IDENTIFICADOR} contra FOLLOW = {$}; EXPR′ tem {OPREL} contra {PONTOVIRGULA, FECHAPAR}; SOMA′ tem {OPSOMA} contra {OPREL, PONTOVIRGULA, FECHAPAR}; TERMO′ tem {OPMUL} contra o FOLLOW de TERMO′. Nenhum par se cruza, e as três alternativas de FATOR começam com tokens diferentes: é LL(1).</li>
+      <li>Repare que EXPR′ → OPREL SOMA | ε não repete: <code>a &lt; b &lt; c</code> é erro sintático nessa gramática.</li>
+      <li>A Mini da <a href="/m8/comp/09-especificacao-linguagem/consulta#nova-linguagem">aula 09</a> também passa: o <code>senao</code> opcional vem depois de um bloco entre chaves, e senao não está no FOLLOW do comando se (que tem início de comando, } e $). Sem else pendente.</li>
+      <li>No ANTLR, a gramática original roda como está: o ALL(*) reescreve a recursão à esquerda direta e decide os prefixos comuns. A transformação é para o papel e para a descida recursiva da <a href="/m8/comp/12-descendente-recursiva">aula 12</a>.</li>
+      <li>Confira no widget da seção <a href="#ll1">LL(1)</a>, opção "Projeto (aula 08) transformada".</li>
+    </ul>
+  </div>
+  <div class="cs-ponderada"><p>A ponderada da semana 7 (prof. Resina) é de análises léxica e sintática, segundo o roteiro da aula 01.</p></div>
+</section>
+
+<!-- ================= Treino ================= -->
+<section class="cs" id="treino" data-grupo="Treino" data-termos="">
+  <h2>Treino: exercícios autorais</h2>
+  <p class="cs-def">Exercícios autorais, não do professor, no estilo dos que o vídeo manda fazer com papel e lápis. Resolva antes de abrir a resposta.</p>
+  <div class="cs-uso">
+    <details><summary>1 · FIRST e FOLLOW de S → A B, A → a A | ε, B → b B | c. É LL(1)?</summary>
+      <details><summary>Uma resposta</summary><p>FIRST(A) = {a, ε}; FIRST(B) = {b, c}; FIRST(S) = {a, b, c}, porque A pode sumir. FOLLOW(S) = {$}; FOLLOW(A) = FIRST(B) = {b, c}; FOLLOW(B) = FOLLOW(S) = {$}. É LL(1): em A, {a} não cruza FOLLOW(A) = {b, c}; em B, {b} e {c} são disjuntos.</p></details>
+    </details>
+    <details><summary>2 · Elimine a recursão à esquerda de L → L , id | id</summary>
+      <details><summary>Uma resposta</summary><p>α = , id e β = id. <code>L → id L′</code>, <code>L′ → , id L′ | ε</code>. Em EBNF: <code>L → id (, id)*</code>.</p></details>
+    </details>
+    <details><summary>3 · Fatore S → a b c | a b d | e</summary>
+      <details><summary>Uma resposta</summary><p><code>S → a b S′ | e</code>, <code>S′ → c | d</code>.</p></details>
+    </details>
+    <details><summary>4 · S → a S b | a b é LL(1)? Se não for, conserte.</summary>
+      <details><summary>Uma resposta</summary><p>Não: as duas regras começam com a. Fatorando: <code>S → a S′</code>, <code>S′ → S b | b</code>. FIRST(S b) = {a} e FIRST(b) = {b}: agora é LL(1).</p></details>
+    </details>
+    <details><summary>5 · Rode o preditivo da Figura 3 em ( id ). Quais regras saem, na ordem?</summary>
+      <details><summary>Uma resposta</summary><p>E → T E′, T → F T′, F → ( E ), casa (, E → T E′, T → F T′, F → id, casa id, T′ → ε, E′ → ε, casa ), T′ → ε, E′ → ε, aceita.</p></details>
+    </details>
+    <details><summary>6 · Shift-reduce de n + n + n com S → S + n | n. A soma ficou associativa a que lado?</summary>
+      <details><summary>Uma resposta</summary><p>shift n, reduce S → n, shift +, shift n, reduce S → S + n, shift +, shift n, reduce S → S + n, aceita. O primeiro n + n é reduzido antes do segundo +: associativa à esquerda, (n + n) + n.</p></details>
+    </details>
+    <details><summary>7 · Ações do LR da Figura 4 para id + id * id</summary>
+      <details><summary>Uma resposta</summary><p>s5, r6, r4, r2, s6, s5, r6, r4 (transição para 9), s7, s5, r6 (transição para 10), r3 (volta a 9), r1, acc. No estado 9 com * a tabela manda s7: o * entra antes de E + T ser reduzido.</p></details>
+    </details>
+    <details><summary>8 · Com E → E + E | E * E | id e a regra "sempre empilhar", que árvore sai para id * id + id?</summary>
+      <details><summary>Uma resposta</summary><p>Com E * E na pilha e + na entrada, o shift ganha: sai id * (id + id), a conta errada. Por isso as expressões precisam das regras de precedência, ou da gramática em níveis.</p></details>
+    </details>
+    <details><summary>9 · Por que S → i E t S S′ | a, S′ → e S | ε, E → b não vira LL(1) nem com mais fatoração?</summary>
+      <details><summary>Uma resposta</summary><p>Ela já está fatorada. O conflito em M[S′, e] vem do else pendente: a gramática é ambígua, e gramática ambígua nunca é LL(1). Só mudando a linguagem (end if) ou deixando o analisador escolher S′ → e S.</p></details>
+    </details>
+    <details><summary>10 · (adaptado do Mogensen, ex. 3.6) A → − A | A − id | id é ambígua? Mostre.</summary>
+      <details><summary>Uma resposta</summary><p>É: <code>− id − id</code> tem a árvore −(id − id), com A → − A na raiz, e a árvore (−id) − id, com A → A − id na raiz. Para o − de sinal valer mais: <code>A → A − B | B</code>, <code>B → − B | id</code>.</p></details>
+    </details>
+    <details><summary>11 · (adaptado do Mogensen, ex. 3.14) E → E E + | E E * | num, em notação pós-fixa: elimine a recursão, fatore, calcule FIRST e FOLLOW e monte a tabela LL(1)</summary>
+      <details><summary>Uma resposta</summary><p>Recursão: α₁ = E +, α₂ = E *, β = num, então <code>E → num E′</code>, <code>E′ → E + E′ | E * E′ | ε</code>. Fatorando E′: <code>E′ → E E″ | ε</code>, <code>E″ → + E′ | * E′</code>. Anuláveis: só E′. FIRST(E) = {num}, FIRST(E E″) = {num}, FIRST(E″) = {+, *}. Com E₀ → E $: FOLLOW(E) = {+, *, $}, FOLLOW(E′) = FOLLOW(E″) = {+, *, $}. Tabela: M[E, num] = E → num E′; M[E′, num] = E′ → E E″; M[E′, +] = M[E′, *] = M[E′, $] = E′ → ε; M[E″, +] = E″ → + E′; M[E″, *] = E″ → * E′. Sem célula dupla: é LL(1).</p></details>
+    </details>
+    <details><summary>12 · (adaptado do Mogensen, ex. 3.21) A → a A a | b A b | ε. Que linguagem é, e por que a tabela SLR tem conflito?</summary>
+      <details><summary>Uma resposta</summary><p>Os palíndromos de tamanho par, wwᴿ. Não é ambígua. No estado inicial há shift em a e b e reduce A → ε em FOLLOW(A) = {a, b, $}: conflito shift-reduce, porque o analisador não sabe se já chegou ao meio. Nenhuma regra de precedência resolve sem mudar a linguagem: wwᴿ não é livre do contexto determinística (<a href="/m8/comp/01-conceitos/consulta#projeto-ap">aula 01</a>).</p></details>
+    </details>
+  </div>
+  <div class="cs-pegadinhas">Uma boa resposta mostra os conjuntos ou a pilha a cada passo, não só o resultado.</div>
+</section>

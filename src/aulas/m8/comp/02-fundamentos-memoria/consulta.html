@@ -469,7 +469,7 @@
     <li>Memória principal (RAM): onde ficam programa e dados enquanto roda. Gigabytes, fora da CPU, dezenas de ns (centenas de ciclos). Perde tudo sem energia.</li>
     <li>SRAM (static): o bit fica enquanto houver energia, sem refresh.</li>
     <li>DRAM (dynamic): linhas e colunas. Um acesso abre uma linha e lê colunas dela; várias colunas da mesma linha aberta saem rápido. DDR SDRAM transfere nas duas bordas do clock (dobra a banda); GDDR é a versão para <a href="#paralelismo">GPUs</a>; HBM empilha DRAM junto do processador para ganhar banda.</li>
-    <li>Flash: apaga um bloco inteiro antes de reescrever; desgasta após ~100 000 escritas por bloco.</li>
+    <li>Flash: apaga um bloco inteiro antes de reescrever; desgasta após ~100 000 escritas por bloco. O número muda com o tipo: 10 000 na flash do ATmega328P, 100 000 na W25Q16JV do Pico e cerca de 10 000 na NAND MLC dos SSDs (<a href="/m8/comp/06-gerencia-recursos/consulta#flash-desgaste">aula 06</a>).</li>
     <li>ECC (códigos de correção de erro): bits extras que detectam e corrigem bits que viram sozinhos (radiação, por exemplo).</li>
   </ul>
   <div class="cs-ponderada">

@@ -1,11 +1,13 @@
 {
   "numero": "06",
+  "data": "2026-11-11",
   "titulo": "Gerência de recursos",
   "tema": "Do silício ao sistema operacional",
   "resumo": "Como o sistema operacional reparte a CPU (FCFS, SJF, SRTF, prioridade, round-robin, filas e tempo real com rate monotonic e EDF), a memória (partições, paginação, substituição de páginas, thrashing e o caso sem MMU), o armazenamento (sistema de arquivos, i-nodes, flash e desgaste) e os dispositivos (polling, interrupção, DMA, escalonamento de disco), com o RP2040, o Arduino Uno e o Linux como exemplos.",
   "topicos": [
     "Critérios de escalonamento",
     "FCFS, SJF, SRTF, RR",
+    "MLFQ e priority boost",
     "Prioridade e tempo real",
     "Rate monotonic e EDF com números",
     "FreeRTOS e tick",
@@ -15,6 +17,7 @@
     "Thrashing e working set",
     "Memória sem MMU",
     "Arquivos e i-nodes",
+    "Journaling",
     "Flash, EEPROM e desgaste",
     "Polling, interrupção, DMA",
     "Escalonamento de disco",
@@ -47,6 +50,9 @@
     { "tipo": "Livro", "titulo": "Machado & Maia, 5ª ed., cap. 10 · Gerência de memória virtual (p. 161–190, indicação)", "secao": "paginacao" },
     { "tipo": "Livro", "titulo": "Machado & Maia, 5ª ed., cap. 11 · Sistema de arquivos (p. 191–206, indicação)", "secao": "arquivos" },
     { "tipo": "Livro", "titulo": "Machado & Maia, 5ª ed., cap. 12 · Gerência de dispositivos (p. 207–220, indicação)", "secao": "es" },
+    { "tipo": "Livro (substituto)", "titulo": "Arpaci-Dusseau & Arpaci-Dusseau, Operating Systems: Three Easy Pieces (OSTEP), v1.10, caps. 7 a 9 (escalonamento, MLFQ, fração da CPU e CFS), lidos inteiros", "url": "https://pages.cs.wisc.edu/~remzi/OSTEP/", "secao": "algoritmos" },
+    { "tipo": "Livro (substituto)", "titulo": "OSTEP, caps. 13 a 22 (espaço de endereçamento, API de memória, base e limite, segmentação, espaço livre, paginação, TLB, tabelas menores, swap e substituição), lidos inteiros", "url": "https://pages.cs.wisc.edu/~remzi/OSTEP/", "secao": "paginacao" },
+    { "tipo": "Livro (substituto)", "titulo": "OSTEP, caps. 36, 37 e 39 a 44 (dispositivos, discos, arquivos e diretórios, implementação, FFS, journaling, LFS e SSD), lidos inteiros", "url": "https://pages.cs.wisc.edu/~remzi/OSTEP/", "secao": "arquivos" },
     { "tipo": "Artigo", "titulo": "Liu & Layland, Scheduling algorithms for multiprogramming in a hard-real-time environment, JACM, 1973", "url": "https://doi.org/10.1145/321738.321743", "secao": "tempo-real" },
     { "tipo": "Livro", "titulo": "Mastering the FreeRTOS Real Time Kernel, cap. 3 (memória) e 4 (tarefas e tick)", "url": "https://github.com/FreeRTOS/FreeRTOS-Kernel-Book", "secao": "tempo-real" },
     { "tipo": "Datasheet", "titulo": "Raspberry Pi, RP2040 Datasheet (SRAM, MPU, latência de interrupção, DMA)", "url": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf", "secao": "memoria-mcu" },
@@ -61,5 +67,5 @@
     { "tipo": "Artigo", "titulo": "Halderman et al., Lest we remember: cold boot attacks on encryption keys, USENIX Security 2008", "url": "https://www.usenix.org/legacy/event/sec08/tech/full_papers/halderman/halderman.pdf", "secao": "seguranca" },
     { "tipo": "Doc", "titulo": "Linux kernel, controlador pids dos cgroups", "url": "https://docs.kernel.org/admin-guide/cgroup-v1/pids.html", "secao": "seguranca" }
   ],
-  "observacao": "Parte III de Machado & Maia, 5ª ed. (LTC, 2013), caps. 8 a 12. As faixas de página por seção vêm da indicação do autoestudo; o texto do livro não foi conferido página a página, então confira notação e numeração no exemplar. Os exemplos numéricos (processos, pedidos de memória, strings de referência, fila do disco, tarefas de tempo real) foram montados para esta página. As seções 00, 05, 09, 11, 13 e 15 a 18 vão além do autoestudo: números de RP2040, W25Q16JV, ATmega328P, FreeRTOS e Linux vêm das fontes primárias listadas; exercícios, quiz e decisão de projeto são autorais e não reproduzem material do professor. Os slides do encontro desta aula ainda não estavam disponíveis."
+  "observacao": "Autoestudo: Parte III de Machado & Maia, Arquitetura de sistemas operacionais, 5ª ed. (LTC, 2013), caps. 8 a 12, p. 125 a 220. O livro não estava disponível e não foi lido: as faixas de página por seção são a indicação do autoestudo, e esta página não equivale à leitura dele; confira notação, termos e numeração no exemplar. A fonte escrita usada no lugar dele é o OSTEP (Arpaci-Dusseau, gratuito no site dos autores), identificado como substituto: os caps. 7 a 9, 13 a 22, 36, 37 e 39 a 44 foram lidos inteiros e conferidos página por página contra a aula (cobertura.json). Onde o OSTEP difere da forma usual dos livros brasileiros (bit de validade e bit de presença, MLFQ, compactação do heap), o texto mostra as duas e cita o OSTEP. Os exemplos numéricos sem fonte (processos, pedidos de memória, strings de referência, fila do disco, tarefas de tempo real) foram montados para esta página. Números de RP2040, W25Q16JV, ATmega328P, FreeRTOS e Linux vêm das fontes primárias listadas. Exercícios, treino e decisão de projeto são autorais, com valores de exemplo; os exercícios 4 a 6 adaptam perguntas de homework do OSTEP. Nada reproduz material do professor. A versão enxuta para o encontro de 11/11 segue o autoestudo: os slides de 04/11, que anunciariam o que ficou para este encontro, não estavam disponíveis; os de 11/11 ainda não existem."
 }

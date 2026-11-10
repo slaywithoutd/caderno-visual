@@ -1,7 +1,7 @@
 {
   "aula": "m8/ux/02-fundamentos-ergonomia",
   "data": "2026-11-10",
-  "criterio": "Conferência humana das fontes do autoestudo que abriram (página da IEA, transcrição do vídeo da NN/g, página da Superflux) e do artigo relacionado da NN/g, com destinos verificáveis no modo Consulta. O PDF do Drive e o filme da Superflux não foram acessados. Complementos (Wobbrock, ANSUR II, MacKenzie) foram lidos em trechos identificados. As quatro categorias de suposição e os critérios vêm do enunciado da ponderada (notas/ponderada.md).",
+  "criterio": "Conferência humana das fontes do autoestudo que abriram (página da IEA, transcrição do vídeo da NN/g, página da Superflux e, desde 10/11/2026, o artigo de Wobbrock et al. que o professor pôs no lugar do PDF do Drive) e do artigo relacionado da NN/g, com destinos verificáveis no modo Consulta. O primeiro PDF do Drive e o filme da Superflux não foram acessados. Complementos (Wobbrock 2018, ANSUR II, MacKenzie) foram lidos em trechos identificados. As quatro categorias de suposição e os critérios vêm do enunciado da ponderada (notas/ponderada.md).",
   "fontes": [
     {
       "id": "iea-ergonomia",
@@ -11,15 +11,139 @@
       "metodo": "HTML baixado (HTTP 200) e texto extraído e lido do começo ao fim, sem menus e rodapé.",
       "totalUnidades": 9,
       "unidades": [
-        { "paginas": [1], "assunto": "Definição da IEA (2000), ergon e nomos, ergonomia = fatores humanos", "antes": "conteudo-novo-da-aula", "justificativa": "Definição no cs-def da seção ergonomia; etimologia e sinonímia nos detalhes.", "consulta": ["ergonomia"], "evidencias": ["ergon", "IEA em 2000"] },
-        { "paginas": [2], "assunto": "Domínios físico, cognitivo e organizacional, com tópicos", "antes": "conteudo-novo-da-aula", "justificativa": "Seção própria com tabela dos tópicos de cada domínio.", "consulta": ["dominios"], "evidencias": ["ergonomia física", "resposta motora", "teletrabalho"] },
-        { "paginas": [3], "assunto": "Problemas sistêmicos, ciência não específica de setor, especialista considera os outros domínios", "antes": "conteudo-novo-da-aula", "justificativa": "Sistema na seção ergonomia; sobreposição de domínios na seção dominios.", "consulta": ["ergonomia", "dominios"], "evidencias": ["sistêmicos", "não pertence a um setor", "considere os outros"] },
-        { "paginas": [4], "assunto": "Valores: pessoas como ativos, tecnologia como ferramenta, qualidade de vida, diferenças individuais, responsabilidade", "antes": "conteudo-novo-da-aula", "justificativa": "Lista de valores na seção ergonomia.", "consulta": ["ergonomia"], "evidencias": ["qualidade de vida", "diferenças individuais"] },
-        { "paginas": [5], "assunto": "Microergonomia e macroergonomia", "antes": "conteudo-novo-da-aula", "justificativa": "Um bullet com os dois níveis.", "consulta": ["ergonomia"], "evidencias": ["Microergonomia", "macroergonomia"] },
-        { "paginas": [6], "assunto": "Abordagem sistêmica, iterativa e guiada pelo projeto; ergonomia participativa", "antes": "conteudo-novo-da-aula", "justificativa": "Termo ergonomia participativa e as três características do método.", "consulta": ["ergonomia"], "evidencias": ["ergonomia participativa", "iterativo"] },
-        { "paginas": [7], "assunto": "Partes interessadas: influenciadores, decisores, especialistas, atores", "antes": "conteudo-novo-da-aula", "justificativa": "Bullet com os quatro tipos.", "consulta": ["ergonomia"], "evidencias": ["Partes interessadas"] },
-        { "paginas": [8], "assunto": "Valor da ergonomia no trabalho: desempenho, custos diretos e indiretos", "antes": "conteudo-novo-da-aula", "justificativa": "Um bullet sobre o valor econômico.", "consulta": ["ergonomia"], "evidencias": ["rotatividade"] },
-        { "paginas": [9], "assunto": "Referências citadas pela página (Bridger, Read et al., IEA/OIT, Wilson, Dul et al., Hendrick)", "antes": "conteudo-novo-da-aula", "justificativa": "Bibliografia da própria página; não foi aberta nem citada na aula.", "consulta": ["ergonomia"], "evidencias": [] }
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "Definição da IEA (2000), ergon e nomos, ergonomia = fatores humanos",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Definição no cs-def da seção ergonomia; etimologia e sinonímia nos detalhes.",
+          "consulta": [
+            "ergonomia"
+          ],
+          "evidencias": [
+            "ergon",
+            "IEA em 2000"
+          ]
+        },
+        {
+          "paginas": [
+            2
+          ],
+          "assunto": "Domínios físico, cognitivo e organizacional, com tópicos",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Seção própria com tabela dos tópicos de cada domínio.",
+          "consulta": [
+            "dominios"
+          ],
+          "evidencias": [
+            "ergonomia física",
+            "resposta motora",
+            "teletrabalho"
+          ]
+        },
+        {
+          "paginas": [
+            3
+          ],
+          "assunto": "Problemas sistêmicos, ciência não específica de setor, especialista considera os outros domínios",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Sistema na seção ergonomia; sobreposição de domínios na seção dominios.",
+          "consulta": [
+            "ergonomia",
+            "dominios"
+          ],
+          "evidencias": [
+            "sistêmicos",
+            "não pertence a um setor",
+            "considere os outros"
+          ]
+        },
+        {
+          "paginas": [
+            4
+          ],
+          "assunto": "Valores: pessoas como ativos, tecnologia como ferramenta, qualidade de vida, diferenças individuais, responsabilidade",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Lista de valores na seção ergonomia.",
+          "consulta": [
+            "ergonomia"
+          ],
+          "evidencias": [
+            "qualidade de vida",
+            "diferenças individuais"
+          ]
+        },
+        {
+          "paginas": [
+            5
+          ],
+          "assunto": "Microergonomia e macroergonomia",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Um bullet com os dois níveis.",
+          "consulta": [
+            "ergonomia"
+          ],
+          "evidencias": [
+            "Microergonomia",
+            "macroergonomia"
+          ]
+        },
+        {
+          "paginas": [
+            6
+          ],
+          "assunto": "Abordagem sistêmica, iterativa e guiada pelo projeto; ergonomia participativa",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Termo ergonomia participativa e as três características do método.",
+          "consulta": [
+            "ergonomia"
+          ],
+          "evidencias": [
+            "ergonomia participativa",
+            "iterativo"
+          ]
+        },
+        {
+          "paginas": [
+            7
+          ],
+          "assunto": "Partes interessadas: influenciadores, decisores, especialistas, atores",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Bullet com os quatro tipos.",
+          "consulta": [
+            "ergonomia"
+          ],
+          "evidencias": [
+            "Partes interessadas"
+          ]
+        },
+        {
+          "paginas": [
+            8
+          ],
+          "assunto": "Valor da ergonomia no trabalho: desempenho, custos diretos e indiretos",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Um bullet sobre o valor econômico.",
+          "consulta": [
+            "ergonomia"
+          ],
+          "evidencias": [
+            "rotatividade"
+          ]
+        },
+        {
+          "paginas": [
+            9
+          ],
+          "assunto": "Referências citadas pela página (Bridger, Read et al., IEA/OIT, Wilson, Dul et al., Hendrick)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Bibliografia da própria página; não foi aberta nem citada na aula.",
+          "consulta": [
+            "ergonomia"
+          ],
+          "evidencias": []
+        }
       ]
     },
     {
@@ -30,11 +154,77 @@
       "metodo": "Transcrição manual em inglês do YouTube baixada e lida inteira. A equação mostrada na tela (\"Here's the equation\") não está na transcrição e não foi vista.",
       "totalUnidades": 5,
       "unidades": [
-        { "paginas": [1], "assunto": "Lei fundamental e ignorada; Paul Fitts e o modelo de seleção de alvo", "antes": "conteudo-novo-da-aula", "justificativa": "Autor do modelo na seção fitts.", "consulta": ["fitts"], "evidencias": ["Paul Fitts"] },
-        { "paginas": [2], "assunto": "Onde vale: sites, apps, interfaces de aparelhos e painéis físicos", "antes": "conteudo-novo-da-aula", "justificativa": "No cs-def da seção fitts.", "consulta": ["fitts"], "evidencias": ["painéis físicos"] },
-        { "paginas": [3], "assunto": "Tempo em função de tamanho e distância; alvo e distância; custo de interação", "antes": "conteudo-novo-da-aula", "justificativa": "cs-def, fórmula e conta passo a passo. A forma exata mostrada no vídeo não foi conferida; a aula usa a forma de Shannon e mostra as outras.", "consulta": ["fitts"], "evidencias": ["Alvo grande e perto custa pouco"] },
-        { "paginas": [4], "assunto": "Aplicações: concluir perto dos campos, ação importante maior, listas curtas como guia", "antes": "conteudo-novo-da-aula", "justificativa": "Bullet de aplicações citando Kane.", "consulta": ["fitts"], "evidencias": ["botão de concluir", "regra absoluta"] },
-        { "paginas": [5], "assunto": "Fecho: alvos grandes e menos tempo mantêm o custo baixo", "antes": "conteudo-novo-da-aula", "justificativa": "Mesma ideia do cs-def.", "consulta": ["fitts"], "evidencias": ["custa caro"] }
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "Lei fundamental e ignorada; Paul Fitts e o modelo de seleção de alvo",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Autor do modelo na seção fitts.",
+          "consulta": [
+            "fitts"
+          ],
+          "evidencias": [
+            "Paul Fitts"
+          ]
+        },
+        {
+          "paginas": [
+            2
+          ],
+          "assunto": "Onde vale: sites, apps, interfaces de aparelhos e painéis físicos",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "No cs-def da seção fitts.",
+          "consulta": [
+            "fitts"
+          ],
+          "evidencias": [
+            "painéis físicos"
+          ]
+        },
+        {
+          "paginas": [
+            3
+          ],
+          "assunto": "Tempo em função de tamanho e distância; alvo e distância; custo de interação",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "cs-def, fórmula e conta passo a passo. A forma exata mostrada no vídeo não foi conferida; a aula usa a forma de Shannon e mostra as outras.",
+          "consulta": [
+            "fitts"
+          ],
+          "evidencias": [
+            "Alvo grande e perto custa pouco"
+          ]
+        },
+        {
+          "paginas": [
+            4
+          ],
+          "assunto": "Aplicações: concluir perto dos campos, ação importante maior, listas curtas como guia",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Bullet de aplicações citando Kane.",
+          "consulta": [
+            "fitts"
+          ],
+          "evidencias": [
+            "botão de concluir",
+            "regra absoluta"
+          ]
+        },
+        {
+          "paginas": [
+            5
+          ],
+          "assunto": "Fecho: alvos grandes e menos tempo mantêm o custo baixo",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Mesma ideia do cs-def.",
+          "consulta": [
+            "fitts"
+          ],
+          "evidencias": [
+            "custa caro"
+          ]
+        }
       ]
     },
     {
@@ -45,15 +235,136 @@
       "metodo": "HTML baixado e texto lido inteiro; as equações são imagens, conferidas pelo texto alternativo (forma log₂(2D/w)).",
       "totalUnidades": 9,
       "unidades": [
-        { "paginas": [1], "assunto": "Fitts, cockpits na Segunda Guerra e teoria da informação de Shannon", "antes": "conteudo-novo-da-aula", "justificativa": "Bullet de história na seção fitts.", "consulta": ["fitts"], "evidencias": ["teoria da informação"] },
-        { "paginas": [2], "assunto": "Fórmula com 2D/w, a e b dependem do ponteiro, W na direção do movimento ou menor dimensão", "antes": "conteudo-novo-da-aula", "justificativa": "Forma de Fitts na tabela de variantes e pegadinha; menor dimensão em medir-dispositivo.", "consulta": ["fitts", "medir-dispositivo"], "evidencias": ["2D/W", "menor dimensão"] },
-        { "paginas": [3], "assunto": "Modelo de dois componentes de Woodworth; log em vez de proporção", "antes": "conteudo-novo-da-aula", "justificativa": "Bullet sobre por que log; loop da margem.", "consulta": ["fitts"], "evidencias": ["Woodworth", "não o dobra"] },
-        { "paginas": [4], "assunto": "Alvos grandes; ícone com rótulo", "antes": "conteudo-novo-da-aula", "justificativa": "Bullet de aplicações de Budiu.", "consulta": ["fitts"], "evidencias": ["rótulo"] },
-        { "paginas": [5], "assunto": "Bordas como alvos infinitos com mouse; sem vantagem no toque (Avrahami)", "antes": "conteudo-novo-da-aula", "justificativa": "Pegadinha sobre tela sensível ao toque.", "consulta": ["fitts"], "evidencias": ["Avrahami"] },
-        { "paginas": [6], "assunto": "Alvos próximos demais e área ativa invisível", "antes": "conteudo-novo-da-aula", "justificativa": "Bullet de aplicações de Budiu.", "consulta": ["fitts"], "evidencias": ["vizinho"] },
-        { "paginas": [7], "assunto": "Menus linear, retangular e em pizza", "antes": "conteudo-novo-da-aula", "justificativa": "Bullet de aplicações de Budiu.", "consulta": ["fitts"], "evidencias": ["pizza"] },
-        { "paginas": [8], "assunto": "Controles usados em sequência perto um do outro; enviar perto do último campo", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto pelo bullet de Kane sobre o botão de concluir.", "consulta": ["fitts"], "evidencias": ["campos ativos"] },
-        { "paginas": [9], "assunto": "Conclusão e referências (Avrahami, Elliott et al., Fitts 1954, MacKenzie e Buxton 1992)", "antes": "conteudo-novo-da-aula", "justificativa": "MacKenzie e Buxton citados em medir-dispositivo; Fitts 1954 na tabela de variantes.", "consulta": ["fitts", "medir-dispositivo"], "evidencias": ["MacKenzie e Buxton"] }
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "Fitts, cockpits na Segunda Guerra e teoria da informação de Shannon",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Bullet de história na seção fitts.",
+          "consulta": [
+            "fitts"
+          ],
+          "evidencias": [
+            "teoria da informação"
+          ]
+        },
+        {
+          "paginas": [
+            2
+          ],
+          "assunto": "Fórmula com 2D/w, a e b dependem do ponteiro, W na direção do movimento ou menor dimensão",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Forma de Fitts na tabela de variantes e pegadinha; menor dimensão em medir-dispositivo.",
+          "consulta": [
+            "fitts",
+            "medir-dispositivo"
+          ],
+          "evidencias": [
+            "2D/W",
+            "menor dimensão"
+          ]
+        },
+        {
+          "paginas": [
+            3
+          ],
+          "assunto": "Modelo de dois componentes de Woodworth; log em vez de proporção",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Bullet sobre por que log; loop da margem.",
+          "consulta": [
+            "fitts"
+          ],
+          "evidencias": [
+            "Woodworth",
+            "não o dobra"
+          ]
+        },
+        {
+          "paginas": [
+            4
+          ],
+          "assunto": "Alvos grandes; ícone com rótulo",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Bullet de aplicações de Budiu.",
+          "consulta": [
+            "fitts"
+          ],
+          "evidencias": [
+            "rótulo"
+          ]
+        },
+        {
+          "paginas": [
+            5
+          ],
+          "assunto": "Bordas como alvos infinitos com mouse; sem vantagem no toque (Avrahami)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Pegadinha sobre tela sensível ao toque.",
+          "consulta": [
+            "fitts"
+          ],
+          "evidencias": [
+            "Avrahami"
+          ]
+        },
+        {
+          "paginas": [
+            6
+          ],
+          "assunto": "Alvos próximos demais e área ativa invisível",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Bullet de aplicações de Budiu.",
+          "consulta": [
+            "fitts"
+          ],
+          "evidencias": [
+            "vizinho"
+          ]
+        },
+        {
+          "paginas": [
+            7
+          ],
+          "assunto": "Menus linear, retangular e em pizza",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Bullet de aplicações de Budiu.",
+          "consulta": [
+            "fitts"
+          ],
+          "evidencias": [
+            "pizza"
+          ]
+        },
+        {
+          "paginas": [
+            8
+          ],
+          "assunto": "Controles usados em sequência perto um do outro; enviar perto do último campo",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Coberto pelo bullet de Kane sobre o botão de concluir.",
+          "consulta": [
+            "fitts"
+          ],
+          "evidencias": [
+            "campos ativos"
+          ]
+        },
+        {
+          "paginas": [
+            9
+          ],
+          "assunto": "Conclusão e referências (Avrahami, Elliott et al., Fitts 1954, MacKenzie e Buxton 1992)",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "MacKenzie e Buxton citados em medir-dispositivo; Fitts 1954 na tabela de variantes.",
+          "consulta": [
+            "fitts",
+            "medir-dispositivo"
+          ],
+          "evidencias": [
+            "MacKenzie e Buxton"
+          ]
+        }
       ]
     },
     {
@@ -64,14 +375,120 @@
       "metodo": "HTML baixado (HTTP 200) e texto do projeto lido inteiro; lista de notícias do rodapé ignorada.",
       "totalUnidades": 8,
       "unidades": [
-        { "paginas": [1], "assunto": "Encomenda, ano, equipe, ator e sinopse de Thomas", "antes": "conteudo-novo-da-aula", "justificativa": "Seção própria.", "consulta": ["design-ficcao"], "evidencias": ["Thomas, 70 anos", "James Leahy"] },
-        { "paginas": [2], "assunto": "Superflux Lab e o consórcio ThingTank", "antes": "conteudo-novo-da-aula", "justificativa": "Bullet do projeto.", "consulta": ["design-ficcao"], "evidencias": ["ThingTank"] },
-        { "paginas": [3], "assunto": "Relação com objetos autônomos, agência humana, ritmos e rotinas", "antes": "conteudo-novo-da-aula", "justificativa": "Bullet das perguntas.", "consulta": ["design-ficcao"], "evidencias": ["agência humana"] },
-        { "paginas": [4], "assunto": "The Neural Network, Objects with Attitude, Defiant Behaviours; útil, crítico e desviante", "antes": "conteudo-novo-da-aula", "justificativa": "Bullet dos temas.", "consulta": ["design-ficcao"], "evidencias": ["Defiant Behaviours", "desviante"] },
-        { "paginas": [5], "assunto": "Casa conectada, cuidado de idosos, monitoramento remoto, substituir cuidadores", "antes": "conteudo-novo-da-aula", "justificativa": "Mesmo bullet dos temas.", "consulta": ["design-ficcao"], "evidencias": ["monitoramento remoto"] },
-        { "paginas": [6], "assunto": "Comportamentos humanos contra o cuidado tamanho único", "antes": "conteudo-novo-da-aula", "justificativa": "Pergunta central e ligação com suposições.", "consulta": ["design-ficcao"], "evidencias": ["tamanho único"] },
-        { "paginas": [7], "assunto": "Objetos como marcadores de lugar e fantasmas do futuro", "antes": "conteudo-novo-da-aula", "justificativa": "Bullet próprio.", "consulta": ["design-ficcao"], "evidencias": ["marcadores de lugar"] },
-        { "paginas": [8], "assunto": "Design fiction cômica para provocar perguntas; agradecimentos", "antes": "conteudo-novo-da-aula", "justificativa": "Definição de design fiction no cs-def; agradecimentos não entram.", "consulta": ["design-ficcao"], "evidencias": ["provocar perguntas"] }
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "Encomenda, ano, equipe, ator e sinopse de Thomas",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Seção própria.",
+          "consulta": [
+            "design-ficcao"
+          ],
+          "evidencias": [
+            "Thomas, 70 anos",
+            "James Leahy"
+          ]
+        },
+        {
+          "paginas": [
+            2
+          ],
+          "assunto": "Superflux Lab e o consórcio ThingTank",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Bullet do projeto.",
+          "consulta": [
+            "design-ficcao"
+          ],
+          "evidencias": [
+            "ThingTank"
+          ]
+        },
+        {
+          "paginas": [
+            3
+          ],
+          "assunto": "Relação com objetos autônomos, agência humana, ritmos e rotinas",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Bullet das perguntas.",
+          "consulta": [
+            "design-ficcao"
+          ],
+          "evidencias": [
+            "agência humana"
+          ]
+        },
+        {
+          "paginas": [
+            4
+          ],
+          "assunto": "The Neural Network, Objects with Attitude, Defiant Behaviours; útil, crítico e desviante",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Bullet dos temas.",
+          "consulta": [
+            "design-ficcao"
+          ],
+          "evidencias": [
+            "Defiant Behaviours",
+            "desviante"
+          ]
+        },
+        {
+          "paginas": [
+            5
+          ],
+          "assunto": "Casa conectada, cuidado de idosos, monitoramento remoto, substituir cuidadores",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Mesmo bullet dos temas.",
+          "consulta": [
+            "design-ficcao"
+          ],
+          "evidencias": [
+            "monitoramento remoto"
+          ]
+        },
+        {
+          "paginas": [
+            6
+          ],
+          "assunto": "Comportamentos humanos contra o cuidado tamanho único",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Pergunta central e ligação com suposições.",
+          "consulta": [
+            "design-ficcao"
+          ],
+          "evidencias": [
+            "tamanho único"
+          ]
+        },
+        {
+          "paginas": [
+            7
+          ],
+          "assunto": "Objetos como marcadores de lugar e fantasmas do futuro",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Bullet próprio.",
+          "consulta": [
+            "design-ficcao"
+          ],
+          "evidencias": [
+            "marcadores de lugar"
+          ]
+        },
+        {
+          "paginas": [
+            8
+          ],
+          "assunto": "Design fiction cômica para provocar perguntas; agradecimentos",
+          "antes": "conteudo-novo-da-aula",
+          "justificativa": "Definição de design fiction no cs-def; agradecimentos não entram.",
+          "consulta": [
+            "design-ficcao"
+          ],
+          "evidencias": [
+            "provocar perguntas"
+          ]
+        }
       ]
     },
     {
@@ -84,16 +501,514 @@
     {
       "id": "drive-pdf",
       "url": "https://drive.google.com/file/d/16Z8U7LPeQ4IZ1AUflmsqZaDjODe7ZiJ2/view",
-      "escopo": "Arquivo do Drive indicado no autoestudo; título, autor e número de páginas desconhecidos.",
+      "escopo": "Primeiro arquivo do Drive indicado no autoestudo; título, autor e número de páginas desconhecidos.",
       "acesso": "indisponivel",
-      "limitacao": "O Drive respondeu com a tela de login (HTTP 401). Nenhum PDF com nome parecido em Downloads, Desktop e Documents. Nada é atribuído a ele."
+      "limitacao": "O Drive respondeu com a tela de login (HTTP 401). Em 10/11/2026 o professor disse que esse autoestudo não estava funcionando e o substituiu pelo artigo de Wobbrock et al. (fonte wobbrock-2011). Nada é atribuído a este arquivo."
     },
     {
       "id": "wobbrock-2011",
+      "url": "https://drive.google.com/file/d/1hUfpboiMajCNwsUJQJJft-rIGsXhDCOI/view",
+      "escopo": "Wobbrock, Kane, Gajos, Harada e Froehlich, Ability-Based Design: Concept, Principles and Examples. PDF indicado pelo professor em 10/11/2026 como autoestudo novo; é a versão submetida à ACM TACCESS (rodapé 'Submitted to ACM Transactions on Accessible Computing', paginação 1:1 a 1:36, 'Resubmitted December 2010'), 36 páginas. Unidade = página do PDF.",
+      "acesso": "integral",
+      "metodo": "A dona baixou o PDF do Drive (que pede login do Inteli) para Downloads; texto extraído com pdftotext e PyMuPDF (36 páginas, todas com texto) e lido do começo ao fim. Tabela 2 e figuras 2, 5 e 6 conferidas na imagem renderizada da página. Contagens da seção 6 conferidas contra a Tabela 2 (10, 6, 12, 2 e 14 batem). SHA-1 11d17eae0989505d39c64544c54eb8a51066f22e.",
+      "totalUnidades": 36,
+      "unidades": [
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "Resumo, palavras-chave e abertura: acessibilidade centraliza a deficiência",
+          "antes": "ja-coberto",
+          "justificativa": "Ideia central já estava no cs-def; abertura reforçada no bullet sobre dis-ability.",
+          "consulta": [
+            "design-habilidades"
+          ],
+          "evidencias": [
+            "o que lhe falta"
+          ]
+        },
+        {
+          "paginas": [
+            2
+          ],
+          "assunto": "Dis-ability, dis-money, faixa de habilidades, contexto, 'what can a person do?', analogia com design centrado no usuário, figura 1 (logos) e exemplo da pessoa com pouca destreza",
+          "antes": "superficial",
+          "justificativa": "Antes só a pergunta e a analogia. Entram a faixa de habilidades e as três saídas da pessoa com pouca destreza. Os logos da figura 1 não foram reproduzidos (imagem de marca).",
+          "consulta": [
+            "design-habilidades"
+          ],
+          "evidencias": [
+            "des-dinheiro",
+            "atleta olimpico",
+            "pouca destreza"
+          ]
+        },
+        {
+          "paginas": [
+            3
+          ],
+          "assunto": "SUPPLE como exemplo; identificar habilidades; adaptação não obrigatória; refinamento de abordagens; seção 2: capturar, medir e modelar",
+          "antes": "parcial",
+          "justificativa": "Adaptação não obrigatória e SUPPLE já estavam; entram 'refinamento' e a subseção 'Por que a ideia apareceu em 2011'.",
+          "consulta": [
+            "design-habilidades",
+            "abordagens"
+          ],
+          "evidencias": [
+            "capturavam, mediam e modelavam",
+            "refinamento"
+          ]
+        },
+        {
+          "paginas": [
+            4
+          ],
+          "assunto": "Avaliação funcional clínica e CIF; interfaces adaptativas; periféricos comuns; custo, complexidade, configuração e manutenção; abandono; 60% (Fichten); limitação leve ou moderada",
+          "antes": "omitido",
+          "justificativa": "Subseção nova com os termos avaliação funcional clínica e CIF e o dado de 60%.",
+          "consulta": [
+            "design-habilidades"
+          ],
+          "evidencias": [
+            "avaliacao funcional clinica",
+            "no maximo 60%",
+            "abandono e alto"
+          ]
+        },
+        {
+          "paginas": [
+            5
+          ],
+          "assunto": "Periféricos comuns com sucesso; dispositivo especial continua; seção 3: objetivo comum; adaptividade e adaptabilidade; início da tecnologia assistiva",
+          "antes": "omitido",
+          "justificativa": "Termos adaptividade e adaptabilidade na seção dona; objetivo comum no cs-def de abordagens.",
+          "consulta": [
+            "design-habilidades",
+            "abordagens"
+          ],
+          "evidencias": [
+            "adaptividade",
+            "adaptabilidade",
+            "independencia, acesso e qualidade de vida"
+          ]
+        },
+        {
+          "paginas": [
+            6
+          ],
+          "assunto": "Figura 2 (a, b, c); objeção e três motivos; ponteira de boca; separado mas igual; estigma",
+          "antes": "parcial",
+          "justificativa": "Figura e ponteira já estavam; entram os três motivos, 'separadas, mas iguais' e estigma.",
+          "consulta": [
+            "design-habilidades",
+            "abordagens"
+          ],
+          "evidencias": [
+            "ponteira de boca",
+            "separadas, mas iguais",
+            "estigmatizar"
+          ]
+        },
+        {
+          "paginas": [
+            7
+          ],
+          "assunto": "Adaptação: sem clínico, escala, barata; computador observa, modela e prevê ao contrário de bengala e rampa; engenharia de reabilitação; início do desenho universal",
+          "antes": "omitido",
+          "justificativa": "Bullet sobre adaptação na seção dona; engenharia de reabilitação na tabela e em bullet de abordagens.",
+          "consulta": [
+            "design-habilidades",
+            "abordagens"
+          ],
+          "evidencias": [
+            "dispensa um clinico",
+            "bengala",
+            "engenharia de reabilitacao"
+          ]
+        },
+        {
+          "paginas": [
+            8
+          ],
+          "assunto": "Desenho universal (tamanho único), usabilidade universal, design para todos, início de UI4All",
+          "antes": "superficial",
+          "justificativa": "Antes só a pergunta de Harper como pegadinha; agora tabela e termos próprios.",
+          "consulta": [
+            "abordagens"
+          ],
+          "evidencias": [
+            "tamanho unico",
+            "usabilidade universal",
+            "design para todos"
+          ]
+        },
+        {
+          "paginas": [
+            9
+          ],
+          "assunto": "UI4All; design inclusivo e exclusão de projeto; IHC extraordinária",
+          "antes": "omitido",
+          "justificativa": "Linhas da tabela e termos próprios; design inclusivo linka para a aula 01.",
+          "consulta": [
+            "abordagens"
+          ],
+          "evidencias": [
+            "ui4all",
+            "exclusao de projeto",
+            "ihc extraordinaria"
+          ]
+        },
+        {
+          "paginas": [
+            10
+          ],
+          "assunto": "Limitações situacionais e lista de fatores; outras abordagens (Evenson, Jipp, SUPPLE)",
+          "antes": "parcial",
+          "justificativa": "Lista de fatores completada na seção dona do termo; Evenson e Jipp em bullet de abordagens.",
+          "consulta": [
+            "design-habilidades",
+            "abordagens"
+          ],
+          "evidencias": [
+            "vibracao ao andar",
+            "evenson",
+            "jipp"
+          ]
+        },
+        {
+          "paginas": [
+            11
+          ],
+          "assunto": "Seção 4: grupos postura, interface e sistema; obrigatório, recomendado, incentivado; Tabela 1",
+          "antes": "parcial",
+          "justificativa": "A tabela já tinha os sete princípios e graus; ganhou a coluna de grupo e os oito verbos da transparência.",
+          "consulta": [
+            "design-habilidades"
+          ],
+          "evidencias": [
+            "postura",
+            "sobrepor, descartar, reverter"
+          ]
+        },
+        {
+          "paginas": [
+            12
+          ],
+          "assunto": "Postura: sem mudar corpo, conhecimento ou comportamento; interface: adaptação e dignidade; transparência também em sistemas adaptáveis; princípios de sistema",
+          "antes": "omitido",
+          "justificativa": "Subseção 'Os sete princípios'.",
+          "consulta": [
+            "design-habilidades"
+          ],
+          "evidencias": [
+            "corpo, o conhecimento ou o comportamento",
+            "dignidade"
+          ]
+        },
+        {
+          "paginas": [
+            13
+          ],
+          "assunto": "Contexto como princípio próprio; commodity e soluções sob medida; seção 5 e Tabela 2 (1 e 2 valem para todos); início do modelo dinâmico de teclado",
+          "antes": "omitido",
+          "justificativa": "Bullets em design-habilidades e em projetos.",
+          "consulta": [
+            "design-habilidades",
+            "projetos-habilidades"
+          ],
+          "evidencias": [
+            "contexto ganhou principio proprio",
+            "valem para os 14"
+          ]
+        },
+        {
+          "paginas": [
+            14
+          ],
+          "assunto": "Tabela 2: projetos, público e princípios; modelo dinâmico de teclado",
+          "antes": "omitido",
+          "justificativa": "Tabela dos 14 projetos conferida na imagem da página.",
+          "consulta": [
+            "projetos-habilidades"
+          ],
+          "evidencias": [
+            "modelo dinamico de teclado",
+            "principios 3 a 7"
+          ]
+        },
+        {
+          "paginas": [
+            15
+          ],
+          "assunto": "Modelo de teclado (sugere, não muda); Invisible Keyguard e OverlapKeys (80%); início do Input Device Agent",
+          "antes": "omitido",
+          "justificativa": "Linhas da tabela.",
+          "consulta": [
+            "projetos-habilidades"
+          ],
+          "evidencias": [
+            "keyguard",
+            "80% menos erros"
+          ]
+        },
+        {
+          "paginas": [
+            16
+          ],
+          "assunto": "Input Device Agent (teclado, ganho do mouse, Compass); TrueKeys",
+          "antes": "omitido",
+          "justificativa": "Linhas da tabela.",
+          "consulta": [
+            "projetos-habilidades"
+          ],
+          "evidencias": [
+            "compass",
+            "25.000 palavras"
+          ]
+        },
+        {
+          "paginas": [
+            17
+          ],
+          "assunto": "TrueKeys (lista das melhores, figura 3 'quikxc'); Trackball EdgeWrite",
+          "antes": "omitido",
+          "justificativa": "Linhas da tabela.",
+          "consulta": [
+            "projetos-habilidades"
+          ],
+          "evidencias": [
+            "quikxc",
+            "edgewrite"
+          ]
+        },
+        {
+          "paginas": [
+            18
+          ],
+          "assunto": "Steady Clicks; Angle Mouse: fase balística, fase de correção, ruído neuromotor, ganho",
+          "antes": "omitido",
+          "justificativa": "Linhas da tabela, bullet sobre as fases e termo ganho controle-exibição.",
+          "consulta": [
+            "projetos-habilidades"
+          ],
+          "evidencias": [
+            "congela o cursor",
+            "ruido neuromotor",
+            "ganho controle-exibicao"
+          ]
+        },
+        {
+          "paginas": [
+            19
+          ],
+          "assunto": "Angle Mouse sem conhecer alvos; figura 4; throughput mais de 10% e 18%; início do SUPPLE",
+          "antes": "omitido",
+          "justificativa": "Linha da tabela.",
+          "consulta": [
+            "projetos-habilidades"
+          ],
+          "evidencias": [
+            "mais de 10% maior",
+            "18% mais precisao"
+          ]
+        },
+        {
+          "paginas": [
+            20
+          ],
+          "assunto": "SUPPLE: bateria, Fitts nem sempre modela, regressão por pessoa, figura 5, sem diagnóstico, sobrepor, 28% e 73%, figura 6",
+          "antes": "superficial",
+          "justificativa": "Antes só a frase de que o SUPPLE redesenha a interface. Entram tabela, bullet sobre Fitts e pegadinha na seção fitts.",
+          "consulta": [
+            "projetos-habilidades",
+            "fitts"
+          ],
+          "evidencias": [
+            "regressao para cada pessoa",
+            "28% mais rapido",
+            "regressao propria para cada pessoa"
+          ]
+        },
+        {
+          "paginas": [
+            21
+          ],
+          "assunto": "Legenda da figura 6; princípios do SUPPLE; Hurst (91%, acima de 90%, C4.5); início do VoiceDraw",
+          "antes": "omitido",
+          "justificativa": "Linhas da tabela.",
+          "consulta": [
+            "projetos-habilidades"
+          ],
+          "evidencias": [
+            "distrofia muscular",
+            "91%",
+            "c4.5"
+          ]
+        },
+        {
+          "paginas": [
+            22
+          ],
+          "assunto": "VoiceDraw (mapa de vogais, figura 7); barrier pointing",
+          "antes": "omitido",
+          "justificativa": "Linhas da tabela.",
+          "consulta": [
+            "projetos-habilidades"
+          ],
+          "evidencias": [
+            "mapa de vogais",
+            "moldura elevada"
+          ]
+        },
+        {
+          "paginas": [
+            23
+          ],
+          "assunto": "Lift-off; estudo de caso 66,7% para 13,3% e 48,5%; figura 8; início das interfaces para quem caminha",
+          "antes": "omitido",
+          "justificativa": "Linha da tabela, termo seleção ao levantar e pegadinha que separa do achado de Avrahami.",
+          "consulta": [
+            "projetos-habilidades"
+          ],
+          "evidencias": [
+            "seleção ao levantar",
+            "66,7%",
+            "48,5%"
+          ]
+        },
+        {
+          "paginas": [
+            24
+          ],
+          "assunto": "Interfaces para quem caminha: resultado misto, Mágico de Oz, figura 9; início do Slide Rule",
+          "antes": "omitido",
+          "justificativa": "Linha da tabela, termo Mágico de Oz e pegadinha.",
+          "consulta": [
+            "projetos-habilidades"
+          ],
+          "evidencias": [
+            "magico de oz",
+            "resultado misto"
+          ]
+        },
+        {
+          "paginas": [
+            25
+          ],
+          "assunto": "Slide Rule: dedo de leitura, segundo dedo, split-tap; início do WebAnywhere",
+          "antes": "omitido",
+          "justificativa": "Linhas da tabela.",
+          "consulta": [
+            "projetos-habilidades"
+          ],
+          "evidencias": [
+            "dedo de leitura",
+            "split-tap"
+          ]
+        },
+        {
+          "paginas": [
+            26
+          ],
+          "assunto": "Princípios do WebAnywhere; seção 6: contagens; ver o aparelho de novo; baixa e alta adaptividade",
+          "antes": "omitido",
+          "justificativa": "Bullets de projetos e gráfico de margem.",
+          "consulta": [
+            "projetos-habilidades"
+          ],
+          "evidencias": [
+            "12 cumprem desempenho",
+            "reconhecedor de fala",
+            "baixa: mudanca imediata e local"
+          ]
+        },
+        {
+          "paginas": [
+            27
+          ],
+          "assunto": "WebAnywhere adaptável; 11 de 14 motores; ceticismo e encanto; seção 7: design para um universal; testes rápidos",
+          "antes": "omitido",
+          "justificativa": "Bullets de projetos e agenda.",
+          "consulta": [
+            "projetos-habilidades"
+          ],
+          "evidencias": [
+            "11 dos 14",
+            "ceticos",
+            "testes rapidos"
+          ]
+        },
+        {
+          "paginas": [
+            28
+          ],
+          "assunto": "Medir no uso real; detectar contexto; início da modelagem",
+          "antes": "omitido",
+          "justificativa": "Agenda de pesquisa.",
+          "consulta": [
+            "projetos-habilidades"
+          ],
+          "evidencias": [
+            "inferir a intencao",
+            "contexto social"
+          ]
+        },
+        {
+          "paginas": [
+            29
+          ],
+          "assunto": "Variação entre pessoas; adaptação (lacunas do SUPPLE); prévias; aparelhos reconfiguráveis; grande desafio; início da conclusão",
+          "antes": "omitido",
+          "justificativa": "Agenda de pesquisa.",
+          "consulta": [
+            "projetos-habilidades"
+          ],
+          "evidencias": [
+            "mesma condicao medica",
+            "previas",
+            "reconfiguraveis"
+          ]
+        },
+        {
+          "paginas": [
+            30
+          ],
+          "assunto": "Conclusão; agradecimentos; início das referências",
+          "antes": "estrutural",
+          "justificativa": "A conclusão repete o resumo (refinamento, sete princípios, 14 projetos); agradecimentos não entram.",
+          "consulta": [
+            "design-habilidades"
+          ],
+          "evidencias": []
+        },
+        {
+          "paginas": [
+            31,
+            32,
+            33,
+            34,
+            35,
+            36
+          ],
+          "assunto": "Referências bibliográficas",
+          "antes": "estrutural",
+          "justificativa": "Bibliografia; os trabalhos citados na aula aparecem com autor e ano (Fichten et al., Harper, Ringbauer et al., Newell, Mace et al., Shneiderman, Evenson et al., Jipp et al.).",
+          "consulta": [
+            "abordagens"
+          ],
+          "evidencias": [
+            "ringbauer",
+            "mace et al., 1991"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wobbrock-2011-publicado",
       "url": "https://faculty.washington.edu/wobbrock/pubs/taccess-11.pdf",
-      "escopo": "Wobbrock, Kane, Gajos, Harada e Froehlich, Ability-Based Design: Concept, Principles and Examples, ACM TACCESS 3(3), artigo 9, 2011, 27 páginas.",
+      "escopo": "Versão publicada do mesmo artigo: ACM TACCESS 3(3), artigo 9, 2011, 27 páginas.",
       "acesso": "trecho",
-      "limitacao": "Lidas as seções 1 a 4 (páginas 9:1 a 9:9) e a abertura da seção 5. Projetos da seção 5, agenda de pesquisa e conclusão não lidos."
+      "limitacao": "Usada antes do autoestudo novo: lidas as seções 1 a 4 (9:1 a 9:9). As diferenças entre a versão publicada e a submetida não foram conferidas; o conteúdo novo da aula vem da versão submetida."
     },
     {
       "id": "wobbrock-2018",

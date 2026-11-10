@@ -6,11 +6,12 @@
   "modos": [
     "consulta"
   ],
-  "resumo": "O que um dispositivo supõe sobre o corpo de quem usa: ergonomia pela IEA, suposições de habilidade e design baseado em habilidades, antropometria com percentis, Lei de Fitts, barreiras com evidência, requisitos verificáveis e como conferir o que a IA produz.",
+  "resumo": "O que um dispositivo supõe sobre o corpo de quem usa: ergonomia pela IEA, suposições de habilidade, design baseado em habilidades com as abordagens anteriores e os 14 projetos de Wobbrock et al., antropometria com percentis, Lei de Fitts, barreiras com evidência, requisitos verificáveis e como conferir o que a IA produz.",
   "topicos": [
     "Ergonomia e seus três domínios",
     "Suposições de habilidade",
     "Design baseado em habilidades",
+    "Abordagens anteriores e os 14 projetos",
     "Antropometria e percentis",
     "Lei de Fitts",
     "Barreiras e requisitos verificáveis",
@@ -33,10 +34,11 @@
       "secao": "fitts"
     },
     {
-      "tipo": "PDF",
-      "titulo": "Arquivo do Google Drive indicado no autoestudo",
-      "url": "https://drive.google.com/file/d/16Z8U7LPeQ4IZ1AUflmsqZaDjODe7ZiJ2/view",
-      "nota": "Autoestudo. O Drive pediu login e nenhum PDF com nome parecido foi achado no computador. Conteúdo não acessado; nada desta aula é atribuído a ele."
+      "tipo": "Artigo",
+      "titulo": "Wobbrock, Kane, Gajos, Harada e Froehlich · Ability-Based Design: Concept, Principles and Examples (versão submetida à ACM TACCESS, dez. 2010, 36 p.)",
+      "url": "https://drive.google.com/file/d/1hUfpboiMajCNwsUJQJJft-rIGsXhDCOI/view",
+      "nota": "Autoestudo. Indicado pelo professor no encontro de 10/11/2026 no lugar do PDF do Drive que não abria. Lido por inteiro (36 páginas); Tabela 2 e figuras 2, 5 e 6 conferidas na imagem da página.",
+      "secao": "design-habilidades"
     },
     {
       "tipo": "Design fiction",
@@ -47,9 +49,9 @@
     },
     {
       "tipo": "Artigo",
-      "titulo": "Wobbrock, Kane, Gajos, Harada e Froehlich · Ability-Based Design: Concept, Principles and Examples (ACM TACCESS 3(3), 2011)",
+      "titulo": "Wobbrock, Kane, Gajos, Harada e Froehlich · Ability-Based Design: Concept, Principles and Examples (versão publicada, ACM TACCESS 3(3), 2011)",
       "url": "https://faculty.washington.edu/wobbrock/pubs/taccess-11.pdf",
-      "nota": "Complemento. Seções 1 a 4 lidas (conceito, abordagens anteriores, sete princípios); projetos da seção 5 só pelo índice e pelo SUPPLE.",
+      "nota": "Complemento. Versão publicada do artigo do autoestudo; dela só as seções 1 a 4 foram lidas. O conteúdo das seções 5 a 8 nesta aula vem da versão submetida, e as diferenças entre as duas versões não foram conferidas.",
       "secao": "design-habilidades"
     },
     {
@@ -94,5 +96,5 @@
       "secao": "antropometria"
     }
   ],
-  "observacao": "O PDF do Drive indicado no autoestudo não foi acessado (exige login) e o filme da Superflux não foi assistido; a equação mostrada no vídeo da NN/g não aparece na transcrição. A aula se apoia na página da IEA, na transcrição do vídeo, na página da Superflux e em complementos identificados. As quatro categorias de suposição vêm do enunciado da ponderada. O leitor de código de barras dos exemplos é fictício: as medidas do aparelho e os valores de a e b são inventados para as contas; os dados do corpo são do ANSUR II, que mede militares americanos de 17 a 58 anos e não representa outras populações. Exemplos, tabelas autorais e exercícios não são do professor."
+  "observacao": "O PDF do Drive indicado primeiro no autoestudo não abria; em 10/11/2026 o professor o trocou pelo artigo de Wobbrock et al. (2011), lido por inteiro na versão submetida à revista (36 páginas). O filme da Superflux não foi assistido e a equação mostrada no vídeo da NN/g não aparece na transcrição. A aula se apoia no artigo de Wobbrock et al., na página da IEA, na transcrição do vídeo, na página da Superflux e em complementos identificados. As quatro categorias de suposição vêm do enunciado da ponderada. O leitor de código de barras dos exemplos é fictício: as medidas do aparelho e os valores de a e b são inventados para as contas; os dados do corpo são do ANSUR II, que mede militares americanos de 17 a 58 anos e não representa outras populações. Exemplos, tabelas autorais e exercícios não são do professor."
 }

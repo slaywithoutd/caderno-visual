@@ -1,0 +1,27 @@
+{
+  "aula": "m8/comp/13-desafio-automatos",
+  "data": "2026-11-12",
+  "criterio": "Conferência da lista de treino do Desafio 1, página por página e exercício por exercício, contra as seções do modo Consulta e o treino. As respostas foram conferidas por força bruta (motor.js) em todas as palavras até 7 a 10 símbolos.",
+  "fontes": [
+    {
+      "id": "lista-treino",
+      "url": "notas/desafio-1-exercicios-treino.pdf",
+      "escopo": "Desafio 1 · Exercícios Treino, 3 páginas; unidades = páginas do PDF",
+      "acesso": "integral",
+      "metodo": "PDF lido inteiro (imagem das páginas).",
+      "totalUnidades": 3,
+      "unidades": [
+        { "paginas": [1], "assunto": "AFD: exercício 2 (grafo de estados e linguagem de três AFDs em tabela) e exercício 5 (inventar AFDs sobre {0,1})", "antes": "conteudo-novo-da-aula", "justificativa": "2(a) resolvido na seção; 2(b) e 2(c) no treino de descrever; os cinco itens do 5 com método na seção e resposta testada no treino.", "consulta": ["ler-tabela", "projetar-afd", "treino-af", "treino-descrever"], "evidencias": ["termina em 1101", "palíndromos de comprimento 6"] },
+        { "paginas": [2], "assunto": "AFN: exercício 1 (diagrama e linguagem de três AFNs); AP: exercício 1 (computações em aba, pertinência de aba, aa, abb, baa, bab, baaaa e a linguagem)", "antes": "conteudo-novo-da-aula", "justificativa": "1(c) simulado na seção do AFN e convertido em AFD; os três AFNs no treino de descrever; o AP com todas as computações de aba, o simulador e a linguagem.", "consulta": ["ler-afn", "afn-afd", "ap-tabela", "computacoes", "treino-descrever"], "evidencias": ["aba", "baaaa"] },
+        { "paginas": [3], "assunto": "AP: exercício 2 (APs para aⁿbⁿ⁺¹, aⁿb²ⁿ, nº de 0 ≠ nº de 1, aⁿbᵐ com m ≠ n e w₁cw₂ com w₁ ≠ w₂ʳ)", "antes": "conteudo-novo-da-aula", "justificativa": "Receitas para os cinco na tabela da seção, 2(a) resolvido, os cinco com dica e resposta testada no treino.", "consulta": ["projetar-ap", "treino-af"], "evidencias": ["aⁿbⁿ⁺¹", "w₁cw₂"] }
+      ]
+    },
+    {
+      "id": "drive-slides",
+      "url": "https://drive.google.com/drive/folders/13sRb90dY3lCeEfUiM5jgQwYO9PZoCFsO",
+      "escopo": "Pasta do Drive com os slides do módulo",
+      "acesso": "nao-acessado",
+      "limitacao": "A pasta pede login com a conta Google. Usados no lugar os slides que já estão em notas/ da aula 01 e o conteúdo das aulas 01, 07 e 08."
+    }
+  ]
+}

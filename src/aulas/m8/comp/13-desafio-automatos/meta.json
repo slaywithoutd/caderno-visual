@@ -1,0 +1,17 @@
+{
+  "numero": "13",
+  "data": "2026-11-12",
+  "titulo": "Desafio 1: autômatos, linguagens formais e análise léxica",
+  "tema": "Linguagens formais e autômatos",
+  "modos": ["consulta"],
+  "resumo": "Preparação para o desafio sem consulta: método para cada tipo de questão (achar a linguagem de um autômato, inventar AFD e AP, listar computações, tokens), a lista de treino do professor resolvida, moldes de código e treino com testes automáticos.",
+  "topicos": ["Linguagem de um AFD", "Projetar AFD", "AFN e subconjuntos", "AP em tabela", "Computações do AP", "Projetar AP", "Classes de linguagens", "Tokens", "Código com testes"],
+  "secoes": [],
+  "fontes": [
+    { "titulo": "Desafio 1 · Exercícios Treino (lista indicada pelo prof. Resina, 3 páginas)", "secao": "formato", "nota": "PDF lido inteiro: exercícios 2 e 5 de AFD, 1 de AFN, 1 e 2 de AP. Todos resolvidos nas seções e no treino; as respostas foram conferidas por força bruta em todas as palavras até 7 a 10 símbolos." },
+    { "titulo": "Enunciado do Desafio 1 (formato, duração, sem consulta, testes automatizados)", "secao": "formato", "nota": "Texto do professor repassado pela dona do caderno." },
+    { "titulo": "Slides da aula 01 (prof. Resina): Conceitos de linguagens formais, Introdução aos AFDs e Introdução aos AFNDs", "secao": "classes", "nota": "Os PDFs em notas/ da aula 01. Usados a definição de AP, a representação das transições e os exemplos de linguagens por classe." },
+    { "titulo": "Pasta do Drive com os slides do módulo", "url": "https://drive.google.com/drive/folders/13sRb90dY3lCeEfUiM5jgQwYO9PZoCFsO", "nota": "Não consultada: a pasta pede login. O conteúdo das aulas 01, 07 e 08 do caderno, que já integraram os slides disponíveis, foi usado no lugar." }
+  ],
+  "observacao": "Os conceitos moram nas aulas 01, 07 e 08; esta página traz os métodos, a lista resolvida e o treino. A linguagem de programação do desafio não foi informada: os moldes estão em Python. A convenção de aceitação do AP (estado final e pilha vazia) foi deduzida do exercício 1(b) da lista, o único jeito de aa não pertencer a L(M)."
+}

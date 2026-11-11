@@ -1,0 +1,603 @@
+<!-- Aula 13 · Preparação para o Desafio 1 (autômatos, linguagens formais e análise léxica).
+     Aula somente Consulta. Os conceitos moram nas aulas 01, 07 e 08; aqui ficam os métodos para cada tipo de
+     questão, os exercícios da lista de treino do professor resolvidos e a área de treino (figuras.js). -->
+
+<!-- ================= Resumo ================= -->
+<section class="cs" id="encontro" data-grupo="Resumo" data-termos="">
+  <h2>Resumo</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 172"><text class="tm st" x="4" y="12">o que a máquina guarda</text><rect class="bl" x="4" y="22" width="70" height="38" rx="8"/><text class="tb" x="39" y="41">AFD</text><text class="tm" x="39" y="74">1 estado</text><rect class="am" x="84" y="22" width="70" height="38" rx="8"/><text class="tb" x="119" y="41">AFN</text><text class="tm" x="119" y="74">conjunto</text><rect class="gr" x="164" y="22" width="72" height="38" rx="8"/><text class="tb" x="200" y="41">AP</text><text class="tm" x="200" y="74">estado + pilha</text><line class="s" x1="4" y1="92" x2="236" y2="92" stroke-dasharray="3 4"/><text class="tm st" x="4" y="110">três perguntas da lista</text><text class="tm st" x="4" y="128">1. dado o autômato, qual L?</text><text class="tm st" x="4" y="146">2. dada L, qual autômato?</text><text class="tm st" x="4" y="164">3. AP: quais computações de w?</text></svg>Tudo no desafio gira em torno de três perguntas.</aside>
+  <p class="cs-def">O Desafio 1 cobra autômatos finitos (AFD e AFN), autômatos com pilha, linguagens formais e análise léxica, em 60 minutos, sem consulta, com questões no papel e código corrigido por testes automáticos.</p>
+  <ul class="b">
+    <li>A lista de treino do professor tem três tipos de questão: dado o autômato, achar a linguagem; dada a linguagem, inventar o autômato; no AP, listar as computações de uma palavra.</li>
+    <li>Para achar a linguagem, dê a cada estado um nome que diga o que ele lembra da palavra lida e teste palavras curtas.</li>
+    <li>Para inventar um AFD, decida o que o estado precisa lembrar. Para um AP, decida o que a pilha guarda.</li>
+    <li>Na lista, o AP aceita só com estado final e pilha vazia ao mesmo tempo. No JFLAP e na aula 01 basta o estado final.</li>
+    <li>No código, quatro moldes resolvem quase tudo: AFD, AFN, AP e léxico. Código que não roda vale zero.</li>
+    <li>A área de treino no fim da página roda o seu autômato e o seu código em milhares de palavras e mostra onde errou.</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>AFD tem uma seta para cada símbolo em cada estado. As que faltam vão para um estado de erro, e ele precisa aparecer (ou ser dito).</li>
+      <li>Na tabela do AP, ε na coluna "topo da pilha" quer dizer "não desempilha". A transição vale com qualquer topo, inclusive com a pilha vazia.</li>
+      <li>"Termina em 1101": quando o símbolo não bate, a volta nem sempre é para o início. 11 seguido de 1 ainda termina em 11.</li>
+      <li>Linguagem que exige lembrar um n sem limite (aⁿbⁿ) não tem autômato finito. Se pediram AFD para ela, releia o enunciado.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= O desafio ================= -->
+<section class="cs" id="formato" data-grupo="O desafio" data-termos="">
+  <h2>Como é o desafio e como usar os 60 minutos</h2>
+  <p class="cs-def">Individual, presencial, das 14h às 15h, sem nenhum tipo de consulta. Pode ter código, corrigido por testes automatizados, e questões de outra natureza (desenhar, descrever, justificar).</p>
+  <ul class="b">
+    <li>Código com erro de sintaxe ou que não roda recebe nota zero, mesmo que a ideia esteja certa.</li>
+    <li>Teste automatizado não lê intenção: o nome da função, a ordem dos parâmetros e o tipo do retorno precisam ser exatamente os pedidos.</li>
+    <li>O professor indicou a lista de treino com exercícios de AFD, AFN e AP. Todos estão resolvidos nesta página e no treino.</li>
+  </ul>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>A questão pede</th><th>Entregue</th><th>Onde estudar</th></tr></thead>
+      <tbody>
+        <tr><td>AFD ou AFN em tabela: desenhe e dê a linguagem</td><td>diagrama e L em palavras (e em notação de conjunto, se der)</td><td><a href="#ler-tabela">ler a tabela</a>, <a href="#ler-afn">AFN</a></td></tr>
+        <tr><td>Invente um AFD para L</td><td>diagrama ou tabela δ completa, com estado inicial e finais</td><td><a href="#projetar-afd">inventar um AFD</a></td></tr>
+        <tr><td>Transforme o AFN em AFD</td><td>tabela de subconjuntos</td><td><a href="#afn-afd">subconjuntos</a></td></tr>
+        <tr><td>AP: computações de uma palavra; mostre que w ∈ L ou ∉ L</td><td>sequências de configurações com ⊢</td><td><a href="#ap-tabela">AP em tabela</a>, <a href="#computacoes">computações</a></td></tr>
+        <tr><td>Invente um AP para L</td><td>tabela ou diagrama e o critério de aceitação usado</td><td><a href="#projetar-ap">inventar um AP</a></td></tr>
+        <tr><td>L é regular? livre do contexto?</td><td>a classe e o argumento em uma ou duas frases</td><td><a href="#classes">classes</a>, <a href="#glc">gramáticas</a></td></tr>
+        <tr><td>Liste os tokens de um trecho</td><td>pares (tipo, lexema) na ordem</td><td><a href="#lexico">tokens à mão</a></td></tr>
+        <tr><td>Programe</td><td>função que passa nos testes</td><td><a href="#codigo">moldes de código</a>, <a href="#treino-codigo">treino</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Minutos 0 a 3: leia tudo e marque o que é código.</li>
+      <li>Faça primeiro o que você resolve com certeza. Questão de "qual a linguagem" trava fácil; deixe para depois se não sair em 5 minutos.</li>
+      <li>Escreva o código no molde, sem enfeite. Antes de entregar, rode na cabeça um caso aceito, um rejeitado e a palavra vazia.</li>
+      <li>Últimos 8 minutos: releia o código linha por linha procurando erro de sintaxe (dois-pontos, parênteses, indentação, <code>return</code>).</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li><code>print</code> no lugar de <code>return</code>: o teste recebe <code>None</code> e falha em tudo.</li>
+      <li>Função que lê com <code>input()</code> trava o teste automático, que chama a função direto.</li>
+      <li>Palavra vazia: <code>''</code> precisa funcionar. Confira se o estado inicial é final.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= Autômatos finitos ================= -->
+<section class="cs" id="ler-tabela" data-grupo="Autômatos finitos" data-termos="">
+  <h2>Dado o AFD em tabela: desenhar e achar a linguagem</h2>
+  <p class="cs-def">Desenhe lendo a tabela linha por linha. Depois dê a cada estado um nome que diga o que ele lembra da palavra lida: a linguagem são as palavras que terminam num estado final.</p>
+  <ol class="b">
+    <li>Linha da tabela = estado; coluna = símbolo; célula = destino. Marque o inicial com uma seta e os finais com círculo duplo. Símbolos com o mesmo destino viram uma seta só ("a, b").</li>
+    <li>Procure o <a href="/m8/comp/01-conceitos/consulta#estado-erro">estado de erro</a> (todas as setas voltam para ele e ele não é final) e estados que prendem a palavra.</li>
+    <li>Nomeie os estados a partir do inicial: "q2 = palavras a⁺", "q3 = b⁺".</li>
+    <li>Teste ε, cada símbolo sozinho e os pares. Anote quem é aceito.</li>
+    <li>Escreva L e confira com duas palavras aceitas e duas rejeitadas.</li>
+  </ol>
+  <div class="cs-uso">
+    <p>Exercício 2(a) da lista: Σ = {a, b, c}, inicial q1, F₁ = {q5}.</p>
+    <div class="tbl prose">
+      <table>
+        <thead><tr><th>δ₁</th><th>a</th><th>b</th><th>c</th><th>o estado lembra</th></tr></thead>
+        <tbody>
+          <tr><td>→ q1</td><td>q2</td><td>q3</td><td>q4</td><td>nada lido (ε)</td></tr>
+          <tr><td>q2</td><td>q2</td><td>q4</td><td>q5</td><td>só a até agora (a⁺)</td></tr>
+          <tr><td>q3</td><td>q4</td><td>q3</td><td>q5</td><td>só b até agora (b⁺)</td></tr>
+          <tr><td>q4</td><td>q4</td><td>q4</td><td>q5</td><td>o resto; a palavra c cai aqui</td></tr>
+          <tr><td>* q5</td><td>q4</td><td>q4</td><td>q5</td><td>terminou em c, com 2 ou mais símbolos</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="b">
+      <li>Para chegar a q5 o último símbolo é c, e de q5 só c mantém a palavra lá. Até aqui: "termina em c".</li>
+      <li>Mas q1 lendo c vai para q4. A palavra <code>c</code> fica de fora.</li>
+      <li>L(M₁) = { wc : w ∈ {a,b,c}⁺ }, as palavras de comprimento 2 ou mais que terminam em c. Aceitas: ac, cc, abc. Rejeitadas: c, ca, ε.</li>
+      <li>Os exercícios 2(b) e 2(c) estão no <a href="#treino-descrever">treino</a>.</li>
+    </ul>
+  </div>
+  <p class="prova">Dado um AFD em tabela: desenhe o grafo de estados e determine a linguagem aceita (exercício 2 da lista).</p>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>A linguagem descreve todas as palavras aceitas e nenhuma outra. "Termina em c" erra o 2(a) por uma palavra só, a <code>c</code>.</li>
+      <li>Sempre confira ε: ela é aceita só se o inicial é final.</li>
+      <li>Quando a linguagem não tem padrão curto, descreva pelos estados com exemplos aceitos e rejeitados. É melhor que um padrão inventado.</li>
+    </ul>
+  </div>
+  <figure class="maq"><svg id="maq-d2a" viewBox="0 0 560 340" role="img" aria-label="Diagrama do AFD do exercício 2(a)"></svg><figcaption>AFD do exercício 2(a): q5 só é alcançado lendo c, e a palavra c sozinha cai em q4.</figcaption></figure>
+</section>
+
+<section class="cs" id="projetar-afd" data-grupo="Autômatos finitos" data-termos="">
+  <h2>Inventar um AFD: o que o estado precisa lembrar</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 120"><text class="tm st" x="4" y="12">lendo 1 1 0 1 …</text><rect class="k" x="4" y="24" width="232" height="30" rx="6"/><text class="tm" x="120" y="39">"qual o maior começo de 1101</text><text class="tm" x="120" y="66">que termina o que já li?"</text><circle class="k" cx="24" cy="98" r="13"/><text class="tm" x="24" y="98">ε</text><circle class="k" cx="70" cy="98" r="13"/><text class="tm" x="70" y="98">1</text><circle class="k" cx="116" cy="98" r="13"/><text class="tm" x="116" y="98">11</text><circle class="k" cx="162" cy="98" r="13"/><text class="tm" x="162" y="98">110</text><circle class="gr" cx="212" cy="98" r="15"/><circle class="gr" cx="212" cy="98" r="11"/><text class="tm" x="212" y="98">1101</text></svg>Cada resposta possível vira um estado.</aside>
+  <p class="cs-def">Antes de desenhar, responda: lendo da esquerda para a direita, o que preciso lembrar para decidir no fim? Cada resposta possível vira um estado, e cada símbolo diz como a resposta muda.</p>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>Linguagem</th><th>O estado lembra</th><th>Estados</th></tr></thead>
+      <tbody>
+        <tr><td>termina em 00</td><td>quantos 0 seguidos no fim: 0, 1, 2 ou mais</td><td>3</td></tr>
+        <tr><td>contém 000</td><td>0 seguidos até 3; achou 000, prende</td><td>4</td></tr>
+        <tr><td>cada 0 entre dois 1</td><td>começou? o último foi 0? já errou?</td><td>3 + erro</td></tr>
+        <tr><td>termina em 1101</td><td>o maior começo de 1101 que termina o lido</td><td>5</td></tr>
+        <tr><td>número par de 1</td><td>a paridade</td><td>2</td></tr>
+        <tr><td>binário múltiplo de 3</td><td>o resto por 3; lendo b, r vira (2r + b) mod 3</td><td>3 (+1 se ε fica fora)</td></tr>
+        <tr><td>palíndromos de comprimento 6</td><td>os 3 primeiros símbolos, depois o que falta conferir</td><td>linguagem finita: árvore + erro</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="cs-uso">
+    <p>Exercício 5(d) da lista, termina em 1101. Os estados são q0 = ε, q1 = 1, q2 = 11, q3 = 110, q4 = 1101 (final). Avançar é seguir 1, 1, 0, 1; o cuidado está nas voltas (as setas de baixo na figura):</p>
+    <ul class="b">
+      <li>q2 (li 11) lendo 1: o lido termina em 111, e o maior começo de 1101 no fim é 11. Fica em q2.</li>
+      <li>q3 (li 110) lendo 0: 1100 não termina em nenhum começo de 1101. Volta para q0.</li>
+      <li>q4 (li 1101) lendo 1: 11011 termina em 11. Vai para q2, e não para q0.</li>
+      <li>q4 lendo 0: 11010 termina em 0. Volta para q0.</li>
+    </ul>
+    <p>Duas operações que caem em pergunta de conceito:</p>
+    <ul class="b">
+      <li>Complemento: troque finais por não finais num AFD completo (com o estado de erro). Sai o AFD de Σ* − L.</li>
+      <li>Interseção e união: rode os dois AFDs juntos; o estado é o par (estado de um, estado do outro).</li>
+    </ul>
+  </div>
+  <p class="prova">Invente AFDs para linguagens sobre {0, 1}: termina em 00, três 0 consecutivos, cada 0 entre dois 1, termina em 1101, palíndromos de comprimento 6 (exercício 5 da lista).</p>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Complemento num AFD sem estado de erro sai errado: as palavras que morriam continuam rejeitadas.</li>
+      <li>Linguagem finita (palíndromos de comprimento 6 são 8 palavras) é sempre regular, mesmo que palíndromos em geral não sejam.</li>
+      <li>"Cada 0 entre dois 1" aceita ε e 111: não há 0 para quebrar a regra.</li>
+    </ul>
+  </div>
+  <figure class="maq"><svg id="maq-1101" viewBox="0 0 600 280" role="img" aria-label="AFD que aceita as palavras terminadas em 1101"></svg><figcaption>AFD de 5(d), termina em 1101: as setas de baixo são as voltas quando o símbolo não bate.</figcaption></figure>
+</section>
+
+<section class="cs" id="ler-afn" data-grupo="Autômatos finitos" data-termos="eps-fecho">
+  <h2>AFN em tabela: conjuntos de estados ativos</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 118"><text class="tm st" x="4" y="12">abaa no AFN 1(c)</text><rect class="k" x="4" y="24" width="44" height="26" rx="5"/><text class="tm" x="26" y="37">{q1}</text><text class="tm" x="58" y="31">a</text><rect class="k" x="66" y="24" width="44" height="26" rx="5"/><text class="tm" x="88" y="37">{q2}</text><text class="tm" x="120" y="31">b</text><rect class="k" x="128" y="24" width="64" height="26" rx="5"/><text class="tm" x="160" y="37">{q1,q3}</text><text class="tm" x="202" y="31">a</text><rect class="gr" x="128" y="68" width="108" height="26" rx="5"/><text class="tm" x="182" y="81">{q1,q2,q3}</text><path class="s" d="M214 52 V64" marker-end="url(#mnarrow)"/><text class="tm st" x="4" y="81">a de novo:</text><text class="tm st" x="4" y="112">q2 ativo no fim: aceita</text></svg>O AFN anda com um conjunto de estados.</aside>
+  <p class="cs-def">Na tabela do <a href="/m8/comp/01-conceitos/consulta#afn">AFN</a> cada célula é um conjunto de estados, e ∅ quer dizer que aquele ramo morre. Para decidir uma palavra, acompanhe o conjunto de estados ativos símbolo a símbolo: aceita se no fim algum ativo é final.</p>
+  <ul class="b">
+    <li>Próximo conjunto = a união das células de todos os estados ativos, na coluna do símbolo lido.</li>
+    <li>Com transição vazia, acrescente sempre o <b>ε-fecho</b>: os estados que se alcançam só por ε, a partir de cada ativo.</li>
+    <li>Conjunto vazio no meio da palavra: todos os ramos morreram, a palavra é rejeitada.</li>
+  </ul>
+  <div class="cs-uso">
+    <p>Exercício 1(c) da lista: inicial q1, F₃ = {q2}, δ₃(q1, a) = {q2}, δ₃(q2, b) = {q1, q3}, δ₃(q3, a) = {q1, q3}, o resto ∅.</p>
+    <div class="tbl prose">
+      <table>
+        <thead><tr><th>lido até agora</th><th>ativos</th><th>aceita aqui?</th></tr></thead>
+        <tbody>
+          <tr><td>ε</td><td>{q1}</td><td>não</td></tr>
+          <tr><td>a</td><td>{q2}</td><td>sim</td></tr>
+          <tr><td>ab</td><td>{q1, q3}</td><td>não</td></tr>
+          <tr><td>aba</td><td>{q2} ∪ {q1, q3} = {q1, q2, q3}</td><td>sim</td></tr>
+          <tr><td>abaa</td><td>{q1, q2, q3}</td><td>sim</td></tr>
+          <tr><td>abab</td><td>{q1, q3}</td><td>não</td></tr>
+          <tr><td>abb</td><td>∅</td><td>não, e nunca mais</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p class="prova">Dado um AFN em tabela: desenhe o diagrama e descreva a linguagem aceita (exercício 1 da lista de AFN).</p>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>∅ na tabela não é erro do enunciado: AFN não precisa de estado de erro.</li>
+      <li>Basta um ramo aceitar. Um ramo que morre não faz a palavra ser rejeitada.</li>
+      <li>Mudar só F muda a linguagem inteira: no 1(b), com F = {q1, q2, q3}, a linguagem vira a*, e ε entra porque q1 é final.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="afn-afd" data-grupo="Autômatos finitos" data-termos="subconjuntos">
+  <h2>AFN para AFD: construção dos subconjuntos</h2>
+  <p class="cs-def">A <b>construção dos subconjuntos</b> transforma um AFN num AFD equivalente: cada estado do AFD é um conjunto de estados ativos do AFN. Comece no ε-fecho de {q0}, calcule para onde cada símbolo leva o conjunto e crie só os conjuntos que aparecerem.</p>
+  <ul class="b">
+    <li>Um estado do AFD é final se o conjunto tem algum estado final do AFN.</li>
+    <li>O conjunto ∅ vira o estado de erro do AFD.</li>
+    <li>No pior caso aparecem 2ⁿ conjuntos, todos os elementos de <a href="/m8/comp/01-conceitos/consulta#produto-partes">𝒫(Q)</a>. Na prática, poucos.</li>
+    <li>Por isso AFN e AFD reconhecem as mesmas linguagens: o não determinismo deixa o autômato menor, não mais poderoso.</li>
+  </ul>
+  <div class="cs-uso">
+    <p>O AFN 1(c) da seção anterior vira:</p>
+    <div class="tbl prose">
+      <table>
+        <thead><tr><th>estado do AFD</th><th>a</th><th>b</th><th>final?</th></tr></thead>
+        <tbody>
+          <tr><td>→ {q1}</td><td>{q2}</td><td>∅</td><td>não</td></tr>
+          <tr><td>{q2}</td><td>∅</td><td>{q1, q3}</td><td>sim</td></tr>
+          <tr><td>{q1, q3}</td><td>{q1, q2, q3}</td><td>∅</td><td>não</td></tr>
+          <tr><td>{q1, q2, q3}</td><td>{q1, q2, q3}</td><td>{q1, q3}</td><td>sim</td></tr>
+          <tr><td>∅</td><td>∅</td><td>∅</td><td>não (erro)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="b">
+      <li>Linha de {q1, q3} lendo a: δ(q1, a) ∪ δ(q3, a) = {q2} ∪ {q1, q3}.</li>
+      <li>Cinco estados, contra 2³ = 8 possíveis.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Esquecer o ε-fecho, no começo e depois de cada símbolo.</li>
+      <li>Marcar como final só o conjunto que é exatamente F. Basta conter um final.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= Autômatos com pilha ================= -->
+<section class="cs" id="ap-tabela" data-grupo="Autômatos com pilha" data-termos="final-vazia">
+  <h2>AP em tabela: como a lista escreve e quando aceita</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 132"><text class="tm st" x="4" y="12">uma linha da tabela</text><rect class="k" x="4" y="20" width="232" height="28" rx="6"/><text class="tm" x="120" y="34">q1 | a | ε | (q1, a)</text><path class="s" d="M120 50 V64" marker-end="url(#mnarrow)"/><rect class="bl" x="34" y="66" width="172" height="28" rx="6"/><text class="tb" x="120" y="80">a, ε → a</text><text class="tm" x="60" y="110">lê a</text><text class="tm" x="120" y="110">não tira</text><text class="tm" x="186" y="110">empilha a</text><text class="tm" x="120" y="128">e fica em q1</text></svg>A coluna "transições" junta destino e o que empilha.</aside>
+  <p class="cs-def">Cada linha da tabela do <a href="/m8/comp/01-conceitos/consulta#ap">AP</a> diz: no estado q, lendo x da entrada com y no topo, vá para q' e empilhe z. Na lista, a palavra é aceita quando, lida toda, a máquina está num estado final e com a pilha vazia.</p>
+  <ul class="b">
+    <li>ε na coluna entrada: não lê nada. ε no topo: não desempilha, e a linha vale com qualquer topo. ε no que empilha: não empilha.</li>
+    <li>Topo a: a transição só vale com a no topo, e ela tira esse a.</li>
+    <li>É a mesma seta <a href="/m8/comp/01-conceitos/consulta#transicao-ap">a, b → c</a> da aula 01, escrita em tabela.</li>
+    <li>Duas linhas com o mesmo estado, entrada e topo (q1, a, ε na lista) são o não determinismo: a máquina segue as duas.</li>
+  </ul>
+  <div class="cs-uso">
+    <p>O AP do exercício 1 da lista: Σ = {a, b}, Γ = {a}, inicial q1, F = {q2}.</p>
+    <ul class="b">
+      <li>Em q1, cada símbolo lido empilha um a: a pilha conta quantos símbolos já passaram.</li>
+      <li>Um a pode ser "o do meio": vai para q2 sem empilhar.</li>
+      <li>Em q2, cada símbolo lido tira um a.</li>
+      <li>Pilha vazia no fim quer dizer que antes e depois do a do meio havia o mesmo número de símbolos.</li>
+      <li>L(M) = { uav : u, v ∈ {a,b}* e |u| = |v| }: comprimento ímpar com a no meio (pergunta 1(c)).</li>
+    </ul>
+  </div>
+  <p class="prova">Na lista, o AP aceita com <b>estado final e pilha vazia</b> ao mesmo tempo. Ao responder, diga o critério que você usou.</p>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Com o critério só de estado final, <code>aa</code> seria aceita (q1 → q1 → q2 com um a sobrando). A lista diz que aa ∉ L(M): o critério dela exige a pilha vazia.</li>
+      <li>"Topo ε" não testa se a pilha está vazia. Para isso existe o truque do <a href="/m8/comp/01-conceitos/consulta#transicao-ap">$ no fundo</a>.</li>
+      <li>Para converter um AP de "só final" para "final e vazia", acrescente um estado final novo que esvazia a pilha com transições ε.</li>
+    </ul>
+  </div>
+  <figure class="maq"><svg id="maq-ap1" viewBox="0 0 520 220" role="img" aria-label="Diagrama do AP do exercício 1"></svg><figcaption>AP do exercício 1: q1 empilha um a por símbolo, um a vai ao meio, q2 desempilha.</figcaption></figure>
+</section>
+
+<section class="cs" id="computacoes" data-grupo="Autômatos com pilha" data-termos="computacao">
+  <h2>Todas as computações de uma palavra no AP</h2>
+  <p class="cs-def">Uma <b>computação</b> é uma sequência de <a href="/m8/comp/01-conceitos/consulta#configuracao">configurações</a> (estado, o que falta ler, pilha) ligadas por ⊢. Como o AP é não determinístico, liste todos os ramos: em cada passo, todas as linhas da tabela que se aplicam.</p>
+  <ul class="b">
+    <li>Nesta página a pilha é escrita com o topo à esquerda; ε é a pilha vazia. Na aula 01, o topo fica à direita. Diga qual convenção você usa.</li>
+    <li>Um ramo para quando nenhuma linha se aplica. Ele aceita só se parou com a entrada lida, num estado final e com a pilha vazia.</li>
+    <li>Para mostrar que w ∈ L, basta uma computação que aceita. Para mostrar que w ∉ L, mostre que todas param sem aceitar.</li>
+  </ul>
+  <div class="cs-uso">
+    <p>Exercício 1(a): todas as computações de M em <code>aba</code>.</p>
+    <div class="cfg">(q1, aba, ε) ⊢ (q2, ba, ε) <span class="bad">para: em q2 lendo b precisa de a no topo</span></div>
+    <div class="cfg">(q1, aba, ε) ⊢ (q1, ba, a) ⊢ (q1, a, aa) ⊢ (q1, ε, aaa) <span class="bad">para: q1 não é final</span></div>
+    <div class="cfg">(q1, aba, ε) ⊢ (q1, ba, a) ⊢ (q1, a, aa) ⊢ (q2, ε, aa) <span class="bad">para: pilha não vazia</span></div>
+    <p>Nenhuma aceita: aba ∉ L(M). Exercício 1(b), o lado que aceita, com <code>baa</code>:</p>
+    <div class="cfg">(q1, baa, ε) ⊢ (q1, aa, a) ⊢ (q2, a, a) ⊢ (q2, ε, ε) <span class="ok">aceita</span></div>
+    <ul class="b">
+      <li>aa: (q1, aa, ε) ⊢ (q1, a, a) ⊢ (q2, ε, a) para com a pilha cheia; os outros dois ramos também falham.</li>
+      <li>abb: o único jeito de ir para q2 é ler a; aqui o a está na 1ª posição, e em q2 ainda faltam 2 símbolos com a pilha vazia.</li>
+      <li>bab e baaaa: o a do meio está na posição 2 de 3 e 3 de 5. Use o simulador abaixo para ver todos os ramos.</li>
+    </ul>
+  </div>
+  <div class="widget prose" id="cp">
+    <div class="wrow"><span class="lbl">palavra</span><input id="cp-w" type="text" value="aba" spellcheck="false" aria-label="Palavra para o AP do exercício 1"><span class="fig-tabs" id="cp-pre"></span></div>
+    <div id="cp-out"></div>
+  </div>
+  <p class="prova">Descreva todas as sequências de transições do AP numa entrada; mostre que certas palavras pertencem ou não a L(M) (exercício 1 da lista de AP).</p>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Esquecer o ramo que troca de estado logo no primeiro símbolo. Ele quase sempre morre rápido, mas faz parte de "todas as sequências".</li>
+      <li>Parar de listar quando um ramo aceita. Para "todas as computações", continue.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="projetar-ap" data-grupo="Autômatos com pilha" data-termos="">
+  <h2>Inventar um AP: o que a pilha guarda</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><text class="tm st" x="4" y="12">aⁿbⁿ⁺¹ lendo aab bb</text><rect class="k" x="20" y="96" width="34" height="22" rx="4"/><text class="tm" x="37" y="107">a</text><rect class="k" x="20" y="72" width="34" height="22" rx="4"/><text class="tm" x="37" y="83">a</text><path class="s" d="M14 60 V122 H60 V60"/><text class="tm" x="37" y="138">depois de aa</text><text class="tm st" x="76" y="40">1º b: lê sem tirar</text><text class="tm st" x="76" y="58">(é o b "a mais")</text><text class="tm st" x="76" y="84">cada b depois:</text><text class="tm st" x="76" y="102">tira um a</text><text class="tm st" x="76" y="128">pilha vazia em q2:</text><text class="tm st" x="76" y="146">aceita</text></svg>A pilha conta os a; os b descontam.</aside>
+  <p class="cs-def">A pergunta do AFD, trocada: o que a pilha precisa guardar? Quase sempre é uma contagem (um símbolo na pilha por unidade) ou o começo da palavra, para comparar com o fim.</p>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>Linguagem</th><th>A pilha guarda</th><th>Truque</th></tr></thead>
+      <tbody>
+        <tr><td>aⁿbⁿ</td><td>um a por a</td><td>cada b tira um</td></tr>
+        <tr><td>aⁿbⁿ⁺¹</td><td>um a por a</td><td>um b lido sem desempilhar</td></tr>
+        <tr><td>aⁿb²ⁿ</td><td>um a por a</td><td>cada par de b tira um (ou empilhe dois por a)</td></tr>
+        <tr><td>aⁿbᵐ, m ≠ n</td><td>um a por a</td><td>duas saídas: sobrou a, ou chegou b com a pilha no $</td></tr>
+        <tr><td>nº de 0 ≠ nº de 1</td><td>o excesso, sobre um $</td><td>igual cancela, diferente empilha; aceita se o topo não é $</td></tr>
+        <tr><td>wwʳ</td><td>w</td><td>chute o meio com uma transição ε</td></tr>
+        <tr><td>w₁cw₂, w₁ ≠ w₂ʳ</td><td>w₁</td><td>o c marca o meio; aceite no primeiro símbolo que não bate ou se os tamanhos diferem</td></tr>
+        <tr><td>aⁱbʲcᵏ, i = j ou i = k</td><td>um a por a</td><td>"ou" vira um chute de ramo no começo</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="cs-uso">
+    <p>Exercício 2(a), { aⁿbⁿ⁺¹ : n ≥ 0 }, com o critério da lista (final e pilha vazia):</p>
+    <div class="tbl prose">
+      <table>
+        <thead><tr><th>estado</th><th>entrada</th><th>topo</th><th>transições</th></tr></thead>
+        <tbody>
+          <tr><td>q1</td><td>a</td><td>ε</td><td>(q1, a)</td></tr>
+          <tr><td>q1</td><td>b</td><td>ε</td><td>(q2, ε)</td></tr>
+          <tr><td>q2</td><td>b</td><td>a</td><td>(q2, ε)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="b">
+      <li>F = {q2}. Com n = 0, a palavra <code>b</code> vai de q1 a q2 com a pilha vazia: aceita.</li>
+      <li><code>abb</code>: empilha a, o 1º b vai para q2, o 2º tira o a. Aceita. <code>ab</code> termina em q2 com a na pilha: rejeita.</li>
+      <li>Os outros itens do exercício 2 estão no <a href="#treino-af">treino</a>, com dica, teste e uma resposta.</li>
+    </ul>
+  </div>
+  <p class="prova">Ache um AP não determinístico para aⁿbⁿ⁺¹, aⁿb²ⁿ, nº de 0 ≠ nº de 1, aⁿbᵐ com m ≠ n e w₁cw₂ com w₁ ≠ w₂ʳ (exercício 2 da lista).</p>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Linha com topo ε vale sempre. No "0 ≠ 1", <code>0, ε → 0</code> empilharia 0 em cima de 1 e aceitaria 01. Por isso as linhas daquele AP olham o topo.</li>
+      <li>Empilhar duas letras numa linha ("0$") é atalho. Se a notação aceita um símbolo só, passe por um estado intermediário com uma transição ε.</li>
+      <li>Num AP com critério de pilha vazia, o $ também precisa sair no fim.</li>
+    </ul>
+  </div>
+  <figure class="maq"><svg id="maq-p2a" viewBox="0 0 440 200" role="img" aria-label="AP para a^n b^(n+1)"></svg><figcaption>AP de 2(a), aⁿbⁿ⁺¹: o primeiro b não desempilha.</figcaption></figure>
+</section>
+
+<!-- ================= Linguagens formais ================= -->
+<section class="cs" id="classes" data-grupo="Linguagens formais" data-termos="">
+  <h2>Qual é a classe da linguagem?</h2>
+  <p class="cs-def">Regular se dá para decidir com memória limitada (só estados). Livre do contexto se basta uma pilha, que casa pares aninhados. Fora disso, nem AP resolve.</p>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>Linguagem</th><th>Classe</th><th>Por quê, em uma linha</th></tr></thead>
+      <tbody>
+        <tr><td>{aa, ab, ba, bb}, qualquer finita</td><td>regular</td><td>um caminho por palavra</td></tr>
+        <tr><td>aⁿbᵐ (n, m ≥ 1), termina em 0, contém 101</td><td>regular</td><td>a memória não depende do tamanho</td></tr>
+        <tr><td>0ᵏ com k múltiplo de 2 ou de 3</td><td>regular</td><td>resto por 6</td></tr>
+        <tr><td>aⁿbⁿ, wwʳ, aⁿbᵐcⁿ⁺ᵐ, mesmo nº de 0 e 1</td><td>livre do contexto, não regular</td><td>uma contagem ou um espelho: a pilha resolve</td></tr>
+        <tr><td>aⁿbⁿcⁿ, ww, aᵖ com p primo</td><td>nem livre do contexto</td><td>duas comparações ao mesmo tempo, ou sem padrão de repetição</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Para dizer que é regular: mostre um AFD, AFN ou expressão regular.</li>
+      <li>Para dizer que não é regular: o argumento curto é "precisa lembrar n sem limite, e um AFD tem um número finito de estados" (<a href="/m8/comp/01-conceitos/consulta#bombeamento">casa dos pombos</a>). A prova formal é o <a href="/m8/comp/01-conceitos/consulta#prova-bombeamento">lema do bombeamento</a>.</li>
+      <li>AFD, AFN e expressão regular reconhecem exatamente as linguagens regulares.</li>
+      <li>AP não determinístico reconhece exatamente as livres do contexto, as mesmas das GLC. O AP determinístico reconhece menos: wwʳ precisa do chute do meio.</li>
+      <li>Regulares ⊊ livres do contexto ⊊ sensíveis ao contexto ⊊ recursivamente enumeráveis (<a href="/m8/comp/01-conceitos/consulta#chomsky">hierarquia de Chomsky</a>).</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Não achar AFD não prova nada. Não regular se prova com o lema (ou com o argumento da memória, se o enunciado aceitar).</li>
+      <li>Subconjunto de regular não é regular por isso: aⁿbⁿ está dentro de a*b*.</li>
+      <li>aⁿbᵐcᵏ com k = n + m é livre do contexto (uma pilha só), mas aⁿbⁿcⁿ não é.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="glc" data-grupo="Linguagens formais" data-termos="">
+  <h2>Gramáticas: ler e escrever no papel</h2>
+  <p class="cs-def">Dada uma GLC, gere palavras pequenas até ver o padrão e justifique os dois lados. Dada uma linguagem, monte a gramática com os blocos de sempre: casamento, sequência, repetição e "ou".</p>
+  <div class="tbl prose">
+    <table>
+      <thead><tr><th>Linguagem</th><th>GLC</th><th>Bloco</th></tr></thead>
+      <tbody>
+        <tr><td>aⁿbⁿ</td><td>S → aSb | ε</td><td>casamento</td></tr>
+        <tr><td>aⁿb²ⁿ</td><td>S → aSbb | ε</td><td>casamento com proporção</td></tr>
+        <tr><td>aⁿbⁿ⁺¹</td><td>S → aSb | b</td><td>casamento com sobra</td></tr>
+        <tr><td>wwʳ</td><td>S → aSa | bSb | ε</td><td>espelho</td></tr>
+        <tr><td>a*b*</td><td>S → AB, A → aA | ε, B → bB | ε</td><td>sequência e repetição</td></tr>
+        <tr><td>aⁱbʲcᵏ, i = j ou i = k</td><td>S → XC | Y, X → aXb | ε, C → cC | ε, Y → aYc | B, B → bB | ε</td><td>"ou" vira duas variáveis</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <ul class="b">
+    <li>O método completo e os exercícios estão na aula 08: <a href="/m8/comp/08-gramaticas-livres-contexto/consulta#qual-linguagem">dada a gramática</a>, <a href="/m8/comp/08-gramaticas-livres-contexto/consulta#construir">dada a linguagem</a>, <a href="/m8/comp/08-gramaticas-livres-contexto/consulta#ambigua">ambiguidade</a> e <a href="/m8/comp/08-gramaticas-livres-contexto/consulta#treino">treino</a>.</li>
+    <li>Repare que a GLC e o AP de cada linha fazem a mesma coisa: o casamento S → aSb é o "empilha nos a, desempilha nos b".</li>
+  </ul>
+</section>
+
+<!-- ================= Análise léxica ================= -->
+<section class="cs" id="lexico" data-grupo="Análise léxica" data-termos="">
+  <h2>Tokens à mão: maior casamento e prioridade</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 120"><text class="tm st" x="4" y="12">em cada ponto da entrada</text><rect class="k" x="4" y="22" width="232" height="26" rx="5"/><text class="tm" x="120" y="35">x1 &gt;= 10</text><rect class="gr" x="4" y="62" width="44" height="22" rx="4"/><text class="tm" x="26" y="73">ID x1</text><rect class="am" x="54" y="62" width="70" height="22" rx="4"/><text class="tm" x="89" y="73">MAIOR_IG</text><rect class="bl" x="130" y="62" width="56" height="22" rx="4"/><text class="tm" x="158" y="73">NUM 10</text><text class="tm st" x="4" y="104">&gt;= é um token só: o maior que casa</text></svg>Pegue sempre o maior pedaço que casa com algum padrão.</aside>
+  <p class="cs-def">Leia da esquerda para a direita. Em cada ponto, pegue o maior lexema que casa com algum padrão; se dois padrões casam o mesmo tamanho, vence o de maior prioridade (palavra-chave antes de identificador). Espaços e comentários são descartados.</p>
+  <ul class="b">
+    <li>Revise os termos na aula 07: <a href="/m8/comp/07-analise-lexica/consulta#lexema-token">lexema, padrão e token</a>, <a href="/m8/comp/07-analise-lexica/consulta#erro-lexico">erro léxico</a>, <a href="/m8/comp/07-analise-lexica/consulta#diagramas">diagramas de transição</a> e <a href="/m8/comp/07-analise-lexica/consulta#desempate">maior casamento</a>.</li>
+    <li>Cada padrão é uma linguagem regular: o léxico é um AFD por padrão, e é por isso que autômatos e léxico caem juntos.</li>
+    <li>Erro léxico só acontece quando nenhum padrão casa naquele ponto (<code>@</code>, <code>#</code> numa linguagem que não os usa).</li>
+  </ul>
+  <div class="cs-uso">
+    <p>Com palavras-chave <code>se</code> e <code>senao</code>, identificador (letra seguida de letras, dígitos ou _), número inteiro e os operadores usuais:</p>
+    <div class="tbl prose">
+      <table>
+        <thead><tr><th>Entrada</th><th>Tokens</th></tr></thead>
+        <tbody>
+          <tr><td><code>se (x1 &gt;= 10) y = x1*2;</code></td><td>SE ABRE ID(x1) MAIOR_IG NUM(10) FECHA ID(y) ATRIB ID(x1) VEZES NUM(2) PV</td></tr>
+          <tr><td><code>senaox</code></td><td>ID(senaox): o maior casamento passa da palavra-chave</td></tr>
+          <tr><td><code>senao x</code></td><td>SENAO ID(x)</td></tr>
+          <tr><td><code>10abc</code></td><td>NUM(10) ID(abc): o número para no primeiro não dígito</td></tr>
+          <tr><td><code>a==b</code></td><td>ID(a) IGUAL ID(b), e não ATRIB ATRIB</td></tr>
+          <tr><td><code>x @ y</code></td><td>ID(x), depois erro léxico em @</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li><code>whilee</code> ou <code>senaox</code> não são erro léxico: são identificadores. Se houver erro, ele aparece no sintático.</li>
+      <li>Em Python, o <code>|</code> de uma expressão regular escolhe a primeira alternativa que casa, e não a maior. Com <code>=|==</code>, <code>==</code> vira dois <code>=</code>. Ponha os operadores longos primeiro.</li>
+      <li>Palavra-chave por expressão regular separada casa dentro de identificador. Reconheça o identificador inteiro e só depois veja se ele é palavra-chave.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= Código ================= -->
+<section class="cs" id="codigo" data-grupo="Código" data-termos="">
+  <h2>Código sem consulta: os quatro moldes</h2>
+  <p class="cs-def">Quatro funções em Python cobrem o que o tema permite pedir em código: aceitar com AFD, aceitar com AFN, aceitar com AP e quebrar um texto em tokens. Treine até escrever cada uma de cabeça, sem erro.</p>
+  <ul class="b">
+    <li>As versões com explicação linha a linha do AFD e do AFN estão na <a href="/m8/comp/01-conceitos/consulta#simulacao">aula 01</a>. Aqui ficam versões curtas, iguais às do treino.</li>
+    <li>A linguagem do desafio não foi informada. Os moldes estão em Python; a lógica é a mesma em qualquer linguagem.</li>
+  </ul>
+  <div class="cs-uso">
+    <p>1 · AFD. <code>delta</code> é um dicionário de dicionários; seta que falta conta como estado de erro.</p>
+<pre><code>def aceita_afd(delta, inicial, finais, w):
+    estado = inicial
+    for c in w:
+        if c not in delta.get(estado, {}):   # sem seta: rejeita
+            return False
+        estado = delta[estado][c]
+    return estado in finais</code></pre>
+    <p>2 · AFN. Cada célula é um conjunto; <code>''</code> é a transição vazia.</p>
+<pre><code>def fecho(delta, estados):
+    pilha = list(estados)
+    vistos = set(estados)
+    while pilha:
+        q = pilha.pop()
+        for r in delta.get(q, {}).get('', set()):
+            if r not in vistos:
+                vistos.add(r)
+                pilha.append(r)
+    return vistos
+
+def aceita_afn(delta, inicial, finais, w):
+    ativos = fecho(delta, {inicial})
+    for c in w:
+        prox = set()
+        for q in ativos:
+            prox |= delta.get(q, {}).get(c, set())
+        ativos = fecho(delta, prox)
+    return len(ativos &amp; set(finais)) &gt; 0</code></pre>
+    <p>3 · AP. Busca em largura nas configurações (estado, posição, pilha). A pilha é uma string com o topo no fim; aceita com estado final e pilha vazia.</p>
+<pre><code>from collections import deque
+
+# trans: lista de (estado, le, topo, destino, empilha); '' = nada
+def aceita_ap(trans, inicial, finais, w):
+    inicio = (inicial, 0, '')
+    fila = deque([inicio])
+    vistos = {inicio}
+    while fila:
+        q, i, pilha = fila.popleft()
+        if i == len(w) and q in finais and pilha == '':
+            return True
+        for (de, le, topo, para, poe) in trans:
+            if de != q:
+                continue
+            if le != '' and (i &gt;= len(w) or w[i] != le):
+                continue
+            if topo != '' and (pilha == '' or pilha[-1] != topo):
+                continue
+            nova = pilha[:-1] if topo != '' else pilha
+            nova = nova + poe[::-1]          # o 1º símbolo de poe fica no topo
+            if len(nova) &gt; 2 * len(w) + 5:   # corta ramos que só empilham
+                continue
+            conf = (para, i + (1 if le != '' else 0), nova)
+            if conf not in vistos:
+                vistos.add(conf)
+                fila.append(conf)
+    return False</code></pre>
+    <p>4 · Léxico à mão, com maior casamento e palavra-chave depois do identificador inteiro.</p>
+<pre><code>PALAVRAS = {'se': 'SE', 'senao': 'SENAO', 'enquanto': 'ENQUANTO'}
+DUPLOS = {'==': 'IGUAL', '!=': 'DIF', '&lt;=': 'MENOR_IG', '&gt;=': 'MAIOR_IG'}
+SIMPLES = {'=': 'ATRIB', '&lt;': 'MENOR', '&gt;': 'MAIOR', '+': 'MAIS', '-': 'MENOS',
+           '*': 'VEZES', '/': 'DIV', '(': 'ABRE', ')': 'FECHA', ';': 'PV'}
+
+def tokens(codigo):
+    saida = []
+    i = 0
+    while i &lt; len(codigo):
+        c = codigo[i]
+        if c in ' \t\n':
+            i += 1
+        elif c.isalpha() or c == '_':
+            j = i
+            while j &lt; len(codigo) and (codigo[j].isalnum() or codigo[j] == '_'):
+                j += 1
+            lex = codigo[i:j]
+            saida.append((PALAVRAS.get(lex, 'ID'), lex))
+            i = j
+        elif c.isdigit():
+            j = i
+            while j &lt; len(codigo) and codigo[j].isdigit():
+                j += 1
+            saida.append(('NUM', codigo[i:j]))
+            i = j
+        elif codigo[i:i + 2] in DUPLOS:        # dois caracteres antes de um
+            saida.append((DUPLOS[codigo[i:i + 2]], codigo[i:i + 2]))
+            i += 2
+        elif c in SIMPLES:
+            saida.append((SIMPLES[c], c))
+            i += 1
+        else:
+            raise ValueError(f'erro léxico: {c!r} na posição {i}')
+    return saida</code></pre>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Esquecer o <code>return False</code> depois do laço do AP: a função devolve <code>None</code>.</li>
+      <li>No AP, sem o corte de tamanho (ou o conjunto <code>vistos</code>), uma linha <code>ε, ε → a</code> roda para sempre.</li>
+      <li>No AFN, <code>delta[q][c]</code> sem <code>.get</code> quebra com <code>KeyError</code> na primeira célula ∅.</li>
+      <li>Laço <code>while</code> do léxico sem avançar <code>i</code> num dos ramos: o programa trava e o teste estoura o tempo.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= Treino ================= -->
+<section class="cs" id="treino-af" data-grupo="Treino" data-termos="">
+  <h2>Treino: escreva o autômato e teste</h2>
+  <p class="cs-def">Escolha um exercício, escreva o autômato no formato abaixo e clique em Testar. A página roda o seu autômato em todas as palavras até um tamanho e mostra as que ele erra, como faria um teste automatizado.</p>
+  <ul class="b">
+    <li>Formato: uma linha <code>inicial q0</code>, uma linha <code>finais q1 q2</code> e uma transição por linha. <code>#</code> começa um comentário.</li>
+    <li>AFD e AFN: <code>q0 a q1</code> (de, símbolo, para). No AFN, vários destinos na mesma linha: <code>q0 a q0 q1</code>. Transição vazia: <code>q0 ε q1</code> (vale também <code>e</code>).</li>
+    <li>AP: <code>q1 a ε -&gt; q1 a</code> (de, lê, desempilha, para, empilha). Para empilhar dois, escreva os dois: <code>0$</code> deixa o 0 no topo.</li>
+    <li>Os itens marcados "lista" são os da lista do professor; os "autoral" foram escritos para treinar no mesmo estilo.</li>
+  </ul>
+  <div class="widget prose" id="tr">
+    <div class="wrow"><span class="lbl">exercício</span><select id="tr-ex" aria-label="Exercício"></select></div>
+    <p class="tr-enun" id="tr-enun"></p>
+    <div class="wrow" id="tr-modo-row"><span class="lbl">aceitação do AP</span><select id="tr-modo" aria-label="Critério de aceitação do AP"><option value="ambos">estado final e pilha vazia (lista)</option><option value="final">só estado final (JFLAP, aula 01)</option></select></div>
+    <textarea id="tr-txt" rows="12" spellcheck="false" aria-label="Seu autômato"></textarea>
+    <div class="wrow"><button class="btn primary" id="tr-run" type="button">Testar</button><button class="btn" id="tr-dica" type="button">Dica</button><button class="btn" id="tr-resp" type="button">Ver uma resposta</button><button class="btn ghost" id="tr-limpa" type="button">Limpar</button></div>
+    <div class="answer" id="tr-out">Escreva o autômato e clique em Testar.</div>
+    <div class="maq"><svg id="tr-svg" viewBox="0 0 600 300" role="img" aria-label="Desenho do seu autômato"></svg></div>
+    <div class="wrow"><span class="lbl">rodar uma palavra</span><input id="tr-w" type="text" spellcheck="false" aria-label="Palavra para rodar no seu autômato"><span id="tr-w-out"></span></div>
+    <div id="tr-rastro"></div>
+  </div>
+</section>
+
+<section class="cs" id="treino-descrever" data-grupo="Treino" data-termos="">
+  <h2>Treino: qual é a linguagem?</h2>
+  <p class="cs-def">Os autômatos dos exercícios 2 (AFD), 1 (AFN) e 1 (AP) da lista. Escreva a linguagem no papel antes de abrir a resposta. Se travar, peça as palavras aceitas: o padrão costuma aparecer.</p>
+  <div id="ds"></div>
+</section>
+
+<section class="cs" id="treino-codigo" data-grupo="Treino" data-termos="">
+  <h2>Treino: código com testes automáticos</h2>
+  <p class="cs-def">Escreva a função pedida e rode os testes. O Python roda aqui mesmo no navegador (Pyodide, baixado na primeira vez, uns 10 MB). Erro de sintaxe aparece como no desafio: vale zero.</p>
+  <ul class="b">
+    <li>Tente primeiro sem olhar os <a href="#codigo">moldes</a>. Errou, compare e apague tudo; escreva de novo do zero.</li>
+    <li>O que você escreve fica salvo neste navegador.</li>
+  </ul>
+  <div class="widget prose" id="py">
+    <div class="wrow"><span class="lbl">exercício</span><select id="py-ex" aria-label="Exercício de código"></select></div>
+    <div class="tr-enun" id="py-enun"></div>
+    <textarea id="py-txt" rows="16" spellcheck="false" aria-label="Seu código em Python"></textarea>
+    <div class="wrow"><button class="btn primary" id="py-run" type="button">Rodar testes</button><button class="btn" id="py-resp" type="button">Ver uma resposta</button><button class="btn ghost" id="py-zera" type="button">Recomeçar</button><span class="tm-status" id="py-status"></span></div>
+    <div class="answer" id="py-out">Os resultados aparecem aqui.</div>
+  </div>
+</section>
+
+<section class="cs" id="simulado" data-grupo="Treino" data-termos="">
+  <h2>Simulado de 60 minutos</h2>
+  <p class="cs-def">Uma rodada no formato do desafio: sem abrir as seções de cima, com o relógio correndo. Papel para o que é desenho; o treino desta página para conferir no fim.</p>
+  <ol class="b">
+    <li>Desenhe o AFD do exercício 2(c) da lista e descreva a linguagem.</li>
+    <li>AFD para 5(d), termina em 1101.</li>
+    <li>Transforme o AFN 1(a) em AFD pela construção dos subconjuntos.</li>
+    <li>Todas as computações do AP do exercício 1 em <code>bab</code>.</li>
+    <li>AP para aⁿbᵐ com m ≠ n, com o critério da lista.</li>
+    <li>Tokens de <code>enquanto(i&lt;=n) s=s+i;</code></li>
+    <li>Código: <code>aceita_ap</code> de cabeça.</li>
+  </ol>
+  <div class="widget prose" id="sim">
+    <div class="wrow"><span class="relogio" id="sim-t">60:00</span><button class="btn primary" id="sim-go" type="button">Começar</button><button class="btn ghost" id="sim-zera" type="button">Zerar</button></div>
+  </div>
+</section>

@@ -759,3 +759,24 @@ button.tk{cursor:pointer}
 .bufh.flash rect{fill:var(--amber-soft);stroke:var(--amber)}
 .bufh rect{fill:none;stroke:var(--line);stroke-width:1.2;stroke-dasharray:4 3;transition:fill .3s,stroke .3s}
 .ptr{transition:transform .45s ease}
+
+/* aula 13 (Desafio 1): diagramas desenhados por drawMachine, treino e simulado */
+.maq{margin:1rem 0;overflow-x:auto}
+.maq svg{width:100%;height:auto;display:block;min-width:420px}
+.tr-enun{margin:0;font-size:.92rem}
+.tm-status{font-size:.78rem;color:var(--muted)}
+.widget .cfg{margin:4px 0;white-space:normal}
+.cs-uso .cfg{margin:6px 0;white-space:normal}
+.widget input[type=text]{min-width:0;flex:1 1 140px;max-width:260px}
+.ds-item{border:1px solid var(--line);border-radius:10px;padding:8px 14px;margin:10px 0;background:var(--surface2)}
+.ds-item>summary{cursor:pointer;font-weight:600}
+.ds-item .tks{margin:8px 0}
+.ds-resp{margin-top:8px}
+.ds-resp>summary{cursor:pointer;color:var(--accent)}
+.py-res{margin:.4rem 0 0}
+.py-res small code{word-break:break-all}
+#py-txt{tab-size:4;min-height:16rem}
+.relogio{font-family:var(--f-mono);font-size:2rem;font-weight:600;letter-spacing:.04em;min-width:6ch}
+.relogio.fim{color:var(--red)}
+#tr,#py,#cp,#sim{grid-template-columns:minmax(0,1fr)}
+#tr select,#py select{min-width:0;flex:1 1 220px;max-width:100%;text-overflow:ellipsis}

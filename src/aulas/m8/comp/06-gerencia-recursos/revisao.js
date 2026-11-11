@@ -32,6 +32,11 @@ export const cartoes = [
   ['O que a IOMMU impede? Por que o RP2040 é exposto a um DMA mal configurado?', 'Impede que um periférico com DMA leia ou grave fora das páginas liberadas pelo SO. O RP2040 não tem IOMMU: quem programa um canal de DMA alcança toda a memória.', 'ataque-dma'],
   ['O que o ataque cold boot explora?', 'A DRAM leva segundos (minutos, se resfriada) para perder os bits, e a chave do disco fica na memória enquanto ele está montado.', 'cold-boot'],
   ['Como se defende de uma fork bomb?', 'Com cota: ulimit -u limita os processos por usuário, e o controlador pids dos cgroups barra novos fork() depois de um limite.', 'negacao-servico'],
+  ['Dois processos que só calculam no mesmo núcleo do Linux, um com nice 0 e outro com nice 5: quanto do processador cada um leva?', 'Uns 75% e 25%. Na classe normal (EEVDF) a prioridade vira peso: 1 024 ÷ (1 024 + 335) ≈ 0,75. Medido no Xeon dos slides de 11/11.', 'reais'],
+  ['O que a classe de tempo real do Linux (SCHED_FIFO) melhora em relação à classe normal?', 'O pior caso, não o atraso típico. No Xeon, os dois acordaram com 0,02 ms típicos; em 1% das vezes, o normal passou de 3,4 ms e o de tempo real ficou abaixo de 0,2 ms.', 'reais'],
+  ['Um page fault custa quantos acessos à RAM?', 'Sem disco (só arranjar um frame zerado): ≈ 1,9 µs, uns 12 acessos de 0,16 µs. Com disco: ≈ 37 µs, mais de 200 acessos.', 'page-fault'],
+  ['Por que o relógio é melhor que o FIFO?', 'O FIFO tira a página mais antiga mesmo que ela seja muito usada. O relógio dá uma segunda chance a quem tem bit de referência 1, então só sai página sem uso recente.', 'algoritmos-substituicao'],
+  ['Por que ler 256 MiB do disco em pedidos de 4 KiB é mais de 20 vezes mais lento que em pedidos de 1 MiB?', 'Cada pedido paga um custo fixo: a latência do dispositivo, o driver e uma interrupção. São 65 536 pedidos (2,49 s) contra 256 (0,11 s).', 'modos-es'],
 ];
 
 export const cola = [

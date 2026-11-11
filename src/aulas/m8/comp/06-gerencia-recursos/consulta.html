@@ -27,7 +27,7 @@
   <div data-ref-mn="mn-recursos"></div>
 </section>
 
-<section class="cs" id="unidades" data-grupo="Base" data-termos="" data-leitura="antes">
+<section class="cs" id="unidades" data-grupo="Base" data-termos="mediana,percentil" data-leitura="antes">
   <h2>Unidades de tempo, potências de 2 e div e mod</h2>
   <p class="cs-def">Os tempos vão de ns (um acesso à memória, ≈ 100 ns) a ms (um braço de disco se mexendo). 1 ms = 1 000 µs = 1 000 000 ns.</p>
   <div data-ref-tbl="tbl-unidades"></div>
@@ -36,6 +36,7 @@
     <li>Memória se mede em potências de 2: 1 KB = 2¹⁰ = 1 024 bytes, 1 MB = 2²⁰, 1 GB = 2³⁰. Uma página de 4 KB tem 4 × 1 024 = 4 096 = 2¹² bytes.</li>
     <li>Com n bits você escreve 2ⁿ números diferentes. Um endereço de 32 bits alcança 2³² bytes = 4 GB.</li>
     <li><code>a div b</code> é o quociente inteiro da divisão; <code>a mod b</code> é o resto.</li>
+    <li>Medidas repetidas se resumem pela <b>mediana</b> (o valor do meio) e pelo <b>percentil</b> 99, o valor que só 1% das medidas passa. A mediana diz o caso típico; o p99, o quase pior caso. Os slides de 11/11 dão os dois para o escalonador do Linux (<a href="#reais">sistemas reais</a>).</li>
   </ul>
   <div class="cs-uso">
     <ul class="b">
@@ -59,7 +60,7 @@
   <div data-ref-mn="mn-escalonador"></div>
 </section>
 
-<section class="cs" id="preemptivo" data-grupo="Processador" data-termos="nao-preemptivo,escalonamento-cooperativo" data-leitura="criterios">
+<section class="cs" id="preemptivo" data-grupo="Processador" data-termos="nao-preemptivo,escalonamento-cooperativo,zephyr" data-leitura="criterios">
   <h2>Quando o escalonador entra: preemptivo, não preemptivo e cooperativo</h2>
   <p class="cs-def">Não preemptivo: o processo só larga a CPU quando termina ou bloqueia. Preemptivo: o SO pode tirar a CPU no meio do surto (preempção, <a href="/m8/comp/04-processos-threads">aula 04</a>), por tempo ou porque chegou alguém mais importante.</p>
   <ul class="b">
@@ -68,6 +69,7 @@
     <li>Não preemptivo: simples e com pouca troca de contexto, mas um processo longo segura todo mundo.</li>
     <li>Preemptivo: melhor tempo de resposta, mais trocas de contexto.</li>
     <li>Escalonamento cooperativo: variação antiga em que o próprio processo devolve a CPU de tempos em tempos (Windows 3.x, MacOS clássico). Um programa com defeito que nunca devolve trava a máquina.</li>
+    <li>O <b>Zephyr</b>, sistema de tempo real dos slides de 11/11, tem os dois tipos de thread ao mesmo tempo. Cooperativa (prioridade negativa): uma interrupção pode deixar outra thread pronta, mas ela só roda quando a atual cede. Preemptiva (prioridade 0 ou maior): a thread de prioridade maior toma o processador assim que fica pronta. No Zephyr, número menor é prioridade maior.</li>
   </ul>
 </section>
 
@@ -496,16 +498,18 @@
   <ul class="b">
     <li>A instrução não pode continuar. O SO trata o page fault: carrega a página do disco numa moldura, atualiza a tabela e manda reexecutar a instrução que falhou.</li>
     <li>Enquanto o disco busca a página, o processo fica bloqueado e o SO roda outro. Onde a página mora no disco costuma ficar anotado na própria entrada da tabela (OSTEP, cap. 21).</li>
+    <li>Nem todo page fault vai ao disco. No primeiro toque numa memória nova, o SO só arranja uma moldura zerada. Medido nos slides de 11/11 (Xeon): acesso à RAM 0,16 µs; page fault sem disco 1,9 µs, uns 12 acessos; page fault com disco 37 µs, mais de 200 acessos.</li>
     <li>Acompanhe na figura a tradução do endereço 20 500, com o page fault no meio.</li>
   </ul>
   <div data-ref="fig-trad"></div>
 </section>
 
-<section class="cs" id="paginacao-demanda" data-grupo="Memória virtual" data-termos="paginacao-demanda" data-leitura="paginacao">
+<section class="cs" id="paginacao-demanda" data-grupo="Memória virtual" data-termos="paginacao-demanda,paginacao-antecipada,arquivo-mapeado" data-leitura="paginacao">
   <h2>Políticas de busca: paginação por demanda</h2>
   <p class="cs-def">Paginação por demanda: uma página só é trazida quando alguém a acessa, ou seja, quando dá page fault. O processo começa com zero páginas na memória e vai carregando o que usa.</p>
   <ul class="b">
-    <li>Paginação antecipada (prepaging): traz também as páginas vizinhas, apostando na localidade espacial. Acerta: economiza page faults. Erra: gasta disco e memória à toa.</li>
+    <li><b>Paginação antecipada</b> (prepaging): traz também as páginas vizinhas, apostando na localidade espacial. Acerta: economiza page faults. Erra: gasta disco e memória à toa.</li>
+    <li>Medido nos slides de 11/11 (Xeon, Linux 6.18): um arquivo de 256 MiB <b>mapeado na memória</b> (<code>mmap</code>) e lido em ordem. Por demanda pura, 65 536 page faults que foram ao disco, 2,46 s (≈ 37 µs cada). No modo normal, com a leitura adiantada do Linux, 1 page fault que foi ao disco e 0,13 s.</li>
   </ul>
 </section>
 
@@ -529,12 +533,14 @@
   </div>
 </section>
 
-<section class="cs" id="tabela-niveis" data-grupo="Memória virtual" data-termos="tabela-multinivel,tabela-invertida" data-leitura="paginacao">
+<section class="cs" id="tabela-niveis" data-grupo="Memória virtual" data-termos="tabela-multinivel,tabela-invertida,sv39,xv6,pagina-grande" data-leitura="paginacao">
   <h2>Tamanho da página e tabelas em níveis</h2>
   <aside class="mn" data-vis="tabela-niveis" aria-hidden="true"><svg viewBox="0 0 240 150"><text class="tm" x="120" y="8">endereço de 32 bits</text><rect class="bl" x="20" y="13" width="60" height="22"/><text x="50" y="24">10</text><rect class="am" x="80" y="13" width="60" height="22"/><text x="110" y="24">10</text><rect class="k" x="140" y="13" width="80" height="22"/><text x="180" y="24">12</text><text class="tm" x="50" y="44">diretório</text><text class="tm" x="110" y="44">tabela</text><text class="tm" x="180" y="44">deslocamento</text><path class="s" d="M50,52 V68" marker-end="url(#mnarrow)"/><path class="s" d="M110,52 V68" marker-end="url(#mnarrow)"/><path class="s" d="M210,52 V78" marker-end="url(#mnarrow)"/><rect class="bl" x="20" y="70" width="60" height="56"/><text x="50" y="92" style="font-size:12px">1 024</text><text class="tm" x="50" y="108">entradas</text><rect class="am" x="110" y="70" width="60" height="56"/><text x="140" y="92" style="font-size:12px">1 024</text><text class="tm" x="140" y="108">entradas</text><path class="s" d="M80,98 H108" marker-end="url(#mnarrow)"/><path class="s" d="M170,98 H188" marker-end="url(#mnarrow)"/><rect class="gr" x="190" y="80" width="40" height="36"/><text x="210" y="98" style="font-size:11px">pág.</text><text class="tm" x="120" y="142">tabela única: 2²⁰ × 4 B = 4 MB</text></svg>Os 20 bits de página viram 10 + 10: um índice no diretório, outro na tabela de segundo nível.</aside>
   <p class="cs-def">A tabela de páginas em níveis quebra a tabela em pedaços: um diretório aponta para tabelas de segundo nível, e as de regiões não usadas nem existem.</p>
   <ul class="b">
     <li>Página grande: tabela menor e menos page faults, mas mais fragmentação interna e mais lixo trazido junto. Página pequena: o contrário. 4 KB é o tamanho mais comum hoje.</li>
+    <li>Medido nos slides de 11/11: tocar 1 GiB página por página deu 262 147 page faults e 0,49 s com páginas de 4 KiB, e 515 page faults e 0,15 s com <b>páginas grandes</b> de 2 MiB. O acesso aleatório caiu de 163 ns para 121 ns, porque cada entrada da TLB passou a cobrir 512 vezes mais memória.</li>
+    <li>Um caso real de três níveis: o <b>Sv39</b> do RISC-V, na figura do <b>xv6</b> que os slides mostram. Endereço virtual de 39 bits = 9 + 9 + 9 bits de índice + 12 de deslocamento. Cada tabela tem 2⁹ = 512 entradas de 8 bytes, 4 KiB, uma página exata. Sem TLB, cada acesso custa 3 leituras de tabela e a leitura do dado.</li>
     <li>O preço dos níveis são mais acessos à memória por tradução (um por nível). A TLB (<a href="/m8/comp/02-fundamentos-memoria">aula 02</a>) esconde isso: com hit rate alto, quase nenhuma tradução precisa percorrer os níveis.</li>
     <li>Cada pedaço da tabela tem de caber numa página, e é isso que decide quantos níveis. Com endereço de 30 bits e páginas de 512 bytes, sobram 21 bits de página e cabem 7 bits de índice por pedaço: 3 níveis (OSTEP, cap. 20). De bônus, a tabela não precisa ser contígua na memória.</li>
     <li>Na troca de contexto, a TLB guarda traduções do processo anterior: ou o SO a esvazia (flush), ou cada entrada leva um identificador do processo (ASID). Se o programa usa mais páginas do que cabem na TLB, os misses disparam; páginas grandes aumentam o alcance dela (OSTEP, cap. 19).</li>
@@ -579,7 +585,7 @@
   </ul>
 </section>
 
-<section class="cs" id="algoritmos-substituicao" data-grupo="Memória virtual" data-termos="otimo-opt,fifo-paginas,lru,relogio,nru,lfu" data-leitura="substituicao">
+<section class="cs" id="algoritmos-substituicao" data-grupo="Memória virtual" data-termos="otimo-opt,fifo-paginas,lru,relogio,nru,lfu,mglru" data-leitura="substituicao">
   <h2>Algoritmos de substituição: ótimo, FIFO, LRU, relógio, NRU e LFU</h2>
   <p class="cs-def">O algoritmo de substituição escolhe a vítima. O ótimo tira a página que vai demorar mais para ser usada de novo; os outros são medidos contra ele.</p>
   <ul class="b">
@@ -593,6 +599,7 @@
     <li>Quem ganha depende da carga (OSTEP, cap. 22). Sem localidade, todos empatam e só o tamanho da memória conta. Com 80% dos acessos em 20% das páginas, o LRU fica perto do ótimo. Num laço que percorre 50 páginas com 49 molduras, LRU e FIFO erram todo acesso, e o aleatório acerta uma parte.</li>
     <li>LRU exato é inviável: com 4 GB em páginas de 4 KB, achar a menos usada seria olhar 1 milhão de entradas a cada page fault. Por isso o relógio.</li>
     <li>O livro ainda cita o FIFO com buffer de páginas: as vítimas vão para uma lista e, se forem acessadas de novo logo, voltam sem ir ao disco.</li>
+    <li>O livro diz que o relógio, com pequenas variações, é o que a maioria dos Unix usa. O Linux aproxima o LRU com as <b>listas de páginas ativas e inativas</b> e, desde a versão 6.1 (2022), com o multi-gen LRU do Google, usado no Android e no ChromeOS (slides de 11/11).</li>
   </ul>
   <div class="cs-uso">
     <ul class="b"><li>Na figura, escolha o algoritmo e o número de molduras e acompanhe cada referência. A string padrão é a do exemplo clássico da <a href="#belady">anomalia de Belady</a>.</li></ul>
@@ -629,6 +636,7 @@
   <ul class="b">
     <li>Começa num processo com menos molduras do que as páginas que usa o tempo todo: ele dá page fault, tira uma página que vai precisar já, dá outro page fault, e assim por diante. Com muitos processos assim, o sistema entra em thrashing.</li>
     <li>Solução: reduzir a multiprogramação, suspendendo processos inteiros (<a href="#swapping">swapping</a>) até sobrar memória para os que ficam (critério: <a href="#working-set">working set</a>). O OSTEP chama isso de admission control. O Linux às vezes faz algo mais drástico: o OOM killer mata um processo que gasta muita memória.</li>
+    <li>Medido nos slides de 11/11: um working set de 128 MiB lido em ordem aleatória, com a memória limitada por um cgroup. Com 512 MiB, uma volta leva menos de 1 ms; com 128 MiB, 22 ms; com 96 MiB, 0,61 s (14 575 páginas voltam do disco); com 64 MiB, 1,08 s (26 781). Mesmo trabalho, mais de mil vezes mais lento.</li>
   </ul>
   <div class="cs-pegadinhas">
     <ul class="b"><li>A armadilha: o SO vê a CPU ociosa e pensa "cabe mais um processo". Coloca mais um, que rouba molduras dos outros, e piora tudo.</li></ul>
@@ -891,6 +899,7 @@
       <li>Polling de um dispositivo que transfere 4 MB/s, de 4 em 4 bytes: 1 milhão de consultas por segundo × 400 ciclos = 4 × 10⁸ ciclos/s = 40% da CPU. Caro demais.</li>
       <li>O mesmo dispositivo com interrupção por palavra: 1 milhão de interrupções por segundo, cada uma de 500 ciclos = 50% da CPU.</li>
       <li>Com DMA, em blocos de 4 KB: 4 MB / 4 KB = 1 000 interrupções por segundo × 500 ciclos = 5 × 10⁵ ciclos/s = 0,05% da CPU.</li>
+      <li>Medido nos slides de 11/11: ler 256 MiB direto do disco do Xeon deu sempre uma interrupção por pedido. Pedidos de 1 MiB: 256 interrupções, 0,11 s. De 128 KiB: 2 048, 0,17 s. De 4 KiB: 65 536, 2,49 s. Uma leitura aleatória de 4 KiB levou 37 µs, contra uns 170 ns da DRAM.</li>
     </ul>
   </div>
   <div class="cs-pegadinhas">
@@ -1010,12 +1019,14 @@
 </section>
 
 <!-- ================= Sistemas reais e segurança ================= -->
-<section class="cs" id="reais" data-grupo="Sistemas reais e segurança" data-termos="" data-leitura="reais">
+<section class="cs" id="reais" data-grupo="Sistemas reais e segurança" data-termos="eevdf,nice,sched-fifo,hipervisor" data-leitura="reais">
   <h2>Os quatro recursos em três sistemas reais</h2>
   <p class="cs-def">A mesma gerência de recursos num Linux, no RP2040 com FreeRTOS e no Arduino Uno sem SO. Da esquerda para a direita, cada decisão sai do SO e passa para o seu código.</p>
   <div data-ref-tbl="tbl-reais"></div>
   <ul class="b">
-    <li>Linux: EEVDF para tarefas comuns desde o kernel 6.6; SCHED_FIFO e SCHED_RR com prioridade fixa de 1 a 99 para tempo real.</li>
+    <li>Linux: <b>EEVDF</b> para tarefas comuns desde o kernel 6.6; <b>SCHED_FIFO</b> e SCHED_RR com prioridade fixa de 1 a 99 para tempo real.</li>
+    <li>Na classe normal, a prioridade é o <b>nice</b> e vira peso: cada um leva peso ÷ soma dos pesos. Nice 0 pesa 1 024 e nice 5 pesa 335, então 1 024 ÷ 1 359 ≈ 75%. Medido nos slides de 11/11, num núcleo do Xeon por 5 s: nice 0 e 1 deram 55% e 45%; 0 e 5, 75% e 25%; 0 e 10, 90% e 10%; 0 e 19, 98% e 2%.</li>
+    <li>Tempo real muda o pior caso, não o típico. Uma tarefa que acorda a cada 1 ms, com dois processos calculando no mesmo núcleo, atrasou 0,02 ms na mediana nas duas classes. O p99 foi 3,4 ms na classe normal (ela espera a vez entre os outros dois) e 0,2 ms em SCHED_FIFO (passa na frente na hora). Os picos maiores incluem pausas do <b>hipervisor</b>, que tirou o processador da máquina virtual por cerca de 1% do tempo.</li>
     <li>Antes do EEVDF, o CFS (OSTEP, cap. 9): roda o processo com o menor tempo de CPU já usado (vruntime), pesado pelo nice, que vai de −20 a +19. A fatia é 48 ms divididos pelo número de prontos, nunca abaixo de 6 ms: com 4 prontos, 12 ms. Quem dormiu muito volta com o vruntime do menor da fila, senão monopolizaria a CPU.</li>
     <li>Menos SO, menos coisa escondida no pior caso (sem page fault, sem troca de contexto), e garantir o pior caso vira trabalho seu.</li>
   </ul>
@@ -1045,14 +1056,14 @@
   </ul>
 </section>
 
-<section class="cs" id="negacao-servico" data-grupo="Sistemas reais e segurança" data-termos="negacao-servico" data-leitura="seguranca">
+<section class="cs" id="negacao-servico" data-grupo="Sistemas reais e segurança" data-termos="negacao-servico,cgroup" data-leitura="seguranca">
   <h2>Negação de serviço por esgotamento de recurso</h2>
   <p class="cs-def">Negação de serviço é deixar o sistema sem atender quem tem direito, gastando um recurso finito até acabar. A defesa é a cota.</p>
   <ul class="b">
     <li>Fork bomb do bash, <code>:(){ :|:&amp; };:</code>: uma função que chama a si mesma duas vezes em segundo plano. Cada processo cria dois; em 20 gerações, 2²⁰ ≈ 1 milhão. A tabela de processos (<a href="/m8/comp/04-processos-threads">aula 04</a>) enche.</li>
     <li>Mesma ideia: memória (OOM killer do Linux), disco cheio, molduras (<a href="#thrashing">thrashing</a>).</li>
     <li>Decisão explorada: entregar recurso a quem pede, sem cota.</li>
-    <li>Mitigação no Linux: <code>ulimit -u</code> por usuário e o controlador pids dos cgroups, que barra novos <code>fork()</code> depois de um limite.</li>
+    <li>Mitigação no Linux: <code>ulimit -u</code> por usuário e o controlador pids dos <b>cgroups</b>, que barra novos <code>fork()</code> depois de um limite. Um cgroup põe um grupo de processos sob limites de memória, processador ou número de processos; é a base dos contêineres.</li>
     <li>No módulo: um laço que grava a EEPROM a cada volta gasta a vida garantida de um byte em 5,5 minutos. A ISA da rotina não tem gravação livre, o firmware limita gravações por hora e um watchdog reinicia um laço travado.</li>
   </ul>
 </section>

@@ -5,10 +5,461 @@
   "fontes": [
     {
       "id": "luisi-encontro",
-      "url": "arquivo S04 - Sistemas operacionais - Semaforos e deadlock.pdf (registrado em m8/comp/05-sincronizacao-deadlocks/cobertura.json); não encontrado em ~/Downloads, ~/Desktop, ~/Documents nem no disco em 09/11/2026",
-      "escopo": "Slides de João Luisi: os do encontro de 04/11/2026 (31 páginas), para saber o que ficou anunciado para 11/11, e os do próprio encontro de 11/11",
-      "acesso": "indisponivel",
-      "limitacao": "O PDF de 04/11 não estava no computador e o Google Drive não estava conectado; os slides finais não foram lidos, então nada do que eles anunciaram foi conferido. A enxuta de 11/11 usa os caps. 8 a 12 como recorte. Os slides de 11/11 ainda não existem; integrar com a skill integrar-notas depois do encontro. Exercícios, treino e decisão de projeto são autorais."
+      "url": "arquivo enviado pela dona: S05 - Sistemas Operacionais - Gerencia de recursos.pptx (pasta do Drive do professor; não republicado)",
+      "escopo": "Slides de João Luisi do encontro de 11/11/2026 (S05, 26 slides, com as notas do apresentador): Machado & Maia caps. 8, 10 e 12, com o cap. 9 como base; medidas próprias no Xeon da aula 02",
+      "acesso": "integral",
+      "totalUnidades": 26,
+      "limitacao": "Os 26 slides e as notas do apresentador foram lidos inteiros e as figuras conferidas (Zephyr, xv6 Sv39, relógio, gráfico do thrashing). Integrados slide a slide em enxuta.html, na ordem do encontro; no consulta.html entraram os termos e números novos (EEVDF, nice, SCHED_FIFO, mediana e p99, Sv39, páginas grandes, paginação antecipada, multi-gen LRU, cgroup, medidas de page fault, thrashing e DMA). O gabarito dos três exercícios e o Desafio 05 estão num documento do professor que não foi fornecido: as resoluções na enxuta foram feitas aqui. O vídeo aula05-cc08-memoria-virtual-narrado.mp4 (5 min 17 s) não foi assistido.",
+      "unidades": [
+        {
+          "paginas": [
+            1
+          ],
+          "assunto": "Capa: Gerência de recursos, CC08, semana 05, 11/11/2026; notas: plano de 2 h, autoestudo caps. 8 a 12, cap. 11 como leitura, vídeo de apoio",
+          "antes": "ja-coberto",
+          "justificativa": "Data e autoestudo já estavam em meta.json; o recorte do encontro (caps. 8, 10 e 12) entrou na seção fora da enxuta.",
+          "leitura": [
+            "encontro"
+          ],
+          "consulta": [
+            "encontro"
+          ],
+          "enxuta": [
+            "encontro",
+            "fora"
+          ]
+        },
+        {
+          "paginas": [
+            2
+          ],
+          "assunto": "Roteiro: o sistema como gerente (processador, memória, dispositivos e o risco do recurso que acaba)",
+          "antes": "superficial",
+          "justificativa": "O Resumo falava em quatro recursos; o desenho do Resumo da enxuta passou a seguir o do slide.",
+          "leitura": [
+            "encontro"
+          ],
+          "consulta": [
+            "gerente"
+          ],
+          "enxuta": [
+            "encontro"
+          ]
+        },
+        {
+          "paginas": [
+            3
+          ],
+          "assunto": "Divisória Parte 1: autoestudo",
+          "antes": "fora-do-escopo",
+          "justificativa": "Só título.",
+          "leitura": [
+            "encontro"
+          ],
+          "consulta": [
+            "encontro"
+          ],
+          "enxuta": []
+        },
+        {
+          "paginas": [
+            4,
+            5
+          ],
+          "assunto": "Quiz: preemptivo, TLB e working set, com respostas e seções do livro (8.4, 10.4.8, 10.4.4)",
+          "antes": "ja-coberto",
+          "justificativa": "Os três conceitos já tinham seção; as definições do livro entraram nas seções da enxuta, sem formato de quiz.",
+          "leitura": [
+            "criterios",
+            "paginacao",
+            "substituicao"
+          ],
+          "consulta": [
+            "preemptivo",
+            "tabela-niveis",
+            "working-set"
+          ],
+          "enxuta": [
+            "criterios",
+            "paginacao",
+            "thrashing"
+          ]
+        },
+        {
+          "paginas": [
+            6
+          ],
+          "assunto": "Divisória Parte 2 e pergunta de passagem sobre critérios",
+          "antes": "superficial",
+          "justificativa": "Os critérios da turma ligados aos do livro entraram em criterios (cs-uso).",
+          "leitura": [
+            "criterios"
+          ],
+          "consulta": [
+            "criterios"
+          ],
+          "enxuta": [
+            "criterios"
+          ]
+        },
+        {
+          "paginas": [
+            7
+          ],
+          "assunto": "Critérios (8.3) e preempção (8.4, 8.7), figuras do Zephyr cooperativo e preemptivo",
+          "antes": "superficial",
+          "justificativa": "Faltavam as definições do livro (turnaround da criação ao término, resposta do pedido ao início) e o Zephyr; entraram com desenho próprio e verbete.",
+          "leitura": [
+            "criterios"
+          ],
+          "consulta": [
+            "preemptivo",
+            "criterios"
+          ],
+          "enxuta": [
+            "criterios"
+          ]
+        },
+        {
+          "paginas": [
+            8
+          ],
+          "assunto": "FIFO, SJF e circular no exemplo do livro (A = 10, B = 4, C = 3): esperas médias 8, 3,3 e 7",
+          "antes": "omitido",
+          "justificativa": "A aula usava outro conjunto de quatro processos e os nomes FCFS e round-robin; a enxuta refaz o exemplo do livro com a tabela de esperas e o Gantt.",
+          "leitura": [
+            "algoritmos"
+          ],
+          "consulta": [
+            "fcfs",
+            "sjf",
+            "round-robin"
+          ],
+          "enxuta": [
+            "fifo-sjf-circular",
+            "leia-como"
+          ]
+        },
+        {
+          "paginas": [
+            9
+          ],
+          "assunto": "Prioridade (8.9), múltiplas filas (8.11, 8.12), tempo real (8.14): starvation, aging, I/O-bound em cima, prioridade estática sem fatia",
+          "antes": "ja-coberto",
+          "justificativa": "Já coberto; a recomendação do livro para tempo real e os exemplos (produção industrial, tráfego aéreo) entraram na enxuta.",
+          "leitura": [
+            "algoritmos",
+            "filas"
+          ],
+          "consulta": [
+            "prioridade",
+            "mlfq",
+            "tempo-real"
+          ],
+          "enxuta": [
+            "prioridade-filas"
+          ]
+        },
+        {
+          "paginas": [
+            10
+          ],
+          "assunto": "Escalonador do Linux medido: nice como peso (55/45 a 98/2) e atraso de quem acorda a cada 1 ms (mediana 0,02 ms; p99 3,4 ms normal e 0,2 ms SCHED_FIFO)",
+          "antes": "omitido",
+          "justificativa": "A aula só citava EEVDF e SCHED_FIFO; entraram os pesos do kernel, a conta da fração, mediana e percentil, hipervisor e folga de timer.",
+          "leitura": [
+            "reais"
+          ],
+          "consulta": [
+            "reais",
+            "unidades"
+          ],
+          "enxuta": [
+            "linux",
+            "leia-como"
+          ]
+        },
+        {
+          "paginas": [
+            11
+          ],
+          "assunto": "Memória virtual por paginação (10.4): bit de validade, vários níveis, TLB; figura do xv6 (Sv39, bits V R W X U G A D)",
+          "antes": "superficial",
+          "justificativa": "A paginação estava coberta com um exemplo de 32 bits; a figura do Sv39 ganhou uma tabela de leitura e verbetes.",
+          "leitura": [
+            "paginacao"
+          ],
+          "consulta": [
+            "paginacao",
+            "tabela-niveis"
+          ],
+          "enxuta": [
+            "paginacao"
+          ]
+        },
+        {
+          "paginas": [
+            12
+          ],
+          "assunto": "Page fault medido: 1 GiB em páginas de 4 KiB e 2 MiB; arquivo de 256 MiB por demanda e com busca antecipada; custos 0,16 µs, 1,9 µs e 37 µs",
+          "antes": "omitido",
+          "justificativa": "A aula usava 8 ms de page fault do livro; entraram os números medidos, páginas grandes, arquivo mapeado e paginação antecipada.",
+          "leitura": [
+            "paginacao"
+          ],
+          "consulta": [
+            "page-fault",
+            "paginacao-demanda",
+            "tabela-niveis"
+          ],
+          "enxuta": [
+            "page-fault-medido"
+          ]
+        },
+        {
+          "paginas": [
+            13
+          ],
+          "assunto": "Substituição (10.4.3, 10.4.5): ótimo, FIFO, LRU, LFU, NRU, relógio; o relógio do slide; Linux com listas ativa e inativa e multi-gen LRU",
+          "antes": "ja-coberto",
+          "justificativa": "Algoritmos já cobertos; entraram o passo a passo do relógio do slide, o porquê de ele melhorar o FIFO e o Linux.",
+          "leitura": [
+            "substituicao"
+          ],
+          "consulta": [
+            "algoritmos-substituicao"
+          ],
+          "enxuta": [
+            "substituicao"
+          ]
+        },
+        {
+          "paginas": [
+            14
+          ],
+          "assunto": "Working set (10.4.4) e thrashing (10.8) medidos: 128 MiB com 512, 128, 96 e 64 MiB de limite",
+          "antes": "superficial",
+          "justificativa": "Definições cobertas; a medida, o cgroup e a leitura dos números entraram.",
+          "leitura": [
+            "substituicao"
+          ],
+          "consulta": [
+            "thrashing",
+            "working-set"
+          ],
+          "enxuta": [
+            "thrashing"
+          ]
+        },
+        {
+          "paginas": [
+            15
+          ],
+          "assunto": "I/O em camadas (12.1 a 12.5) e modelo de drivers do Zephyr",
+          "antes": "ja-coberto",
+          "justificativa": "Camadas cobertas; entraram o modelo do Zephyr e a segurança do driver malicioso.",
+          "leitura": [
+            "es"
+          ],
+          "consulta": [
+            "camadas-es"
+          ],
+          "enxuta": [
+            "camadas-es"
+          ]
+        },
+        {
+          "paginas": [
+            16
+          ],
+          "assunto": "Interrupção e DMA (12.3, 12.4) medidos: 256 MiB em pedidos de 1 MiB, 128 KiB e 4 KiB; leitura aleatória de 37 µs",
+          "antes": "omitido",
+          "justificativa": "Os quatro passos do DMA estavam implícitos; entraram os passos e a medida, com a conta do custo fixo por pedido.",
+          "leitura": [
+            "es"
+          ],
+          "consulta": [
+            "modos-es"
+          ],
+          "enxuta": [
+            "dma"
+          ]
+        },
+        {
+          "paginas": [
+            17
+          ],
+          "assunto": "Armadilhas: fatia menor, mais programas abertos, disco quase RAM",
+          "antes": "superficial",
+          "justificativa": "Viraram pegadinhas errado e certo no Resumo e nas seções.",
+          "leitura": [
+            "algoritmos",
+            "substituicao",
+            "es"
+          ],
+          "consulta": [
+            "round-robin",
+            "thrashing",
+            "modos-es"
+          ],
+          "enxuta": [
+            "encontro",
+            "fifo-sjf-circular",
+            "thrashing",
+            "dma"
+          ]
+        },
+        {
+          "paginas": [
+            18
+          ],
+          "assunto": "Divisória Parte 3: exercícios",
+          "antes": "fora-do-escopo",
+          "justificativa": "Só título.",
+          "leitura": [
+            "exercicios"
+          ],
+          "consulta": [
+            "treino"
+          ],
+          "enxuta": []
+        },
+        {
+          "paginas": [
+            19
+          ],
+          "assunto": "Exercício 1: circular com Backup 6, Alerta 2, Relatório 3, fatias 1, 4 e 6",
+          "antes": "omitido",
+          "justificativa": "Resolvido na enxuta com as regras das notas; o gabarito oficial não foi fornecido.",
+          "leitura": [
+            "exercicios"
+          ],
+          "consulta": [
+            "treino"
+          ],
+          "enxuta": [
+            "exercicios"
+          ]
+        },
+        {
+          "paginas": [
+            20
+          ],
+          "assunto": "Exercício 2: FIFO e LRU com 3 quadros na sequência 2 3 2 1 5 2 4 5 3 2 5 2",
+          "antes": "omitido",
+          "justificativa": "Resolvido na enxuta (FIFO 9, LRU 7); confere com os números do Stallings citados nas notas.",
+          "leitura": [
+            "exercicios"
+          ],
+          "consulta": [
+            "treino"
+          ],
+          "enxuta": [
+            "exercicios"
+          ]
+        },
+        {
+          "paginas": [
+            21
+          ],
+          "assunto": "Exercício 3: som de 64 KiB por programa ou por DMA em blocos de 4 KiB e 512 B",
+          "antes": "omitido",
+          "justificativa": "Resolvido na enxuta (3,28 ms, 160 µs, 1,28 ms).",
+          "leitura": [
+            "exercicios"
+          ],
+          "consulta": [
+            "treino"
+          ],
+          "enxuta": [
+            "exercicios"
+          ]
+        },
+        {
+          "paginas": [
+            22
+          ],
+          "assunto": "Divisória Parte 4: aplicação ao projeto",
+          "antes": "fora-do-escopo",
+          "justificativa": "Só título.",
+          "leitura": [
+            "projeto"
+          ],
+          "consulta": [
+            "treino"
+          ],
+          "enxuta": []
+        },
+        {
+          "paginas": [
+            23
+          ],
+          "assunto": "Os recursos do módulo: tabela recurso, uso e quem decide; Uno 2 KiB, Pico 264 KiB, sem MMU, MPU; rotina de 20 B e 148 B",
+          "antes": "superficial",
+          "justificativa": "A aula tinha uma tabela de três sistemas; entrou a do slide, com um orçamento de exemplo.",
+          "leitura": [
+            "projeto",
+            "memoria-mcu"
+          ],
+          "consulta": [
+            "memoria-mcu"
+          ],
+          "enxuta": [
+            "projeto"
+          ]
+        },
+        {
+          "paginas": [
+            24
+          ],
+          "assunto": "Para o projeto: prazos, orçamento de memória, como cada dispositivo chega; pergunta ao parceiro sobre o prazo",
+          "antes": "omitido",
+          "justificativa": "Entrou na seção projeto da enxuta, com a curiosidade dos tempos de resposta (fonte externa).",
+          "leitura": [
+            "projeto"
+          ],
+          "consulta": [
+            "treino"
+          ],
+          "enxuta": [
+            "projeto"
+          ]
+        },
+        {
+          "paginas": [
+            25
+          ],
+          "assunto": "Resumo do encontro: cinco ideias",
+          "antes": "superficial",
+          "justificativa": "O Resumo da enxuta segue as cinco ideias do slide.",
+          "leitura": [
+            "encontro"
+          ],
+          "consulta": [
+            "encontro"
+          ],
+          "enxuta": [
+            "encontro"
+          ]
+        },
+        {
+          "paginas": [
+            26
+          ],
+          "assunto": "Referências: Machado & Maia, xv6, Belady 1969, Denning 1968, Stoica 1995, Zephyr, Linux; medidas próprias no Xeon (inclui ASLR, sem slide)",
+          "antes": "ja-coberto",
+          "justificativa": "Fontes registradas em meta.json; a medida de ASLR citada não tem slide e não foi integrada.",
+          "leitura": [
+            "encontro"
+          ],
+          "consulta": [
+            "encontro"
+          ],
+          "enxuta": [
+            "encontro"
+          ]
+        }
+      ]
     },
     {
       "id": "machado-caps8-12",

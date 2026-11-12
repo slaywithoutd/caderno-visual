@@ -1,0 +1,6 @@
+/* Glossário da aula 14 (Desafio 1, versão objetiva). Só os termos novos: AFD, AFN, AP e o resto moram nas aulas 01 e 13. */
+export default {
+  complemento: { t: 'Complemento (L̄)', m: ['complemento'], d: 'As palavras de Σ* que não estão em L: L̄ = Σ* − L. Num AFD completo (com o estado de erro), sai trocando os estados finais pelos não finais.', see: ['diferenca', 'estado-erro'] },
+  'produto-afd': { t: 'Construção do produto', m: ['construção do produto'], d: 'Junta dois AFDs num só que roda os dois ao mesmo tempo: cada estado é um par (estado do primeiro, estado do segundo). Com os finais certos, reconhece a interseção ou a união das duas linguagens.', a: 'como andar com um dedo em cada diagrama', x: 'Com |Q₁| e |Q₂| estados, o produto tem |Q₁| × |Q₂|.', see: ['afd', 'intersecao'] },
+  fechamento: { t: 'Propriedades de fechamento', m: ['propriedades de fechamento', 'fechadas sob', 'fechada sob'], d: 'Uma classe de linguagens é fechada sob uma operação quando a operação aplicada a linguagens da classe sempre dá outra da classe. As regulares são fechadas sob união, interseção, complemento, concatenação e estrela; as livres do contexto, sob união, concatenação e estrela, mas não sob interseção nem complemento.', see: ['regular', 'llc'] },
+};

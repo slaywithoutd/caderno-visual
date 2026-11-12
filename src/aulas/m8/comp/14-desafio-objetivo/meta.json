@@ -1,0 +1,16 @@
+{
+  "numero": "14",
+  "data": "2026-11-12",
+  "titulo": "Desafio 1, versão objetiva: construir e ler AFD, AFN e AP",
+  "tema": "Linguagens formais e autômatos",
+  "modos": ["consulta"],
+  "resumo": "Só o que o desafio cobra: dada a linguagem, construir o AFD, AFN ou AP; dado o autômato, dizer a linguagem. Notação, o que cada máquina consegue e não consegue, moldes e três treinos com correção automática.",
+  "topicos": ["Notação", "AFD, AFN e AP", "Poder e limites", "Fechamento", "Moldes de construção", "Ler a linguagem", "Treino"],
+  "secoes": [],
+  "fontes": [
+    { "titulo": "Escopo do Desafio 1 informado pelo professor", "secao": "encontro", "nota": "Exercícios que pedem, para AFD, AFN e AP: dada uma linguagem, construir o autômato; dado um autômato, dizer a linguagem. Texto repassado pela dona do caderno." },
+    { "titulo": "Desafio 1 · Exercícios Treino (lista indicada pelo professor, 3 páginas)", "secao": "treino-ler", "nota": "Os exercícios da lista entram nos treinos 2 e 3 (marcados como da lista). As respostas foram conferidas por força bruta em todas as palavras até 6 a 10 símbolos." },
+    { "titulo": "Aula 01 do caderno (conceitos, AFD, AFN, AP e hierarquia) e aula 13 (versão completa do desafio)", "secao": "poder", "nota": "Definições formais, critérios de aceitação e a construção dos subconjuntos moram lá." }
+  ],
+  "observacao": "Os exercícios marcados como autorais foram escritos para treinar no estilo da lista e não são do professor. A convenção de aceitação do AP (estado final e pilha vazia) foi deduzida do exercício 1(b) da lista; os treinos deixam trocar para só estado final."
+}

@@ -1,0 +1,20 @@
+{
+  "aula": "m8/comp/14-desafio-objetivo",
+  "data": "2026-11-12",
+  "criterio": "Os exercícios da lista de treino que pedem as duas habilidades do desafio (construir o autômato, dizer a linguagem) conferidos contra os treinos desta página. As respostas foram conferidas por força bruta (motor.js da aula 13).",
+  "fontes": [
+    {
+      "id": "lista-treino",
+      "url": "../13-desafio-automatos/notas/desafio-1-exercicios-treino.pdf",
+      "escopo": "Desafio 1 · Exercícios Treino, 3 páginas; unidades = páginas do PDF",
+      "acesso": "integral",
+      "metodo": "PDF lido inteiro (imagem das páginas) para a aula 13.",
+      "totalUnidades": 3,
+      "unidades": [
+        { "paginas": [1], "assunto": "AFD: exercício 2 (linguagem de AFDs em tabela) e exercício 5 (construir AFDs sobre {0,1})", "antes": "conteudo-da-aula-13", "justificativa": "2(a) no treino de leitura; os cinco itens do 5 no treino de construir, com o método na seção de construir AFD.", "consulta": ["ler-af", "construir-afd", "treino-ler", "treino-construir"], "evidencias": ["termina em 1101", "Lista, 2(a)"] },
+        { "paginas": [2], "assunto": "AFN: exercício 1 (linguagem de três AFNs); AP: exercício 1 (linguagem e pertinência)", "antes": "conteudo-da-aula-13", "justificativa": "1(a) e 1(c) no treino de leitura; o AP 1 no treino de leitura e na pegadinha do critério. As computações uma a uma ficam na aula 13.", "consulta": ["ler-ap", "treino-ler"], "evidencias": ["Lista, AP 1", "22 autômatos"] },
+        { "paginas": [3], "assunto": "AP: exercício 2 (construir APs para aⁿbⁿ⁺¹, aⁿb²ⁿ, nº de 0 ≠ nº de 1, aⁿbᵐ com m ≠ n, w₁cw₂)", "antes": "conteudo-da-aula-13", "justificativa": "Receitas na tabela da seção de construir AP; os cinco no treino de construir.", "consulta": ["construir-ap", "treino-construir"], "evidencias": ["aⁿbⁿ⁺¹", "37 linguagens"] }
+      ]
+    }
+  ]
+}

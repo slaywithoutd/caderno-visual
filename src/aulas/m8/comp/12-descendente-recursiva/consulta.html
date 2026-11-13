@@ -7,22 +7,135 @@
 <!-- ================= Resumo ================= -->
 <section class="cs" id="encontro" data-grupo="Resumo" data-termos="">
   <h2>Resumo</h2>
-  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 170"><rect class="bl" x="4" y="6" width="232" height="30" rx="6"/><text class="st" x="12" y="21" style="font-size:10px">soma = termo { OPSOMA termo } ;</text><path class="s" d="M120 38 V54" marker-end="url(#mnarrow)"/><rect class="k" x="4" y="56" width="232" height="84" rx="6"/><text class="st" x="12" y="72" style="font-size:10px">def soma():</text><text class="st" x="24" y="88" style="font-size:10px">esq = termo()</text><text class="st" x="24" y="104" style="font-size:10px">while atual == OPSOMA:</text><text class="st" x="36" y="120" style="font-size:10px">match(OPSOMA); termo()</text><text class="st" x="24" y="134" style="font-size:10px">return esq</text><text class="tm" x="120" y="160">a regra vira função; { } vira while</text></svg>O corpo da função copia o corpo da regra.</aside>
-  <p class="cs-def">Descida recursiva é escrever o analisador sintático à mão, com uma função por regra da gramática. Esta aula mostra como cada pedaço de uma regra vira código, como escolher a alternativa sem voltar atrás, como montar a árvore durante a descida e como reportar erros e continuar depois deles.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 180"><rect class="bl" x="4" y="6" width="232" height="30" rx="6"/><text class="st" x="10" y="21" style="font-size:9px">&lt;atribuicao&gt; ::= ID ASSIGN (ID | INT) SEMICOLON</text><path class="s" d="M120 38 V52" marker-end="url(#mnarrow)"/><rect class="k" x="4" y="54" width="232" height="100" rx="6"/><text class="st" x="10" y="70" style="font-size:9.5px">def atribuicao(self):</text><text class="st" x="22" y="85" style="font-size:9.5px">self.comparar('ID')</text><text class="st" x="22" y="100" style="font-size:9.5px">self.comparar('ASSIGN')</text><text class="st" x="22" y="115" style="font-size:9.5px">if self.tokenCorrente == 'ID': …ID</text><text class="st" x="22" y="130" style="font-size:9.5px">else: self.comparar('INT')</text><text class="st" x="22" y="145" style="font-size:9.5px">self.comparar('SEMICOLON')</text><text class="tm" x="120" y="172">terminal: comparar · | : if no tokenCorrente</text></svg>O método copia a regra, símbolo por símbolo.</aside>
+  <p class="cs-def">Descida recursiva é o analisador sintático escrito à mão: uma classe com a lista de tokens, o token corrente, o <code>comparar</code> e um método por não terminal. O passo seguinte, anunciado no fim dos slides de 12/11, é cada método devolver o seu pedaço da árvore sintática abstrata.</p>
   <ul class="b">
-    <li>Terminal vira <code>match</code>, que confere o tipo do token e consome. Variável vira chamada. <code>|</code> vira um if que olha o próximo token, <code>{ }</code> vira while e <code>[ ]</code> vira if.</li>
-    <li>O analisador preditivo escolhe pelo próximo token e nunca volta. O de backtracking tenta, falha, volta o ponteiro e tenta de novo, e o número de passos explode.</li>
-    <li>Regra com recursão à esquerda faz a função chamar a si mesma sem consumir nada: laço infinito. Reescreva a regra ou use repetição.</li>
-    <li>Uma função por nível de precedência. O while monta a conta associativa à esquerda; a recursão à direita, associativa à direita.</li>
-    <li>Cada função devolve o nó da sua regra, e a AST fica pronta quando a função da variável inicial retorna.</li>
-    <li>Mensagem de erro boa diz o que esperava, o que encontrou, a linha e a coluna. No modo pânico, o analisador descarta tokens até um ponto de sincronização e continua.</li>
+    <li>Não terminal vira método; terminal vira <code>comparar('TIPO')</code> (o <code>match</code>), que confere o token corrente e avança, ou lança "Erro sintático: esperava X, mas obtive Y".</li>
+    <li><code>|</code> vira um if sobre <code>self.tokenCorrente</code>, sem consumir. Alternativa vazia é não fazer nada. Repetição vira recursão (<code>lista_atribuicao</code> chama a si mesma) ou while.</li>
+    <li><code>analisar()</code> chama o método da variável inicial e termina com <code>comparar('EOF')</code>. As chamadas de função fazem o papel da pilha do autômato de pilha.</li>
+    <li>Para gerar a AST, cada token leva o lexema, <code>comparar</code> devolve o lexema e cada método devolve o seu nó, como <code>('=', 'x', 5)</code>. Chaves, <code>;</code> e parênteses somem: a forma da árvore já guarda a precedência.</li>
+    <li>Recursão à esquerda trava a descida (a função chama a si mesma sem consumir). Precedência sai de um método por nível; associatividade à esquerda, de um while.</li>
+    <li>Mensagem de erro boa diz o que esperava, o que encontrou, a linha e a coluna. No modo pânico, o analisador descarta tokens até um ponto seguro e continua.</li>
   </ul>
   <div class="cs-pegadinhas">
     <ul class="b">
-      <li>Sem conferir o fim do arquivo, o analisador aceita um começo certo e ignora o lixo do final.</li>
+      <li>O exemplo de brinquedo dos slides, <code>S(cadeia, pos)</code>, aceita <code>bb</code>: ele imprime o primeiro símbolo sem conferir que é <code>a</code>. A versão em classe começa com <code>comparar("a")</code> e recusa.</li>
+      <li>Sem <code>comparar('EOF')</code> no fim, o analisador aceita um começo certo e ignora o lixo do final.</li>
+      <li>Em <code>&lt;lista_atribuicao&gt; ::= &lt;atribuicao&gt; &lt;lista_atribuicao&gt; | ε</code>, o ε não tem else de erro: se o token não é ID, o método só volta.</li>
       <li>Trocar <code>E → E − T</code> por <code>E → T − E</code> tira a recursão à esquerda e muda a conta: 5 − 3 − 1 vira 5 − (3 − 1) = 3.</li>
-      <li>Em <code>E′ → + T E′ | ε</code>, o ε não é erro: se o próximo token não é <code>+</code>, a função só retorna.</li>
-      <li>"No viable alternative" no sintático pode ser bug do léxico: uma palavra-chave que virou identificador.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= Da aula de 12/11 ================= -->
+<section class="cs" id="aula-resina" data-grupo="Da aula de 12/11" data-termos="">
+  <h2>Os exemplos e a dinâmica de 12/11, resolvidos</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="gr" x="2" y="30" width="62" height="26" rx="5"/><text class="tm" x="33" y="43" style="font-size:8px">ABREBLOCO</text><rect class="gr" x="67" y="30" width="26" height="26" rx="5"/><text class="tm" x="80" y="43" style="font-size:8px">ID</text><rect class="am" x="96" y="30" width="50" height="26" rx="5"/><text x="121" y="43" style="font-size:9px">ASSIGN</text><rect class="k" x="149" y="30" width="28" height="26" rx="5"/><text class="tm" x="163" y="43" style="font-size:8px">INT</text><rect class="k" x="180" y="30" width="58" height="26" rx="5"/><text class="tm" x="209" y="43" style="font-size:8px">SEMICOLON</text><text class="tm" x="48" y="18">já comparados</text><text class="tm" x="190" y="18">ainda na lista</text><path class="s" d="M121 86 V60" marker-end="url(#mnarrow)"/><text class="tam" x="121" y="98">tokenCorrente</text><text class="tm" x="120" y="122">comparar('ASSIGN') confere e chama</text><text class="tm" x="120" y="136">proximoToken(): a seta anda uma casa</text></svg>Só o token corrente decide; os outros esperam na lista.</aside>
+  <p class="cs-def">Na aula de 12/11, o analisador é uma classe Python que recebe a lista de tipos de token e tem um método por não terminal. Aqui estão os dois exemplos dos slides, a dinâmica resolvida e a mesma classe devolvendo a árvore, que é o passo anunciado para depois.</p>
+  <ul class="b">
+    <li>O padrão é o das seções seguintes (<a href="#uma-funcao">uma função por regra</a>, <a href="#match">match</a>, <a href="#decisao">decisão pelo próximo token</a>), com os nomes do professor: <code>tokenCorrente</code> é o token atual, <code>comparar</code> é o <code>match</code> e <code>proximoToken()</code> avança uma posição.</li>
+    <li>O construtor guarda a lista, começa em <code>posicao = -1</code> e chama <code>proximoToken()</code>, para o <code>tokenCorrente</code> já ser o primeiro token.</li>
+    <li><code>proximoToken()</code> não passa do último token. No esqueleto do exemplo 2 ele fica parado no <code>EOF</code>; no da dinâmica, depois do último vira <code>None</code>.</li>
+    <li>Os tokens dos slides são só tipos (<code>'ID'</code>, <code>'INT'</code>). Dá para conferir a sintaxe, mas a árvore não teria o nome da variável nem o valor. Para a árvore, cada token vira o par (tipo, lexema).</li>
+    <li>Os exemplos 1 e 2 são dos slides. A solução da dinâmica e a versão com árvore são autorais, testadas com Python 3.13.</li>
+  </ul>
+  <div class="prose"><pre class="code"># Exemplo 1 (slides): S -&gt; aSb | ab
+def analisar(self):              # supõe que o último token é sempre EOF
+    self.S()
+    self.comparar('EOF')
+
+def S(self):
+    self.comparar("a")
+    if self.tokenCorrente == "a":   # aSb: vem outro S antes do b
+        self.S()
+    self.comparar("b")
+
+# Exemplo 2 (slides): S -&gt; aAb,  A -&gt; c d A e | f
+def S(self):
+    self.comparar("a")
+    self.A()
+    self.comparar("b")
+
+def A(self):
+    if self.tokenCorrente == 'c':   # a alternativa que começa com c
+        self.comparar('c')
+        self.comparar('d')
+        self.A()
+        self.comparar('e')
+    else:                           # senão, só pode ser f
+        self.comparar('f')
+
+# Dinâmica (solução autoral)
+# &lt;bloco&gt;            ::= ABREBLOCO &lt;lista_atribuicao&gt; FECHABLOCO
+# &lt;lista_atribuicao&gt; ::= &lt;atribuicao&gt; &lt;lista_atribuicao&gt; | ε
+# &lt;atribuicao&gt;       ::= ID ASSIGN (ID | INT) SEMICOLON
+def analisar(self):
+    self.bloco()
+    self.comparar('EOF')
+    print("Aceita!")
+
+def bloco(self):
+    self.comparar('ABREBLOCO')
+    self.lista_atribuicao()
+    self.comparar('FECHABLOCO')
+
+def lista_atribuicao(self):
+    if self.tokenCorrente == 'ID':  # só uma atribuição começa com ID
+        self.atribuicao()
+        self.lista_atribuicao()
+    # outro token: escolhe ε e volta sem consumir
+
+def atribuicao(self):
+    self.comparar('ID')
+    self.comparar('ASSIGN')
+    if self.tokenCorrente == 'ID':
+        self.comparar('ID')
+    else:
+        self.comparar('INT')
+    self.comparar('SEMICOLON')
+
+# A mesma dinâmica devolvendo a árvore (autoral): tokens viram (tipo, lexema)
+def comparar(self, tipoEsperado):
+    tipo, lexema = self.tokenCorrente or ('EOF', '')
+    if tipo != tipoEsperado:
+        raise Exception(f"Erro sintático: esperava '{tipoEsperado}', mas obtive '{tipo}'")
+    self.proximoToken()
+    return lexema                   # quem chamou guarda o nome ou o valor
+
+def bloco(self):
+    self.comparar('ABREBLOCO')      # a chave não vira nó
+    atribuicoes = self.lista_atribuicao()
+    self.comparar('FECHABLOCO')
+    return ('bloco', atribuicoes)
+
+def lista_atribuicao(self):
+    if self.tokenCorrente and self.tokenCorrente[0] == 'ID':
+        primeira = self.atribuicao()
+        return [primeira] + self.lista_atribuicao()
+    return []                       # ε vira lista vazia
+
+def atribuicao(self):
+    nome = self.comparar('ID')
+    self.comparar('ASSIGN')         # = e ; não viram nó
+    if self.tokenCorrente[0] == 'ID':
+        valor = self.comparar('ID')
+    else:
+        valor = int(self.comparar('INT'))
+    self.comparar('SEMICOLON')
+    return ('=', nome, valor)</pre></div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Teste válido da dinâmica, <code>{ x = 5; y = x; }</code> em tipos: imprime "Aceita!". Na versão com árvore, analisar devolve <code>('bloco', [('=', 'x', 5), ('=', 'y', 'x')])</code>.</li>
+      <li>Teste inválido, sem o <code>;</code>: depois do INT, <code>atribuicao</code> pede SEMICOLON e encontra FECHABLOCO. Sai "Erro sintático: esperava 'SEMICOLON', mas obtive 'FECHABLOCO'".</li>
+      <li><code>{ }</code> é aceito: <code>lista_atribuicao</code> vê FECHABLOCO, escolhe ε e volta. <code>{ } x</code> só é recusado pelo <code>comparar('EOF')</code>: "esperava 'EOF', mas obtive 'ID'".</li>
+      <li>Árvore sintática × AST, com o <code>(2+3)*4</code> dos slides: a árvore sintática tem um nó para cada símbolo e cada variável usada, parênteses incluídos; a AST fica só com <code>*</code>, tendo <code>+</code> (com 2 e 3) e 4 como filhos. O <code>+</code> embaixo já diz que ele é calculado antes. O conceito está na <a href="/m8/comp/09-especificacao-linguagem/consulta#concreta-abstrata">aula 09</a> e a montagem durante a descida, em <a href="#ast">Montando a árvore</a>.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>O exemplo de brinquedo <code>S(cadeia, pos)</code> dos slides aceita <code>bb</code> e quebra com <code>IndexError</code> em <code>aab</code>: ele não confere o primeiro símbolo e lê fora da cadeia. É a razão de existir o <code>comparar</code>.</li>
+      <li>Com <code>if ID … else comparar('INT')</code>, a entrada <code>x = ;</code> dá "esperava 'INT'", e o certo seria "esperava ID ou INT". Para a mensagem completa, teste os dois e lance o erro no else.</li>
+      <li>No esqueleto da dinâmica, numa lista sem <code>'EOF'</code> no fim, o <code>tokenCorrente</code> vira <code>None</code> e a mensagem fica "obtive 'None'".</li>
     </ul>
   </div>
 </section>

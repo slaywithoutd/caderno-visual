@@ -3,19 +3,69 @@
   "data": "2026-11-12",
   "titulo": "Análise sintática",
   "tema": "Linguagens formais e autômatos",
-  "modos": ["consulta"],
+  "modos": [
+    "consulta"
+  ],
   "resumo": "O papel do analisador sintático, descendente × ascendente, como preparar a gramática (ambiguidade, recursão e fatoração à esquerda), FIRST, FOLLOW e a tabela LL(1), e a análise ascendente: shift-reduce, tabela LR, itens LR(0), SLR, LALR e conflitos.",
-  "topicos": ["Papel do sintático", "Descendente × ascendente", "Técnicas contra ambiguidade", "Lookahead e LL(k)", "Recursão e fatoração à esquerda", "FIRST e FOLLOW", "Tabela LL(1)", "LL(*) e ALL(*)", "Shift-reduce e handle", "Tabela LR", "Itens LR(0) e SLR", "Conflitos", "LR(1) e LALR"],
+  "topicos": [
+    "Papel do sintático",
+    "Descendente × ascendente",
+    "Técnicas contra ambiguidade",
+    "Lookahead e LL(k)",
+    "Recursão e fatoração à esquerda",
+    "FIRST e FOLLOW",
+    "Tabela LL(1)",
+    "LL(*) e ALL(*)",
+    "Shift-reduce e handle",
+    "Tabela LR",
+    "Itens LR(0) e SLR",
+    "Conflitos",
+    "LR(1) e LALR"
+  ],
   "secoes": [],
   "fontes": [
-    { "titulo": "Construção de Compiladores · Aula 05 · Análise Sintática, Introdução (D. Lucrédio, UFSCar)", "url": "https://www.youtube.com/watch?v=5OAwf86vyhA", "nota": "Autoestudo, 86 min. Transcrição automática do YouTube lida inteira." },
-    { "titulo": "Construção de Compiladores · Aula 06 · Análise Sintática Descendente (D. Lucrédio)", "url": "https://www.youtube.com/watch?v=yan1Z1JItaM", "nota": "Autoestudo, 77 min. Transcrição automática lida inteira; o reconhecimento de voz é ruim em vários trechos, interpretados pelo contexto. As telas não foram vistas." },
-    { "titulo": "Construção de Compiladores · Aula 07 · Análise Sintática Ascendente (D. Lucrédio)", "url": "https://www.youtube.com/watch?v=DHM8aYzdcQ8", "nota": "Autoestudo, 51 min. Transcrição automática lida inteira; as telas não foram vistas." },
-    { "titulo": "Compiladores · cap. 3 · Gramáticas livres de contexto e análise sintática (p. 95–140)", "nota": "Autoestudo. Não consultado: o livro não estava acessível." },
-    { "titulo": "Compiladores · cap. 4 · Análise sintática descendente (p. 157–166)", "nota": "Autoestudo. Não consultado: o livro não estava acessível." },
-    { "titulo": "Mogensen, Basics of Compiler Design, edição de 2010 · cap. 3, Syntax Analysis (p. 53–112)", "url": "http://hjemmesider.diku.dk/~torbenm/Basics/", "nota": "Substituto do livro, PDF gratuito do próprio autor (baixado de cópia arquivada da página dele). Capítulo lido inteiro." },
-    { "titulo": "Thain, Introduction to Compilers and Language Design, 2ª ed. · cap. 4, Parsing (p. 35–68)", "url": "https://dthain.github.io/books/compiler/", "nota": "Substituto do livro, capítulo gratuito no site do autor. Lido inteiro." },
-    { "titulo": "Slides da aula 01 (prof. Resina)", "nota": "Só o roteiro das ponderadas (semana 7: análises léxica e sintática), já em notas/ da aula 01." }
+    {
+      "titulo": "Construção de Compiladores · Aula 05 · Análise Sintática, Introdução (D. Lucrédio, UFSCar)",
+      "url": "https://www.youtube.com/watch?v=5OAwf86vyhA",
+      "nota": "Autoestudo, 86 min. Transcrição automática do YouTube lida inteira."
+    },
+    {
+      "titulo": "Construção de Compiladores · Aula 06 · Análise Sintática Descendente (D. Lucrédio)",
+      "url": "https://www.youtube.com/watch?v=yan1Z1JItaM",
+      "nota": "Autoestudo, 77 min. Transcrição automática lida inteira; o reconhecimento de voz é ruim em vários trechos, interpretados pelo contexto. As telas não foram vistas."
+    },
+    {
+      "titulo": "Construção de Compiladores · Aula 07 · Análise Sintática Ascendente (D. Lucrédio)",
+      "url": "https://www.youtube.com/watch?v=DHM8aYzdcQ8",
+      "nota": "Autoestudo, 51 min. Transcrição automática lida inteira; as telas não foram vistas."
+    },
+    {
+      "titulo": "Compiladores · cap. 3 · Gramáticas livres de contexto e análise sintática (p. 95–140)",
+      "nota": "Autoestudo. Não consultado: o livro não estava acessível."
+    },
+    {
+      "titulo": "Compiladores · cap. 4 · Análise sintática descendente (p. 157–166)",
+      "nota": "Autoestudo. Não consultado: o livro não estava acessível."
+    },
+    {
+      "titulo": "Mogensen, Basics of Compiler Design, edição de 2010 · cap. 3, Syntax Analysis (p. 53–112)",
+      "url": "http://hjemmesider.diku.dk/~torbenm/Basics/",
+      "nota": "Substituto do livro, PDF gratuito do próprio autor (baixado de cópia arquivada da página dele). Capítulo lido inteiro."
+    },
+    {
+      "titulo": "Thain, Introduction to Compilers and Language Design, 2ª ed. · cap. 4, Parsing (p. 35–68)",
+      "url": "https://dthain.github.io/books/compiler/",
+      "nota": "Substituto do livro, capítulo gratuito no site do autor. Lido inteiro."
+    },
+    {
+      "titulo": "Slides da aula 01 (prof. Resina)",
+      "nota": "Só o roteiro das ponderadas (semana 7: análises léxica e sintática), já em notas/ da aula 01."
+    },
+    {
+      "titulo": "Slides 05 · Análise Sintática, semana 5 (prof. Fillipe Resina), encontro de 12/11",
+      "url": "https://drive.google.com/drive/folders/115IfdbxHF8mE0eUjAwD9mcphD9aUBVbC",
+      "nota": "Lidos inteiros (27 slides) depois do encontro; PDF em notas/. O Resumo foi reescrito com eles, e os exemplos e a dinâmica estão resolvidos na aula 12."
+    }
   ],
-  "observacao": "Escrita a partir das três transcrições completas e dos capítulos de análise sintática do Mogensen e do Thain, lidos inteiros como substitutos. Os dois trechos de leitura indicados (cap. 3, p. 95–140, e cap. 4, p. 157–166) não foram consultados; os títulos parecem ser os do Louden, Compiladores: princípios e práticas, que o vídeo 05 cita entre as referências, mas edição e páginas não foram conferidas. Nada aqui promete equivalência a esse livro: confira nele a notação e os exemplos. Ficaram fora dos autoestudos, marcados no texto: a construção da tabela SLR com itens LR(0), Nullable e FOLLOW por restrições (Mogensen), o exemplo em que a SLR falha e o LR(1) (Thain), a aplicação à gramática do projeto e os exercícios de treino."
+  "observacao": "Escrita a partir das três transcrições completas e dos capítulos de análise sintática do Mogensen e do Thain, lidos inteiros como substitutos. Os dois trechos de leitura indicados (cap. 3, p. 95–140, e cap. 4, p. 157–166) não foram consultados; os títulos parecem ser os do Louden, Compiladores: princípios e práticas, que o vídeo 05 cita entre as referências, mas edição e páginas não foram conferidas. Nada aqui promete equivalência a esse livro: confira nele a notação e os exemplos. Ficaram fora dos autoestudos, marcados no texto: a construção da tabela SLR com itens LR(0), Nullable e FOLLOW por restrições (Mogensen), o exemplo em que a SLR falha e o LR(1) (Thain), a aplicação à gramática do projeto e os exercícios de treino. Depois do encontro de 12/11: os slides cobriram léxico × sintático, limites do sintático e a descida recursiva em classe Python; LL(1), FIRST/FOLLOW e LR não apareceram e ficam como aprofundamento dos vídeos."
 }

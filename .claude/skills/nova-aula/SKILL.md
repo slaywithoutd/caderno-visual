@@ -86,6 +86,9 @@ a aula abre com a seção `encontro` e termina com `exercicios` e `projeto`. Ant
 
 - Leia os slides do encontro anterior da mesma matéria (`notas/` da aula anterior ou o PDF enviado) e
   liste o que eles anunciaram para este encontro. Cada item anunciado precisa ter seção na aula nova.
+  No eixo "Linguagens formais e autômatos", procure também a pasta da semana no Drive da disciplina
+  ("Programação - Resina") e siga a seção desse eixo no `CLAUDE.md`: código no padrão do professor e
+  dinâmica resolvida perto do topo, teoria dos vídeos como aprofundamento.
 - Para cada conceito central, pergunte: em que chip do projeto ele aparece, que número medido o mostra,
   que ataque ou falha real ele explica, e que decisão do módulo de controle ele muda.
 - Caminho curto: marque o que é essencial para o quiz e os exercícios; o resto vai para "depois".

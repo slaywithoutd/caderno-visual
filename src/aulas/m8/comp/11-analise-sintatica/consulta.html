@@ -7,21 +7,21 @@
 <section class="cs" id="encontro" data-grupo="Resumo" data-termos="">
   <h2>Resumo</h2>
   <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 170"><rect class="k" x="4" y="6" width="232" height="26" rx="6"/><text class="tm" x="38" y="19">tokens</text><text x="140" y="19" style="font-size:11px">id  +  id  *  id  $</text><text class="tam" x="60" y="48">LL: de cima</text><text class="tam" x="180" y="48">LR: de baixo</text><circle class="bl" cx="60" cy="70" r="11"/><text x="60" y="70" style="font-size:10px">E</text><circle class="k" cx="36" cy="106" r="10"/><circle class="k" cx="84" cy="106" r="10"/><line class="s" x1="54" y1="79" x2="40" y2="97"/><line class="s" x1="66" y1="79" x2="80" y2="97"/><path class="s" d="M60 120 V146" marker-end="url(#mnarrow)"/><text class="tm" x="60" y="160">derivação</text><circle class="k" cx="156" cy="70" r="10"/><circle class="k" cx="204" cy="70" r="10"/><circle class="gr" cx="180" cy="106" r="11"/><text x="180" y="106" style="font-size:10px">E</text><line class="s" x1="160" y1="79" x2="174" y2="97"/><line class="s" x1="200" y1="79" x2="186" y2="97"/><path class="s" d="M180 146 V122" marker-end="url(#mnarrow)"/><text class="tm" x="180" y="160">redução</text></svg>A mesma árvore, montada em sentidos opostos.</aside>
-  <p class="cs-def">O analisador sintático recebe os tokens do léxico e monta a árvore do programa. Esta aula mostra os dois jeitos de montar essa árvore, de cima para baixo (LL) e de baixo para cima (LR), e o que a gramática precisa ter para cada um funcionar sem chutar.</p>
+  <p class="cs-def">O analisador sintático confere se a sequência de tipos de token segue a gramática da linguagem e monta a árvore do programa. Para isso ele precisa de uma gramática livre de contexto e de uma pilha, e na descida recursiva a pilha são as próprias chamadas de função.</p>
   <ul class="b">
-    <li>Descendente parte da variável inicial e deriva sempre pela esquerda; ascendente parte dos tokens e reduz até a inicial.</li>
-    <li>O descendente preditivo escolhe a regra olhando k tokens à frente. Com uma gramática LL(1), um token basta e não há tentativa e erro.</li>
-    <li>Para chegar a LL(1): tire a ambiguidade, elimine a recursão à esquerda (A → Aα | β vira A → βA′, A′ → αA′ | ε) e fatore os prefixos comuns.</li>
-    <li>FIRST(α) são os terminais que podem começar α; FOLLOW(A), os que podem vir logo depois de A. Com eles você preenche a tabela LL(1); célula com duas regras quer dizer que a gramática não é LL(1).</li>
-    <li>O ascendente faz shift (empilha o token) e reduce (troca um handle, o corpo de uma regra no topo da pilha, pela cabeça). A tabela LR diz qual dos dois fazer, e recursão à esquerda não atrapalha.</li>
-    <li>Conflitos shift-reduce e reduce-reduce são a célula dupla do LR. O else pendente se resolve empilhando; a precedência, com regras extras como as do Yacc. SLR, LR(1) e LALR diferem só na tabela.</li>
+    <li>O léxico classifica cada lexema num tipo de token; o sintático trabalha com os tipos (ID, INT), porque a lista de tokens sozinha não mostra a estrutura do programa (<a href="#papel">papel do sintático</a>).</li>
+    <li>Expressão regular não reconhece blocos aninhados nem parênteses balanceados. Gramática livre de contexto reconhece, e reconhecê-la pede uma pilha.</li>
+    <li>Limite: o autômato de pilha não vê contexto. Variável usada sem declarar e tipos trocados passam pelo sintático e ficam para o semântico.</li>
+    <li>Na descida recursiva, cada não terminal vira um método, cada terminal vira <code>comparar</code> e <code>analisar()</code> termina conferindo o EOF. O código e os exercícios do encontro estão resolvidos na <a href="/m8/comp/12-descendente-recursiva/consulta#aula-resina">aula 12</a>.</li>
+    <li>Descendente parte da variável inicial, da raiz para as folhas, como a descida recursiva; ascendente parte dos tokens e reduz até a inicial (shift e reduce).</li>
+    <li>Aprofundamento dos vídeos: com uma gramática LL(1), um token basta para escolher a regra. Para chegar lá, tire a ambiguidade, a recursão à esquerda e os prefixos comuns; FIRST e FOLLOW preenchem a tabela LL(1).</li>
   </ul>
   <div class="cs-pegadinhas">
     <ul class="b">
+      <li>Passar no sintático não quer dizer programa certo: <code>x = y;</code> com <code>y</code> nunca declarado passa.</li>
       <li>Recursão à esquerda não é ambiguidade: E → E + T é recursiva à esquerda e tem uma árvore só por cadeia.</li>
       <li>FIRST pode conter ε; FOLLOW nunca contém ε, mas pode conter $.</li>
       <li>No preditivo com pilha, o corpo da regra entra ao contrário: o primeiro símbolo fica no topo.</li>
-      <li>No reduce do LR, você desempilha tantos estados quantos símbolos o corpo tem, sem olhar quais são, e depois consulta a transição.</li>
     </ul>
   </div>
 </section>
@@ -37,6 +37,8 @@
     <li>Os terminais da gramática são os tipos de token. De um token (ID, var1), o sintático usa só ID; o nome var1 fica para depois, porque nomes quebram a liberdade de contexto (<a href="/m8/comp/07-analise-lexica/consulta#sintaxe">aula 07</a>).</li>
     <li>Os não terminais são as construções da linguagem: programa, lista de comandos, comando if, atribuição.</li>
     <li>O sintático pode ir preenchendo a tabela de símbolos, mas não confere nada que dependa de contexto.</li>
+    <li>Por que classificar os tokens (pergunta da aula de 12/11)? Guardar só os lexemas não basta: a gramática fala de tipos, e é a classificação que permite escrever uma regra para "qualquer identificador" ou "qualquer inteiro".</li>
+    <li>Limites (aula de 12/11): o autômato de pilha, que reconhece as linguagens livres de contexto, também tem limite, e o sintático deixa passar situações indesejadas. Exemplos: usar uma variável que nunca foi declarada, somar texto com número. Quem pega é o semântico.</li>
     <li>Nomes do vídeo: cabeça é o lado esquerdo de uma regra (uma variável só); corpo é o lado direito (zero ou mais símbolos). A quádrupla é (V, T, P, S), como na <a href="/m8/comp/01-conceitos/consulta#gramatica">aula 01</a>, e em geral basta escrever P.</li>
     <li>Atalhos de escrita: | separa alternativas da mesma cabeça; parênteses criam uma sub-regra sem nome, como em <code>CMD → (CMD_IF | ATRIB)</code>.</li>
   </ul>

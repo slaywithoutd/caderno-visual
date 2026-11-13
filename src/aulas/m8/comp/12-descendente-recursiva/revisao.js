@@ -1,6 +1,10 @@
 /* Revisão da aula: cartões (pergunta, resposta, seção) e cola de uma página (tópico, resumo, seção).
    O 3º item é o id da seção do consulta.html onde o assunto mora. Pode usar HTML simples. */
 export const cartoes = [
+  ['No analisador em classe da aula de 12/11, o que fazem o construtor, <code>proximoToken</code>, <code>comparar</code> e <code>analisar</code>?', 'O construtor guarda a lista e já carrega o 1º token em <code>tokenCorrente</code>. <code>proximoToken</code> avança sem passar do último. <code>comparar(t)</code> avança se o token corrente é t, senão lança "esperava t, mas obtive …". <code>analisar</code> chama a variável inicial e depois <code>comparar(&#39;EOF&#39;)</code>.', 'aula-resina'],
+  ['Como fica <code>lista_atribuicao</code> para <code>&lt;atribuicao&gt; &lt;lista_atribuicao&gt; | ε</code>?', 'Se o token corrente é ID, chama <code>atribuicao()</code> e depois <code>lista_atribuicao()</code>. Senão, não faz nada (ε), sem erro.', 'aula-resina'],
+  ['Por que o <code>S(cadeia, pos)</code> de brinquedo dos slides aceita <code>bb</code>?', 'Ele imprime e pula o primeiro símbolo sem conferir que é <code>a</code>. A versão em classe começa com <code>comparar("a")</code>.', 'aula-resina'],
+  ['O que muda no analisador para ele devolver a AST?', 'Cada token vira (tipo, lexema), <code>comparar</code> devolve o lexema e cada método devolve o seu nó: <code>(&#39;=&#39;, &#39;x&#39;, 5)</code>. Chaves e ; não viram nó.', 'aula-resina'],
   ['Como cada pedaço de uma regra vira código na descida recursiva?', 'Terminal: <code>match</code>. Variável: chamada da função dela. <code>|</code>: if ou switch pelo próximo token. <code>{ }</code>: while. <code>[ ]</code>: if.', 'uma-funcao'],
   ['O que <code>match(tipo)</code> faz?', 'Confere se o token atual é do tipo esperado. Se é, consome e passa ao próximo; se não é, acusa erro de sintaxe.', 'match'],
   ['Como a função escolhe a alternativa, e o que fazer com a alternativa ε?', 'Olha o token atual e escolhe a única alternativa que começa com ele (FIRST disjuntos). Escolher ε é não fazer nada: a função retorna sem consumir.', 'decisao'],
@@ -16,6 +20,8 @@ export const cartoes = [
 ];
 
 export const cola = [
+  ['Classe da aula', 'tokenCorrente · proximoToken · comparar (= match) · analisar termina em EOF', 'aula-resina'],
+  ['AST na classe', 'token (tipo, lexema); comparar devolve lexema; método devolve nó', 'aula-resina'],
   ['Regra → função', 'terminal: match · variável: chamada · | : if · { }: while · [ ]: if', 'uma-funcao'],
   ['match', 'confere o tipo do atual, consome, ou erro', 'match'],
   ['Decisão', 'atual escolhe a alternativa; FIRST disjuntos; ε = retornar sem consumir', 'decisao'],

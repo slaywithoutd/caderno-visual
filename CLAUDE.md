@@ -60,6 +60,33 @@ Regras que saíram disso, para toda aula do eixo:
 - Depois do encontro, `integrar-notas` confere os slides página por página em `cobertura.json` e
   reescreve a seção `encontro` com o que de fato aconteceu.
 
+## O encontro presencial (Computação, eixo "Linguagens formais e autômatos")
+
+Os encontros deste eixo são do prof. Fillipe Resina (Programação). Os slides e os códigos ficam no Drive da
+disciplina, numa pasta por semana dentro de "Programação - Resina" (conta do Inteli da dona). A aula 11 errou o
+alvo: virou um resumo de 3 h de vídeo (LL(1), FIRST/FOLLOW, LR, SLR, LALR) e o encontro de 12/11 foi outra
+coisa. Formato dos slides (semana 5):
+
+1. Revisão em perguntas sobre o encontro anterior (lexema × token × tipo, por que classificar tokens).
+2. Conceito curto, com o limite da técnica ("o que o analisador deixa passar").
+3. Exemplo de brinquedo em Python, depois a versão em classe (`tokenCorrente`, `proximoToken`, `comparar`,
+   `analisar`, um método por não terminal; tokens como strings de tipo, `'EOF'` no fim).
+4. Exemplos resolvidos e uma **Dinâmica**: completar um esqueleto `*_ini.py` em aula.
+5. "Cenas dos próximos capítulos": o que vem no encontro seguinte.
+
+Regras que saíram disso:
+
+- Antes de escrever ou fechar uma aula do eixo, abra a pasta da semana no Drive e os slides do encontro anterior.
+  O "Cenas dos próximos capítulos" diz o que a aula nova precisa cobrir primeiro. Se a pasta da semana ainda não
+  existe, a aula continua o último deck.
+- O encontro é prático e em Python. A aula traz, perto do topo, uma seção com o código no padrão do professor
+  (mesmos nomes de métodos e formato de token) e os exemplos e a dinâmica resolvidos e testados; a teoria dos
+  vídeos vem depois, ligada a esse código. Solução de dinâmica é autoral e assim identificada.
+- Autoestudo longo (playlists, vídeos de outros cursos) cobre muito mais que o encontro. Priorize o que os slides
+  pedem; o resto entra como aprofundamento, sem dominar o Resumo.
+- Depois do encontro, `integrar-notas` guarda o PDF em `notas/`, registra os slides em `cobertura.json` e reescreve
+  o Resumo com o que o encontro cobriu.
+
 ## Estrutura
 
 ```

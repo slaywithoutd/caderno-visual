@@ -1,6 +1,7 @@
 /* Revisão da aula: cartões (pergunta, resposta, seção) e cola de uma página (tópico, resumo, seção).
    O 3º item é o id da seção do consulta.html onde o assunto mora. Pode usar HTML simples. */
 export const cartoes = [
+  ['Como a AST de <code>(2+3)*4</code> sai da descida recursiva?', 'Um método por nível (<code>expr</code>, <code>termo</code>, <code>fator</code>), cada um devolvendo um nó. <code>fator</code> devolve o nó + de dentro dos parênteses sem criar nó para eles, e o while de <code>termo</code> monta (* (+ 2 3) 4).', 'expr-ast'],
   ['No analisador em classe da aula de 12/11, o que fazem o construtor, <code>proximoToken</code>, <code>comparar</code> e <code>analisar</code>?', 'O construtor guarda a lista e já carrega o 1º token em <code>tokenCorrente</code>. <code>proximoToken</code> avança sem passar do último. <code>comparar(t)</code> avança se o token corrente é t, senão lança "esperava t, mas obtive …". <code>analisar</code> chama a variável inicial e depois <code>comparar(&#39;EOF&#39;)</code>.', 'aula-resina'],
   ['Como fica <code>lista_atribuicao</code> para <code>&lt;atribuicao&gt; &lt;lista_atribuicao&gt; | ε</code>?', 'Se o token corrente é ID, chama <code>atribuicao()</code> e depois <code>lista_atribuicao()</code>. Senão, não faz nada (ε), sem erro.', 'aula-resina'],
   ['Por que o <code>S(cadeia, pos)</code> de brinquedo dos slides aceita <code>bb</code>?', 'Ele imprime e pula o primeiro símbolo sem conferir que é <code>a</code>. A versão em classe começa com <code>comparar("a")</code>.', 'aula-resina'],
@@ -20,6 +21,7 @@ export const cartoes = [
 ];
 
 export const cola = [
+  ['Expressão → AST', 'um método por nível; while monta à esquerda; ( ) não vira nó; avaliar em pós-ordem', 'expr-ast'],
   ['Classe da aula', 'tokenCorrente · proximoToken · comparar (= match) · analisar termina em EOF', 'aula-resina'],
   ['AST na classe', 'token (tipo, lexema); comparar devolve lexema; método devolve nó', 'aula-resina'],
   ['Regra → função', 'terminal: match · variável: chamada · | : if · { }: while · [ ]: if', 'uma-funcao'],

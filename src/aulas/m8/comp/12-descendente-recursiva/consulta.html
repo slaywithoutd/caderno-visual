@@ -140,6 +140,91 @@ def atribuicao(self):
   </div>
 </section>
 
+<section class="cs" id="expr-ast" data-grupo="Da aula de 12/11" data-termos="">
+  <h2>Expressões que viram AST, na mesma classe</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><text class="tm st" x="4" y="12">(2+3)*4</text><circle class="bl" cx="140" cy="24" r="13"/><text x="140" y="24">*</text><circle class="bl" cx="96" cy="66" r="13"/><text x="96" y="66">+</text><circle class="k" cx="186" cy="66" r="12"/><text x="186" y="66">4</text><circle class="k" cx="66" cy="108" r="12"/><text x="66" y="108">2</text><circle class="k" cx="126" cy="108" r="12"/><text x="126" y="108">3</text><line class="s" x1="131" y1="33" x2="105" y2="56"/><line class="s" x1="149" y1="33" x2="178" y2="56"/><line class="s" x1="88" y1="76" x2="72" y2="98"/><line class="s" x1="104" y1="76" x2="120" y2="98"/><text class="tm" x="204" y="112">fator()</text><text class="tm" x="204" y="124">devolve o +</text><text class="tm" x="120" y="144">sem nó para ( ): o + embaixo já diz "antes"</text></svg>termo() monta o *; fator() entrega o + que estava entre parênteses.</aside>
+  <p class="cs-def">O próximo passo anunciado nos slides de 12/11 é o analisador devolver a árvore sintática abstrata, e o exemplo deles é <code>(2+3)*4</code>. Aqui está a gramática de expressões com dois níveis de precedência escrita na classe do professor, com cada método devolvendo um nó. Exemplo autoral, testado com Python 3.13.</p>
+  <ul class="b">
+    <li>Um método por nível de precedência, o de mais baixa precedência em cima (<a href="#precedencia">precedência no código</a>). <code>{ }</code> da regra vira while (<a href="#repeticao">repetição</a>).</li>
+    <li>Cada token é o par (tipo, lexema), e <code>comparar</code> devolve o lexema: é assim que o número e o operador chegam ao nó.</li>
+    <li>O nó é uma classe pequena com <code>valor</code> e <code>filhos</code>. Folha é número; nó interno é operador com dois filhos.</li>
+    <li>Calcular a árvore é percorrê-la em pós-ordem: os filhos primeiro, depois o operador do nó (<a href="#ast">montando a árvore</a>).</li>
+  </ul>
+  <div class="prose"><pre class="code"># &lt;expr&gt;  ::= &lt;termo&gt; { (MAIS | MENOS) &lt;termo&gt; }
+# &lt;termo&gt; ::= &lt;fator&gt; { (VEZES | DIV) &lt;fator&gt; }
+# &lt;fator&gt; ::= NUM | ABREPAR &lt;expr&gt; FECHAPAR
+
+class No:
+    def __init__(self, valor, filhos=None):
+        self.valor = valor                 # '+', '*' ou o número
+        self.filhos = filhos or []
+
+    def __repr__(self):                    # imprime (* (+ 2 3) 4)
+        if not self.filhos:
+            return str(self.valor)
+        return f"({self.valor} {' '.join(map(repr, self.filhos))})"
+
+class AnalisadorExpr:
+    # __init__ e proximoToken iguais aos da aula; tokens são (tipo, lexema)
+    def tipo(self):
+        return self.tokenCorrente[0]
+
+    def comparar(self, tipoEsperado):
+        tipo, lexema = self.tokenCorrente
+        if tipo != tipoEsperado:
+            raise Exception(f"Erro sintático: esperava '{tipoEsperado}', mas obtive '{tipo}'")
+        self.proximoToken()
+        return lexema
+
+    def analisar(self):
+        arvore = self.expr()
+        self.comparar('EOF')
+        return arvore
+
+    def expr(self):
+        esq = self.termo()
+        while self.tipo() in ('MAIS', 'MENOS'):
+            op = self.comparar(self.tipo())
+            esq = No(op, [esq, self.termo()])  # a árvore que já existe vai para a esquerda
+        return esq
+
+    def termo(self):
+        esq = self.fator()
+        while self.tipo() in ('VEZES', 'DIV'):
+            op = self.comparar(self.tipo())
+            esq = No(op, [esq, self.fator()])
+        return esq
+
+    def fator(self):
+        if self.tipo() == 'NUM':
+            return No(int(self.comparar('NUM')))
+        self.comparar('ABREPAR')
+        dentro = self.expr()
+        self.comparar('FECHAPAR')
+        return dentro                      # o parêntese não vira nó
+
+def avaliar(no):                           # pós-ordem: filhos primeiro
+    if not no.filhos:
+        return no.valor
+    a, b = (avaliar(f) for f in no.filhos)
+    return {'+': a + b, '-': a - b, '*': a * b, '/': a / b}[no.valor]</pre></div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li><code>(2+3)*4</code>: <code>termo</code> chama <code>fator</code>, que vê ABREPAR, chama <code>expr</code> e devolve o nó <code>+</code>. Depois o while de <code>termo</code> vê VEZES e monta <code>(* (+ 2 3) 4)</code>. Avaliar dá 20.</li>
+      <li><code>2+3*4</code>: o segundo <code>termo</code> engole <code>3*4</code> antes de voltar, e sai <code>(+ 2 (* 3 4))</code> = 14.</li>
+      <li><code>8-3-1</code>: o while põe a árvore que já existe à esquerda, e sai <code>(- (- 8 3) 1)</code> = 4.</li>
+      <li><code>(2+3</code> sem fechar: "Erro sintático: esperava 'FECHAPAR', mas obtive 'EOF'".</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Copiar a regra recursiva à esquerda, <code>&lt;expr&gt; ::= &lt;expr&gt; MAIS &lt;termo&gt;</code>, faz <code>expr()</code> chamar <code>expr()</code> sem consumir nada, até estourar a pilha.</li>
+      <li>Trocar por <code>&lt;expr&gt; ::= &lt;termo&gt; MENOS &lt;expr&gt;</code> não trava, mas <code>8-3-1</code> vira <code>8-(3-1)</code> = 6.</li>
+      <li>Na árvore sintática (concreta), os parênteses e cada método chamado viram nós; na AST, não. Se a AST de <code>(2+3)*4</code> tem um nó para "(", ela está concreta demais.</li>
+    </ul>
+  </div>
+</section>
+
 <!-- ================= Da gramática ao código ================= -->
 <section class="cs" id="uma-funcao" data-grupo="Da gramática ao código" data-termos="grafo-sintatico">
   <h2>Uma função por regra</h2>

@@ -1,0 +1,55 @@
+/* Matemática · aula 01. Só peças desta aula; toda cor vem dos tokens do :root. */
+[data-aula="m8/mat/01-fundamentos-criptografia"] {
+  /* régua A = 0 … Z = 25 */
+  & table.regua td { text-align: center; padding: 3px 4px; font-family: var(--f-mono); font-size: .82rem; min-width: 1.6em; }
+  & table.regua tr:nth-child(odd) td { font-weight: 600; color: var(--fg); }
+  & table.regua tr:nth-child(even) td { color: var(--muted); font-size: .74rem; border-bottom: 1px solid var(--line); }
+
+  /* força bruta: a linha da chave certa */
+  & table.fb td { font-family: var(--f-mono); font-size: .82rem; padding: 3px 8px; white-space: nowrap; }
+  & table.fb td:nth-child(odd) { color: var(--muted); }
+  & table.fb tr.achou td:nth-child(1), & table.fb tr.achou td:nth-child(2) { background: var(--green-soft); color: var(--green); }
+
+  & .resp { font-weight: 600; color: var(--fg); }
+  /* exercícios */
+  & details.ds-item > summary { font-weight: 600; line-height: 1.45; }
+  & details.ds-item p.muted { font-size: .88rem; margin: .5rem 0; }
+  & details.ds-resp { margin: .5rem 0 .3rem; }
+  & section.cs h3 { margin: 1.6rem 0 .5rem; font-size: 1rem; }
+
+  /* Figura de Euclides */
+  & #eu-svg .eu-piso { fill: var(--surface); stroke: var(--line2); stroke-width: 1.5; }
+  & #eu-svg .eu-q1 { fill: var(--blue-soft); stroke: var(--blue); stroke-width: 1.5; }
+  & #eu-svg .eu-q2 { fill: var(--amber-soft); stroke: var(--amber); stroke-width: 1.5; }
+  & #eu-svg .eu-q3 { fill: var(--green-soft); stroke: var(--green); stroke-width: 1.5; }
+  & #eu-svg .eu-sobra { fill: var(--red-soft); stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 5 3; }
+  & #eu-svg .eu-az { fill: none; stroke: var(--fg2); stroke-width: 1; }
+  & #eu-svg .eu-res { fill: var(--green-soft); stroke: var(--green); stroke-width: 1.5; }
+  & #eu-svg text { font-family: var(--f-mono); fill: var(--fg); text-anchor: middle; dominant-baseline: central; font-size: 14px; }
+  & #eu-svg text.eu-cota, & #eu-svg text.eu-lab { fill: var(--muted); font-size: 12px; }
+  & #eu-svg text.eu-th { fill: var(--muted); font-size: 12px; text-anchor: start; }
+  & #eu-svg text.eu-td { text-anchor: start; font-size: 15px; }
+  & #eu-svg text.eu-fim { fill: var(--green); font-weight: 600; }
+  & #eu-svg text.eu-leg { fill: var(--muted); font-size: 13px; text-anchor: start; }
+
+  /* quebra-César */
+  & .qb-barras { display: flex; gap: 10px; align-items: flex-end; margin: 6px 0 10px; }
+  & .qb-b { display: flex; flex-direction: column; align-items: center; gap: 3px; font-family: var(--f-mono); font-size: .8rem; }
+  & .qb-barra { display: block; width: 22px; background: var(--blue-soft); border: 1px solid var(--blue); border-radius: 3px 3px 0 0; }
+  & .qb-n { color: var(--muted); font-size: .72rem; }
+  & .qb-l small { color: var(--muted); }
+  & .qb-lista { max-height: 260px; overflow-y: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+  & .qb-linha { display: flex; gap: 12px; padding: 2px 10px; font-family: var(--f-mono); font-size: .8rem; align-items: baseline; }
+  & .qb-linha.palpite { background: var(--amber-soft); }
+  & .qb-k { color: var(--muted); min-width: 4.2em; }
+  & .qb-t { overflow-wrap: anywhere; flex: 1; }
+  & .qb-p { color: var(--amber); font-size: .72rem; white-space: nowrap; }
+
+  /* laboratório da afim */
+  & #af-status { font-size: .88rem; line-height: 1.5; padding: 6px 10px; border-radius: 8px; }
+  & #af-status.af-ok { background: var(--green-soft); color: var(--fg); }
+  & #af-status.af-no { background: var(--red-soft); color: var(--fg); }
+  & #af-tab th { text-align: right; font-weight: 500; color: var(--muted); white-space: nowrap; font-size: .78rem; }
+  & #af-tab td { text-align: center; font-family: var(--f-mono); font-size: .82rem; padding: 2px 6px; }
+  & #lab-afim label { display: inline-flex; gap: 6px; align-items: center; font-family: var(--f-mono); }
+}

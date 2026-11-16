@@ -1,0 +1,972 @@
+{
+ "aula": "m8/mat/01-fundamentos-criptografia",
+ "data": "2026-11-16",
+ "criterio": "Conferência dos slides página a página, das pílulas e dos três vídeos contra as seções do caderno. O livro não foi lido; a aula não promete equivalência a ele.",
+ "fontes": [
+  {
+   "id": "slides-mundim-s06",
+   "url": "https://drive.google.com/drive/folders/1ZvYOtNSm-nme8hL5xEc4wZUBTWBbaZK-",
+   "escopo": "CC08-S06-cripto-fundamentos.pdf (prof. Leandro Mundim), 62 slides, recebido da dona do caderno pela pasta Downloads; a pasta do Drive pediu login.",
+   "acesso": "integral",
+   "metodo": "Extração de texto (pdftotext) de todas as páginas; figuras conferidas pelos quadros das pílulas, que repetem os slides. Todas as contas refeitas por script. Não republicado.",
+   "totalUnidades": 62,
+   "unidades": [
+    {
+     "paginas": [
+      1,
+      2
+     ],
+     "assunto": "Capa, as quatro aulas do módulo e o mapa de capítulos do Stallings",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Estrutural; o mapa das semanas entra no fim da seção do encontro.",
+     "consulta": [
+      "hoje"
+     ],
+     "evidencias": [
+      "semana 7",
+      "semana 10"
+     ]
+    },
+    {
+     "paginas": [
+      3
+     ],
+     "assunto": "Motivação: César, Al-Kindi, Kerckhoffs, HTTPS",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Cada marco mora na seção do conceito.",
+     "consulta": [
+      "cesar",
+      "frequencia",
+      "cifra-simetrica"
+     ],
+     "evidencias": [
+      "suetonio",
+      "al-kindi",
+      "kerckhoffs"
+     ]
+    },
+    {
+     "paginas": [
+      4
+     ],
+     "assunto": "Criptologia = criptografia + criptoanálise",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Para autoestudo.",
+     "consulta": [
+      "vocabulario"
+     ],
+     "evidencias": [
+      "criptoanalise"
+     ]
+    },
+    {
+     "paginas": [
+      5
+     ],
+     "assunto": "Alice, Bob, Eve, Mallory; ataques passivo e ativo; origem dos nomes",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Para autoestudo, com a história dos nomes do slide.",
+     "consulta": [
+      "vocabulario"
+     ],
+     "evidencias": [
+      "1978",
+      "1988",
+      "schneier"
+     ]
+    },
+    {
+     "paginas": [
+      6
+     ],
+     "assunto": "Quatro serviços de segurança (X.800)",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Tabela com pergunta, garantia e outro nome.",
+     "consulta": [
+      "vocabulario"
+     ],
+     "evidencias": [
+      "irretratabilidade",
+      "nao repudio",
+      "x.800"
+     ]
+    },
+    {
+     "paginas": [
+      7
+     ],
+     "assunto": "Pergunta de abertura: mais chaves que estrelas",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Resposta preparada no encontro e explicada em frequência.",
+     "consulta": [
+      "hoje",
+      "monoalfabetica"
+     ],
+     "evidencias": [
+      "mais chaves que estrelas",
+      "10²²"
+     ]
+    },
+    {
+     "paginas": [
+      8
+     ],
+     "assunto": "Revisão: algoritmo da divisão, quociente, resto, Zn",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Base com exemplo 17 mod 5.",
+     "consulta": [
+      "resto"
+     ],
+     "evidencias": [
+      "17 = 3·5 + 2",
+      "0 ≤ r"
+     ]
+    },
+    {
+     "paginas": [
+      9
+     ],
+     "assunto": "Revisão: função, domínio, contradomínio; f(x) = x mod 3",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Base com a tabela do slide.",
+     "consulta": [
+      "funcao"
+     ],
+     "evidencias": [
+      "x mod 3",
+      "f(0) = f(3)"
+     ]
+    },
+    {
+     "paginas": [
+      10
+     ],
+     "assunto": "Abertura da parte 2.1",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Pergunta e tempo na tabela do encontro.",
+     "consulta": [
+      "hoje"
+     ],
+     "evidencias": [
+      "o que e, exatamente, uma cifra simetrica"
+     ]
+    },
+    {
+     "paginas": [
+      11
+     ],
+     "assunto": "Modelo simplificado da encriptação simétrica, PAO para SDR",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção do modelo.",
+     "consulta": [
+      "cifra-simetrica"
+     ],
+     "evidencias": [
+      "c = e(k, m)",
+      "pao"
+     ]
+    },
+    {
+     "paginas": [
+      12
+     ],
+     "assunto": "O criptoanalista vê só o texto cifrado; canal seguro da chave; Kerckhoffs",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção do modelo.",
+     "consulta": [
+      "cifra-simetrica"
+     ],
+     "evidencias": [
+      "canal seguro",
+      "k̂"
+     ]
+    },
+    {
+     "paginas": [
+      13
+     ],
+     "assunto": "César como relógio de 26 letras; P vira S; Z vira C; decriptar",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Loop do disco e contas.",
+     "consulta": [
+      "cesar"
+     ],
+     "evidencias": [
+      "28 = 1·26 + 2",
+      "pao vira sdr"
+     ]
+    },
+    {
+     "paginas": [
+      14
+     ],
+     "assunto": "Toda cifra é uma função; E(K,·) e D(K,·) em Z26 (MEMORIZE)",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Marcado como prova (MEMORIZE).",
+     "consulta": [
+      "cesar"
+     ],
+     "evidencias": [
+      "e(k, ·) : ℤ₂₆ → ℤ₂₆"
+     ]
+    },
+    {
+     "paginas": [
+      15
+     ],
+     "assunto": "O resto nunca é negativo: 11 mod 7 e −11 mod 7",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Base com desenho da reta.",
+     "consulta": [
+      "resto"
+     ],
+     "evidencias": [
+      "−11 = (−2)·7 + 3"
+     ]
+    },
+    {
+     "paginas": [
+      16
+     ],
+     "assunto": "Congruência; relógio 15h e 3h; classes; Zn",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Base com loop do relógio.",
+     "consulta": [
+      "congruencia"
+     ],
+     "evidencias": [
+      "15 ≡ 3 (mod 12)",
+      "classes de resto"
+     ]
+    },
+    {
+     "paginas": [
+      17
+     ],
+     "assunto": "Exemplo resolvido da função de César com K = 3",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Contas na seção César.",
+     "consulta": [
+      "cesar"
+     ],
+     "evidencias": [
+      "d(3, 2) = 25"
+     ]
+    },
+    {
+     "paginas": [
+      18
+     ],
+     "assunto": "A encriptação precisa ser um para um; pergunta ao público",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Pergunta respondida no encontro; exigência na bijeção.",
+     "consulta": [
+      "hoje",
+      "bijecao"
+     ],
+     "evidencias": [
+      "que tipo de funcao",
+      "um para um"
+     ]
+    },
+    {
+     "paginas": [
+      19
+     ],
+     "assunto": "Injetora, sobrejetora, bijetora; só a bijetora tem volta (MEMORIZE)",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Desenho de margem e prova.",
+     "consulta": [
+      "bijecao"
+     ],
+     "evidencias": [
+      "inverta",
+      "f⁻¹(f(x)) = x"
+     ]
+    },
+    {
+     "paginas": [
+      20
+     ],
+     "assunto": "Atividade em grupo Cartas secretas",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Método para achar a chave e as cinco falas.",
+     "consulta": [
+      "hoje"
+     ],
+     "evidencias": [
+      "cartas secretas",
+      "grupo a"
+     ]
+    },
+    {
+     "paginas": [
+      21
+     ],
+     "assunto": "Abertura da parte 2.2",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Tabela do encontro.",
+     "consulta": [
+      "hoje"
+     ],
+     "evidencias": [
+      "um espaco de chaves enorme impede a criptoanalise"
+     ]
+    },
+    {
+     "paginas": [
+      22
+     ],
+     "assunto": "Força bruta: tabela FDVD, três motivos, arquivo compactado; fala do grupo A",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Tabela completa e motivos.",
+     "consulta": [
+      "forca-bruta",
+      "hoje"
+     ],
+     "evidencias": [
+      "fdvd",
+      "arquivo compactado"
+     ]
+    },
+    {
+     "paginas": [
+      23
+     ],
+     "assunto": "26! chaves; 6,3·10⁹ anos; César 13 ns",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conta refeita.",
+     "consulta": [
+      "monoalfabetica",
+      "forca-bruta"
+     ],
+     "evidencias": [
+      "6,3·10⁹ anos",
+      "13 ns"
+     ]
+    },
+    {
+     "paginas": [
+      24
+     ],
+     "assunto": "Frequência: César K = 14; carta da Alice, QWERTY; necessário, não suficiente; fala do grupo B",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Desenho das barras e widget.",
+     "consulta": [
+      "frequencia"
+     ],
+     "evidencias": [
+      "q = a, t = e e g = o",
+      "123"
+     ]
+    },
+    {
+     "paginas": [
+      25,
+      26,
+      27
+     ],
+     "assunto": "Atividade 1 e respostas",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Resolvida com o raciocínio.",
+     "consulta": [
+      "atividades"
+     ],
+     "evidencias": [
+      "5! = 120",
+      "k = 14 − 0"
+     ]
+    },
+    {
+     "paginas": [
+      28
+     ],
+     "assunto": "Abertura da parte 2.3",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Tabela do encontro.",
+     "consulta": [
+      "hoje"
+     ],
+     "evidencias": [
+      "quando uma multiplicacao modulo n tem inverso"
+     ]
+    },
+    {
+     "paginas": [
+      29
+     ],
+     "assunto": "Multiplicar por 3 tem volta? Tabela 3x e 2x mod 10; por que o 7 desfaz o 3",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Desenho de margem; pergunta no encontro.",
+     "consulta": [
+      "inverso",
+      "hoje"
+     ],
+     "evidencias": [
+      "0, 3, 6, 9, 2, 5, 8, 1, 4, 7",
+      "por que o 7 desfaz o 3"
+     ]
+    },
+    {
+     "paginas": [
+      30
+     ],
+     "assunto": "Inverso multiplicativo; 3·7 = 21; fala do grupo C",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Definição e exemplo.",
+     "consulta": [
+      "inverso"
+     ],
+     "evidencias": [
+      "3⁻¹ ≡ 7 (mod 10)"
+     ]
+    },
+    {
+     "paginas": [
+      31
+     ],
+     "assunto": "Quando o inverso existe: mdc = 1 (MEMORIZE); fala do grupo D",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Prova.",
+     "consulta": [
+      "inverso"
+     ],
+     "evidencias": [
+      "a⁻¹ mod n existe ⟺ mdc(a, n) = 1"
+     ]
+    },
+    {
+     "paginas": [
+      32
+     ],
+     "assunto": "Exemplo resolvido mdc(21, 15); continuação do grupo D: mdc(12, 8) e 13 mod 26",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Tabela, figura e falas.",
+     "consulta": [
+      "mdc",
+      "hoje"
+     ],
+     "evidencias": [
+      "21 = 1·15 + 6",
+      "mdc(12, 8)"
+     ]
+    },
+    {
+     "paginas": [
+      33,
+      34
+     ],
+     "assunto": "mdc, coprimos, algoritmo de Euclides; mdc(15, 8); 8 tem inverso módulo 15",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Para autoestudo; passos e exemplo do livro.",
+     "consulta": [
+      "mdc"
+     ],
+     "evidencias": [
+      "15 = 1·8 + 7",
+      "coprimos"
+     ]
+    },
+    {
+     "paginas": [
+      35
+     ],
+     "assunto": "Cifra afim como composição g ∘ f; ida e volta de C com K = (7, 3); ordem errada; fala do grupo E",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Desenho de margem e contas.",
+     "consulta": [
+      "afim"
+     ],
+     "evidencias": [
+      "210 = 8·26 + 2",
+      "252 = 9·26 + 18"
+     ]
+    },
+    {
+     "paginas": [
+      36
+     ],
+     "assunto": "Afim bijetora se e somente se mdc(a, 26) = 1 (MEMORIZE); contraexemplo (2, 3); 312 chaves",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Prova.",
+     "consulta": [
+      "afim"
+     ],
+     "evidencias": [
+      "312",
+      "e(k, 13) = 29"
+     ]
+    },
+    {
+     "paginas": [
+      37,
+      38
+     ],
+     "assunto": "Vote 1 e resposta",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Resolvido com o contraexemplo de cada alternativa.",
+     "consulta": [
+      "atividades"
+     ],
+     "evidencias": [
+      "vote 1",
+      "(13, 1)"
+     ]
+    },
+    {
+     "paginas": [
+      39,
+      40
+     ],
+     "assunto": "Atividade 2 e resposta",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Resolvida.",
+     "consulta": [
+      "atividades"
+     ],
+     "evidencias": [
+      "mdc(18, 12)",
+      "53 = 2·26 + 1"
+     ]
+    },
+    {
+     "paginas": [
+      41,
+      42
+     ],
+     "assunto": "Atividade 3 (autoestudo) e resposta",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Resolvida.",
+     "consulta": [
+      "atividades"
+     ],
+     "evidencias": [
+      "5·21 = 105",
+      "21·9 = 189"
+     ]
+    },
+    {
+     "paginas": [
+      43,
+      44
+     ],
+     "assunto": "Encerramento: abas do sistema, leitura, Adalove",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Fim da seção do encontro.",
+     "consulta": [
+      "hoje"
+     ],
+     "evidencias": [
+      "abas 1 a 3",
+      "adalove"
+     ]
+    },
+    {
+     "paginas": [
+      45,
+      46,
+      47
+     ],
+     "assunto": "Apêndice: índice; o resto; relógio 10h + 5h e 2h − 5h",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Relógio na congruência.",
+     "consulta": [
+      "congruencia"
+     ],
+     "evidencias": [
+      "2h − 5h"
+     ]
+    },
+    {
+     "paginas": [
+      48,
+      49
+     ],
+     "assunto": "Atividade extra: relógio",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Resolvida.",
+     "consulta": [
+      "atividades"
+     ],
+     "evidencias": [
+      "59 = 4·12 + 11"
+     ]
+    },
+    {
+     "paginas": [
+      50
+     ],
+     "assunto": "Reduza antes de calcular; a divisão falha",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Tabela na seção do resto.",
+     "consulta": [
+      "resto"
+     ],
+     "evidencias": [
+      "reduza antes de calcular",
+      "(3 × 7) mod 8 = 5"
+     ]
+    },
+    {
+     "paginas": [
+      51,
+      52
+     ],
+     "assunto": "Atividade extra: Kerckhoffs, HUUR",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Resolvida.",
+     "consulta": [
+      "atividades"
+     ],
+     "evidencias": [
+      "huur"
+     ]
+    },
+    {
+     "paginas": [
+      53,
+      54
+     ],
+     "assunto": "Atividade extra: César com K = 10",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Resolvida.",
+     "consulta": [
+      "atividades"
+     ],
+     "evidencias": [
+      "k′ = 16"
+     ]
+    },
+    {
+     "paginas": [
+      55,
+      56
+     ],
+     "assunto": "Vote extra: quantas funções são bijetoras",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Resolvido, com o Atbash como curiosidade.",
+     "consulta": [
+      "atividades"
+     ],
+     "evidencias": [
+      "f₄(1) = 1",
+      "atbash"
+     ]
+    },
+    {
+     "paginas": [
+      57,
+      58
+     ],
+     "assunto": "Como esconder a frequência? Cifra de Hill",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção Hill com base de matriz.",
+     "consulta": [
+      "hill"
+     ],
+     "evidencias": [
+      "gk",
+      "det k = 11"
+     ]
+    },
+    {
+     "paginas": [
+      59
+     ],
+     "assunto": "Vigenère: POLVILHO, QUEIJO; Bellaso, Kasiski",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Tabela e curiosidade.",
+     "consulta": [
+      "vigenere"
+     ],
+     "evidencias": [
+      "kasiski",
+      "queijo"
+     ]
+    },
+    {
+     "paginas": [
+      60
+     ],
+     "assunto": "One-time pad; segurança incondicional e computacional",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Desenho e seção do modelo.",
+     "consulta": [
+      "otp",
+      "cifra-simetrica"
+     ],
+     "evidencias": [
+      "agmlomjb",
+      "seguranca incondicional"
+     ]
+    },
+    {
+     "paginas": [
+      61,
+      62
+     ],
+     "assunto": "Origem de Euclides; o maior azulejo 12×8",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Curiosidade e leitura geométrica.",
+     "consulta": [
+      "mdc"
+     ],
+     "evidencias": [
+      "livro vii",
+      "azulejo"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pilulas-mundim-s06",
+   "url": "https://drive.google.com/drive/folders/1ZvYOtNSm-nme8hL5xEc4wZUBTWBbaZK-",
+   "escopo": "pilulas/00 a 10 *_narrado.mp4, 11 vídeos, 18 min.",
+   "acesso": "integral",
+   "metodo": "Transcrição por Whisper small (faster-whisper) de todos os vídeos e quadros extraídos com ffmpeg para conferir trechos duvidosos (pílula 04: '3 e 15').",
+   "totalUnidades": 11,
+   "unidades": [
+    {
+     "paginas": [
+      1
+     ],
+     "assunto": "00 Motivação",
+     "antes": "ja-coberto",
+     "justificativa": "Repete os slides 3 e 7.",
+     "consulta": [
+      "hoje"
+     ],
+     "evidencias": [
+      "mais chaves que estrelas"
+     ]
+    },
+    {
+     "paginas": [
+      2
+     ],
+     "assunto": "01 Cifra simétrica",
+     "antes": "ja-coberto",
+     "justificativa": "Repete os slides 11, 12 e 14; injetora para Bob saber voltar.",
+     "consulta": [
+      "cifra-simetrica",
+      "bijecao"
+     ],
+     "evidencias": [
+      "kerckhoffs"
+     ]
+    },
+    {
+     "paginas": [
+      3
+     ],
+     "assunto": "02 Serviços de segurança",
+     "antes": "ja-coberto",
+     "justificativa": "Repete o slide 6.",
+     "consulta": [
+      "vocabulario"
+     ],
+     "evidencias": [
+      "integridade"
+     ]
+    },
+    {
+     "paginas": [
+      4
+     ],
+     "assunto": "03 Resto da divisão",
+     "antes": "ja-coberto",
+     "justificativa": "Repete slides 8 e 15.",
+     "consulta": [
+      "resto"
+     ],
+     "evidencias": [
+      "−14"
+     ]
+    },
+    {
+     "paginas": [
+      5
+     ],
+     "assunto": "04 Congruência",
+     "antes": "ja-coberto",
+     "justificativa": "Repete slide 16 e o extra dos ímpares.",
+     "consulta": [
+      "congruencia"
+     ],
+     "evidencias": [
+      "15 ≡ 3 (mod 12)"
+     ]
+    },
+    {
+     "paginas": [
+      6
+     ],
+     "assunto": "05 Cifra de César",
+     "antes": "ja-coberto",
+     "justificativa": "Repete slides 13, 14 e 17.",
+     "consulta": [
+      "cesar"
+     ],
+     "evidencias": [
+      "pao vira sdr"
+     ]
+    },
+    {
+     "paginas": [
+      7
+     ],
+     "assunto": "06 Força bruta; decriptar com K = encriptar com 26 − K",
+     "antes": "ja-coberto",
+     "justificativa": "O fato do 26 − K entra na seção César.",
+     "consulta": [
+      "forca-bruta",
+      "cesar"
+     ],
+     "evidencias": [
+      "26 − k"
+     ]
+    },
+    {
+     "paginas": [
+      8
+     ],
+     "assunto": "07 Frequência das letras",
+     "antes": "ja-coberto",
+     "justificativa": "Repete slides 23 e 24.",
+     "consulta": [
+      "frequencia"
+     ],
+     "evidencias": [
+      "123"
+     ]
+    },
+    {
+     "paginas": [
+      9
+     ],
+     "assunto": "08 Inverso multiplicativo; 5 inverso mod 7",
+     "antes": "ja-coberto",
+     "justificativa": "Repete slides 29 e 30.",
+     "consulta": [
+      "inverso"
+     ],
+     "evidencias": [
+      "5⁻¹ ≡ 3 (mod 7)"
+     ]
+    },
+    {
+     "paginas": [
+      10
+     ],
+     "assunto": "09 mdc e Euclides; 13 sem inverso",
+     "antes": "ja-coberto",
+     "justificativa": "Repete slides 31 a 34.",
+     "consulta": [
+      "mdc",
+      "inverso"
+     ],
+     "evidencias": [
+      "(15, 8)"
+     ]
+    },
+    {
+     "paginas": [
+      11
+     ],
+     "assunto": "10 Cifra afim; meia e sapato",
+     "antes": "ja-coberto",
+     "justificativa": "Repete slides 35 e 36.",
+     "consulta": [
+      "afim"
+     ],
+     "evidencias": [
+      "meia e sapato"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "bbc-primos",
+   "url": "https://www.youtube.com/watch?v=Uf7nd8sz5yQ",
+   "escopo": "BBC News Brasil, O enigma dos números primos, 4 min 50 s.",
+   "acesso": "integral",
+   "metodo": "Legenda pt-BR do YouTube lida inteira.",
+   "totalUnidades": 1,
+   "unidades": [
+    {
+     "paginas": [
+      1
+     ],
+     "assunto": "Primos, fatoração, Euclides, n² + n + 41, Riemann, Clay, RSA",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção primos; o exagero sobre Riemann vira pegadinha.",
+     "consulta": [
+      "primos"
+     ],
+     "evidencias": [
+      "n² + n + 41",
+      "riemann"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "patrickjmt-rsa",
+   "url": "https://www.youtube.com/watch?v=mf7x9IiJndY",
+   "escopo": "Patrick J, Cryptography: The Math of the Public Private Key of RSA, 19 min.",
+   "acesso": "integral",
+   "metodo": "Legenda automática em inglês lida inteira.",
+   "totalUnidades": 1,
+   "unidades": [
+    {
+     "paginas": [
+      1
+     ],
+     "assunto": "Chave pública, função de mão única, Shor, mod, RSA com p = 11 e q = 17",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção RSA, passo a passo.",
+     "consulta": [
+      "rsa"
+     ],
+     "evidencias": [
+      "187",
+      "d = 23",
+      "humpty dumpty"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "genial-enigma",
+   "url": "https://www.youtube.com/watch?v=5w3zDa7bgLU",
+   "escopo": "Genial 360, Como Funcionou a Máquina Enigma, 3 min 40 s.",
+   "acesso": "integral",
+   "metodo": "Legenda pt do YouTube lida inteira.",
+   "totalUnidades": 1,
+   "unidades": [
+    {
+     "paginas": [
+      1
+     ],
+     "assunto": "Enigma: rotores, 17.576 posições, plugs, livro de chaves, Morse",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção Enigma, com duas correções.",
+     "consulta": [
+      "enigma"
+     ],
+     "evidencias": [
+      "17.576",
+      "codigo morse"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "stallings-2015-cap2",
+   "url": "https://plataforma.bvirtual.com.br/",
+   "escopo": "Stallings, Criptografia e segurança de redes, 6. ed., §2.1 e §2.2, p. 20–37.",
+   "acesso": "nao-acessado",
+   "limitacao": "Livro não lido. Usadas as referências de página dos slides; Playfair e tipos de ataque entram como complemento sem conferência."
+  }
+ ]
+}

@@ -19,7 +19,12 @@ export const modulos = [
           { slug: 'interface', titulo: 'Interface com dispositivos embarcados', descricao: 'Como um programa no computador, inclusive uma página no navegador, conversa com um microcontrolador: porta serial, USB e Web Serial API.' },
         ],
       },
-      { slug: 'mat', titulo: 'Matemática', descricao: '' },
+      {
+        slug: 'mat', titulo: 'Matemática', descricao: 'A matemática por trás da criptografia: resto, funções bijetoras, inverso modular, hash e chave pública.',
+        eixos: [
+          { slug: 'cripto', titulo: 'Criptografia e sua matemática', descricao: 'Quatro aulas (prof. Leandro Mundim, Stallings 2015): fundamentos e cifras clássicas, hash e integridade, criptografia simétrica, chave pública e RSA.' },
+        ],
+      },
       { slug: 'negocios', titulo: 'Negócios', descricao: '' },
       { slug: 'ux', titulo: 'Design / UX', descricao: 'Conceitos conectados, decisões de projeto e exercícios para discutir e aplicar.' },
       { slug: 'lideranca', titulo: 'Liderança', descricao: '' },

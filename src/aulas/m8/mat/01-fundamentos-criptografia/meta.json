@@ -1,0 +1,58 @@
+{
+  "numero": "01",
+  "data": "2026-11-16",
+  "titulo": "Fundamentos de criptografia: da cifra como função à cifra afim",
+  "tema": "Criptografia e sua matemática",
+  "modos": ["consulta"],
+  "resumo": "A cifra como função de ℤ₂₆ em ℤ₂₆: resto e congruência, bijeção e inversa, César, força bruta, 26! chaves e análise de frequência, mdc por Euclides, inverso multiplicativo e cifra afim, com todas as atividades do slide resolvidas, as cinco falas da dinâmica em grupo e as curiosidades por trás dos nomes.",
+  "topicos": ["Resto e mod", "Congruência", "Função bijetora", "Modelo simétrico e Kerckhoffs", "César", "Força bruta", "26! e frequência", "Euclides", "Inverso modular", "Cifra afim", "Atividades resolvidas", "Hill, Vigenère, one-time pad", "Prévia do RSA"],
+  "secoes": [],
+  "fontes": [
+    {
+      "tipo": "Slides",
+      "titulo": "CC08 · Semana 6 · Fundamentos de Criptografia (prof. Leandro Resende Mundim), encontro de 16/11",
+      "url": "https://drive.google.com/drive/folders/1ZvYOtNSm-nme8hL5xEc4wZUBTWBbaZK-",
+      "secao": "hoje",
+      "nota": "PDF de 62 slides lido inteiro (texto extraído de todas as páginas). Todas as atividades, votações e extras estão resolvidos na seção de atividades; todas as contas foram refeitas por script. Não republicado."
+    },
+    {
+      "tipo": "Vídeo",
+      "titulo": "Pílulas narradas do professor (00 a 10): motivação, cifra simétrica, serviços, resto, congruência, César, força bruta, frequência, inverso, mdc, cifra afim",
+      "url": "https://drive.google.com/drive/folders/1ZvYOtNSm-nme8hL5xEc4wZUBTWBbaZK-",
+      "duracao": "18 min no total",
+      "secao": "resto",
+      "nota": "Os 11 vídeos transcritos inteiros por reconhecimento de fala (Whisper) e conferidos por quadros dos vídeos. Repetem os slides; o que acrescentam (decriptar com K = encriptar com 26 − K, a analogia da meia e do sapato) está nas seções."
+    },
+    {
+      "tipo": "Livro",
+      "titulo": "Stallings, Criptografia e segurança de redes, 6. ed. (Pearson, 2015), §2.1 e §2.2, p. 20–37",
+      "secao": "cifra-simetrica",
+      "nota": "Livro não acessado. As páginas e figuras citadas vêm das referências dos próprios slides (Fig. 2.1, 2.2, 2.3, 2.5, 2.7; Problema 2.1; §4.1–4.3). Playfair, os tipos de ataque e os dois níveis de segurança entram como complemento da §2.2 sem conferência no livro."
+    },
+    {
+      "tipo": "Vídeo",
+      "titulo": "BBC News Brasil · O enigma dos números primos, cuja solução ameaçaria a internet (Camilla Veras Mota)",
+      "url": "https://www.youtube.com/watch?v=Uf7nd8sz5yQ",
+      "duracao": "5 min",
+      "secao": "primos",
+      "nota": "Legenda do YouTube lida inteira. A afirmação de que resolver a hipótese de Riemann quebraria o RSA é tratada como exagero na seção."
+    },
+    {
+      "tipo": "Vídeo",
+      "titulo": "Patrick J (patrickJMT) · Cryptography: The Math of the Public Private Key of RSA",
+      "url": "https://www.youtube.com/watch?v=mf7x9IiJndY",
+      "duracao": "19 min",
+      "secao": "rsa",
+      "nota": "Em inglês. Legenda automática do YouTube lida inteira. O exemplo p = 11, q = 17, e = 7, d = 23, M = 80 → C = 75 foi refeito por script."
+    },
+    {
+      "tipo": "Vídeo",
+      "titulo": "Genial 360 · Como Funcionou a Máquina Enigma",
+      "url": "https://www.youtube.com/watch?v=5w3zDa7bgLU",
+      "duracao": "4 min",
+      "secao": "enigma",
+      "nota": "Legenda do YouTube lida inteira. Duas afirmações corrigidas na seção (rotores independentes; Enigma indecifrável hoje)."
+    }
+  ],
+  "observacao": "O livro de Stallings não foi lido: a aula segue os slides, que citam o livro página a página, e não promete equivalência à leitura das p. 20–37. Curiosidades marcadas como tal vêm de fora do autoestudo, com a fonte ao lado. As soluções das atividades seguem as respostas dos slides, com o raciocínio escrito no caderno; o exemplo de Playfair é autoral."
+}

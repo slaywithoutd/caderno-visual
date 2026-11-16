@@ -1,0 +1,945 @@
+<!-- Matemática · aula 01 · Fundamentos de criptografia (encontro de 16/11/2026, prof. Leandro Mundim).
+     Aula somente Consulta. A ordem segue a dependência: primeiro a base (resto, congruência, função, bijeção),
+     depois as três partes dos slides (2.1 cifra como função, 2.2 espaço de chaves, 2.3 inverso e afim),
+     as atividades do slide resolvidas, o apêndice (Playfair, Hill, Vigenère, one-time pad, Enigma) e a prévia
+     de RSA dos vídeos do autoestudo. Contas conferidas por script (Python 3.13). -->
+
+<!-- ================= Resumo ================= -->
+<section class="cs" id="encontro" data-grupo="Resumo" data-termos="">
+  <h2>Resumo</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 196">
+    <text class="tm" x="120" y="10">César: soma</text>
+    <rect class="k" x="6" y="20" width="44" height="26" rx="6"/><text x="28" y="33">M</text>
+    <path class="s" d="M52 33 H92" marker-end="url(#mnarrow)"/><text class="tam" x="72" y="24" style="font-size:11px">+K</text>
+    <rect class="bl" x="96" y="20" width="44" height="26" rx="6"/><text class="tb" x="118" y="33">C</text>
+    <text class="tm" x="190" y="33">volta: −K</text>
+    <text class="tm" x="120" y="66">afim: multiplica e soma</text>
+    <rect class="k" x="6" y="76" width="44" height="26" rx="6"/><text x="28" y="89">M</text>
+    <path class="s" d="M52 89 H82" marker-end="url(#mnarrow)"/><text class="tam" x="67" y="80" style="font-size:11px">×a</text>
+    <path class="s" d="M86 89 H116" marker-end="url(#mnarrow)"/><text class="tam" x="101" y="80" style="font-size:11px">+b</text>
+    <rect class="bl" x="120" y="76" width="44" height="26" rx="6"/><text class="tb" x="142" y="89">C</text>
+    <text class="tm" x="120" y="116">volta: primeiro −b, depois ×a⁻¹</text>
+    <rect class="am" x="6" y="130" width="228" height="34" rx="8"/>
+    <text x="120" y="147" style="font-size:12px">a⁻¹ existe ⟺ mdc(a, 26) = 1</text>
+    <text class="tm" x="120" y="184">mod 26: o resto que sobra depois das voltas</text>
+  </svg>Toda cifra da aula é uma função de ℤ₂₆ em ℤ₂₆; só a bijetora tem volta.</aside>
+  <p class="cs-def">Uma cifra simétrica é uma função: com a chave fixa, cada texto claro vira um único texto cifrado, e o Bob só consegue voltar se essa função for bijetora. As cifras da aula fazem conta com as letras numeradas de 0 a 25, sempre pegando o resto da divisão por 26.</p>
+  <ul class="b">
+    <li><b>a mod n</b> é o resto da divisão de a por n, sempre entre 0 e n − 1, mesmo para a negativo: −11 mod 7 = 3, porque −11 = (−2)·7 + 3.</li>
+    <li>César: C = (M + K) mod 26 e M = (C − K) mod 26. PAO vira SDR com K = 3. Só tem 26 chaves: a força bruta testa todas em instantes.</li>
+    <li>Monoalfabética: a chave é qualquer bijeção das 26 letras, 26! ≈ 4·10²⁶ chaves, mais que as estrelas do universo. Mesmo assim cai: ela não esconde a frequência das letras (Al-Kindi, século 9). Espaço de chaves grande é necessário, não suficiente.</li>
+    <li>O inverso de a módulo n é o número que, multiplicado por a, deixa resto 1. Ele existe se e somente se mdc(a, n) = 1. O mdc sai pelo algoritmo de Euclides: troque (a, b) por (b, a mod b) até b = 0.</li>
+    <li>Afim: C = (aM + b) mod 26, com volta M = a⁻¹(C − b) mod 26 (primeiro tira o b, depois multiplica pelo inverso). É bijetora se e somente se mdc(a, 26) = 1: 12 valores de a, 312 chaves.</li>
+    <li>Kerckhoffs (1883): o algoritmo pode ser público; só a chave é secreta.</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Resto negativo não existe: −1 mod 26 é 25, não −1. Some 26 até cair entre 0 e 25.</li>
+      <li>13 é primo e mesmo assim não tem inverso módulo 26: o que importa é mdc(13, 26) = 13, não se o número é primo.</li>
+      <li>Na volta da afim a ordem inverte: subtraia b e depois multiplique por a⁻¹. Na ordem errada, R volta como S em vez de C.</li>
+      <li>Na afim, quem decide se a função é bijetora é o a. O b só desloca, como na César.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= No encontro ================= -->
+<section class="cs" id="hoje" data-grupo="No encontro" data-termos="">
+  <h2>Para participar do encontro de 16/11</h2>
+  <p class="cs-def">O encontro tem três perguntas, uma por parte, e alterna explicação curta, votações e atividades em dupla. Os slides marcados "Para autoestudo" o professor espera que você já tenha visto; o resto ele explica e cobra na hora.</p>
+  <div class="tbl prose"><table>
+    <thead><tr><th>Parte</th><th>Pergunta do slide</th><th>Tempo</th><th>No caderno</th></tr></thead>
+    <tbody>
+      <tr><td>2.1</td><td>O que é, exatamente, uma cifra simétrica?</td><td>≈ 28 min</td><td><a href="#cifra-simetrica">modelo</a>, <a href="#cesar">César</a>, <a href="#bijecao">bijeção</a></td></tr>
+      <tr><td>2.2</td><td>Um espaço de chaves enorme impede a criptoanálise?</td><td>≈ 27 min</td><td><a href="#forca-bruta">força bruta</a>, <a href="#monoalfabetica">26!</a>, <a href="#frequencia">frequência</a></td></tr>
+      <tr><td>2.3</td><td>Quando uma multiplicação módulo n tem inverso?</td><td>≈ 32 min</td><td><a href="#mdc">mdc</a>, <a href="#inverso">inverso</a>, <a href="#afim">afim</a></td></tr>
+    </tbody>
+  </table></div>
+  <div class="cs-uso">
+    <h3>A pergunta de abertura</h3>
+    <p>"Por que mais chaves que estrelas não garante segurança?" O professor pede para anotar a resposta antes e só responde na parte 2.2. Uma resposta em três frases:</p>
+    <ol>
+      <li>A cifra que troca letras de qualquer jeito tem 26! ≈ 4·10²⁶ chaves; o universo tem de 10²² a 10²⁴ estrelas. Testar metade das chaves a 10⁹ por segundo leva uns 6 bilhões de anos.</li>
+      <li>Só que a chave é uma bijeção fixa: o A vira sempre a mesma letra. Ela troca o nome da letra, mas não quantas vezes ela aparece.</li>
+      <li>Então basta contar letras no texto cifrado e casar as mais frequentes com A, E e O. A quantidade de chaves protege contra a força bruta, não contra a <a href="#frequencia">análise de frequência</a>.</li>
+    </ol>
+    <h3>As perguntas soltas dos slides</h3>
+    <ul class="b">
+      <li>Slide 18, "que tipo de função deixa Bob decriptar?": uma <a href="#bijecao">bijetora</a>. Se fosse só injetora mas faltasse alguém no contradomínio, ou se duas letras dessem o mesmo C, o Bob não saberia para qual voltar. De ℤ₂₆ em ℤ₂₆, ser injetora já basta: 26 entradas sem repetir saída ocupam as 26 saídas.</li>
+      <li>Slide 29, "por que o 7 desfaz o 3 módulo 10?": porque 3·7 = 21 deixa resto 1. Multiplicar por 3 e depois por 7 é multiplicar por 21, e 21x ≡ x (mod 10). No exemplo, 4 → 3·4 = 12 → 2, e 2 → 7·2 = 14 → 4.</li>
+      <li>Slide 32, "por que o 13 não tem inverso módulo 26?": 13 vezes um par é múltiplo de 26 (resto 0); 13 vezes um ímpar deixa resto 13. Nunca sai resto 1. Em termos de mdc: mdc(13, 26) = 13 ≠ 1.</li>
+    </ul>
+    <h3>Cartas secretas: a atividade em grupo</h3>
+    <p>Cada dupla recebe um bloco da carta, sem a chave; em 10 min o grupo acha a chave, decripta, junta os blocos e separa as palavras. Depois o professor sorteia uma letra de A a E e uma pessoa explica um conceito em 2 min. Você não sabe qual letra vai cair, então tenha as cinco na ponta da língua.</p>
+    <p>Para achar a chave sem computador: conte as letras do bloco, chute que a mais frequente veio do A (K = número da letra − 0) e decripte três ou quatro letras. Se não formar português, tente que ela veio do E (K = número − 4) ou do O (K = número − 14). Bloco curto demais para contar? Vá pela <a href="#forca-bruta">força bruta</a> numa palavra só. O <a href="#frequencia">quebra-César</a> desta aula faz as duas coisas, para conferir depois.</p>
+    <details class="ds-item"><summary>Grupo A · força bruta (2 min)</summary>
+      <ul class="b">
+        <li>A César tem só 26 chaves, de 0 a 25. Dá para escrever o texto para cada uma e olhar qual vira português.</li>
+        <li>Funciona por três motivos (Stallings, p. 26): o algoritmo é público, as chaves são só 26 e a Eve reconhece o texto claro quando ele aparece.</li>
+        <li>Mostre como o grupo achou a chave: "testamos K = 0, 1, 2… e em K = __ apareceu ___".</li>
+        <li>Se o texto claro fosse um arquivo compactado, nenhuma tentativa pareceria certa: o terceiro motivo cai.</li>
+      </ul>
+    </details>
+    <details class="ds-item"><summary>Grupo B · frequência (2 min)</summary>
+      <ul class="b">
+        <li>Na substituição, a chave é uma bijeção fixa: a letra muda de nome, mas aparece o mesmo número de vezes.</li>
+        <li>Mostre a contagem: "a letra mais frequente do bloco foi __, com __ aparições".</li>
+        <li>No português, A, E e O são as mais comuns. Se a mais frequente veio do A, K = número dela − 0.</li>
+        <li>Fecho: espaço de chaves grande é necessário, não suficiente. Al-Kindi descreveu isso em Bagdá, no século 9.</li>
+      </ul>
+    </details>
+    <details class="ds-item"><summary>Grupo C · inverso multiplicativo (2 min)</summary>
+      <ul class="b">
+        <li>Para desfazer "somar K" basta subtrair K. Para desfazer "multiplicar por a" não dá para dividir: em ℤ₂₆ só existem inteiros de 0 a 25.</li>
+        <li>No lugar da divisão, multiplicamos pelo inverso: o número a⁻¹ tal que a·a⁻¹ deixa resto 1.</li>
+        <li>Exemplo do slide: 3·7 = 21 = 2·10 + 1. Então 3⁻¹ ≡ 7 (mod 10): multiplicar por 7 desfaz multiplicar por 3.</li>
+      </ul>
+    </details>
+    <details class="ds-item"><summary>Grupo D · quando o inverso existe (2 min + continuação)</summary>
+      <ul class="b">
+        <li>Regra: a⁻¹ mod n existe se e somente se mdc(a, n) = 1. mdc(3, 10) = 1, então o 3 tem inverso (7). mdc(2, 10) = 2, então o 2 não tem.</li>
+        <li>Módulo 26 = 2·13, têm inverso os ímpares diferentes de 13.</li>
+        <li>Euclides em (21, 15): 21 = 1·15 + 6, 15 = 2·6 + 3, 6 = 2·3 + 0. Parou em (3, 0): mdc = 3.</li>
+        <li>Continuação pedida no slide 32: mdc(12, 8): 12 = 1·8 + 4, 8 = 2·4 + 0, mdc = 4. E o 13 não tem inverso módulo 26 porque mdc(13, 26) = 13: 13·x deixa resto 0 ou 13, nunca 1.</li>
+      </ul>
+    </details>
+    <details class="ds-item"><summary>Grupo E · cifra afim (2 min)</summary>
+      <ul class="b">
+        <li>A afim multiplica por a e soma b: E = g ∘ f, com f(M) = 7M e g(x) = x + 3 no exemplo K = (7, 3).</li>
+        <li>Ida: C = 2 → 2·7 = 14 → 14 + 3 = 17, o R.</li>
+        <li>Volta na ordem contrária: 17 − 3 = 14 → 14·15 = 210 = 8·26 + 2, o C. O 15 é 7⁻¹, porque 7·15 = 105 = 4·26 + 1.</li>
+        <li>Na ordem errada, 17·15 − 3 = 252 → 18, o S: multiplicar e somar não comutam.</li>
+      </ul>
+    </details>
+    <h3>Votações e atividades</h3>
+    <p>Vote 1 (slide 37), Atividades 1 e 2, e os extras do apêndice estão <a href="#atividades">resolvidos com o raciocínio</a>. Na votação o professor dá 1 min sozinha, 2 min para convencer a dupla e 30 s para votar de novo: o argumento que convence é o contraexemplo (duas letras que viram a mesma).</p>
+    <h3>Depois do encontro</h3>
+    <ul class="b">
+      <li>Abas 1 a 3 do sistema "Fundamentos de criptografia e aritmética modular".</li>
+      <li>Ler Stallings (2015), §2.1, §2.2 e §§4.1–4.3. Feedback na Adalove.</li>
+      <li>Semana 7: hash e integridade ("saber se um arquivo mudou", cap. 11 e 12). Semana 10: chave pública e RSA, que os vídeos do autoestudo já adiantam (<a href="#rsa">prévia</a>).</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= Base ================= -->
+<section class="cs" id="leia-como" data-grupo="Base" data-termos="">
+  <h2>Antes de começar: como ler os símbolos</h2>
+  <p class="cs-def">Os slides usam pouca notação, mas toda ela aparece já no começo. Esta tabela traduz cada símbolo para português; cada um é explicado de verdade na seção indicada.</p>
+  <div class="tbl prose"><table>
+    <thead><tr><th>Escrito</th><th>Leia como</th><th>Exemplo</th><th>Seção</th></tr></thead>
+    <tbody>
+      <tr><td>a mod n</td><td>a módulo n: o resto de a dividido por n</td><td>17 mod 5 = 2</td><td><a href="#resto">resto</a></td></tr>
+      <tr><td>⌊a/n⌋</td><td>piso de a sobre n: a divisão arredondada para baixo</td><td>⌊17/5⌋ = 3</td><td><a href="#resto">resto</a></td></tr>
+      <tr><td>ℤₙ</td><td>Z n: os restos {0, 1, …, n − 1}</td><td>ℤ₂₆ = {0, …, 25}</td><td><a href="#resto">resto</a></td></tr>
+      <tr><td>a ≡ b (mod n)</td><td>a é congruente a b módulo n: mesmo resto</td><td>15 ≡ 3 (mod 12)</td><td><a href="#congruencia">congruência</a></td></tr>
+      <tr><td>⟺</td><td>se e somente se: vale a ida e a volta</td><td>a⁻¹ existe ⟺ mdc = 1</td><td></td></tr>
+      <tr><td>f : A → B</td><td>f de A em B</td><td>f : ℤ₅ → ℤ₃</td><td><a href="#funcao">função</a></td></tr>
+      <tr><td>x ↦ 3x</td><td>x vai em 3x: a regra da função, sem dar nome a ela</td><td>4 ↦ 12</td><td><a href="#funcao">função</a></td></tr>
+      <tr><td>f⁻¹</td><td>f inversa: desfaz f</td><td>f⁻¹(f(x)) = x</td><td><a href="#bijecao">bijeção</a></td></tr>
+      <tr><td>g ∘ f</td><td>g composta com f: primeiro f, depois g</td><td>(g ∘ f)(2) = g(f(2))</td><td><a href="#afim">afim</a></td></tr>
+      <tr><td>E(K, M)</td><td>E de K e M: encriptar M com a chave K</td><td>E(3, 15) = 18</td><td><a href="#cifra-simetrica">modelo</a></td></tr>
+      <tr><td>E(K, ·)</td><td>E de K, ponto: a função com K fixo e a entrada livre</td><td>E(3, ·) : ℤ₂₆ → ℤ₂₆</td><td><a href="#cesar">César</a></td></tr>
+      <tr><td>a⁻¹</td><td>inverso de a (módulo n), não 1/a</td><td>3⁻¹ ≡ 7 (mod 10)</td><td><a href="#inverso">inverso</a></td></tr>
+      <tr><td>mdc(a, b)</td><td>máximo divisor comum de a e b</td><td>mdc(12, 8) = 4</td><td><a href="#mdc">mdc</a></td></tr>
+      <tr><td>n!</td><td>n fatorial: n·(n − 1)·…·1</td><td>5! = 120</td><td><a href="#monoalfabetica">monoalfabética</a></td></tr>
+      <tr><td>M̂, K̂</td><td>M chapéu, K chapéu: o palpite do criptoanalista</td><td></td><td><a href="#cifra-simetrica">modelo</a></td></tr>
+    </tbody>
+  </table></div>
+  <div class="cs-uso">
+    <p>A régua que aparece em quase todo slide: cada letra vale a sua posição, começando do zero.</p>
+    <div class="tbl prose"><table class="regua">
+      <tbody>
+        <tr><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td><td>G</td><td>H</td><td>I</td><td>J</td><td>K</td><td>L</td><td>M</td></tr>
+        <tr><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td></tr>
+        <tr><td>N</td><td>O</td><td>P</td><td>Q</td><td>R</td><td>S</td><td>T</td><td>U</td><td>V</td><td>W</td><td>X</td><td>Y</td><td>Z</td></tr>
+        <tr><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td></tr>
+      </tbody>
+    </table></div>
+    <ul class="b">
+      <li>Por que começar do zero? Porque os restos módulo 26 vão de 0 a 25. Com A = 0, cada letra é exatamente um resto e nenhuma conta "cai fora" da régua. Se fosse A = 1, o Z valeria 26, que módulo 26 é 0.</li>
+      <li>Atalhos para decorar: A = 0, E = 4, J = 9, O = 14, T = 19, Z = 25. O resto você acha contando a partir do mais próximo.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="resto" data-grupo="Base" data-termos="cr-algoritmo-divisao,cr-quociente,cr-resto,cr-mod,cr-zn">
+  <h2>Divisão inteira: quociente e resto</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 130">
+    <line class="s" x1="6" y1="40" x2="234" y2="40"/>
+    <g><line class="s" x1="20" y1="34" x2="20" y2="46"/><text class="tm" x="20" y="24">−21</text></g>
+    <g><line class="s" x1="80" y1="30" x2="80" y2="50"/><text class="tam" x="80" y="20">−14</text></g>
+    <g><line class="s" x1="140" y1="34" x2="140" y2="46"/><text class="tm" x="140" y="24">−7</text></g>
+    <g><line class="s" x1="200" y1="34" x2="200" y2="46"/><text class="tm" x="200" y="24">0</text></g>
+    <circle class="bl" cx="105.7" cy="40" r="5"/><text class="tb" x="106" y="62">−11</text>
+    <path class="am" d="M80 76 H106" style="fill:none;stroke-width:3"/>
+    <text class="tam" x="93" y="90">r = 3</text>
+    <text class="tm" x="120" y="112">o múltiplo de 7 logo abaixo de −11 é −14</text>
+    <text class="tm" x="120" y="125">−11 = (−2)·7 + 3</text>
+  </svg>O resto é a distância até o múltiplo de n logo abaixo: nunca negativa.</aside>
+  <p class="cs-def">Dividir a por n (com n > 0) dá um <b>quociente</b> q, quantas vezes n cabe inteiro em a, e um <b>resto</b> r, o que sobra. Escrevemos r = <b>a mod n</b> ("a módulo n"). O resto fica sempre entre 0 e n − 1.</p>
+  <div class="cs-formula">
+    <div class="formula">a = q · n + r, &nbsp; 0 ≤ r &lt; n</div>
+    <p>Esse é o <b>algoritmo da divisão</b>: para cada a e cada n > 0 existem um único q e um único r assim. q = ⌊a/n⌋ é o maior inteiro com q·n ≤ a; r = a − q·n.</p>
+    <div class="formula">ℤₙ = {0, 1, …, n − 1}</div>
+    <p><b>ℤₙ</b> é o conjunto dos restos possíveis. Nas cifras da aula, n = 26 e ℤ₂₆ são as 26 letras.</p>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>17 mod 5: 3·5 = 15 não passa de 17, 4·5 = 20 já passa. Então q = 3 e r = 17 − 15 = 2. Escrevemos 17 = 3·5 + 2 e 17 mod 5 = 2.</li>
+      <li>11 mod 7: 11 = 1·7 + 4, resto 4.</li>
+      <li>−11 mod 7: o múltiplo de 7 logo abaixo de −11 é −14 (não −7, que está acima). De −14 até −11 sobram 3. Então −11 = (−2)·7 + 3 e −11 mod 7 = 3. Repare no desenho: o resto mede para a direita, a partir do múltiplo.</li>
+      <li>Atalho para negativo: some n até cair entre 0 e n − 1. −11 + 7 = −4, −4 + 7 = 3.</li>
+      <li>Onde isso aparece: na volta da César, C − K pode dar negativo. D(3, 2) = (2 − 3) mod 26 = −1 mod 26 = 25, o Z.</li>
+    </ul>
+    <h3>Reduza antes de calcular</h3>
+    <p>Na soma, na subtração e no produto, dá para trocar cada número pelo seu resto antes da conta. O resultado módulo n não muda (exemplo do livro, módulo 8: 11 mod 8 = 3 e 15 mod 8 = 7).</p>
+    <div class="tbl prose"><table>
+      <thead><tr><th>Conta original</th><th>Conta direta</th><th>Reduzindo antes</th></tr></thead>
+      <tbody>
+        <tr><td>(11 + 15) mod 8</td><td>26 = 3·8 + 2 → 2</td><td>(3 + 7) mod 8 = 2</td></tr>
+        <tr><td>(11 − 15) mod 8</td><td>−4 = (−1)·8 + 4 → 4</td><td>(3 − 7) mod 8 = 4</td></tr>
+        <tr><td>(11 × 15) mod 8</td><td>165 = 20·8 + 5 → 5</td><td>(3 × 7) mod 8 = 5</td></tr>
+        <tr><td>(20 / 4) mod 8</td><td>5</td><td>20 mod 8 = 4, 4/4 = 1 ✗</td></tr>
+      </tbody>
+    </table></div>
+    <p>A divisão quebra a regra (5 ≠ 1). Por isso, módulo n, a gente não divide: multiplica pelo <a href="#inverso">inverso</a>.</p>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Muitas linguagens de programação devolvem resto negativo: em C e em Java, -11 % 7 dá -4. Em Python, dá 3, como na matemática. Na prova, use a definição: 0 ≤ r &lt; n.</li>
+    <li>Para negativo, o quociente fica mais negativo, não mais perto de zero: −11 = (−2)·7 + 3, e não (−1)·7 − 4.</li>
+  </ul></div>
+  <div class="curio"><p>"Módulo" vem do latim modulus, "pequena medida". Foi Gauss quem tornou a aritmética dos restos uma teoria, nas Disquisitiones Arithmeticae (1801), e quem inventou o símbolo ≡ da <a href="#congruencia">congruência</a>.</p><p class="cs-fonte">Gauss, Disquisitiones Arithmeticae, 1801, art. 2.</p></div>
+</section>
+
+<section class="cs" id="congruencia" data-grupo="Base" data-termos="cr-congruencia,cr-classe">
+  <h2>Congruência: o mesmo resto</h2>
+  <aside class="mn loop" data-loop="relogio" data-ms="7000" data-still="0.6" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>São 10h; daqui a 5 horas, o ponteiro para no 3: 15 ≡ 3 (mod 12).</aside>
+  <p class="cs-def">Dois inteiros são <b>congruentes</b> módulo n quando deixam o mesmo resto na divisão por n. 15 e 3 deixam resto 3 na divisão por 12, então 15 ≡ 3 (mod 12): no relógio, 15h e 3h ficam no mesmo lugar.</p>
+  <div class="cs-formula">
+    <div class="formula">a ≡ b (mod n) ⟺ (a mod n) = (b mod n)</div>
+    <p>Lê-se "a é congruente a b módulo n". O ⟺ ("se e somente se") diz que as duas frases são a mesma afirmação.</p>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>A congruência separa os inteiros em n <b>classes de resto</b>, uma por resto. Módulo 12: {…, −9, 3, 15, 27, …} é a classe do 3. Os representantes 0, 1, …, n − 1 formam ℤₙ.</li>
+      <li>Relógio, ida: 10h + 5h = 15h, e 15 = 1·12 + 3, então 3h. Volta: 2h − 5h = −3, e −3 = (−1)·12 + 9, então 9h.</li>
+      <li>Diferença entre os dois símbolos: "a mod n" é uma conta que dá um número (17 mod 5 = 2). "a ≡ b (mod n)" é uma frase que é verdadeira ou falsa (17 ≡ 2 (mod 5) é verdade; 17 ≡ 7 (mod 5) também).</li>
+      <li>Outra leitura útil: a ≡ b (mod n) quando n divide a − b. 15 − 3 = 12, que 12 divide.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Congruente não é igual: 15 ≡ 3 (mod 12), mas 15 ≠ 3. E escrever "15 mod 12 ≡ 3" mistura os dois símbolos; escreva 15 mod 12 = 3.</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="funcao" data-grupo="Base" data-termos="cr-funcao,cr-dominio,cr-contradominio,cr-imagem">
+  <h2>Função: cada entrada, uma única saída</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 160">
+    <rect class="k" x="20" y="8" width="56" height="144" rx="20"/><rect class="k" x="160" y="28" width="56" height="104" rx="20"/>
+    <text x="48" y="24">0</text><text x="48" y="52">1</text><text x="48" y="80">2</text><text x="48" y="108">3</text><text x="48" y="136">4</text>
+    <text class="tb" x="188" y="48">0</text><text class="tb" x="188" y="80">1</text><text class="tb" x="188" y="112">2</text>
+    <path class="s" d="M58 24 L176 46" marker-end="url(#mnarrow)"/><path class="s" d="M58 52 L176 78" marker-end="url(#mnarrow)"/><path class="s" d="M58 80 L176 110" marker-end="url(#mnarrow)"/><path class="s" d="M58 108 L176 50" marker-end="url(#mnarrow)"/><path class="s" d="M58 136 L176 82" marker-end="url(#mnarrow)"/>
+    <text class="tm" x="48" y="158">domínio</text><text class="tm" x="188" y="148">contradomínio</text>
+  </svg>f(x) = x mod 3: cada x solta uma flecha só; o 0 e o 3 caem no mesmo lugar.</aside>
+  <p class="cs-def">Uma <b>função</b> f : A → B associa a cada elemento de A um único elemento de B. A é o <b>domínio</b> (as entradas), B é o <b>contradomínio</b> (onde as saídas podem cair) e f(x) é a <b>imagem de</b> x.</p>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Exemplo do slide: f : {0, 1, 2, 3, 4} → {0, 1, 2}, f(x) = x mod 3. Tabela: f(0) = 0, f(1) = 1, f(2) = 2, f(3) = 0, f(4) = 1.</li>
+      <li>"Única" é a parte que importa: cada x solta exatamente uma flecha. Já chegar várias flechas no mesmo ponto pode: f(0) = f(3) = 0.</li>
+      <li>Por que a aula precisa disso: com a chave fixa, a encriptação leva cada texto claro a um único texto cifrado. Ela é uma função de ℤ₂₆ em ℤ₂₆ (<a href="#cesar">César</a>).</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="bijecao" data-grupo="Base" data-termos="cr-injetora,cr-sobrejetora,cr-bijetora,cr-inversa">
+  <h2>Injetora, sobrejetora, bijetora: só a bijetora tem volta</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150">
+    <text class="tm" x="40" y="10">injetora</text><text class="tm" x="120" y="10">sobrejetora</text><text class="tm" x="200" y="10">bijetora</text>
+    <g><text x="20" y="34">1</text><text x="20" y="64">2</text><text x="20" y="94">3</text><text class="tb" x="60" y="30">a</text><text class="tb" x="60" y="56">b</text><text class="rd" x="60" y="82" style="fill:var(--red)">c</text><text class="tb" x="60" y="108">d</text>
+      <path class="s" d="M27 34 L52 31" marker-end="url(#mnarrow)"/><path class="s" d="M27 64 L52 58" marker-end="url(#mnarrow)"/><path class="s" d="M27 94 L52 106" marker-end="url(#mnarrow)"/></g>
+    <g><text x="100" y="34">1</text><text x="100" y="58">2</text><text x="100" y="82">3</text><text x="100" y="106">4</text><text class="tb" x="140" y="40">a</text><text class="tb" x="140" y="70">b</text><text class="tb" x="140" y="100">c</text>
+      <path class="s" d="M107 34 L132 40" marker-end="url(#mnarrow)"/><path class="s" d="M107 58 L132 68" marker-end="url(#mnarrow)"/><path class="am" style="fill:none" d="M107 82 L132 98" marker-end="url(#mnarrow)"/><path class="am" style="fill:none" d="M107 106 L132 102" marker-end="url(#mnarrow)"/></g>
+    <g><text x="180" y="40">1</text><text x="180" y="70">2</text><text x="180" y="100">3</text><text class="tb" x="220" y="40">a</text><text class="tb" x="220" y="70">b</text><text class="tb" x="220" y="100">c</text>
+      <path class="ac" d="M187 40 L212 40" marker-end="url(#mnarrow)"/><path class="ac" d="M187 70 L212 70" marker-end="url(#mnarrow)"/><path class="ac" d="M187 100 L212 100" marker-end="url(#mnarrow)"/></g>
+    <text class="tm" x="40" y="128">c sem flecha</text><text class="tm" x="120" y="128">3 e 4 no c</text><text class="tm" x="200" y="128">inverta: f⁻¹</text>
+  </svg>Só na bijetora dá para virar todas as flechas e ainda ter uma função.</aside>
+  <p class="cs-def">Uma função é <b>injetora</b> quando entradas diferentes dão saídas diferentes; <b>sobrejetora</b> quando todo elemento do contradomínio recebe alguma flecha; <b>bijetora</b> quando é as duas coisas. Só a bijetora tem <b>função inversa</b> f⁻¹, a que desfaz f.</p>
+  <div class="cs-formula">
+    <div class="formula">f⁻¹(f(x)) = x</div>
+    <p>Lê-se "f inversa de f de x é x". O expoente −1 aqui não é potência: é o nome da função que anda as flechas ao contrário.</p>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Injetora no desenho: 1, 2 e 3 vão para a, b e d, sem repetir. Falha em ser sobrejetora: o c não recebe flecha.</li>
+      <li>Sobrejetora: a, b e c recebem flechas, mas o 3 e o 4 vão ambos ao c. Se você estiver no c, não sabe se veio do 3 ou do 4: não há volta.</li>
+      <li>Bijetora: cada um do lado direito recebe exatamente uma flecha. Vire as flechas e você tem f⁻¹.</li>
+      <li>No livro, injetora aparece como "um para um" e bijetora como "reversível" ou "não singular". O livro exige da encriptação: se M₁ ≠ M₂, então E(K, M₁) ≠ E(K, M₂).</li>
+      <li>Atalho que a aula usa o tempo todo: de um conjunto finito nele mesmo (ℤ₂₆ → ℤ₂₆), injetora, sobrejetora e bijetora são a mesma coisa. 26 entradas sem repetir saída ocupam as 26 saídas. Então, para provar que uma cifra não é bijetora, basta achar duas letras que viram a mesma.</li>
+    </ul>
+  </div>
+  <p class="prova">Só a função bijetora tem volta: injetora (entradas diferentes, saídas diferentes) e sobrejetora (todo elemento do contradomínio recebe flecha). A inversa satisfaz f⁻¹(f(x)) = x.</p>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Primo não tem nada a ver com bijetora; quem decide é o mdc com 26 (veja a <a href="#afim">afim</a>).</li>
+    <li>f⁻¹(x) não é 1/f(x). E a⁻¹ módulo n também não é 1/a: é um inteiro de 0 a n − 1.</li>
+  </ul></div>
+  <div class="curio"><p>Os nomes vêm do latim iacere, "lançar": injetar é lançar para dentro, sobrejetar é lançar sobre (cobrir tudo), e bi- marca a ida e a volta. Quem fixou os três termos foi Nicolas Bourbaki, pseudônimo coletivo de um grupo de matemáticos franceses que reescreveu a matemática a partir dos conjuntos, a partir dos anos 1930.</p><p class="cs-fonte">Bourbaki, Théorie des ensembles; etimologia em dicionários de latim.</p></div>
+</section>
+
+<!-- ================= 2.1 A cifra é uma função ================= -->
+<section class="cs" id="vocabulario" data-grupo="2.1 · A cifra é uma função" data-termos="cr-criptologia,cr-criptografia,cr-criptoanalise,cr-ataque-passivo,cr-ataque-ativo,cr-confidencialidade,cr-integridade,cr-autenticacao,cr-irretratabilidade">
+  <h2>Vocabulário: quem cifra, quem ataca, o que se protege</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150">
+    <rect class="gr" x="4" y="50" width="52" height="28" rx="6"/><text x="30" y="64">Alice</text>
+    <rect class="gr" x="184" y="50" width="52" height="28" rx="6"/><text x="210" y="64">Bob</text>
+    <path class="s" d="M58 64 H182" marker-end="url(#mnarrow)"/><text class="tb" x="120" y="56">C</text>
+    <rect class="am" x="92" y="8" width="56" height="26" rx="6"/><text x="120" y="21" style="font-size:11px">Mallory</text>
+    <path class="am" style="fill:none" d="M120 36 V58"/>
+    <rect class="bl" x="98" y="92" width="44" height="26" rx="6"/><text x="120" y="105" style="font-size:11px">Eve</text>
+    <path class="s" d="M120 90 V72" stroke-dasharray="3 3"/>
+    <text class="tm" x="190" y="21">ativo: altera</text><text class="tm" x="190" y="105">passivo: escuta</text>
+    <text class="tm" x="120" y="140">o canal é público</text>
+  </svg>A Eve só escuta; o Mallory mexe na mensagem.</aside>
+  <p class="cs-def">A <b>criptologia</b> tem duas áreas: a <b>criptografia</b> cria os esquemas de encriptação e a <b>criptoanálise</b> tenta decriptar sem conhecer a chave. A criptografia existe para garantir quatro serviços de segurança.</p>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Os personagens: Alice manda, Bob recebe. Eve (de eavesdropper, "quem escuta atrás da porta") faz <b>ataque passivo</b>: só escuta. Mallory (de malicious) faz <b>ataque ativo</b>: altera a mensagem no caminho.</li>
+      <li>De onde vêm os nomes (slide 5): Alice e Bob aparecem em 1978, no artigo do RSA, de Rivest, Shamir e Adleman. Eve aparece em 1988, com Bennett, Brassard e Robert. Mallory ficou conhecido no livro Applied Cryptography, de Bruce Schneier.</li>
+    </ul>
+    <div class="tbl prose"><table>
+      <thead><tr><th>Serviço (outro nome)</th><th>Pergunta e garantia</th></tr></thead>
+      <tbody>
+        <tr><td><b>Confidencialidade</b> (sigilo)</td><td>Quem pode ler? Só quem tem autorização lê o conteúdo.</td></tr>
+        <tr><td><b>Integridade</b></td><td>Alguém mudou? O dado chega como saiu.</td></tr>
+        <tr><td><b>Autenticação</b> (autenticidade)</td><td>Veio de quem diz? A origem é quem diz ser.</td></tr>
+        <tr><td><b>Irretratabilidade</b> (não repúdio)</td><td>O autor pode negar? Quem enviou não pode negar que enviou.</td></tr>
+      </tbody>
+    </table></div>
+    <ul class="b">
+      <li>As cifras desta aula dão só confidencialidade. A Eve ameaça esse serviço. O Mallory ameaça os outros: ele pode trocar letras do texto cifrado sem nunca ler a mensagem. Integridade é o tema da semana 7 (hash).</li>
+      <li>Os quatro serviços vêm da recomendação X.800 da ITU (Stallings, §1.4).</li>
+    </ul>
+  </div>
+  <div class="curio"><p>"Criptografia" junta o grego kryptós, "escondido", com gráphein, "escrever". A palavra "criptoanálise" é bem mais nova: foi cunhada por William Friedman, criptólogo do exército americano, por volta de 1920.</p><p class="cs-fonte">David Kahn, The Codebreakers (1967).</p></div>
+</section>
+
+<section class="cs" id="cifra-simetrica" data-grupo="2.1 · A cifra é uma função" data-termos="cr-texto-claro,cr-texto-cifrado,cr-chave,cr-encriptacao,cr-decriptacao,cr-cifra,cr-cifra-simetrica,cr-kerckhoffs,cr-seg-incondicional,cr-seg-computacional">
+  <h2>O modelo da cifra simétrica</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 190">
+    <rect class="k" x="4" y="10" width="48" height="26" rx="6"/><text x="28" y="23">PAO</text>
+    <path class="s" d="M54 23 H76" marker-end="url(#mnarrow)"/>
+    <rect class="bl" x="80" y="8" width="44" height="30" rx="6"/><text class="tb" x="102" y="23">E</text>
+    <path class="s" d="M126 23 H148" marker-end="url(#mnarrow)"/>
+    <rect class="am" x="152" y="10" width="48" height="26" rx="6"/><text x="176" y="23">SDR</text>
+    <path class="s" d="M176 38 V70" marker-end="url(#mnarrow)"/>
+    <text class="tm" x="216" y="54">canal</text><text class="tm" x="216" y="66">público</text>
+    <rect class="bl" x="154" y="74" width="44" height="30" rx="6"/><text class="tb" x="176" y="89">D</text>
+    <path class="s" d="M152 89 H126" marker-end="url(#mnarrow)"/>
+    <rect class="k" x="74" y="76" width="48" height="26" rx="6"/><text x="98" y="89">PAO</text>
+    <rect class="gr" x="70" y="130" width="100" height="26" rx="6"/><text x="120" y="143">K = 3</text>
+    <path class="s" d="M100 128 L102 40" stroke-dasharray="3 3"/><path class="s" d="M150 132 L172 106" stroke-dasharray="3 3"/>
+    <text class="tm" x="120" y="172">a mesma chave nas duas pontas,</text><text class="tm" x="120" y="184">combinada por um canal seguro</text>
+  </svg>Algoritmos públicos (E e D), chave secreta (K).</aside>
+  <p class="cs-def">Numa <b>cifra simétrica</b>, Alice transforma o <b>texto claro</b> M em <b>texto cifrado</b> C com o algoritmo de <b>encriptação</b> e uma <b>chave</b> K; Bob usa a mesma chave no algoritmo de <b>decriptação</b> e recupera M. A <b>cifra</b> é o par de algoritmos.</p>
+  <div class="cs-formula">
+    <div class="formula">C = E(K, M) &nbsp; &nbsp; M = D(K, C)</div>
+    <p>Lê-se "C é igual a E de K e M". O livro chama o texto claro de X e o cifrado de Y; os slides usam M (mensagem) e C (cipher, cifra).</p>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Exemplo do slide 11: César com K = 3. PAO entra, SDR passa pelo canal, PAO sai do outro lado.</li>
+      <li>"Simétrica" porque as duas pontas usam a mesma chave. O problema que isso cria: a chave precisa chegar ao Bob antes, por um canal seguro (o desenho do slide 12). Resolver isso sem encontro prévio é a semana 10.</li>
+      <li>O criptoanalista vê só C (o único dado público além dos algoritmos) e tenta chutar M̂ (a mensagem) ou K̂ (a chave). Achar K é melhor: abre todas as mensagens futuras.</li>
+      <li><b>Princípio de Kerckhoffs</b> (1883): o sistema pode cair nas mãos do inimigo sem prejuízo. Em linguagem de hoje, o algoritmo é público e só a chave é secreta. É assim no HTTPS e no Wi-Fi: o AES é público e testado por todo mundo.</li>
+      <li>Por que não esconder o algoritmo também? Algoritmo é difícil de trocar e vaza (alguém captura a máquina, um funcionário sai). Chave se troca num instante. E algoritmo público é atacado por muita gente, então as falhas aparecem antes.</li>
+    </ul>
+    <h3>O que o atacante tem nas mãos</h3>
+    <ul class="b">
+      <li>Só o texto cifrado: o caso do slide. É o pior cenário para quem ataca.</li>
+      <li>Alguns pares de texto claro e cifrado conhecidos (por exemplo, toda carta começa com "Prezado"): é o que derruba a <a href="#hill">cifra de Hill</a>.</li>
+      <li>Poder escolher textos claros e ver o cifrado: o cenário mais forte, comum quando o atacante usa o próprio sistema.</li>
+    </ul>
+    <h3>Dois níveis de segurança</h3>
+    <ul class="b">
+      <li><b>Segurança incondicional</b>: o texto cifrado não traz informação nenhuma sobre M, com qualquer tempo e computador. Só o <a href="#otp">one-time pad</a> tem.</li>
+      <li><b>Segurança computacional</b>: quebrar custa mais do que a informação vale ou demora mais do que ela continua útil. É a meta de toda cifra prática (AES, RSA).</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Segurança por esconder o algoritmo ("ninguém sabe como funciona") viola Kerckhoffs. Na prova, o que fica secreto é só a chave.</li>
+  </ul></div>
+  <div class="curio"><p>Auguste Kerckhoffs (1835–1903) era um linguista holandês, professor de alemão em Paris, que escreveu "La cryptographie militaire" com seis regras para cifras de campo; a famosa é a segunda. Claude Shannon reescreveu a ideia em 1949 como "o inimigo conhece o sistema", frase que ficou conhecida como máxima de Shannon.</p><p class="cs-fonte">Kerckhoffs, Journal des sciences militaires, 1883; Shannon, Communication Theory of Secrecy Systems, 1949.</p></div>
+  <div class="curio"><p>A palavra "cifra" vem do árabe ṣifr, "vazio", o nome do zero. No latim medieval virou cifra, primeiro o zero, depois qualquer algarismo e, por fim, a escrita secreta (que trocava letras por números). Do mesmo ṣifr saiu a palavra "zero", pelo italiano zefiro.</p><p class="cs-fonte">Dicionário Houaiss, verbete "cifra".</p></div>
+</section>
+
+<section class="cs" id="cesar" data-grupo="2.1 · A cifra é uma função" data-termos="cr-cesar">
+  <h2>A cifra de César é um relógio de 26 letras</h2>
+  <aside class="mn loop" data-loop="cesar" data-ms="9000" data-still="0.5" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>O anel de dentro gira K = 3 casas: o A de fora fica sobre o D de dentro.</aside>
+  <p class="cs-def">Na <b>cifra de César</b>, as letras viram números (A = 0 até Z = 25) e a encriptação soma a chave K, módulo 26. Com K fixo, E(K, ·) é uma função bijetora de ℤ₂₆ em ℤ₂₆, e a decriptação, que subtrai K, é a inversa dela.</p>
+  <div class="cs-formula">
+    <div class="formula">E(K, ·) : ℤ₂₆ → ℤ₂₆<br>C = E(K, M) = (M + K) mod 26</div>
+    <div class="formula">D(K, ·) : ℤ₂₆ → ℤ₂₆<br>M = D(K, C) = (C − K) mod 26</div>
+    <p>O ponto em E(K, ·) marca a entrada livre: a chave K fica fixa e só M varia. Lê-se "E de K, ponto, de Z 26 em Z 26".</p>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>P com K = 3: P é 15 na régua, 15 + 3 = 18, e 18 é o S. Fazendo o mesmo com A (0 → 3, D) e O (14 → 17, R): PAO vira SDR.</li>
+      <li>Z com K = 3: 25 + 3 = 28 = 1·26 + 2, então E(3, 25) = 2, o C. O disco dá a volta: é o "mod 26".</li>
+      <li>Volta do C: 2 − 3 = −1 = (−1)·26 + 25, então D(3, 2) = 25, o Z. Resto negativo vira positivo somando 26 (<a href="#resto">resto</a>).</li>
+      <li>Por que funciona: D(K, E(K, M)) = (M + K − K) mod 26 = M. Subtrair desfaz somar, então D(K, ·) é a inversa de E(K, ·), e E(K, ·) é bijetora.</li>
+      <li>Decriptar com K é o mesmo que encriptar com 26 − K: subtrair 10 dá o mesmo resto que somar 16.</li>
+    </ul>
+  </div>
+  <p class="prova">Toda cifra é uma função: com a chave K fixa, E(K, ·) leva cada texto claro a um único texto cifrado. Na César, E(K, M) = (M + K) mod 26 e D(K, C) = (C − K) mod 26, de ℤ₂₆ em ℤ₂₆.</p>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Contar a régua a partir do 1 (A = 1) desloca tudo e dá a letra vizinha. A régua começa no 0.</li>
+    <li>K = 0 e K = 26 são a mesma chave (nada muda). A César tem 26 funções diferentes, de K = 0 a 25; elas diferem já no A, porque E(K, 0) = K.</li>
+  </ul></div>
+  <div class="curio"><p>O historiador romano Suetônio conta, em A vida dos doze Césares, que Júlio César escrevia cartas confidenciais trocando cada letra pela que vem três posições depois. Sobre o sobrinho, o imperador Augusto, ele conta que o deslocamento era de uma letra só e que, no lugar do X, Augusto escrevia AA (sem dar a volta no alfabeto).</p><p class="cs-fonte">Suetônio, Vida de César, 56, e Vida de Augusto, 88.</p></div>
+  <div class="curio"><p>A César com K = 13 é a própria inversa: somar 13 duas vezes dá 26, uma volta inteira. Esse caso tem nome, ROT13, e era usado em fóruns da internet dos anos 1980 para esconder spoiler e final de piada: o mesmo comando escondia e revelava.</p><p class="cs-fonte">The Jargon File, verbete "rot13".</p></div>
+</section>
+
+<!-- ================= 2.2 Espaço de chaves ================= -->
+<section class="cs" id="forca-bruta" data-grupo="2.2 · Espaço de chaves" data-termos="cr-forca-bruta,cr-espaco-chaves">
+  <h2>Força bruta: 26 tentativas e acabou</h2>
+  <p class="cs-def">A <b>força bruta</b> testa todas as chaves até uma delas dar um texto claro que faz sentido. O conjunto de chaves possíveis é o <b>espaço de chaves</b>; na César ele tem só 26 elementos.</p>
+  <div class="cs-uso">
+    <p>Texto cifrado FDVD, decriptado com cada K (exemplo do slide 22):</p>
+    <div class="tbl prose"><table class="fb">
+      <tbody>
+        <tr><td>K = 0</td><td>FDVD</td><td>K = 7</td><td>YWOW</td><td>K = 14</td><td>RPHP</td><td>K = 21</td><td>KIAI</td></tr>
+        <tr><td>K = 1</td><td>ECUC</td><td>K = 8</td><td>XVNV</td><td>K = 15</td><td>QOGO</td><td>K = 22</td><td>JHZH</td></tr>
+        <tr><td>K = 2</td><td>DBTB</td><td>K = 9</td><td>WUMU</td><td>K = 16</td><td>PNFN</td><td>K = 23</td><td>IGYG</td></tr>
+        <tr class="achou"><td>K = 3</td><td>CASA</td><td>K = 10</td><td>VTLT</td><td>K = 17</td><td>OMEM</td><td>K = 24</td><td>HFXF</td></tr>
+        <tr><td>K = 4</td><td>BZRZ</td><td>K = 11</td><td>USKS</td><td>K = 18</td><td>NLDL</td><td>K = 25</td><td>GEWE</td></tr>
+        <tr><td>K = 5</td><td>AYQY</td><td>K = 12</td><td>TRJR</td><td>K = 19</td><td>MKCK</td><td></td><td></td></tr>
+        <tr><td>K = 6</td><td>ZXPX</td><td>K = 13</td><td>SQIQ</td><td>K = 20</td><td>LJBJ</td><td></td><td></td></tr>
+      </tbody>
+    </table></div>
+    <ul class="b">
+      <li>Repare que cada linha é a anterior com todas as letras voltando uma casa. Só K = 3 dá português: CASA.</li>
+      <li>A força bruta funciona aqui por três motivos, todos necessários: (1) o algoritmo é público; (2) a cifra tem só 26 chaves; (3) a Eve reconhece o texto claro quando ele aparece.</li>
+      <li>Tire o motivo 3 e ela trava: se o texto claro fosse um arquivo compactado (bytes sem cara de nada), nenhuma tentativa pareceria certa.</li>
+      <li>Em média, a busca acha a chave na metade das tentativas: às vezes de cara, às vezes na última. Para a César, 13 testes a 10⁹ por segundo levam 13 ns.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Tirar o motivo 1 (esconder o algoritmo) não vale como defesa: viola o <a href="#cifra-simetrica">princípio de Kerckhoffs</a>. A defesa honesta é aumentar o espaço de chaves.</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="monoalfabetica" data-grupo="2.2 · Espaço de chaves" data-termos="cr-monoalfabetica,cr-fatorial">
+  <h2>Monoalfabética: 26! chaves, mais que as estrelas</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150">
+    <text class="tm" x="120" y="10">quantos destinos sobram para cada letra</text>
+    <g><rect class="bl" x="6" y="22" width="34" height="26" rx="5"/><text x="23" y="35" style="font-size:11px">A</text><text class="tam" x="23" y="62">26</text></g>
+    <g><rect class="bl" x="46" y="22" width="34" height="26" rx="5"/><text x="63" y="35" style="font-size:11px">B</text><text class="tam" x="63" y="62">25</text></g>
+    <g><rect class="bl" x="86" y="22" width="34" height="26" rx="5"/><text x="103" y="35" style="font-size:11px">C</text><text class="tam" x="103" y="62">24</text></g>
+    <text x="140" y="35">…</text>
+    <g><rect class="bl" x="160" y="22" width="34" height="26" rx="5"/><text x="177" y="35" style="font-size:11px">Z</text><text class="tam" x="177" y="62">1</text></g>
+    <text x="120" y="88" style="font-size:12px">26·25·24·…·1 = 26!</text>
+    <rect class="am" x="20" y="102" width="200" height="22" rx="5"/><text x="120" y="113" style="font-size:11px">≈ 4·10²⁶ chaves</text>
+    <text class="tm" x="120" y="140">estrelas no universo: 10²² a 10²⁴</text>
+  </svg>Cada letra escolhida tira uma opção das próximas.</aside>
+  <p class="cs-def">Na <b>cifra monoalfabética</b>, a chave é uma bijeção qualquer de ℤ₂₆ em ℤ₂₆: cada letra vira sempre a mesma outra letra, sem a regra fixa de "somar K". O número de chaves é 26·25·…·1 = 26! (26 <b>fatorial</b>) ≈ 4·10²⁶.</p>
+  <div class="cs-formula">
+    <div class="formula">26! = 26 · 25 · 24 ⋯ 2 · 1 ≈ 4 · 10²⁶</div>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Por que fatorial: o A pode ir para qualquer das 26 letras. O B, para qualquer das 25 que sobraram (bijeção não repete destino). O C, para 24. Multiplicando as escolhas: 26!.</li>
+      <li>Em miniatura (Atividade 1): bijeções de ℤ₅ em ℤ₅ são 5·4·3·2·1 = 120. A César em ℤ₅ usa só 5 delas (K de 0 a 4).</li>
+      <li>Exemplo de chave: o teclado QWERTY. A → Q, B → W, C → E, D → R, E → T…</li>
+      <li>Força bruta, em média metade das chaves: 2·10²⁶ testes a 10⁹ por segundo dão 2·10¹⁷ s. Um ano tem uns 3,2·10⁷ s, então são ≈ 6,3·10⁹ anos, mais que a idade da Terra (4,5·10⁹ anos).</li>
+      <li>Conclusão do slide 23: a força bruta não quebra a monoalfabética. A próxima seção mostra que outra coisa quebra.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>"Média de metade das chaves" é a conta do livro e do slide. Se a pergunta for o pior caso, use todas: 4·10²⁶ testes.</li>
+  </ul></div>
+  <div class="curio"><p>A notação n! foi proposta pelo matemático francês Christian Kramp em 1808. Ele queria um símbolo curto porque o produto aparecia demais nas contas de probabilidade da época.</p><p class="cs-fonte">Kramp, Élémens d'arithmétique universelle, 1808.</p></div>
+</section>
+
+<section class="cs" id="frequencia" data-grupo="2.2 · Espaço de chaves" data-termos="cr-frequencia">
+  <h2>A substituição não esconde a frequência</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 160">
+    <text class="tm" x="60" y="10">carta (123 letras)</text><text class="tm" x="182" y="10">a mesma, cifrada</text>
+    <rect class="k" x="14" y="26" width="24" height="98"/><rect class="k" x="46" y="68" width="24" height="56"/><rect class="k" x="78" y="89" width="24" height="35"/>
+    <text class="tm" x="26" y="18">28</text><text class="tm" x="58" y="60">16</text><text class="tm" x="90" y="81">10</text>
+    <text x="26" y="136">A</text><text x="58" y="136">E</text><text x="90" y="136">O</text>
+    <rect class="bl" x="138" y="26" width="24" height="98"/><rect class="bl" x="170" y="68" width="24" height="56"/><rect class="bl" x="202" y="89" width="24" height="35"/>
+    <text class="tm" x="150" y="18">28</text><text class="tm" x="182" y="60">16</text><text class="tm" x="214" y="81">10</text>
+    <text class="tb" x="150" y="136">Q</text><text class="tb" x="182" y="136">T</text><text class="tb" x="214" y="136">G</text>
+    <text class="tm" x="120" y="154">as barras são as mesmas; só o nome muda</text>
+  </svg>A chave QWERTY troca A por Q, E por T, O por G.</aside>
+  <p class="cs-def">A <b>análise de frequência</b> conta quantas vezes cada letra aparece no texto cifrado e casa as mais frequentes com as mais comuns da língua. Funciona contra qualquer substituição monoalfabética, porque a chave é uma bijeção fixa: a letra troca de nome, mas aparece o mesmo número de vezes.</p>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Caso César: a letra mais frequente do texto cifrado é O = 14 e ela veio de A = 0. Então K = 14 − 0 = 14. Uma subtração e acabou.</li>
+      <li>Caso monoalfabética (carta da Alice, slide 24): a Eve conta Q 28 vezes, T 16 e G 10. No português, A, E e O são as mais comuns, então o chute é Q = A, T = E e G = O. As letras raras e as palavras curtas ("de", "que", "o") fecham o resto.</li>
+      <li>Frequências típicas do português: A ≈ 14,6%, E ≈ 12,6%, O ≈ 10,7%, S ≈ 7,8%, R ≈ 6,5%. Na carta, A = 28/123 ≈ 23%: texto curto foge da média, mas a ordem das campeãs costuma se manter.</li>
+      <li>Resposta à pergunta de abertura: o espaço de chaves grande é necessário (contra força bruta), mas não é suficiente (não esconde a frequência).</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Na César basta uma letra para achar K. Na monoalfabética cada letra tem um destino próprio: a frequência dá os primeiros palpites e o resto sai por tentativa, palavra a palavra.</li>
+    <li>A afim também é monoalfabética (cada letra tem sempre a mesma imagem), então cai do mesmo jeito. Para esconder a frequência é preciso mudar de substituição ao longo do texto (<a href="#vigenere">Vigenère</a>) ou cifrar blocos (<a href="#hill">Hill</a>).</li>
+  </ul></div>
+  <div class="widget prose" id="quebra">
+    <div class="wrow"><span class="resp">Quebra-César</span><span class="muted">cole um texto cifrado (por exemplo, o bloco da carta)</span></div>
+    <textarea id="qb-txt" rows="3" spellcheck="false">FDVD</textarea>
+    <div id="qb-freq" class="qb-freq" aria-live="polite"></div>
+    <div id="qb-lista" class="qb-lista"></div>
+  </div>
+  <div class="curio"><p>Al-Kindi (c. 801–873), o "filósofo dos árabes", trabalhava na Casa da Sabedoria de Bagdá. O tratado dele, Manuscrito sobre a decifração de mensagens criptográficas, é a descrição mais antiga que se conhece da análise de frequência. Ficou perdido por séculos e foi redescoberto em 1987, num arquivo otomano em Istambul.</p><p class="cs-fonte">Simon Singh, O livro dos códigos (1999), cap. 1.</p></div>
+</section>
+
+<!-- ================= 2.3 Inverso e cifra afim ================= -->
+<section class="cs" id="mdc" data-grupo="2.3 · Inverso e cifra afim" data-termos="cr-mdc,cr-coprimos,cr-euclides">
+  <h2>mdc e o algoritmo de Euclides</h2>
+  <p class="cs-def">O <b>mdc</b> (máximo divisor comum) de a e b é o maior inteiro que divide os dois. Quando mdc(a, b) = 1, eles são <b>coprimos</b>. O <b>algoritmo de Euclides</b> calcula o mdc sem fatorar: troca o par (a, b) por (b, a mod b) até b virar 0.</p>
+  <div class="cs-formula">
+    <div class="formula">mdc(a, b) = mdc(b, a mod b)</div>
+    <p>Por que vale: a mod b = a − q·b. Quem divide a e b divide a − q·b; quem divide b e a − q·b divide a. Os dois pares têm exatamente os mesmos divisores comuns, então o mesmo mdc.</p>
+  </div>
+  <div class="cs-uso">
+    <ol>
+      <li>Se b = 0, pare. A saída é a.</li>
+      <li>Calcule r = a mod b.</li>
+      <li>Troque o par (a, b) por (b, r).</li>
+      <li>Volte ao passo 1.</li>
+    </ol>
+    <div class="tbl prose"><table>
+      <thead><tr><th>Par (a, b)</th><th>Divisão</th><th>Novo par</th></tr></thead>
+      <tbody>
+        <tr><td>(21, 15)</td><td>21 = 1·15 + 6</td><td>(15, 6)</td></tr>
+        <tr><td>(15, 6)</td><td>15 = 2·6 + 3</td><td>(6, 3)</td></tr>
+        <tr><td>(6, 3)</td><td>6 = 2·3 + 0</td><td>(3, 0) → mdc(21, 15) = 3</td></tr>
+      </tbody>
+    </table></div>
+    <ul class="b">
+      <li>Exemplo do livro, (15, 8): 15 = 1·8 + 7, 8 = 1·7 + 1, 7 = 7·1 + 0. Parou em (1, 0): mdc = 1. 8 e 15 são coprimos sem que nenhum dos dois seja primo.</li>
+      <li>Para o inverso módulo 26, o par é (26, a): (26, 7) → 26 = 3·7 + 5 → (7, 5) → (5, 2) → (2, 1) → (1, 0). mdc = 1, então o 7 tem inverso.</li>
+      <li>O resto cai rápido: a cada duas linhas ele pelo menos cai pela metade. Por isso o algoritmo serve até para números de centenas de dígitos, como os do RSA.</li>
+      <li>Leitura geométrica (apêndice): o maior azulejo quadrado que cobre um piso 12×8 sem cortes. Cabe 1 quadrado de 8 e sobra uma faixa 8×4; nela cabem 2 de 4 e não sobra nada. Lado 4 = mdc(12, 8). A figura abaixo faz o mesmo com 21×15.</li>
+    </ul>
+  </div>
+  <figure class="fig" id="fig-euclides">
+    <div class="fig-head"><span class="fig-title">Figura 1 · Euclides com azulejos: mdc(21, 15)</span><div class="fig-tabs"></div></div>
+    <div class="fig-body">
+      <div class="fig-stage"><svg id="eu-svg" viewBox="0 0 640 300"></svg></div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>O algoritmo para quando o resto é 0, e a resposta é o último resto diferente de 0 (o a do par final), não o 0.</li>
+    <li>Coprimo não é o mesmo que primo: 8 e 15 são coprimos; 13 e 26, os dois "com primo no meio", não são.</li>
+  </ul></div>
+  <div class="curio"><p>Euclides escreveu os Elementos em Alexandria, por volta de 300 a.C.; o algoritmo está no Livro VII, Proposições 1 e 2, formulado com segmentos: tire o menor do maior até sobrar menos que o menor e repita com a sobra. Donald Knuth chama o algoritmo de "o avô de todos os algoritmos", por ser o mais antigo ainda em uso.</p><p class="cs-fonte">Euclides, Elementos VII.1–2; Knuth, The Art of Computer Programming, vol. 2.</p></div>
+</section>
+
+<section class="cs" id="inverso" data-grupo="2.3 · Inverso e cifra afim" data-termos="cr-inverso">
+  <h2>Inverso multiplicativo: quando multiplicar tem volta</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150">
+    <text class="tm" x="14" y="12" style="text-anchor:start">x</text>
+    <text class="tm" x="14" y="40" style="text-anchor:start">3x mod 10</text>
+    <text class="tm" x="14" y="88" style="text-anchor:start">x</text>
+    <text class="tm" x="14" y="116" style="text-anchor:start">2x mod 10</text>
+    <g id="mn-inv-3"></g>
+  </svg>Com 3, cada dígito aparece uma vez; com 2, o 0 aparece duas vezes e o 1 nunca.</aside>
+  <p class="cs-def">O <b>inverso multiplicativo</b> de a módulo n é o número a⁻¹ que, multiplicado por a, deixa resto 1. Multiplicar por a⁻¹ desfaz multiplicar por a. Ele existe se e somente se mdc(a, n) = 1.</p>
+  <div class="cs-formula">
+    <div class="formula">a · a⁻¹ ≡ 1 (mod n)</div>
+    <div class="formula">a⁻¹ mod n existe ⟺ mdc(a, n) = 1</div>
+    <p>a⁻¹ lê-se "inverso de a". É um inteiro entre 0 e n − 1, não a fração 1/a.</p>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Tabela do slide 29: multiplique cada dígito x por 3 e guarde só o último dígito (mod 10): 0, 3, 6, 9, 2, 5, 8, 1, 4, 7. Cada dígito aparece uma vez, então x ↦ 3x mod 10 é bijetora.</li>
+      <li>Com 2: 0, 2, 4, 6, 8, 0, 2, 4, 6, 8. O 0 aparece duas vezes (2·0 e 2·5) e os ímpares nunca: x ↦ 2x mod 10 não é injetora nem sobrejetora.</li>
+      <li>3⁻¹ módulo 10: 3·7 = 21 = 2·10 + 1, então 3⁻¹ ≡ 7 (mod 10).</li>
+      <li>Por que o mdc decide: se d = mdc(a, n) > 1, então a·x e n são ambos múltiplos de d, e a·x mod n também é. O resto 1 nunca aparece. Ex.: 2x mod 10 é sempre par.</li>
+      <li>Quem tem inverso módulo 10: 1, 3, 7 e 9. Módulo 26 = 2·13: os ímpares menos o 13, ou seja, 12 números.</li>
+      <li>Como achar sem calculadora: teste a·1, a·2, a·3… até o resto dar 1. Para 5 mod 7: 5, 10 → 3, 15 → 1. Então 5⁻¹ ≡ 3 (mod 7).</li>
+    </ul>
+    <p>Os 12 inversos módulo 26 andam em pares: se a⁻¹ = x, então x⁻¹ = a.</p>
+    <div class="tbl prose"><table>
+      <tbody>
+        <tr><th>par</th><td>1 ↔ 1</td><td>3 ↔ 9</td><td>5 ↔ 21</td><td>7 ↔ 15</td></tr>
+        <tr><th>par</th><td>11 ↔ 19</td><td>17 ↔ 23</td><td>25 ↔ 25</td><td></td></tr>
+      </tbody>
+    </table></div>
+    <details class="base">
+      <summary><span class="base-tag">Base · além do slide</span> Achar o inverso com Euclides de trás para frente</summary>
+      <p>Para números grandes, testar um por um não dá. O livro (§4.4) usa o algoritmo de Euclides estendido: guarde as divisões e escreva o 1 como combinação de 26 e a. Para 7 módulo 26:</p>
+      <ul class="b">
+        <li>Divisões: 26 = 3·7 + 5, 7 = 1·5 + 2, 5 = 2·2 + 1.</li>
+        <li>De baixo para cima: 1 = 5 − 2·2 = 5 − 2·(7 − 5) = 3·5 − 2·7 = 3·(26 − 3·7) − 2·7 = 3·26 − 11·7.</li>
+        <li>Módulo 26, o 3·26 some: 1 ≡ −11·7. Então 7⁻¹ ≡ −11 ≡ 15 (mod 26). Confere: 7·15 = 105 = 4·26 + 1.</li>
+        <li>É assim que o vídeo do RSA acha d = 23 (<a href="#rsa">prévia</a>). Em Python: <code>pow(7, -1, 26)</code> devolve 15.</li>
+      </ul>
+    </details>
+  </div>
+  <p class="prova">a⁻¹ mod n existe ⟺ mdc(a, n) = 1. Como mdc(3, 10) = 1, o 3 tem inverso módulo 10, e ele é 7; como mdc(2, 10) = 2, o 2 não tem. Módulo 26, os ímpares diferentes de 13 têm inverso.</p>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>13 é primo e não tem inverso módulo 26. O critério é mdc(a, n) = 1, não "a é primo".</li>
+    <li>O inverso depende do módulo: 3⁻¹ é 7 módulo 10, mas 9 módulo 26 (3·9 = 27 = 26 + 1).</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="afim" data-grupo="2.3 · Inverso e cifra afim" data-termos="cr-afim,cr-composicao">
+  <h2>A cifra afim: multiplica, depois soma</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 170">
+    <text class="tm" x="120" y="10">ida: E = g ∘ f, K = (7, 3)</text>
+    <rect class="k" x="4" y="20" width="44" height="26" rx="6"/><text x="26" y="33">C=2</text>
+    <path class="s" d="M50 33 H78" marker-end="url(#mnarrow)"/><text class="tam" x="64" y="24" style="font-size:10px">×7</text>
+    <rect class="k" x="82" y="20" width="36" height="26" rx="6"/><text x="100" y="33">14</text>
+    <path class="s" d="M120 33 H148" marker-end="url(#mnarrow)"/><text class="tam" x="134" y="24" style="font-size:10px">+3</text>
+    <rect class="bl" x="152" y="20" width="56" height="26" rx="6"/><text class="tb" x="180" y="33">17=R</text>
+    <text class="tm" x="120" y="66">volta: E⁻¹ = f⁻¹ ∘ g⁻¹, ordem contrária</text>
+    <rect class="bl" x="4" y="76" width="44" height="26" rx="6"/><text class="tb" x="26" y="89">17</text>
+    <path class="s" d="M50 89 H78" marker-end="url(#mnarrow)"/><text class="tam" x="64" y="80" style="font-size:10px">−3</text>
+    <rect class="k" x="82" y="76" width="36" height="26" rx="6"/><text x="100" y="89">14</text>
+    <path class="s" d="M120 89 H148" marker-end="url(#mnarrow)"/><text class="tam" x="134" y="80" style="font-size:10px">×15</text>
+    <rect class="gr" x="152" y="76" width="56" height="26" rx="6"/><text x="180" y="89">2=C</text>
+    <text class="tm" x="120" y="122">210 = 8·26 + 2 · 15 = 7⁻¹</text>
+    <rect class="rd" x="20" y="134" width="200" height="24" rx="6"/><text x="120" y="146" style="font-size:10.5px">ordem errada: 17·15 − 3 → 18 = S</text>
+  </svg>Para tirar, desfaça o último passo primeiro.</aside>
+  <p class="cs-def">A <b>cifra afim</b> usa a chave K = (a, b): multiplica a letra por a e depois soma b, módulo 26. Ela é uma <b>composição</b> de duas funções, e a volta desfaz as duas na ordem contrária. Só é bijetora quando mdc(a, 26) = 1.</p>
+  <div class="cs-formula">
+    <div class="formula">E(K, M) = (aM + b) mod 26</div>
+    <div class="formula">D(K, C) = a⁻¹(C − b) mod 26</div>
+    <div class="formula">E = g ∘ f, &nbsp; E⁻¹ = f⁻¹ ∘ g⁻¹</div>
+    <p>f(M) = aM multiplica; g(x) = x + b soma. g ∘ f ("g composta com f") aplica primeiro f, depois g. A César é a afim com a = 1.</p>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Ida com K = (7, 3), letra C = 2: 2·7 = 14, 14 + 3 = 17, o R.</li>
+      <li>Volta: primeiro desfaz a soma, 17 − 3 = 14. Depois desfaz a multiplicação com 7⁻¹ = 15 (porque 7·15 = 105 = 4·26 + 1): 14·15 = 210 = 8·26 + 2, o C.</li>
+      <li>Na ordem errada, 17·15 − 3 = 252 = 9·26 + 18, o S. Multiplicar e somar não comutam: a ordem importa, como meia e sapato.</li>
+      <li>Por que a volta funciona: D(K, E(K, M)) ≡ a⁻¹(aM + b − b) ≡ a⁻¹·a·M ≡ M (mod 26). O passo a⁻¹·a ≡ 1 só existe se mdc(a, 26) = 1.</li>
+      <li>Contraexemplo do livro, K = (2, 3), com mdc(2, 26) = 2: E(K, 0) = 3 e E(K, 13) = 29 = 26 + 3 = 3. A e N viram D: não é injetora, Bob não sabe voltar.</li>
+      <li>Contagem: a pode ser 1, 3, 5, 7, 9, 11, 15, 17, 19, 21, 23 ou 25 (12 valores) e b qualquer de 0 a 25. São 12·26 = 312 chaves. Pouco: cai por força bruta e por frequência.</li>
+      <li>Atalho para achar o contraexemplo: se a é par, M = 0 e M = 13 colidem (13·a é múltiplo de 26). Se a = 13, M = 0 e M = 2 colidem.</li>
+    </ul>
+  </div>
+  <p class="prova">E(K, M) = (aM + b) mod 26, com K = (a, b), é bijetora ⟺ mdc(a, 26) = 1. Nesse caso D(K, C) = a⁻¹(C − b) mod 26 desfaz E. São 12·26 = 312 chaves.</p>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>O b nunca estraga a bijeção: ele só desloca, como na César. Quem decide é o a.</li>
+    <li>Na volta, não divida por a: multiplique por a⁻¹, depois de subtrair b.</li>
+  </ul></div>
+  <div class="widget prose" id="lab-afim">
+    <div class="wrow"><span class="resp">Laboratório da afim</span><span class="muted">a = 1 é a César</span></div>
+    <div class="wrow">
+      <label>a <select id="af-a"></select></label>
+      <label>b <select id="af-b"></select></label>
+      <input type="text" id="af-txt" value="PAO" spellcheck="false" aria-label="texto claro">
+    </div>
+    <div id="af-status" aria-live="polite"></div>
+    <div class="tbl prose"><table id="af-tab"></table></div>
+  </div>
+  <div class="curio"><p>"Afim" vem do latim affinis, "vizinho, aparentado": uma função afim é parente próxima da linear (só multiplica), com um deslocamento a mais. É o mesmo nome do y = ax + b do ensino médio, agora com mod 26.</p><p class="cs-fonte">Etimologia: Dicionário Houaiss, verbete "afim".</p></div>
+</section>
+
+<!-- ================= Atividades ================= -->
+<section class="cs" id="atividades" data-grupo="Atividades do slide" data-termos="">
+  <h2>Atividades do slide, resolvidas e explicadas</h2>
+  <p class="cs-def">Todas as atividades, votações e extras dos slides, na ordem em que aparecem. Cada uma tem a pista de por onde começar e a resolução com o porquê de cada passo; tente antes de abrir.</p>
+  <div class="cs-uso">
+    <h3>Atividade 1 (slide 25) · conte as chaves e use a frequência</h3>
+    <details class="ds-item" open><summary>a) Quantas bijeções de ℤ₅ em ℤ₅ existem?</summary>
+      <p class="muted">Por onde começar: uma bijeção de ℤ₅ nele mesmo é um jeito de embaralhar 0, 1, 2, 3, 4. Conte escolhas.</p>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <p>A imagem do 0 tem 5 opções. A do 1 tem 4 (não pode repetir a do 0, senão não seria injetora). A do 2 tem 3, a do 3 tem 2 e a do 4, a única que sobrou. Total: 5·4·3·2·1 = 5! = <span class="resp">120</span>.</p>
+      </details>
+    </details>
+    <details class="ds-item" open><summary>b) Quantas chaves a César tem em ℤ₅?</summary>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <p><span class="resp">5</span>, de K = 0 a K = 4 (K = 5 dá a volta e repete o K = 0). A César usa só 5 das 120 bijeções: as que "andam todo mundo a mesma distância".</p>
+      </details>
+    </details>
+    <details class="ds-item" open><summary>c) Num texto cifrado por César, a letra mais frequente é O, de número 14. Ela veio de A. Ache a chave e decripte C.</summary>
+      <p class="muted">Por onde começar: na César, C = M + K. Você conhece um par (M, C).</p>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <p>A chave é o quanto A andou para virar O: K = 14 − 0 = <span class="resp">14</span>. Para decriptar a letra C = 2: 2 − 14 = −12 = (−1)·26 + 14. O 14 é o O: o C vem de <span class="resp">O</span>.</p>
+        <p class="muted">Por que −12 vira 14: resto nunca é negativo; some 26.</p>
+      </details>
+    </details>
+
+    <h3>Vote 1 (slide 37) · qual chave dá uma afim bijetora?</h3>
+    <details class="ds-item" open><summary>Com E(K, M) = (aM + b) mod 26: A) (13, 1) · B) (7, 4) · C) (2, 7) · D) as três.</summary>
+      <p class="muted">Por onde começar: ignore o b. Calcule mdc(a, 26) para cada a.</p>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <p><span class="resp">B) K = (7, 4).</span> mdc(7, 26) = 1, e 7⁻¹ ≡ 15 (mod 26) desfaz a multiplicação.</p>
+        <ul class="b">
+          <li>A) O 13 é primo, mas mdc(13, 26) = 13. Contraexemplo: E(K, 2) = 27 = 26 + 1 = E(K, 0). A e C viram B.</li>
+          <li>C) mdc(2, 26) = 2. E(K, 13) = 33 = 26 + 7 = E(K, 0).</li>
+          <li>D) O b só desloca. Quem decide é o a.</li>
+        </ul>
+        <p class="muted">Argumento para convencer a dupla: mostre duas letras que viram a mesma. Um contraexemplo derruba; "parece que funciona" não prova.</p>
+      </details>
+    </details>
+
+    <h3>Atividade 2 (slide 39) · sem calculadora</h3>
+    <details class="ds-item" open><summary>a) Quais números de 1 a 9 têm inverso módulo 10?</summary>
+      <p class="muted">Por onde começar: 10 = 2·5. Quem divide por 2 ou por 5 divide junto com 10.</p>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <p>Os a com mdc(a, 10) = 1: <span class="resp">1, 3, 7 e 9</span>. Os pares têm o 2 em comum com 10; o 5 tem o 5. Confira: 1·1, 3·7 = 21, 7·3 = 21, 9·9 = 81, todos com resto 1.</p>
+      </details>
+    </details>
+    <details class="ds-item" open><summary>b) Calcule mdc(18, 12) por Euclides.</summary>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <p>(18, 12): 18 = 1·12 + 6 → (12, 6). 12 = 2·6 + 0 → (6, 0). Parou: mdc = <span class="resp">6</span>.</p>
+      </details>
+    </details>
+    <details class="ds-item" open><summary>c) Ache o inverso de 5 módulo 7.</summary>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <p>mdc(5, 7) = 1, então existe. Teste: 5·1 = 5, 5·2 = 10 → 3, 5·3 = 15 = 2·7 + 1 → 1. O inverso é <span class="resp">3</span>.</p>
+      </details>
+    </details>
+    <details class="ds-item" open><summary>d) E(K, M) = (4M + 1) mod 26 é bijetora? Se não for, dê um contraexemplo.</summary>
+      <p class="muted">Por onde começar: mdc(4, 26). Se não for 1, procure o par M = 0 e M = 13.</p>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <p><span class="resp">Não</span>, porque mdc(4, 26) = 2. Contraexemplo: E(K, 0) = 1 e E(K, 13) = 53 = 2·26 + 1 = 1. A e N viram B.</p>
+        <p class="muted">Por que o 13: 4·13 = 52 é múltiplo de 26, então somar 13 à entrada não muda a saída.</p>
+      </details>
+    </details>
+
+    <h3>Atividade 3 (slide 41, para autoestudo) · K = (5, 8)</h3>
+    <details class="ds-item" open><summary>a) E(K, M) = (5M + 8) mod 26 é bijetora? b) Confira que 5⁻¹ ≡ 21 (mod 26). c) Calcule E(K, 7). d) Decripte C = 17.</summary>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <ul class="b">
+          <li>a) <span class="resp">Sim</span>, porque mdc(5, 26) = 1 (Euclides: 26 = 5·5 + 1, 5 = 5·1 + 0).</li>
+          <li>b) 5·21 = 105 = 4·26 + 1. Resto <span class="resp">1</span>, então 21 é o inverso.</li>
+          <li>c) 5·7 + 8 = 43 = 1·26 + 17 → <span class="resp">17</span>. H (7) vira R (17).</li>
+          <li>d) Primeiro subtraia b: 17 − 8 = 9. Depois multiplique por 5⁻¹: 21·9 = 189 = 7·26 + 7 → <span class="resp">7</span>, o H. Confere com o item c.</li>
+        </ul>
+      </details>
+    </details>
+
+    <h3>Extra (slide 48) · o relógio, às 9h</h3>
+    <details class="ds-item" open><summary>a) Um backup roda daqui a 50 horas. b) Um alerta disparou há 30 horas. c) Todo par de números ímpares é congruente módulo 2?</summary>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <ul class="b">
+          <li>a) 9 + 50 = 59 = 4·12 + 11 → <span class="resp">11h</span> (quatro voltas inteiras e sobram 11).</li>
+          <li>b) 9 − 30 = −21 = (−2)·12 + 3 → <span class="resp">3h</span>. O múltiplo de 12 logo abaixo de −21 é −24.</li>
+          <li>c) <span class="resp">Sim</span>. Todo ímpar é 2k + 1, deixa resto 1. Então dois ímpares têm o mesmo resto: 7 mod 2 = 13 mod 2 = 1.</li>
+        </ul>
+      </details>
+    </details>
+
+    <h3>Extra (slide 51) · Kerckhoffs</h3>
+    <details class="ds-item" open><summary>Um servidor encripta os logs com a César. O intruso copia HUUR. a) O que fica secreto? b) Com K = 3, qual é M? c) Que igualdade garante que o Bob recupera todo M?</summary>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <ul class="b">
+          <li>a) Só a <span class="resp">chave K</span>. Algoritmos e texto cifrado são públicos.</li>
+          <li>b) H = 7, U = 20, R = 17. Volte 3 em cada: 4, 17, 17, 14 → <span class="resp">ERRO</span>.</li>
+          <li>c) <span class="resp">D(K, E(K, M)) = M</span>: a decriptação desfaz a encriptação, para todo M.</li>
+        </ul>
+      </details>
+    </details>
+
+    <h3>Extra (slide 53) · César com K = 10</h3>
+    <details class="ds-item" open><summary>a) E(10, 20). b) D(10, 4). c) Que chave K′ dá E(K′, ·) = D(10, ·)? d) Quantas funções E(K, ·) diferentes a César tem, e por quê?</summary>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <ul class="b">
+          <li>a) U = 20. 20 + 10 = 30 = 1·26 + 4 → <span class="resp">4</span>, o E.</li>
+          <li>b) 4 − 10 = −6 = (−1)·26 + 20 → <span class="resp">20</span>, o U. Volta ao começo do item a.</li>
+          <li>c) <span class="resp">K′ = 16</span>, porque −10 ≡ 16 (mod 26): somar 16 tem o mesmo resto que subtrair 10.</li>
+          <li>d) <span class="resp">26</span>, uma por K de 0 a 25. São diferentes porque já diferem no 0: E(K, 0) = K.</li>
+        </ul>
+      </details>
+    </details>
+
+    <h3>Vote extra (slide 55) · quantas destas são bijetoras de ℤ₂₆ em ℤ₂₆?</h3>
+    <details class="ds-item" open><summary>f₁(M) = (M + 5) mod 26 · f₂(M) = 2M mod 26 · f₃(M) = 25 − M · f₄(M) = M² mod 26. A) uma B) duas C) três D) quatro.</summary>
+      <p class="muted">Por onde começar: em ℤ₂₆ → ℤ₂₆, basta procurar duas entradas com a mesma saída.</p>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <p><span class="resp">B) duas</span>: f₁ e f₃.</p>
+        <ul class="b">
+          <li>f₁ é a César com K = 5: bijetora.</li>
+          <li>f₃ é a própria inversa: 25 − (25 − M) = M. Ela espelha a régua (A ↔ Z, B ↔ Y). Quem marca "uma" esquece dela por não ser César.</li>
+          <li>f₂ falha: f₂(0) = f₂(13) = 0 (mdc(2, 26) = 2).</li>
+          <li>f₄ falha: f₄(1) = 1 e f₄(25) = 625 = 24·26 + 1 = 1. Todo quadrado tem esse problema: M e 26 − M dão o mesmo quadrado.</li>
+        </ul>
+      </details>
+    </details>
+  </div>
+  <div class="curio"><p>A f₃ do Vote extra é uma cifra de verdade, com uns 2.500 anos: o Atbash hebraico troca a primeira letra do alfabeto pela última, a segunda pela penúltima, e assim por diante. O nome junta as letras do par: Aleph–Tav, Bet–Shin. Aparece na Bíblia, no livro de Jeremias.</p><p class="cs-fonte">Simon Singh, O livro dos códigos (1999); Kahn, The Codebreakers.</p></div>
+</section>
+
+<!-- ================= Apêndice: outras cifras ================= -->
+<section class="cs" id="playfair" data-grupo="Além da aula: o resto da §2.2" data-termos="cr-playfair">
+  <h2>Playfair: pares de letras numa grade 5×5</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 160" id="mn-playfair"></svg>Grade da palavra-chave MONARCHY; I e J dividem casa.</aside>
+  <p class="cs-def">A <b>cifra de Playfair</b> cifra pares de letras numa grade 5×5 montada a partir de uma palavra-chave. Ela está no livro, na §2.2, entre a monoalfabética e Hill; os slides pulam essa cifra.</p>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Monte a grade: escreva a palavra-chave sem repetir letras (MONARCHY) e complete com o resto do alfabeto em ordem. I e J dividem uma casa (25 letras).</li>
+      <li>Quebre o texto em pares. Letra repetida no mesmo par ganha um X no meio: BALLOON vira BA LX LO ON.</li>
+      <li>Mesma linha: cada letra vira a da direita (dando a volta). Mesma coluna: a de baixo. Senão, as duas formam os cantos de um retângulo: cada uma vira o canto da sua linha na coluna da outra.</li>
+      <li>Exemplo (autoral, com a grade do desenho): SEGREDO → SE GR ED OX → LI KN KC AV. S e E estão em linhas e colunas diferentes: S vira L (linha do S, coluna do E) e E vira I.</li>
+      <li>Ganho: são 25·25 = 625 pares, então a frequência de letras isoladas some. Mas a frequência de pares continua lá, e alguns pares de texto claro bastam para reconstruir a grade.</li>
+    </ul>
+  </div>
+  <div class="curio"><p>Quem inventou foi o físico Charles Wheatstone, em 1854, mas quem fez propaganda foi o amigo dele, o barão Lyon Playfair, e o nome ficou com o divulgador. Os britânicos usaram a cifra como código de campo na Guerra dos Bôeres e na Primeira Guerra.</p><p class="cs-fonte">Kahn, The Codebreakers.</p></div>
+</section>
+
+<section class="cs" id="hill" data-grupo="Além da aula: o resto da §2.2" data-termos="cr-hill,cr-matriz,cr-determinante">
+  <h2>Hill: a chave é uma matriz</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 130">
+    <path class="s" d="M8 20 Q2 50 8 80"/><path class="s" d="M72 20 Q78 50 72 80"/>
+    <text x="26" y="35">3</text><text x="54" y="35">2</text><text x="26" y="65">5</text><text x="54" y="65">7</text>
+    <text x="90" y="50">·</text>
+    <path class="s" d="M104 20 Q98 50 104 80"/><path class="s" d="M132 20 Q138 50 132 80"/>
+    <text class="tb" x="118" y="35">2</text><text class="tb" x="118" y="65">0</text>
+    <text x="152" y="50">=</text>
+    <path class="s" d="M166 20 Q160 50 166 80"/><path class="s" d="M202 20 Q208 50 202 80"/>
+    <text class="tam" x="184" y="35">6</text><text class="tam" x="184" y="65">10</text>
+    <text class="tm" x="118" y="96">C A</text><text class="tm" x="184" y="96">G K</text>
+    <text class="tm" x="120" y="118">3·2 + 2·0 = 6 · 5·2 + 7·0 = 10</text>
+  </svg>Cada linha da matriz multiplica o par e soma.</aside>
+  <p class="cs-def">A <b>cifra de Hill</b> multiplica cada bloco de letras por uma <b>matriz</b> inversível, módulo 26. Como a mesma letra dá resultados diferentes conforme a vizinha, a frequência de letras isoladas some.</p>
+  <div class="cs-formula">
+    <div class="formula">C = K · P mod 26</div>
+    <p>P é o bloco de texto claro (um par, como coluna), K a matriz-chave e C o bloco cifrado.</p>
+  </div>
+  <div class="cs-uso">
+    <details class="base" open>
+      <summary><span class="base-tag">Base</span> Matriz 2×2 vezes um par, em um minuto</summary>
+      <ul class="b">
+        <li>A matriz de linhas (3, 2) e (5, 7) vezes o par (2, 0): a 1ª linha dá 3·2 + 2·0 = 6; a 2ª, 5·2 + 7·0 = 10. Resultado (6, 10). Repare no desenho.</li>
+        <li>O <b>determinante</b> da matriz de linhas (a, b) e (c, d) é ad − bc. Aqui: 3·7 − 2·5 = 11.</li>
+        <li>A matriz tem inversa módulo 26 quando mdc(det, 26) = 1. É o mesmo critério do <a href="#inverso">inverso</a>, agora para o determinante.</li>
+      </ul>
+    </details>
+    <ul class="b">
+      <li>Slide 58, K com linhas (3, 2) e (5, 7): CA = (2, 0) vira (6, 10) = GK. SA = (18, 0) vira (54, 90) mod 26 = (2, 12) = CM. O A sai K num par e M no outro.</li>
+      <li>Volta: det K = 11 e mdc(11, 26) = 1, então K⁻¹ existe. Com 11⁻¹ ≡ 19 (mod 26), K⁻¹ tem linhas (3, 14) e (9, 5); ela leva GK de volta a CA.</li>
+      <li>Fraqueza: Hill é linear. Com poucos pares conhecidos de texto claro e cifrado, o atacante monta um sistema de equações e resolve K.</li>
+    </ul>
+  </div>
+  <div class="curio"><p>Lester S. Hill, matemático americano, publicou a cifra em 1929 na American Mathematical Monthly, com o título "Cryptography in an Algebraic Alphabet". Foi a primeira cifra polialfabética construída com álgebra linear; ele chegou a patentear uma máquina de engrenagens para cifrar blocos de 6 letras.</p><p class="cs-fonte">Hill, American Mathematical Monthly 36 (1929); Stallings, §2.2.</p></div>
+</section>
+
+<section class="cs" id="vigenere" data-grupo="Além da aula: o resto da §2.2" data-termos="cr-polialfabetica,cr-vigenere">
+  <h2>Vigenère: a chave muda a cada letra</h2>
+  <p class="cs-def">Numa cifra <b>polialfabética</b>, a substituição muda ao longo do texto. Na <b>Vigenère</b>, cada letra usa uma César diferente, dada pela letra da chave repetida embaixo do texto.</p>
+  <div class="cs-formula">
+    <div class="formula">Cᵢ = (Mᵢ + Kᵢ) mod 26</div>
+    <p>Mᵢ é a i-ésima letra do texto claro e Kᵢ a letra da chave embaixo dela. Para decriptar, subtraia Kᵢ.</p>
+  </div>
+  <div class="cs-uso">
+    <div class="tbl prose"><table>
+      <tbody>
+        <tr><th>texto claro</th><td>P</td><td>O</td><td>L</td><td>V</td><td>I</td><td>L</td><td>H</td><td>O</td></tr>
+        <tr><th>chave</th><td>Q</td><td>U</td><td>E</td><td>I</td><td>J</td><td>O</td><td>Q</td><td>U</td></tr>
+        <tr><th>texto cifrado</th><td>F</td><td>I</td><td>P</td><td>D</td><td>R</td><td>Z</td><td>X</td><td>I</td></tr>
+      </tbody>
+    </table></div>
+    <ul class="b">
+      <li>P + Q = 15 + 16 = 31 = 1·26 + 5, que é F. Segue igual: O + U = 14 + 20 = 34 → 8 = I.</li>
+      <li>Os dois L saem P e Z: a mesma letra vira coisas diferentes, e a contagem simples de letras para de funcionar.</li>
+      <li>Ponto fraco: os dois O estão a 6 casas e a chave QUEIJO tem 6 letras. Eles caem sob o mesmo U e saem iguais (I). Repetições no texto cifrado a distâncias múltiplas do tamanho da chave denunciam esse tamanho; aí cada posição vira uma César, e a frequência volta a valer.</li>
+    </ul>
+  </div>
+  <div class="curio"><p>O nome é um erro histórico. Quem publicou a cifra, em 1553, foi o italiano Giovan Battista Bellaso; Blaise de Vigenère descreveu, em 1586, uma variante mais forte, e o século 19 juntou o nome dele à cifra mais fraca. Ela ganhou o apelido de "le chiffre indéchiffrable" e durou três séculos: Charles Babbage a quebrou por volta de 1854 sem publicar, e Friedrich Kasiski publicou o método em 1863.</p><p class="cs-fonte">Slide 59; Singh, O livro dos códigos, cap. 2.</p></div>
+</section>
+
+<section class="cs" id="otp" data-grupo="Além da aula: o resto da §2.2" data-termos="cr-otp">
+  <h2>One-time pad: a chave serve uma vez só</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150">
+    <rect class="bl" x="70" y="8" width="100" height="26" rx="6"/><text class="tb" x="120" y="21">AGMLOMJB</text>
+    <path class="s" d="M100 36 L40 82" marker-end="url(#mnarrow)"/><path class="s" d="M120 36 V82" marker-end="url(#mnarrow)"/><path class="s" d="M140 36 L200 82" marker-end="url(#mnarrow)"/>
+    <text class="tm" x="44" y="56">LSBQ…</text><text class="tm" x="136" y="62" style="text-anchor:start">OGZS…</text><text class="tm" x="206" y="56">JCWR…</text>
+    <rect class="k" x="2" y="86" width="76" height="24" rx="6"/><text x="40" y="98" style="font-size:11px">POLVILHO</text>
+    <rect class="k" x="82" y="86" width="76" height="24" rx="6"/><text x="120" y="98" style="font-size:11px">MANTEIGA</text>
+    <rect class="k" x="162" y="86" width="76" height="24" rx="6"/><text x="200" y="98" style="font-size:11px">REQUEIJO</text>
+    <text class="tm" x="120" y="132">com a chave certa, qualquer texto sai</text>
+  </svg>O mesmo texto cifrado, três chaves, três mensagens possíveis.</aside>
+  <p class="cs-def">O <b>one-time pad</b> é uma Vigenère com chave aleatória do tamanho da mensagem, usada uma única vez. É a única cifra com segurança incondicional: o texto cifrado não revela nada.</p>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Slide 60: a Eve vê AGMLOMJB. Com a chave LSBQGBCN ele vira POLVILHO; com OGZSKEDB, MANTEIGA; com JCWRKEAN, REQUEIJO. As três mensagens são possíveis, e sem a chave nada favorece uma delas.</li>
+      <li>Por que: para cada texto claro fixo, K ↦ C é bijetora. Com a chave sorteada uniformemente, todo texto cifrado é igualmente provável, seja qual for a mensagem.</li>
+      <li>O custo: a chave é tão longa quanto tudo o que você vai mandar, precisa ser realmente aleatória e precisa chegar ao Bob antes. Reusar a chave quebra tudo.</li>
+      <li>Contraste com as cifras práticas, que têm <a href="#cifra-simetrica">segurança computacional</a>: chave curta, quebra possível em teoria, cara demais na prática.</li>
+    </ul>
+  </div>
+  <div class="curio"><p>Gilbert Vernam, engenheiro da AT&amp;T, criou em 1917 a versão para teletipo (combinando cada bit com um bit da fita-chave), e Joseph Mauborgne, do exército americano, acrescentou a exigência de chave aleatória e de uso único. Claude Shannon provou a segurança incondicional em 1949. A linha direta Washington–Moscou, de 1963, usava fitas de one-time pad; e os soviéticos que reaproveitaram páginas de pads nos anos 1940 tiveram mensagens lidas pelos americanos no projeto Venona.</p><p class="cs-fonte">Slide 60; Kahn, The Codebreakers; NSA, Venona (documentos liberados em 1995).</p></div>
+</section>
+
+<section class="cs" id="enigma" data-grupo="Além da aula: o resto da §2.2" data-termos="cr-enigma">
+  <h2>A Enigma: uma polialfabética mecânica</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 140">
+    <rect class="k" x="4" y="40" width="34" height="50" rx="5"/><text class="tm" x="21" y="65">tecla</text>
+    <rect class="am" x="48" y="40" width="30" height="50" rx="5"/><text class="tm" x="63" y="100">plugs</text>
+    <rect class="bl" x="88" y="30" width="28" height="70" rx="5"/><rect class="bl" x="122" y="30" width="28" height="70" rx="5"/><rect class="bl" x="156" y="30" width="28" height="70" rx="5"/>
+    <text class="tm" x="136" y="20">3 rotores · 26 posições cada</text>
+    <rect class="gr" x="194" y="30" width="22" height="70" rx="5"/><text class="tm" x="205" y="110">refletor</text>
+    <path class="ac" d="M38 56 H208 M208 74 H38"/>
+    <text class="tm" x="120" y="128">ida e volta: a letra nunca vira ela mesma</text>
+  </svg>O sinal atravessa os rotores, bate no refletor e volta por outro caminho.</aside>
+  <p class="cs-def">A <b>Enigma</b> foi a máquina de cifrar do exército alemão na Segunda Guerra. Cada tecla apertada gira os rotores, então a substituição muda a cada letra: é uma cifra polialfabética feita de fios e engrenagens.</p>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Vídeo do autoestudo: pesava pouco mais de 6 kg, era portátil e fácil de usar. Havia 5 rotores numerados e 3 ficavam na máquina; cada rotor tinha 26 posições, então 26³ = 17.576 posições iniciais.</li>
+      <li>O painel de plugs trocava pares de letras antes e depois dos rotores, uma camada extra de substituição. Com 3 de 5 rotores em ordem (60 jeitos), as 17.576 posições e 10 cabos de plug, o total passa de 1,5·10²⁰ configurações.</li>
+      <li>Um livro de chaves dizia, para cada dia do mês, quais rotores usar, em que posição e como ligar os plugs; o livro mudava todo mês. Um oficial ditava, o operador digitava, outra pessoa anotava as letras que acendiam no painel, e o rádio transmitia o texto cifrado em código Morse. Do outro lado, a mesma configuração digitada devolvia a mensagem.</li>
+      <li>A chave do dia é segredo; a máquina, os alemães sabiam que podia ser capturada. É Kerckhoffs na prática.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>O vídeo diz que cada rotor "girava independentemente". Na máquina, eles andavam como um hodômetro: o da direita a cada tecla, o do meio uma vez por volta completa do primeiro, e assim por diante.</li>
+    <li>O vídeo fecha dizendo que decriptar a Enigma é difícil mesmo hoje. Não é: ela foi quebrada durante a própria guerra, e hoje um computador comum testa as configurações rapidamente. O que a derrubou foram falhas de projeto e de uso (a letra nunca vira ela mesma; mensagens com começo previsível), não a força bruta pura.</li>
+  </ul></div>
+  <div class="curio"><p>O matemático polonês Marian Rejewski reconstruiu a fiação da Enigma em 1932, usando permutações (as mesmas bijeções desta aula). Em 1939, a Polônia passou o trabalho aos ingleses, e em Bletchley Park Alan Turing e Gordon Welchman projetaram a Bombe, máquina eletromecânica que testava configurações explorando palavras que se sabia estarem na mensagem, como o boletim do tempo.</p><p class="cs-fonte">Singh, O livro dos códigos, cap. 4.</p></div>
+</section>
+
+<!-- ================= Prévia: chave pública ================= -->
+<section class="cs" id="primos" data-grupo="Prévia da semana 10: chave pública" data-termos="cr-primo,cr-fatoracao">
+  <h2>Números primos e o mistério da distribuição</h2>
+  <p class="cs-def">Um <b>número primo</b> só é divisível por 1 e por ele mesmo (3 é; 4 não, porque 2 divide 4). Todo inteiro maior que 1 é um produto de primos, de um jeito só: essa é a <b>fatoração</b> em primos.</p>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>15 = 3·5 e 50 = 2·5·5. Multiplicar primos é fácil; voltar do produto para os primos fica cada vez mais difícil conforme o número cresce.</li>
+      <li>Euclides provou, há mais de 2.300 anos, que existem infinitos primos (Elementos, Livro IX). Mas não se sabe prever onde aparece o próximo: não existe fórmula que gere todos os primos sem falha.</li>
+      <li>A fórmula famosa n² + n + 41 dá primos de n = 0 a 39 (n = 1 dá 43; n = 22 dá 547). Em n = 40 ela dá 1681 = 41·41, que não é primo.</li>
+      <li>A hipótese de Riemann (1859), sobre a função zeta, descreveria a distribuição dos primos. Ela é um dos Problemas do Milênio do Instituto Clay, que desde 2000 paga US$ 1 milhão pela solução.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>O vídeo da BBC diz que resolver Riemann deixaria o sistema financeiro vulnerável. É exagero: a hipótese fala de como os primos se espalham, não dá um jeito rápido de fatorar um n dado. A ameaça real ao RSA é o computador quântico (próxima seção).</li>
+  </ul></div>
+  <div class="curio"><p>A fórmula n² + n + 41 é de Euler, de 1772. O 41 não é acaso: n² + n + p dá primo para todo n de 0 a p − 2 só quando p é 2, 3, 5, 11, 17 ou 41, os "números da sorte de Euler", e o 41 é o maior deles.</p><p class="cs-fonte">Vídeo da BBC News Brasil (autoestudo); Euler, 1772.</p></div>
+</section>
+
+<section class="cs" id="rsa" data-grupo="Prévia da semana 10: chave pública" data-termos="cr-mao-unica,cr-chave-publica,cr-rsa">
+  <h2>RSA em números pequenos</h2>
+  <p class="cs-def">No <b>RSA</b>, cada pessoa publica uma <b>chave pública</b> (n, e) que qualquer um usa para encriptar, e guarda uma chave privada d, a única que decripta. A segurança vem de uma <b>função de mão única</b>: multiplicar dois primos grandes é fácil, achar os primos a partir do produto não é.</p>
+  <div class="cs-formula">
+    <div class="formula">C = Mᵉ mod n &nbsp; &nbsp; M = Cᵈ mod n</div>
+    <p>n = p·q, com p e q primos secretos; e é coprimo de (p − 1)(q − 1); d é o inverso de e módulo (p − 1)(q − 1).</p>
+  </div>
+  <div class="cs-uso">
+    <p>O exemplo do vídeo, passo a passo (cada passo usa uma ferramenta desta aula):</p>
+    <ol>
+      <li>Primos p = 11 e q = 17. n = 11·17 = 187.</li>
+      <li>(p − 1)(q − 1) = 10·16 = 160. Escolha e = 7: mdc(7, 160) = 1, então 7 tem inverso módulo 160 (<a href="#inverso">inverso</a>).</li>
+      <li>Chave pública: (n, e) = (187, 7). Qualquer um pode ver, como numa lista telefônica.</li>
+      <li>Mensagem: a letra P, que em ASCII é o número 80. C = 80⁷ mod 187 = 75. Só o 75 trafega.</li>
+      <li>Chave privada: d com 7·d ≡ 1 (mod 160). Por Euclides estendido, d = 23 (7·23 = 161 = 160 + 1).</li>
+      <li>Bob decripta: 75²³ mod 187 = 80, o P.</li>
+    </ol>
+    <ul class="b">
+      <li>Quem só vê (187, 7) e o 75 precisa de d; para achar d precisa de 160; para achar 160 precisa de p e q, ou seja, fatorar 187. Com 187 é fácil. Com n de 600 dígitos (RSA-2048), ninguém sabe fazer em tempo útil.</li>
+      <li>O vídeo chama essa função de "Humpty Dumpty", a do ovo quebrado: fácil de quebrar, impossível de remontar.</li>
+      <li>O algoritmo de Shor (Peter Shor, 1994) fatora rápido, mas exige um computador quântico grande, que ainda não existe. Para quando existir, já há algoritmos pós-quânticos padronizados pelo NIST em 2024.</li>
+      <li>Isto é a semana 10. Aqui serve para ver que mdc e inverso modular, que hoje parecem só "a matemática da afim", são as peças do RSA.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>O vídeo diz que p e q "são as chaves privadas". A chave privada que decripta é d; p e q são o segredo de onde d sai, e também precisam ficar escondidos.</li>
+  </ul></div>
+  <div class="curio"><p>Ron Rivest, Adi Shamir e Leonard Adleman criaram o RSA no MIT em 1977, e o nome são as iniciais deles. Só em 1997 o governo britânico revelou que Clifford Cocks, matemático do GCHQ, tinha chegado à mesma ideia em 1973, em segredo.</p><p class="cs-fonte">Singh, O livro dos códigos, cap. 6.</p></div>
+</section>

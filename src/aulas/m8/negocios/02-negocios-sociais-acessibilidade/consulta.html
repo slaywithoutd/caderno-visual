@@ -1,0 +1,460 @@
+<!-- Aula 02 de Negócios (17/11/2026), só modo Consulta. Um conceito por seção, em ordem de dependência.
+     Estrutura de cada seção: h2 → p.cs-def → .cs-uso → .cs-pegadinhas → .cs-ponderada → visuais.
+     Os visuais (desenhos de margem, tabelas, figuras e loops) estão escritos aqui mesmo; não há conteudo.html. -->
+
+<!-- ================= Resumo ================= -->
+<section class="cs" id="encontro" data-grupo="Resumo" data-termos="">
+  <h2>Resumo</h2>
+  <p class="cs-def">Deficiência acontece quando um corpo encontra uma barreira. Tecnologia assistiva remove barreiras, o Estado brasileiro tem um plano para financiá-la e o negócio social é um jeito de levá-la adiante vendendo, sem distribuir lucro.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="bl" x="4" y="10" width="60" height="30" rx="6"/><text x="34" y="25">pessoa</text><rect class="rd" x="84" y="4" width="14" height="42" rx="3"/><text class="tm" x="91" y="56">barreira</text><path class="s" d="M64 25 H80" marker-end="url(#mnarrow)"/><rect class="gr" x="140" y="10" width="96" height="30" rx="6"/><text class="tm" x="188" y="25">participação</text><path class="s" d="M100 25 H136" marker-end="url(#mnarrow)" style="stroke-dasharray:4 3"/><rect class="acf" x="4" y="78" width="112" height="30" rx="6"/><text class="tm" x="60" y="87">tecnologia</text><text class="tm" x="60" y="99">assistiva</text><rect class="am" x="124" y="78" width="112" height="30" rx="6"/><text class="tm" x="180" y="87">quem paga</text><text class="tm" x="180" y="99">e mantém</text><path class="s" d="M60 76 L88 50" marker-end="url(#mnarrow)"/><text class="tm" x="120" y="124">PNTA · negócio social · OSC</text><text class="tm" x="120" y="138">Estado · mercado · terceiro setor</text></svg>Tirar a barreira pede tecnologia e alguém que pague por ela.</aside>
+  <ul class="b">
+    <li>Pelo modelo social, a deficiência nasce da interação entre um impedimento de longo prazo e as barreiras do ambiente. Tirar a barreira muda o resultado.</li>
+    <li>Quantas pessoas precisam de apoio depende da régua: o Censo 2010 contou 45,6 milhões (23,9%) com "alguma dificuldade" e 12,7 milhões (6,7%) com "muita dificuldade ou não consegue".</li>
+    <li>Para a lei (LBI, 2015), tecnologia assistiva inclui produtos, serviços, métodos e práticas que dão autonomia. Apoio de cuidado também conta.</li>
+    <li>O Plano Nacional de Tecnologia Assistiva (2021) tem cinco eixos: pesquisa e empreendedorismo, capacitação, cadeia produtiva, regulação e acesso, com 24 iniciativas. No edital de 2020, a Finep recebeu quase quatro vezes mais pedidos do que tinha para dar.</li>
+    <li>No negócio social de Yunus, a empresa resolve um problema social vendendo, cobre os custos e reinveste todo o lucro. O investidor recupera o capital, sem dividendos.</li>
+    <li>A Yunus Social Business acelera e empresta (não doa) para negócios sociais em oito regiões. A crítica: o modelo alivia o problema no lugar, mas não mexe nas causas.</li>
+  </ul>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>45,6 milhões e 12,7 milhões vêm do mesmo censo. A diferença é o critério, não um erro.</li>
+    <li>Negócio social de Yunus e negócio de impacto não são sinônimos exatos: no de Yunus não há dividendo.</li>
+    <li>A YSB recebe doações, mas só empresta. Quem reembolsa um credor filantrópico devolve no máximo o valor nominal.</li>
+    <li>Indicador do PNTA como "documento elaborado" mede entrega, não mudança na vida da pessoa.</li>
+  </ul></div>
+</section>
+
+<!-- ================= Deficiência e tecnologia assistiva ================= -->
+<section class="cs" id="deficiencia" data-grupo="Deficiência e tecnologia assistiva" data-termos="pessoa-com-deficiencia,modelo-social-deficiencia,cdpd,mobilidade-reduzida">
+  <h2>Deficiência como interação com barreiras</h2>
+  <p class="cs-def">Para a <b>Convenção sobre os Direitos das Pessoas com Deficiência</b> da ONU, a deficiência resulta da interação entre impedimentos de longo prazo (físicos, mentais, intelectuais ou sensoriais) e barreiras de atitude e de ambiente. É o <b>modelo social da deficiência</b>.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="k" x="2" y="8" width="72" height="30" rx="5"/><text class="tm" x="38" y="23">impedimento</text><text x="81" y="23">+</text><rect class="rd" x="88" y="8" width="56" height="30" rx="5"/><text class="tm" x="116" y="23">barreira</text><text x="151" y="23">=</text><rect class="am" x="158" y="8" width="80" height="30" rx="5"/><text class="tm" x="198" y="17">participação</text><text class="tm" x="198" y="29">limitada</text><text class="tm" x="116" y="56">rampa, legenda, leitor de tela,</text><text class="tm" x="116" y="68">apoio de cuidado</text><path class="s" d="M116 76 V90" marker-end="url(#mnarrow)"/><rect class="k" x="2" y="96" width="72" height="30" rx="5"/><text class="tm" x="38" y="111">impedimento</text><text x="81" y="111">+</text><rect class="k" x="88" y="96" width="56" height="30" rx="5" style="stroke-dasharray:4 3"/><text class="tm" x="116" y="111">sem ela</text><text x="151" y="111">=</text><rect class="gr" x="158" y="96" width="80" height="30" rx="5"/><text class="tm" x="198" y="105">participação</text><text class="tm" x="198" y="117">plena</text></svg>O impedimento fica; a barreira é o que dá para mudar.</aside>
+  <div class="cs-uso"><ul class="b">
+    <li>Exemplo: uma pessoa cega e um site sem texto alternativo. Com o texto alternativo, ela compra sozinha; sem ele, depende de alguém. O olho é o mesmo nos dois casos. Os detalhes de barreira e participação estão na <a href="/m8/ux/01-acessibilidade-desenho-universal/consulta#barreiras">aula 01 de UX</a>.</li>
+    <li>Daí vem o termo <b>pessoa com deficiência</b>, o mais apropriado hoje segundo o PNTA. Ele põe a pessoa antes da condição e carrega a ideia de empoderamento: usar o poder pessoal para escolher e decidir.</li>
+    <li>O Brasil promulgou a Convenção pelo Decreto 6.949/2009 com status de emenda constitucional. Na prática, ela fica acima das leis comuns e revoga o que a contrarie.</li>
+    <li>Os oito princípios da Convenção: (a) dignidade, autonomia e liberdade de escolha; (b) não discriminação; (c) participação e inclusão plenas; (d) respeito pela diferença, a deficiência como parte da diversidade humana; (e) igualdade de oportunidades; (f) acessibilidade; (g) igualdade entre homem e mulher; (h) respeito ao desenvolvimento e à identidade das crianças com deficiência.</li>
+    <li>Por que surgiu: a Declaração Universal dos Direitos Humanos (1948) abriu a primeira fase da proteção, geral e abstrata, com igualdade formal e proibição de discriminar. Com o tempo, tratar todos de forma abstrata ficou insuficiente. Na segunda fase, entra o direito à diferença: mulheres, crianças, minorias, migrantes e pessoas com deficiência passam a ser vistos nas suas especificidades.</li>
+    <li>O PNTA adota a dimensão biopsicossocial, a mesma da CIF da OMS, que você viu na <a href="/m8/ux/02-fundamentos-ergonomia/consulta#design-habilidades">aula 02 de UX</a>. Ela olha corpo, atividade e ambiente juntos.</li>
+    <li>A lei de tecnologia assistiva cobre também quem tem <b>mobilidade reduzida</b>, com ou sem deficiência.</li>
+  </ul></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>"Portador de deficiência" aparece em leis antigas (1999, 2000) e saiu de uso. Ninguém porta a deficiência como porta um documento.</li>
+    <li>Modelo social não nega o impedimento. Ele só diz que a participação depende também do ambiente.</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="quantas" data-grupo="Deficiência e tecnologia assistiva" data-termos="linha-corte,prevalencia">
+  <h2>Quantas pessoas: o censo e a linha de corte</h2>
+  <p class="cs-def">O Censo 2010 contou 45,6 milhões de brasileiros com pelo menos uma deficiência (23,9%) pelo critério amplo. Com a <b>linha de corte</b> internacional, que só conta "muita dificuldade" ou "não consegue", o número cai para 12,7 milhões (6,7%).</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 132"><text class="tm" x="4" y="10" style="text-anchor:start">Censo 2010, ao menos uma deficiência</text><rect class="acf" x="4" y="20" width="200" height="22" rx="3"/><text x="104" y="35">45,6 mi · 23,9%</text><text class="tm" x="4" y="58" style="text-anchor:start">alguma dificuldade conta</text><rect class="am" x="4" y="72" width="56" height="22" rx="3"/><text x="66" y="87" style="text-anchor:start">12,7 mi · 6,7%</text><text class="tm" x="4" y="108" style="text-anchor:start">só muita dificuldade ou não consegue</text><text class="tm" x="4" y="124" style="text-anchor:start">OMS: mais de 1 bi no mundo (15%)</text></svg>A régua muda o tamanho do público em quase quatro vezes.</aside>
+  <div class="cs-uso"><ul class="b">
+    <li>No mundo, a OMS estima mais de um bilhão de pessoas com algum tipo de deficiência, cerca de 15% da população. Pelo menos 10% das crianças nascem com uma deficiência ou a adquirem. A reportagem do Olhar Digital lembra que esse número só cresce com o envelhecimento.</li>
+    <li>Como o censo pergunta: para enxergar, ouvir e andar, a pessoa escolhe entre nenhuma, alguma, grande dificuldade ou não consegue de modo algum. A figura abaixo mostra o efeito do corte com os números da visão.</li>
+    <li>Brasil, 2000 e 2010: 24,5 milhões (14,5%) e depois 45,6 milhões (23,9%). Em 2010, 38,5 milhões viviam em área urbana e 7,1 milhões em área rural.</li>
+    <li>Por tipo, em 2010: visual 18,6% (35 milhões), motora 7% (13,3 milhões), auditiva 5,1% (9,7 milhões), mental ou intelectual 1,4% (2,6 milhões). Uma pessoa pode ter mais de uma, por isso a soma passa de 23,9%.</li>
+    <li>Por sexo: 26,5% das mulheres e 21,2% dos homens (25,8 milhões e 19,8 milhões). Por idade, a deficiência aparece em qualquer fase, mas cresce com ela: 2,79% de 0 a 4 anos, 29,19% de 40 a 44 e 80,61% com 80 anos ou mais. O maior grupo absoluto tem 40 a 59 anos: 17,4 milhões.</li>
+    <li>Por estado, a prevalência vai de 21,26% em Roraima a 27,86% no Rio Grande do Norte. O Nordeste tem a maior proporção entre seus moradores (26,63%).</li>
+    <li>O índice de envelhecimento subiu de 19,8 em 2000 para 30,7 em 2010. Pelo IBGE, ele conta quantas pessoas de 65 anos ou mais existem para cada 100 de até 14 anos (definição de fora do PNTA).</li>
+    <li>História do censo: desde 1872 há perguntas sobre deficiência, mas até 1920 só sobre o corpo. De 1920 a 1991, eram dois grupos (física e mental). Em 2000, o censo passou a usar uma escala de dificuldade, seguindo a CIF.</li>
+    <li>Próximo censo, segundo o plano: manter o corte, perguntar renda e escola e detalhar o uso de órteses, próteses e meios de locomoção. A pandemia de covid-19 aumentou a procura por reabilitação.</li>
+  </ul></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>O PNTA diz que o Sudeste concentra 9,7% e o Nordeste 7,4%. Esses números são fatias da população do país inteiro (a soma das regiões dá 23,9%), não a prevalência dentro de cada região. Dentro do Sudeste, a prevalência é 23,03%.</li>
+    <li>O censo é autodeclarado e, no critério amplo, muito aberto. Por isso o próprio plano pede cuidado ao usar o 23,9%.</li>
+    <li>Com o corte, a parcela de idosos com deficiência cai de 63,4% para 23,5%: o critério amplo contava muita gente com dificuldade leve, comum na velhice.</li>
+  </ul></div>
+  <figure class="fig" id="fig-corte">
+    <div class="fig-head"><span class="fig-title">Figura 1 · A mesma pergunta, dois tamanhos de público</span><div class="fig-tabs"></div></div>
+    <div class="fig-body">
+      <div class="fig-stage"><svg id="corte-svg" viewBox="0 0 640 300"></svg></div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+</section>
+
+<section class="cs" id="ta-lei" data-grupo="Deficiência e tecnologia assistiva" data-termos="ajuda-tecnica,lbi,opm,acessibilidade-comunicacional">
+  <h2>Tecnologia assistiva na lei e no dia a dia</h2>
+  <p class="cs-def">A <b>Lei Brasileira de Inclusão</b> (Lei 13.146/2015, art. 3º, III) define tecnologia assistiva ou <b>ajuda técnica</b> como produtos, equipamentos, dispositivos, recursos, metodologias, estratégias, práticas e serviços que promovem a funcionalidade da pessoa com deficiência ou mobilidade reduzida, para dar autonomia, independência, qualidade de vida e inclusão social.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><line class="s" x1="16" y1="20" x2="16" y2="140"/><circle class="acf" cx="16" cy="22" r="5"/><text class="st" x="28" y="22" style="font-size:10.5px">1999 · Dec. 3.298: ajuda técnica</text><circle class="acf" cx="16" cy="46" r="5"/><text class="st" x="28" y="46" style="font-size:10.5px">2000 · Lei 10.098</text><circle class="acf" cx="16" cy="70" r="5"/><text class="st" x="28" y="70" style="font-size:10.5px">2004 · Decreto 5.296</text><circle class="am" cx="16" cy="96" r="6"/><text class="st" x="28" y="96" style="font-size:10.5px;font-weight:600">2015 · LBI: tecnologia assistiva</text><circle class="acf" cx="16" cy="122" r="5"/><text class="st" x="28" y="122" style="font-size:10.5px">2021 · Dec. 10.645: o plano</text></svg>O termo "tecnologia assistiva" só entra na lei brasileira em 2015.</aside>
+  <div class="cs-uso"><ul class="b">
+    <li>O conceito de tecnologia assistiva como área de recursos e serviços está na <a href="/m8/ux/01-acessibilidade-desenho-universal/consulta#tecnologia-assistiva">aula 01 de UX</a>. Aqui fica o que a lei e o plano acrescentam.</li>
+    <li>Antes da LBI, a lei falava em ajuda técnica. O Decreto 3.298/1999 (art. 19) a definia como elementos que compensam limitações motoras, sensoriais ou mentais para superar barreiras de comunicação e mobilidade. A Lei 10.098/2000 e o Decreto 5.296/2004 ampliaram a ideia, e a LBI chegou à definição atual.</li>
+    <li>A definição da LBI vai além do objeto. Uma metodologia de ensino, um serviço de adaptação e uma estratégia de rotina também contam.</li>
+    <li>O PNTA vai um passo além: trata o cuidado como tecnologia assistiva. Apoio de pessoas, serviços e produtos que ampliam a capacidade de cuidar das famílias contam, e isso faz do cuidado um direito que o Estado deve oferecer.</li>
+    <li>O SUS concede um grupo específico, as <b>OPM</b>: órteses, próteses e meios auxiliares de locomoção. A meta do Ministério da Saúde para 2020 a 2023 era chegar a 10 milhões de concessões não cirúrgicas.</li>
+    <li><b>Acessibilidade comunicacional</b> é a tecnologia assistiva da informação: audiodescrição, legendas, janela de Libras, impressão em braille e dublagem.</li>
+    <li>Da reportagem do Olhar Digital: o primeiro aparelho do tipo seria o Vocoder, de 1928, criado por Homer Dudley no Bell Labs, que reproduzia sinais elétricos como voz robótica (segundo a Fast Company Brasil). Quase um século depois, a voz sintética é quase humana e a visão computacional entende o ambiente.</li>
+    <li>O exemplo da reportagem: numa campanha da Apple, um músico com deficiência visual ergue o celular no camarim e a Siri diz o que há ali. A caminho do palco, de bengala numa mão e celular na outra, ele ouve "duas portas detectadas", lê a placa "Para o palco" e sabe que a porta está a 1,2 metro.</li>
+  </ul></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Para a lei, ajuda técnica e tecnologia assistiva são sinônimos. A diferença é só de época.</li>
+    <li>Tecnologia assistiva não precisa ser eletrônica nem cara. Uma bengala, uma rotina ensinada e um apoio de cuidado contam.</li>
+    <li>O plano escreve o número da LBI errado duas vezes: "Lei nº 13.145" (p. 3) e "Lei nº 12.146/2015" (p. 59). O certo é 13.146/2015.</li>
+  </ul></div>
+</section>
+
+<!-- ================= A política pública ================= -->
+<section class="cs" id="historia-politica" data-grupo="A política pública" data-termos="cita">
+  <h2>Da ONU ao plano: a política em linha do tempo</h2>
+  <p class="cs-def">A política brasileira para pessoas com deficiência foi montada por documentos internacionais e por órgãos federais que subiram de status, até a LBI mandar fazer um plano de tecnologia assistiva e o <b>Comitê Interministerial de Tecnologia Assistiva</b> (CITA) propô-lo em 2021.</p>
+  <details class="base" open>
+   <summary><span class="base-tag">Base</span> Lei, decreto e portaria em 1 minuto</summary>
+   <ul class="b">
+    <li>Lei: aprovada pelo Congresso. Cria direitos e obrigações (a LBI).</li>
+    <li>Decreto: assinado pelo presidente para regulamentar uma lei, dizendo como ela será cumprida (o Decreto 10.645/2021 regulamenta o art. 75 da LBI).</li>
+    <li>Portaria: ato de um ministério ou órgão para organizar a própria atuação (uma portaria cria um centro de pesquisa).</li>
+    <li>Emenda constitucional muda a Constituição e fica acima de todas. A Convenção da ONU entrou no Brasil com esse status.</li>
+   </ul>
+  </details>
+  <div class="cs-uso"><ul class="b">
+    <li>Documentos internacionais que influenciaram o Brasil: Declaração dos Direitos das Pessoas Deficientes (ONU, 1975), Declaração Mundial sobre Educação para Todos (1990), Declaração de Salamanca (1994), Convenção Interamericana contra a discriminação (2001), Declaração de Montreal sobre Inclusão (2001) e a Convenção da ONU (2007).</li>
+    <li>Em 1981, Ano Internacional da Pessoa Deficiente da ONU, os movimentos sociais se articularam e ganharam o primeiro espaço federal: o Comitê Nacional para Educação Especial (1985).</li>
+    <li>O trabalho do comitê virou o Plano Nacional de Ação Conjunta (1986), que levou à criação da CORDE no mesmo ano. A CORDE articulava as políticas entre ministérios, com câmaras técnicas que ouviam pessoas com deficiência e especialistas.</li>
+    <li>A CORDE virou Subsecretaria em 2009 e Secretaria Nacional em 2010, abaixo só dos ministros e do presidente. Hoje é a Secretaria Nacional dos Direitos da Pessoa com Deficiência, no ministério de Direitos Humanos.</li>
+    <li>2011: o Plano Viver sem Limite junta educação, inclusão social, saúde e acessibilidade. No mesmo ano nasce o CITA.</li>
+    <li>2015: a LBI, cujo art. 75 manda o poder público fazer um plano de tecnologia assistiva. 2021: o Decreto 10.645 define diretrizes, objetivos e eixos, e o CITA publica o PNTA.</li>
+    <li>Dois colegiados acompanham o tema. O CONADE (1999, hoje Decreto 10.177/2019) é paritário (metade governo, metade sociedade civil), consultivo e deliberativo. O CITA (2011, hoje Decreto 10.094/2019) é coordenado pelo MCTI e junta Educação, Cidadania, Saúde e Direitos Humanos.</li>
+  </ul></div>
+  <div class="cs-pegadinhas">O PNTA não é lei nova. Ele é o plano que uma lei (a LBI) mandou fazer e que um decreto organizou.</div>
+  <div class="tbl prose"><table>
+    <thead><tr><th>Ano</th><th>Marco</th><th>O que mudou</th></tr></thead>
+    <tbody>
+      <tr><td>1948</td><td>Declaração Universal dos Direitos Humanos</td><td>Igualdade formal, proteção geral</td></tr>
+      <tr><td>1985–1986</td><td>Comitê Nacional, Plano de Ação Conjunta, CORDE</td><td>Primeiro espaço federal de decisão</td></tr>
+      <tr><td>2007–2009</td><td>Convenção da ONU, Decreto 6.949</td><td>Modelo social com status constitucional</td></tr>
+      <tr><td>2010</td><td>Secretaria Nacional</td><td>Órgão de coordenação com status alto</td></tr>
+      <tr><td>2011</td><td>Viver sem Limite, CITA</td><td>Políticas integradas, comitê de TA</td></tr>
+      <tr><td>2015</td><td>LBI (Lei 13.146)</td><td>Define tecnologia assistiva, exige o plano</td></tr>
+      <tr><td>2021</td><td>Decreto 10.645, PNTA</td><td>Diretrizes, eixos, metas e indicadores</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="cs" id="governo" data-grupo="A política pública" data-termos="sus,suas,bpc,conitec,custo-efetividade">
+  <h2>Quem faz o quê no governo federal</h2>
+  <p class="cs-def">Cinco ministérios dividem a tecnologia assistiva: Ciência e Tecnologia fomenta a criação, Saúde concede pelo <b>SUS</b>, Educação leva à escola, Cidadania leva à casa pelo <b>Sistema Único de Assistência Social</b> (SUAS) e Direitos Humanos coordena os direitos.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="acf" x="88" y="62" width="64" height="26" rx="6"/><text x="120" y="79">CITA</text><rect class="bl" x="4" y="6" width="70" height="26" rx="5"/><text x="39" y="23">MCTI</text><rect class="gr" x="85" y="6" width="70" height="26" rx="5"/><text x="120" y="23">Saúde</text><rect class="am" x="166" y="6" width="70" height="26" rx="5"/><text x="201" y="23">Educação</text><rect class="k" x="20" y="118" width="86" height="26" rx="5"/><text x="63" y="135">Cidadania</text><rect class="k" x="134" y="118" width="86" height="26" rx="5"/><text x="177" y="135">Direitos Hum.</text><path class="s" d="M39 32 L100 62 M120 32 V62 M201 32 L140 62 M63 118 L104 88 M177 118 L136 88"/><text class="tm" x="40" y="44">fomenta</text><text class="tm" x="206" y="44">escola</text><text class="tm" x="38" y="104">casa · BPC</text><text class="tm" x="210" y="104">direitos</text></svg>O CITA, coordenado pelo MCTI, junta os cinco.</aside>
+  <div class="cs-uso"><ul class="b">
+    <li>MCTI: tecnologia assistiva é tema prioritário de pesquisa e inovação de 2020 a 2023. A Secretaria de Empreendedorismo e Inovação coordena o CITA. Lançou em 2020 a seleção pública de tecnologia assistiva com a Finep e o Ministério da Saúde.</li>
+    <li>Saúde: a Rede de Cuidados à Pessoa com Deficiência (2012) amplia o acesso no SUS, inclusive a OPM. A <b>Conitec</b> (Lei 12.401/2011) decide o que o SUS incorpora, com critérios de eficácia, segurança, <b>custo-efetividade</b> e impacto orçamentário. Também monitora tecnologias novas, avalia as incorporadas e propõe fomento à inovação.</li>
+    <li>Educação: a Diretoria de Educação Especial mantém o Portal de Ajudas Técnicas, equipa salas de recursos multifuncionais (para o atendimento educacional especializado, com dinheiro do FNDE) e distribui livros acessíveis pelo PNLD Acessível a estudantes cegos, com baixa visão e surdos.</li>
+    <li>Cidadania: coordena o SUAS, organizado desde 2005 em proteção social básica e especial, financiado por União, estados e municípios. Paga o <b>BPC</b>: um salário mínimo para idoso de 65 anos ou mais ou pessoa com deficiência, se a renda por pessoa da família é menor que 1/4 do salário mínimo. Em março de 2021, eram 4,6 milhões de beneficiários (2,5 milhões com deficiência e 2,1 milhões idosos).</li>
+    <li>Serviços do SUAS: CRAS (visitas domiciliares, Programa Criança Feliz para a primeira infância), CREAS (risco pessoal e social), Centro Dia (divide o cuidado com a família para o cuidador poder trabalhar e estudar) e Residências Inclusivas (acolhimento em pequenos grupos).</li>
+    <li>Direitos Humanos: a Secretaria Nacional dos Direitos da Pessoa com Deficiência articula as políticas e combate a discriminação.</li>
+  </ul></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Funcionar não basta para entrar no SUS. A Conitec compara custo e resultado com o que já existe e olha o impacto no orçamento.</li>
+    <li>BPC não é aposentadoria: não exige contribuição, exige renda baixa.</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="pnta" data-grupo="A política pública" data-termos="pnta">
+  <h2>O Plano Nacional de Tecnologia Assistiva por dentro</h2>
+  <p class="cs-def">O <b>PNTA</b> organiza as ações do Estado para apoiar pesquisa, inovação e oferta de tecnologia assistiva. Ele desce em camadas: cinco diretrizes, cinco objetivos específicos, cinco eixos e 24 iniciativas, cada uma com metas e indicadores.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="acf" x="70" y="4" width="100" height="20" rx="4"/><text x="120" y="18">objetivo geral</text><rect class="bl" x="54" y="28" width="132" height="20" rx="4"/><text x="120" y="42">5 diretrizes</text><rect class="bl" x="40" y="52" width="160" height="20" rx="4"/><text x="120" y="66">5 objetivos específicos</text><rect class="bl" x="26" y="76" width="188" height="20" rx="4"/><text x="120" y="90">5 eixos</text><rect class="am" x="12" y="100" width="216" height="20" rx="4"/><text x="120" y="114">24 iniciativas</text><rect class="gr" x="2" y="124" width="236" height="20" rx="4"/><text x="120" y="138">metas e indicadores</text></svg>Do mais geral (por quê) ao mais concreto (como medir).</aside>
+  <div class="cs-uso"><ul class="b">
+    <li>Objetivo geral: estruturar a ação do Estado para pesquisa, desenvolvimento, inovação e oferta de tecnologia assistiva, para dar autonomia e vencer barreiras de acesso a educação, saúde, trabalho, lazer, transporte e moradia.</li>
+    <li>Cinco diretrizes: (I) eliminar barreiras pelo acesso à tecnologia assistiva; (II) fomentar pesquisa e inovação; (III) fomentar empreendedorismo, indústria nacional e cadeias produtivas; (IV) levar a tecnologia assistiva ao trabalho, à educação, ao cuidado e à proteção social; (V) priorizar autonomia e independência.</li>
+    <li>Cinco objetivos específicos (art. 4º do Decreto 10.645): (I) crédito subsidiado para o usuário comprar; (II) importação mais rápida e simples; (III) fomento à pesquisa e à produção nacional; (IV) menos imposto na cadeia e na importação; (V) inclusão mais rápida de recursos novos no SUS e em outros órgãos.</li>
+    <li>Cinco eixos: (I) pesquisa, desenvolvimento, inovação e empreendedorismo; (II) capacitação; (III) cadeia produtiva; (IV) regulamentação, certificação e registro; (V) acesso. As duas próximas seções passam por eles.</li>
+    <li>Como ler uma iniciativa, com a 1 do plano: a iniciativa é a estratégia de comunicação; a meta é fazer 2 campanhas, 2 seminários e 2 materiais por ano; o indicador é o número de campanhas e materiais feitos.</li>
+    <li>Monitoramento: os membros do CITA acompanham as metas e publicam um relatório periódico nas páginas dos ministérios. O plano vale por quatro anos e deve ser reavaliado a cada dois, como manda a LBI.</li>
+    <li>O ministério responsável por uma iniciativa acompanha a meta, mas não a executa sozinho: o plano depende de parceiros.</li>
+  </ul></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Diretriz diz a direção; objetivo específico diz o que mudar (crédito, imposto, importação); eixo agrupa as ações. Em prova, não troque os três.</li>
+    <li>Três dos cinco objetivos específicos mexem no bolso: crédito, imposto e importação. O plano trata preço como barreira.</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="produzir" data-grupo="A política pública" data-termos="subvencao-economica,finep,ict,encomenda-tecnologica">
+  <h2>Eixos I a III: criar, formar e produzir</h2>
+  <p class="cs-def">Os três primeiros eixos cuidam de fazer a tecnologia existir: pesquisa e empreendedorismo, gente capacitada e uma cadeia que produza no país. O principal instrumento de dinheiro é a <b>subvenção econômica</b> da <b>Finep</b>.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 140"><text class="tm" x="4" y="10" style="text-anchor:start">Seleção pública de 2020 (R$ milhões)</text><rect class="k" x="4" y="20" width="200" height="22" rx="3"/><text x="104" y="35">pedido: 151,7</text><rect class="acf" x="4" y="50" width="53" height="22" rx="3"/><text x="62" y="65" style="text-anchor:start">limite: 40</text><text class="tm" x="4" y="92" style="text-anchor:start">propostas</text><rect class="k" x="4" y="100" width="200" height="14" rx="3"/><rect class="am" x="4" y="100" width="69" height="14" rx="3"/><rect class="gr" x="4" y="100" width="49" height="14" rx="3"/><text class="tm" x="4" y="130" style="text-anchor:start">102 enviadas, 35 aprovadas, 25 pagas</text></svg>Quase quatro reais pedidos para cada real disponível.</aside>
+  <div class="cs-uso">
+    <h3>Eixo I · Pesquisa, inovação e empreendedorismo</h3>
+    <ul class="b">
+      <li>Centro Nacional de Referência em Tecnologia Assistiva (CNRTA, 2012), no CTI Renato Archer, em Campinas: rede de pesquisa e observatório das demandas da sociedade.</li>
+      <li>Núcleo de Tecnologias Tridimensionais do mesmo centro: com dinheiro do Ministério da Saúde desde 2009, quase 5.000 casos de hospitais públicos atendidos com impressão 3D até abril de 2017.</li>
+      <li>Rede Nacional de Núcleos de Pesquisa em Tecnologia Assistiva (2013): 54 instituições e 108 projetos em todas as regiões.</li>
+      <li>Centro Nacional de Tecnologias para Pessoas com Deficiência e Doenças Raras, em Uberlândia, anunciado em 2020 com a universidade federal local, o Comitê Paralímpico, uma fundação municipal e o Grupo Algar: 10 laboratórios, cerca de R$ 35 milhões, e a meta de se sustentar sozinho em cinco anos com recursos da indústria.</li>
+      <li>O plano promete: mapear iniciativas nacionais e internacionais, criar crédito e parcerias para pesquisa, fomentar a rede de núcleos, apoiar empreendedorismo, atender demandas do governo e da sociedade e fomentar tecnologias de baixo custo.</li>
+    </ul>
+    <h3>Eixo II · Capacitação</h3>
+    <ul class="b">
+      <li>Bolsa-Formação (Ministério da Educação), 2011 a 2021: quase 35 mil matrículas em cursos de Libras, 3.914 em multimeios didáticos, 3.475 em agente de inclusão digital, 1.030 técnicos em órteses e próteses e 228 guias-intérpretes. Pessoas com deficiência têm prioridade de matrícula.</li>
+      <li>Centro de Referência em Tecnologia Assistiva no Instituto Federal do Rio Grande do Sul, para espalhar o conhecimento na rede federal.</li>
+      <li>Edital de pós-graduação de 2014: 15 projetos, R$ 20,4 milhões, 30 programas em 35 universidades, 294 bolsistas de mestrado, 286 de doutorado, 19 de pós-doutorado e 11 professores visitantes.</li>
+      <li>Fiocruz e Ministério da Saúde (2021): curso para formar 172 ortesistas e protesistas para as oficinas ortopédicas do SUS.</li>
+      <li>OSCs como Apaes, Pestalozzis e associações de surdos e de cegos pesquisam e praticam tecnologia assistiva, em especial para deficiência intelectual, autismo e grande dependência de cuidado.</li>
+      <li>O plano promete capacitação nas políticas públicas, desenho universal e tecnologia assistiva nos currículos técnicos e superiores, e formação técnica e superior em todo o país.</li>
+    </ul>
+    <h3>Eixo III · Cadeia produtiva</h3>
+    <ul class="b">
+      <li>A Finep financia com o FNDCT. Subvenção a empresas, de 2007 a 2012: 325 propostas, 59 projetos, R$ 52,7 milhões. Cooperação <b>ICT</b>-empresa, de 2005 a 2015: 784 propostas, 60 projetos, R$ 53,6 milhões.</li>
+      <li>Seleção de 2020 (Finep, MCTI e Saúde): 102 propostas de 163 instituições pediram R$ 151,7 milhões. 35 foram aprovadas no mérito (R$ 54,9 milhões), mas o limite era R$ 40 milhões: entraram os 15 projetos ICT-empresa e os 10 melhores de subvenção.</li>
+      <li>Conta nossa com esses números: a subvenção aprovou 18% das propostas, a cooperação 7,7% e a seleção de 2020 pagou 24,5%. Nos dois primeiros editais, cada projeto recebeu em média cerca de R$ 0,9 milhão.</li>
+      <li>Desde 2009, o Ministério da Saúde apoia um laboratório de biomecânica da universidade federal de Santa Catarina que compara próteses de quadril e joelho nacionais e importadas e analisa implantes retirados de pacientes para achar a causa da falha.</li>
+      <li>O plano promete: ecossistema de inovação, profissionais para produção, aplicação de resultados de pesquisa em produtos, crédito e parcerias para produção nacional e apoio a <b>encomendas tecnológicas</b> e compras públicas.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Subvenção não é empréstimo: a empresa não devolve. É dinheiro para assumir risco tecnológico.</li>
+    <li>Aprovado no mérito não quer dizer financiado. Em 2020, 10 projetos bons ficaram de fora por falta de dinheiro.</li>
+  </ul></div>
+  <div class="tbl prose"><table>
+    <thead><tr><th>Edital (Finep)</th><th>Propostas</th><th>Projetos</th><th>R$ milhões</th><th>Aprovação</th></tr></thead>
+    <tbody>
+      <tr><td>Subvenção 2007–2012</td><td>325</td><td>59</td><td>52,7</td><td>18%</td></tr>
+      <tr><td>ICT-empresa 2005–2015</td><td>784</td><td>60</td><td>53,6</td><td>7,7%</td></tr>
+      <tr><td>Seleção 2020 · subvenção</td><td>62</td><td>10 pagos (20 no mérito)</td><td>33,5 no mérito</td><td>16%</td></tr>
+      <tr><td>Seleção 2020 · ICT-empresa</td><td>40</td><td>15</td><td>21,4</td><td>37,5%</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="cs" id="chegar" data-grupo="A política pública" data-termos="maturidade-tecnologica,tecnovigilancia,anvisa,telecentro">
+  <h2>Eixos IV e V: regular e fazer chegar</h2>
+  <p class="cs-def">Os eixos IV e V cuidam do caminho entre o produto pronto e a pessoa: regras de qualidade, certificação e registro, e acesso por SUS, SUAS, escola, crédito e menos imposto.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 120"><text class="tm" x="4" y="10" style="text-anchor:start">Telecentros com recurso para… (2019)</text><text class="st" x="4" y="32">física ou motora</text><rect class="acf" x="110" y="22" width="72" height="14" rx="2"/><text x="190" y="33" style="text-anchor:start">18%</text><text class="st" x="4" y="58">auditiva</text><rect class="acf" x="110" y="48" width="60" height="14" rx="2"/><text x="178" y="59" style="text-anchor:start">15%</text><text class="st" x="4" y="84">visual</text><rect class="acf" x="110" y="74" width="52" height="14" rx="2"/><text x="170" y="85" style="text-anchor:start">13%</text><text class="tm" x="4" y="110" style="text-anchor:start">fonte: Cetic, citado no PNTA</text></svg>Quase nove em cada dez telecentros não tinham recurso para cegos.</aside>
+  <div class="cs-uso">
+    <h3>Eixo IV · Regulamentação, certificação e registro</h3>
+    <ul class="b">
+      <li>O centro de Uberlândia deve apoiar a transferência de tecnologia para empresas e associações. O CNRTA classifica as tecnologias assistivas pelo nível de <b>maturidade tecnológica</b>.</li>
+      <li>Em Campina Grande, um laboratório de biomateriais apoiado pela Saúde é uma das quatro unidades do país designadas pela <b>Anvisa</b> e credenciadas pelo Inmetro para certificar implantes mamários. Atua também em <b>tecnovigilância</b>.</li>
+      <li>Desde 2009, a Saúde financia o comitê da ABNT que escreve normas de produtos para saúde. Essas normas são a referência da certificação do Inmetro, e o certificado é exigido para registrar equipamento médico na Anvisa.</li>
+      <li>O plano promete: o CITA ajudar a categorizar tecnologia assistiva, priorizar seus processos regulatórios e criar critérios de qualidade com o setor privado.</li>
+    </ul>
+    <h3>Eixo V · Acesso</h3>
+    <ul class="b">
+      <li>No SUAS, os serviços de acolhimento são tecnologia assistiva em si (cuidado que promove autonomia) e também ponte para conseguir produtos.</li>
+      <li>No SUS, centros especializados em reabilitação, oficinas ortopédicas e serviços credenciados avaliam e concedem a partir de uma lista. O próprio plano admite que, no dia a dia, problemas no processo atrapalham a compra e até impedem a pessoa de começar a reabilitação.</li>
+      <li>Por isso, a secretaria de direitos da pessoa com deficiência tem um projeto para rever a lista do SUS, mapear os serviços, levantar o que ajuda e o que atrapalha a concessão e propor melhorias.</li>
+      <li>Digital: em abril de 2021, 193 órgãos federais ofereciam 4.137 serviços na internet, 64,5% totalmente digitais, inclusive o pedido do BPC pelo Meu INSS. Se o canal não é acessível, a pessoa que mais precisa do benefício não consegue pedi-lo.</li>
+      <li>Uma saída citada é pôr tecnologia assistiva nos <b>telecentros</b>. Em 2019, só 18% tinham recurso para deficiência física ou motora, 15% para auditiva e 13% para visual.</li>
+      <li>O plano promete: propor isenção ou redução de impostos, crédito subsidiado para a pessoa comprar, manutenção, estoque e reposição de peças no país, e prioridade na avaliação de produtos e serviços novos no SUS, no SUAS, na educação e na previdência.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Digitalizar um serviço público sem acessibilidade cria uma barreira nova para quem o serviço deveria atender.</li>
+    <li>Peça de reposição é política de acesso: um produto importado sem estoque de peças vira sucata no primeiro defeito.</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="iniciativas" data-grupo="A política pública" data-termos="">
+  <h2>As 24 iniciativas e o que elas medem</h2>
+  <p class="cs-def">As 24 iniciativas do PNTA ficam a cargo de cinco ministérios. Cidadania responde por 8, Educação por 5, e muitas metas são entregas (um documento, um relatório), não mudanças na vida da pessoa.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 140"><text class="tm" x="4" y="10" style="text-anchor:start">iniciativas por ministério</text><text class="st" x="4" y="30">Cidadania</text><rect class="acf" x="88" y="20" width="128" height="14" rx="2"/><text x="222" y="31" style="text-anchor:start">8</text><text class="st" x="4" y="50">Educação</text><rect class="acf" x="88" y="40" width="80" height="14" rx="2"/><text x="174" y="51" style="text-anchor:start">5</text><text class="st" x="4" y="70">MCTI</text><rect class="acf" x="88" y="60" width="56" height="14" rx="2"/><text x="150" y="71" style="text-anchor:start">3,5</text><text class="st" x="4" y="90">Saúde</text><rect class="acf" x="88" y="80" width="40" height="14" rx="2"/><text x="134" y="91" style="text-anchor:start">2,5</text><text class="st" x="4" y="110">Dir. Humanos</text><rect class="acf" x="88" y="100" width="48" height="14" rx="2"/><text x="142" y="111" style="text-anchor:start">3</text><text class="tm" x="4" y="132" style="text-anchor:start">+ 2 em rodízio · dividida conta ½</text></svg>Contagem nossa: a 13 e a 14 são divididas entre dois ministérios.</aside>
+  <div class="cs-uso"><ul class="b">
+    <li>Transversais (1 a 3): estratégia de comunicação e de articulação, com ministério responsável em rodízio a cada ano, e um relatório anual de iniciativas nacionais e internacionais.</li>
+    <li>MCTI (4 a 6 e 13.2): por ano, 3 iniciativas com ICTs, 1 com o setor privado, 2 produtos ou serviços apoiados, 1 iniciativa de empreendedorismo (startups, editais, eventos) e 1 centro ou rede apoiado. Também uma Semana Nacional de Ciência e Tecnologia com o tema e a revisão dos critérios de subvenção de 2012.</li>
+    <li>Educação (7 a 11): 1.000 vagas por ano de formação de professores, pelo menos 1 curso público por estado com o tema, +2% de estudantes cegos atendidos pelo livro acessível, +10% de vagas de formação para usá-lo, Portal de Ajudas Técnicas acessível, +5% de escolas com sala de recursos, e cursos online de 60 h e 40 h (este sobre fabricação digital de tecnologia assistiva de baixo custo).</li>
+    <li>Direitos Humanos (3, 12, 13.1 e 14 com a Saúde): acessibilidade comunicacional nos órgãos federais e Catálogo Nacional de Tecnologia Assistiva atualizado todo ano.</li>
+    <li>Saúde (14 a 16): diagnóstico da concessão de tecnologia assistiva pelo SUS em 2 anos e plano de ação em 4, revisão da lista do SUS, 3 produtos priorizados para tecnovigilância a cada 2 anos e relatório de tecnologias com potencial de entrar no SUS.</li>
+    <li>Cidadania (17 a 24): inclusão digital de jovens de 15 a 29 anos que recebem BPC, apoio do SUAS no domicílio, Criança Feliz, Centro Dia, orientações para acolhimento de idosos e de pessoas com deficiência, uso do BPC dentro das unidades de acolhimento e compra de tecnologia assistiva para acolhidos até 2022.</li>
+  </ul></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>"Documento elaborado" é indicador de produto. Ele diz que o governo entregou algo, não que alguém ganhou autonomia. Compare com <a href="/m8/negocios/01-terceiro-setor/consulta#tensoes">impacto social</a> na aula 01.</li>
+    <li>Na iniciativa 15, a meta é revisar a lista do SUS, mas o indicador é instituir câmaras técnicas em 2 anos. Meta e indicador medem coisas diferentes (leitura nossa).</li>
+    <li>As iniciativas 1 e 2 preveem rodízio até o 5º ano, num plano de quatro anos.</li>
+  </ul></div>
+</section>
+
+<!-- ================= Negócios sociais ================= -->
+<section class="cs" id="crises" data-grupo="Negócios sociais" data-termos="consenso-washington">
+  <h2>Por que se fala em negócio social: as multicrises</h2>
+  <p class="cs-def">O artigo de Pires, Luzio dos Santos e Mostagi parte de uma ideia: crises econômica, social e ambiental se reforçam, e empresas movidas só por lucro agravam desigualdade e degradação. Daí a busca por organizações que juntem compromisso social e viabilidade econômica.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 132"><text class="tm st" x="4" y="10">Oxfam 2016: quem levou a renda nova</text><text class="tm st" x="4" y="32">10% mais ricos</text><rect class="rd" x="104" y="24" width="100" height="16" rx="2"/><text x="208" y="32" style="text-anchor:start">46%</text><text class="tm st" x="4" y="58">10% mais pobres</text><rect class="rd" x="104" y="50" width="2" height="16"/><text x="112" y="58" style="text-anchor:start">0,6%</text><text class="tm st" x="4" y="90">20% mais ricos ÷ 20% mais pobres</text><text class="tm st" x="4" y="108">antes: 30 para 1 · hoje: 80 para 1</text></svg>A renda nova vai quase toda para quem já tem.</aside>
+  <div class="cs-uso"><ul class="b">
+    <li>Econômica: a crise financeira de 2008 mostrou os riscos de uma economia muito financeirizada.</li>
+    <li>Social: segundo a Oxfam (2016), o 1% mais rico tem mais riqueza que os outros 99%, e 46% do crescimento da renda foi para os 10% mais ricos contra 0,6% para os 10% mais pobres. A razão entre os 20% mais ricos e os 20% mais pobres subiu de 30 para 80. Há mais de 800 milhões de analfabetos e 100 milhões de crianças em trabalho infantil.</li>
+    <li>Ambiental: segundo a ONU, 60% dos ecossistemas estão deteriorados; estabilizar a atmosfera pede cortar 60% das emissões e investir US$ 230 bilhões até 2030 (0,5% do PIB e 1,7% dos investimentos globais). Para Foladori, os problemas ambientais se reduzem a três: esgotar recursos, poluir e a pobreza de quem fica fora da produção.</li>
+    <li>Entre países: nos anos 1990, o <b>Consenso de Washington</b> recomendou dez medidas: abertura comercial, privatização de estatais, corte de gastos, disciplina fiscal, reforma tributária, desregulamentação, estímulo ao investimento estrangeiro, juros e câmbio de mercado e propriedade intelectual.</li>
+    <li>Para os autores, as medidas não miravam a pobreza. Vieram crises (Ásia 1997, Rússia 1998, Argentina 2002), e o capital que deveria ir dos países ricos para os pobres fez o caminho contrário.</li>
+    <li>Ponto de partida do artigo: vivemos numa "sociedade de organizações", em que dependemos delas para quase tudo. Então elas podem tanto agravar a crise quanto ajudar a mitigá-la.</li>
+  </ul></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>O artigo diz que "mais de 1,3 milhão de pessoas" viviam com menos de um dólar por dia em 2010. A ordem de grandeza conhecida para essa linha de pobreza é de bilhões; trate o número como erro de digitação.</li>
+    <li>O artigo é crítico do modelo econômico. Ele não é neutro: usa esse diagnóstico para avaliar os negócios sociais.</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="negocio-social" data-grupo="Negócios sociais" data-termos="negocio-social,dividendo">
+  <h2>Negócio social: o modelo Yunus</h2>
+  <p class="cs-def">Para Muhammad Yunus, economista e Nobel da Paz, <b>negócio social</b> é uma empresa que tem como propósito resolver um problema social usando métodos de negócio, inclusive vender produtos e serviços. O benefício social substitui a maximização do lucro, e o lucro é todo reinvestido.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="bl" x="4" y="6" width="80" height="26" rx="5"/><text x="44" y="19">investidor</text><rect class="gr" x="136" y="56" width="100" height="34" rx="6"/><text class="tm" x="186" y="67">negócio social</text><text class="tm" x="186" y="80">vende, se paga</text><path class="s" d="M84 20 C120 20 150 30 170 54" marker-end="url(#mnarrow)"/><text class="tm" x="126" y="14">capital</text><path class="s" d="M146 90 C110 110 60 80 44 34" marker-end="url(#mnarrow)" style="stroke-dasharray:4 3"/><text class="tm" x="64" y="104">devolve o capital</text><path class="s" d="M220 92 C236 120 160 130 176 94" marker-end="url(#mnarrow)"/><text class="tm" x="180" y="138">lucro reinvestido</text><text x="60" y="54" style="fill:var(--red)">sem dividendo</text></svg>O investidor recebe o capital de volta e mais nada.</aside>
+  <div class="cs-uso"><ul class="b">
+    <li>Três jeitos de organizar. Empresa tradicional: maximiza lucro e paga <b>dividendos</b>. OSC: vive de doações e não distribui excedente (veja <a href="/m8/negocios/01-terceiro-setor/consulta#reconhecer-osc">aula 01</a>). Negócio social: vende para se sustentar, o investidor pode recuperar o capital inicial e continua dono, com controle, mas não recebe dividendo.</li>
+    <li>O argumento: o dinheiro filantrópico rende mais quando volta e pode ser usado de novo, em vez de ser gasto uma vez como caridade.</li>
+    <li>Yunus descreve dois tipos. Tipo 1: empresa com foco em benefício social, sem lucro para os donos, financeiramente independente. Tipo 2: empresa com lucro, mas que pertence a pessoas pobres, como uma cooperativa de baixa renda; parte do dividendo vai aos trabalhadores e parte amplia o negócio. Os dois podem se combinar.</li>
+    <li>Não há consenso sobre o termo (Dees, Kerlin, Young). A rede ibero-americana SEKN, muito usada na América Latina, chama de negócio social qualquer organização que gera mudança social por atividade de mercado, inclusive OSCs e empresas privadas que atuam em áreas típicas do setor público.</li>
+    <li>Outras abordagens só aceitam empresas com fins lucrativos que existem para um fim social. O ponto comum a todas: setor privado e atividade de mercado a serviço de objetivo social.</li>
+    <li>O <a href="/m8/negocios/01-terceiro-setor/consulta#tres-setores">negócio de impacto</a> da aula 01 (setor 2.5) é o guarda-chuva mais largo. O negócio social de Yunus é a versão estrita, sem dividendo.</li>
+  </ul></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>No modelo Yunus, o investidor pode recuperar o capital. O que ele não recebe é rendimento além disso.</li>
+    <li>Sem dividendo não quer dizer sem lucro. O negócio social precisa de lucro para crescer; só não o distribui.</li>
+    <li>O artigo escreve "organizações com fins lucrativos (ONGs)" ao citar a SEKN. ONG é sem fins lucrativos; é erro de digitação.</li>
+  </ul></div>
+  <div class="tbl prose"><table>
+    <thead><tr><th></th><th>Empresa tradicional</th><th>OSC</th><th>Negócio social (Yunus)</th></tr></thead>
+    <tbody>
+      <tr><td>Finalidade</td><td>lucro</td><td>missão pública</td><td>resolver problema social</td></tr>
+      <tr><td>De onde vem o dinheiro</td><td>vendas</td><td>doações, parcerias</td><td>vendas</td></tr>
+      <tr><td>Lucro</td><td>distribuído</td><td>não distribuído</td><td>reinvestido</td></tr>
+      <tr><td>Investidor recebe</td><td>dividendos</td><td>nada (doador)</td><td>capital de volta</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="cs" id="grameen" data-grupo="Negócios sociais" data-termos="microcredito,joint-venture">
+  <h2>Grameen Bank e Grameen Danone</h2>
+  <p class="cs-def">O primeiro negócio social de Yunus foi o Grameen Bank (Banco da Aldeia), de <b>microcrédito</b>: empréstimos pequenos, sem garantia nem fiador, para gente pobre de Bangladesh, principalmente mulheres da zona rural.</p>
+  <aside class="mn loop" data-loop="grupo" data-ms="9000" data-still="0.55" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Quem paga em dia abre a vez do próximo do grupo.</aside>
+  <div class="cs-uso"><ul class="b">
+    <li>1976: Yunus começa a emprestar com alunos e professores da Universidade de Chittagong. Em 1983, o Grameen vira banco oficial.</li>
+    <li>O problema: sem bens nem fiador, os pobres não tinham crédito em banco e caíam nas mãos de agiotas com juros quase impossíveis de pagar.</li>
+    <li>Como funciona: o empréstimo é individual, mas a aprovação é coletiva. À medida que os primeiros pagam em dia, o crédito se estende aos outros membros do grupo. O dinheiro gira para criar emprego e renda em pequenos negócios.</li>
+    <li>Por que mulheres: pela história de exploração e pobreza delas e porque o crédito dado a mulheres gerava mais benefício para a família inteira, em especial para as crianças.</li>
+    <li>2006: a primeira <b>joint venture</b> de negócio social, com o Grupo Danone. A Grameen Danone vende iogurte fortificado a preço acessível para combater a desnutrição de crianças da zona rural. Gera lucro para se manter e crescer, mas nem a Grameen nem a Danone ficam com ele: recuperam o capital e o resto é reinvestido.</li>
+  </ul></div>
+  <div class="cs-pegadinhas">Microcrédito é o caso de origem, não a definição. Um negócio social pode vender iogurte, energia ou um dispositivo de apoio.</div>
+</section>
+
+<section class="cs" id="ysb" data-grupo="Negócios sociais" data-termos="aceleradora">
+  <h2>Yunus Social Business: uma aceleradora global</h2>
+  <p class="cs-def">A Yunus Social Business (YSB), fundada em 2011 por Saskia Bruysten, Sophie Eisenmann e Yunus, é uma <b>aceleradora</b> social: treina e financia negócios sociais locais em economias emergentes, como uma incubadora de startups combinada a um fundo de capital de risco.</p>
+  <div class="cs-uso"><ul class="b">
+    <li>Oito regiões: Haiti, Colômbia, Índia, Bálcãs, Costa Rica, Brasil, Tunísia e Uganda. Áreas: agricultura, saúde, energia e meio ambiente, educação.</li>
+    <li>O caminho do empreendedor: divulgação em workshops e eventos; programa de aceleração de cerca de três meses, gratuito; mentoria individual (1-on-1 coaching) sobre estratégia, modelo de negócio e finanças; acesso a mercados e fornecedores (distribuidores, contabilidade, jurídico, marketing); comunidade com outros negócios e o grupo Grameen; preparação para investimento (investment readiness); comitê de financiamento; acompanhamento depois do investimento. A figura abaixo percorre esse caminho.</li>
+    <li>Haiti (2011, com apoio da SAP): 12 empresas, 762 empregos. Colômbia (2011, antes Grameen Caldas): 2 empresas, uma joint venture com a McCain, 636 empregos. Índia (2011, Mumbai): 7 financiadas até 2015, 2 já quitaram o empréstimo.</li>
+    <li>Albânia (2012, com o governo): um programa de TV para achar empreendedores, expansão a Kosovo e a seis países dos Bálcãs, mais de 250 empresários apoiados, 64 empregos. Uganda (2013, com o Banco Africano de Desenvolvimento): mais de 100 empreendedores, 1.217 empregos. Tunísia (2014, com Yale): 2 negócios, 9 empregos. Costa Rica (2014): joint venture de alimentos contra desnutrição infantil, 428 empregos.</li>
+    <li>Brasil (2013): quatro ciclos de aceleração e uma rede universitária de negócios sociais em 2015. Financiamento previsto para 2016; até o artigo, nenhum.</li>
+    <li>Como os autores sabem: estudo de caso qualitativo, exploratório e descritivo, com análise de documentos (relatórios anuais da YSB, site, artigos), coletados sobretudo em 2017.</li>
+  </ul></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Os números de empregos são da própria YSB, que não diz como os mede. O artigo aponta também critérios de seleção pouco claros e países sem dados, sem justificativa.</li>
+    <li>Aceleração é gratuita para o empreendedor; o financiamento vem depois, só para os selecionados, e é empréstimo.</li>
+  </ul></div>
+  <div class="tbl prose"><table>
+    <thead><tr><th>País</th><th>Inscritos</th><th>Selecionados</th><th>Empregos</th><th>Setores</th></tr></thead>
+    <tbody>
+      <tr><td>Haiti</td><td>300</td><td>12</td><td>762</td><td>agricultura, educação, energia</td></tr>
+      <tr><td>Colômbia</td><td>sem dado</td><td>sem dado</td><td>636</td><td>agricultura, saúde</td></tr>
+      <tr><td>Índia</td><td>sem dado</td><td>sem dado</td><td>122</td><td>agricultura, energia, saúde</td></tr>
+      <tr><td>Albânia</td><td>360</td><td>36</td><td>64</td><td>agricultura, saúde, outros</td></tr>
+      <tr><td>Brasil</td><td>251</td><td>26</td><td>sem dado</td><td>sem dado</td></tr>
+      <tr><td>Uganda</td><td>304</td><td>15</td><td>1.217</td><td>agricultura, energia, saúde</td></tr>
+      <tr><td>Tunísia</td><td>578</td><td>21</td><td>9</td><td>outros</td></tr>
+      <tr><td>Costa Rica</td><td>sem dado</td><td>sem dado</td><td>428</td><td>saúde</td></tr>
+    </tbody>
+  </table></div>
+  <figure class="fig" id="fig-ysb">
+    <div class="fig-head"><span class="fig-title">Figura 2 · De inscrito a negócio financiado na YSB</span><div class="fig-tabs"></div></div>
+    <div class="fig-body">
+      <div class="fig-stage"><svg id="ysb-svg" viewBox="0 0 640 300"></svg></div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+</section>
+
+<section class="cs" id="financiamento-ysb" data-grupo="Negócios sociais" data-termos="credor-filantropico,ponto-equilibrio,kpi">
+  <h2>Como a YSB financia: doar ou emprestar</h2>
+  <p class="cs-def">O dinheiro entra na YSB de duas formas: doações, que não voltam, e empréstimos de <b>credores filantrópicos</b>, que voltam até o valor emprestado. Para os negócios, a YSB só empresta, para que o mesmo dinheiro financie vários negócios em sequência.</p>
+  <aside class="mn loop" data-loop="capital" data-ms="10000" data-still="0.6" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>O mesmo dólar volta e financia o próximo negócio.</aside>
+  <div class="cs-uso"><ul class="b">
+    <li>Quem financia é o braço YSB Funds, sem fins lucrativos. Critérios de seleção: capacidade da equipe, profundidade e alcance do impacto, possibilidade de replicar e escalar, e maturidade do modelo de negócio.</li>
+    <li>Doador: a doação pode ser deduzida do imposto, mas não volta e não dá participação na empresa. Credor filantrópico: recebe de volta ao longo do tempo, até o valor nominal. O investidor tradicional busca ganho próprio; o credor filantrópico busca o maior retorno social.</li>
+    <li>O empréstimo: de longo prazo, abaixo das condições de mercado, com até dois anos de carência (prazo antes da primeira parcela) e uma pequena parte em participação no capital, de até 25% da empresa, sempre minoritária.</li>
+    <li>Quando o negócio paga, a YSB financia outros ou devolve aos credores, na proporção do que cada um pôs.</li>
+    <li>Regra de viabilidade: o produto precisa atingir pelo menos o <b>ponto de equilíbrio</b>. Exemplo: um negócio com R$ 10.000 de custo fixo por mês que vende a R$ 50 um item de custo variável R$ 30 ganha R$ 20 por unidade; empata vendendo 10.000 ÷ 20 = 500 por mês (exemplo nosso).</li>
+    <li>Contrato e relatórios: o empreendedor envia relatório mensal, trimestral e anual com <b>KPIs</b> financeiros e operacionais, escolhidos junto com a YSB.</li>
+    <li>Desde 2011, mais de US$ 8,6 milhões para 34 empresas. Por região: Índia 2,58 mi, Haiti 2,19 mi, Colômbia 1,63 mi, Costa Rica 1,21 mi, Bálcãs 0,54 mi, Uganda 0,31 mi, Tunísia 0,15 mi. Brasil: nada.</li>
+  </ul></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>A contradição que o artigo aponta: a YSB depende de doações, mas não doa. Diz que empresta para dar autonomia aos negócios, enquanto ela mesma não é autônoma.</li>
+    <li>Não há dados sobre os pagamentos dos empréstimos. Sem eles, não dá para saber se os negócios atingem a sustentabilidade que a YSB exige.</li>
+  </ul></div>
+  <div class="tbl prose"><table>
+    <thead><tr><th></th><th>Doador</th><th>Credor filantrópico</th><th>Investidor tradicional</th></tr></thead>
+    <tbody>
+      <tr><td>Recebe de volta</td><td>nada</td><td>até o valor emprestado</td><td>capital e lucro</td></tr>
+      <tr><td>Participação na empresa</td><td>não</td><td>pela YSB, minoritária</td><td>sim</td></tr>
+      <tr><td>Busca</td><td>impacto</td><td>maior retorno social</td><td>ganho financeiro</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="cs" id="limites" data-grupo="Negócios sociais" data-termos="valor-compartilhado,logica-paliativa">
+  <h2>Limites e contradições dos negócios sociais</h2>
+  <p class="cs-def">O artigo reconhece que a YSB faz negócios locais saírem do papel, mas conclui que o negócio social segue uma <b>lógica paliativa</b>: alivia o problema onde atua sem mudar as estruturas que o causam, e pode reforçá-las ao usar a lógica de mercado.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 130"><line class="s" x1="10" y1="60" x2="230" y2="60"/><circle class="gr" cx="46" cy="60" r="7"/><text class="tm" x="46" y="84">valor</text><text class="tm" x="46" y="96">compartilhado</text><text class="tm" x="46" y="38">ganha-ganha</text><circle class="am" cx="120" cy="60" r="7"/><text class="tm" x="120" y="84">negócio</text><text class="tm" x="120" y="96">social</text><text class="tm" x="120" y="26">paliativo,</text><text class="tm" x="120" y="38">mas realista</text><circle class="rd" cx="194" cy="60" r="7"/><text class="tm" x="194" y="84">críticos</text><text class="tm" x="194" y="38">conflito</text><text class="tm" x="120" y="120">onde fica cada autor</text></svg>O artigo fica no meio, mais perto dos críticos.</aside>
+  <div class="cs-uso"><ul class="b">
+    <li>Medir: um negócio social precisa de indicadores além dos financeiros e de entender antes o problema social e o contexto cultural e político onde atua (Grove e Berg).</li>
+    <li>Otimistas: para Porter e Kramer (<b>valor compartilhado</b>, 2011), Mackey e Sisodia (capitalismo consciente, 2013) e London e Hart (base da pirâmide, 2011), empresas comuns podem ter propósito e ganhar com o social.</li>
+    <li>Céticos: para Crane e colegas (2014), na maior parte do tempo lucro e impacto não combinam. Para O'Connor, Foladori e Schnaiberg, é irracional esperar que empresas capitalistas privilegiem meio ambiente, países pobres ou trabalhadores.</li>
+    <li>Laville e colegas (2016): a abordagem de empresa social separa economia, sociedade e política, não tem visão macroeconômica e reduz tudo a soluções de mercado. Faltam debate público e democracia na conta.</li>
+    <li>Diferença para a empresa comum, nas considerações finais: o negócio social é mais complexo na forma e depende de recursos plurais (de mercado, não mercantis e não monetários, como trabalho voluntário).</li>
+    <li>Ainda assim, os autores defendem que medidas paliativas são necessárias e que o negócio social, mesmo reformista, é uma resposta realista, sobretudo nos países mais pobres.</li>
+    <li>Limite do próprio estudo: só usou dados publicados pela YSB, que podem omitir o que não interessa à organização.</li>
+  </ul></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Paliativo não quer dizer inútil. O artigo chama de paliativo e, na mesma conclusão, de necessário.</li>
+    <li>Equilibrar missão e caixa é a tensão central: espera-se que o negócio se pague, e um objetivo pode engolir o outro.</li>
+  </ul></div>
+</section>
+
+<!-- ================= Projeto parceiro ================= -->
+<section class="cs" id="aplicacao" data-grupo="Projeto parceiro" data-termos="">
+  <h2>Do plano ao modelo de negócio do dispositivo</h2>
+  <p class="cs-def">Leitura autoral: as quatro <a href="/m8/negocios/01-terceiro-setor/consulta#rotas">rotas da aula 01</a> para levar o dispositivo de rotinas até a casa do paciente encontram, cada uma, um instrumento do PNTA ou do modelo Yunus, e uma exigência que vem junto.</p>
+  <div class="cs-uso"><ul class="b">
+    <li>Quem usa: pessoas com dificuldade cognitiva (atenção, memória, sequência de passos) e motricidade preservada, de várias idades. É tecnologia assistiva pela definição da LBI: produto mais estratégia de rotina, para dar autonomia em <a href="/m8/negocios/01-terceiro-setor/consulta#ecossistema">atividades de vida diária</a>.</li>
+    <li>O dispositivo avisa com luz e som. Pela acessibilidade comunicacional, vale ter os dois canais sempre juntos, para não excluir quem não ouve ou não vê bem.</li>
+    <li>Para qualquer rota, o eixo V lembra três custos que somem do protótipo: reposição de peças, manutenção e um canal digital acessível (se houver app).</li>
+    <li>Use a tabela para defender a rota sorteada e dizer o que ela exige que o time prove.</li>
+  </ul></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Não diga que o dispositivo "precisa de registro na Anvisa" sem conferir. O PNTA só afirma que equipamento médico precisa do certificado do Inmetro para o registro; se o dispositivo é classificado assim é algo a verificar.</li>
+    <li>Preço baixo sozinho não é modelo de negócio. Diga quem paga, quanto e com que frequência.</li>
+  </ul></div>
+  <div class="tbl prose"><table>
+    <thead><tr><th>Rota</th><th>Instrumento</th><th>O que você teria de provar</th><th>Risco</th></tr></thead>
+    <tbody>
+      <tr><td>A · SUS</td><td>Conitec, lista de tecnologia assistiva do SUS (iniciativas 15 e 16)</td><td>eficácia, segurança, custo-efetividade e impacto no orçamento</td><td>processo longo; o plano admite falhas na concessão</td></tr>
+      <tr><td>B · startup</td><td>subvenção da Finep, crédito subsidiado ao usuário, menos imposto</td><td>risco tecnológico e capacidade de produzir</td><td>aprovação de 7,7% a 24,5% nos editais; quem não paga fica sem</td></tr>
+      <tr><td>C · OSC</td><td>SUAS (Centro Dia, acolhimento), parcerias com Apaes e associações</td><td>que o cuidado com o dispositivo amplia autonomia</td><td>dependência de doação e de convênio</td></tr>
+      <tr><td>D · negócio social</td><td>modelo Yunus: credor filantrópico, preço acessível, lucro reinvestido</td><td>ponto de equilíbrio com preço que o público paga</td><td>lógica paliativa; missão e caixa em conflito</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="cs" id="exercicios" data-grupo="Projeto parceiro" data-termos="">
+  <h2>Exercícios para praticar</h2>
+  <p class="cs-def">Exercícios autorais, não questões do professor. A resposta é uma linha possível, não um gabarito.</p>
+  <div class="cs-uso">
+    <details><summary>1 · O tamanho do público</summary>
+      <p>(a) A população de 2010 era de 190,8 milhões. Confira os 6,7% da linha de corte. (b) Na visão, 0,53 milhão não consegue enxergar, 6,06 milhões têm grande dificuldade e 29,21 milhões têm alguma. Quantos contam em cada critério? (c) Qual número você usaria para estimar o mercado de um produto de apoio a rotinas, e por quê?</p>
+      <details><summary>Uma linha possível de resposta</summary><p>(a) 12,7 ÷ 190,8 = 0,067, ou 6,7%. (b) Amplo: 0,53 + 6,06 + 29,21 = 35,8 milhões. Com corte: 0,53 + 6,06 = 6,6 milhões. (c) O número com corte, porque quem tem dificuldade leve raramente precisa de apoio; e diga que o censo não pergunta sobre dificuldade cognitiva de rotina, então nenhum dos dois mede o público do projeto.</p></details>
+    </details>
+    <details><summary>2 · Classifique a organização</summary>
+      <p>(a) Associação que recebe doações e empresta cadeiras de rodas. (b) Empresa de iogurte fortificado cujos donos recuperam o capital e não recebem dividendo. (c) Cooperativa de costureiras de baixa renda que divide o lucro entre elas. (d) Startup de próteses que paga dividendos e doa 5% do lucro.</p>
+      <details><summary>Uma linha possível de resposta</summary><p>(a) OSC. (b) Negócio social tipo 1. (c) Negócio social tipo 2: tem lucro, mas pertence às pessoas pobres. (d) Empresa tradicional, ainda que com investimento social; pode ser chamada de negócio de impacto, nunca de negócio social de Yunus.</p></details>
+    </details>
+    <details><summary>3 · Indicador de entrega ou de mudança?</summary>
+      <p>Reescreva o indicador "documento elaborado contendo as estratégias identificadas" (iniciativa 17, inclusão digital de jovens no BPC) para medir mudança na vida das pessoas.</p>
+      <details><summary>Uma linha possível de resposta</summary><p>"Percentual de jovens de 15 a 29 anos que recebem BPC e usaram um serviço digital sozinhos nos últimos 30 dias." Ele exige linha de base e coleta; é mais caro, por isso diga como seria medido.</p></details>
+    </details>
+    <details><summary>4 · O dinheiro que gira</summary>
+      <p>Um credor filantrópico empresta US$ 100 mil à YSB. Um negócio recebe tudo, com dois anos de carência, e devolve em mais três anos. Quantos negócios esse dinheiro financia em 10 anos, se cada um leva 5 anos para devolver? Compare com uma doação de US$ 100 mil.</p>
+      <details><summary>Uma linha possível de resposta</summary><p>Dois negócios em sequência (anos 0 a 5 e 5 a 10), e o credor ainda pode receber os US$ 100 mil de volta. A doação financia um negócio uma vez. Se algum negócio não paga, a cadeia para: por isso a YSB exige ponto de equilíbrio.</p></details>
+    </details>
+    <details><summary>5 · Defenda a rota D para o dispositivo</summary>
+      <p>Use o ponto de equilíbrio. Suponha custo fixo de R$ 6.000 por mês e custo variável de R$ 120 por unidade. A que preço o negócio empata vendendo 50 unidades por mês? Que crítica do artigo você responderia?</p>
+      <details><summary>Uma linha possível de resposta</summary><p>Preço = 120 + 6.000 ÷ 50 = R$ 240. Os números são inventados para o exercício. Responda à lógica paliativa dizendo o que o negócio não resolve (oferta pública de reabilitação) e com quem ele precisa se articular (SUS, SUAS) para não ficar só local.</p></details>
+    </details>
+  </div>
+  <div class="cs-pegadinhas">Uma boa resposta liga um número a uma decisão e diz o que o número não mede.</div>
+</section>

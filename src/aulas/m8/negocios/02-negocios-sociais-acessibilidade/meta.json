@@ -1,0 +1,42 @@
+{
+  "numero": "02",
+  "data": "2026-11-17",
+  "titulo": "Negócios sociais: tecnologia e modelos de negócio a favor da acessibilidade e da inclusão",
+  "tema": "Terceiro setor e impacto",
+  "modos": [
+    "consulta"
+  ],
+  "resumo": "Quem precisa de tecnologia assistiva no Brasil, o que a lei chama assim, como o Plano Nacional de Tecnologia Assistiva organiza o Estado para fomentá-la e como um negócio social, no modelo de Muhammad Yunus, tenta resolver problema social sem distribuir lucro.",
+  "topicos": [
+    "Deficiência como interação com barreiras",
+    "Quantas pessoas: censo e linha de corte",
+    "Tecnologia assistiva na lei",
+    "Plano Nacional de Tecnologia Assistiva: eixos e iniciativas",
+    "Negócio social no modelo Yunus",
+    "Yunus Social Business: aceleração e financiamento",
+    "Limites dos negócios sociais",
+    "Aplicação ao dispositivo do projeto"
+  ],
+  "secoes": [],
+  "fontes": [
+    {
+      "tipo": "PDF",
+      "titulo": "Plano Nacional de Tecnologia Assistiva · Comitê Interministerial de Tecnologia Assistiva, MCTI (2021, 72 páginas)",
+      "url": "https://www.gov.br/mcti/pt-br/centrais-de-conteudo/publicacoes-mcti/plano-nacional-de-tecnologia-assistiva/pnta_-documento_web.pdf",
+      "nota": "Lido por inteiro por extração de texto; quadros e gráficos de dados conferidos na imagem das páginas."
+    },
+    {
+      "tipo": "Artigo",
+      "titulo": "Pires, Luzio dos Santos e Mostagi · Negócios sociais em foco: o caso da Yunus Social Business · Desenvolvimento em Questão, v. 17, n. 47, p. 102-119 (2019)",
+      "url": "https://www.revistas.unijui.edu.br/index.php/desenvolvimentoemquestao/article/view/6846",
+      "nota": "18 páginas, lidas por inteiro, com as figuras 1 e 2 conferidas na imagem. Licença CC BY 4.0."
+    },
+    {
+      "tipo": "Reportagem",
+      "titulo": "Adriano Camargo · Acessibilidade na tecnologia: qual sua importância? · Olhar Digital (02/01/2023)",
+      "url": "https://olhardigital.com.br/2023/01/02/pro/acessibilidade-na-tecnologia-qual-sua-importancia/",
+      "nota": "Texto lido por inteiro. O vídeo da campanha da Apple citado na reportagem não foi assistido; a cena entra como a reportagem a descreve."
+    }
+  ],
+  "observacao": "Aula montada antes do encontro de 17/11/2026, sem os slides do professor: o Resumo diz o que as três leituras trazem e será reescrito depois do encontro. Os números do PNTA são os do documento de 2021 (Censo 2010, editais até 2020); confira dados mais novos antes de citar. Onde o texto da fonte tem erro de digitação (número de lei, unidade), a aula avisa. A seção de aplicação ao projeto e os exercícios são autorais."
+}

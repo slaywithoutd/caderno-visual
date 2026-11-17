@@ -1,0 +1,1136 @@
+{
+ "aula": "m8/negocios/02-negocios-sociais-acessibilidade",
+ "data": "2026-11-17",
+ "criterio": "Conferência das três leituras indicadas, página por página (PDFs) e parágrafo por parágrafo (reportagem), com destinos verificáveis. Os slides do encontro de 17/11/2026 ainda não existiam quando a aula foi escrita.",
+ "fontes": [
+  {
+   "id": "pnta-2021",
+   "url": "https://www.gov.br/mcti/pt-br/centrais-de-conteudo/publicacoes-mcti/plano-nacional-de-tecnologia-assistiva/pnta_-documento_web.pdf",
+   "escopo": "Plano Nacional de Tecnologia Assistiva, CITA/MCTI, 2021. 72 páginas do PDF; a numeração impressa coincide com a do PDF.",
+   "acesso": "integral",
+   "metodo": "Extração de texto de todas as 72 páginas (PyMuPDF). Quadro 3 e Gráfico 3 (p. 16 e 17) conferidos na imagem. Gráficos 1 e 2 (p. 13 e 15) lidos pelo texto e pelo Quadro 3. Divergências da fonte: 'Lei nº 13.145' (p. 3) e 'Lei Nº 12.146/2015' (p. 59) para a LBI, sinalizadas na aula; o Decreto 5.296 aparece com dia 4 (p. 7) e dia 2 (p. 70) de dezembro de 2004; a portaria de prioridades aparece como MCTIC 5.109/2021 no texto e 1.122/2020 nas referências (não citadas na aula).",
+   "totalUnidades": 72,
+   "unidades": [
+    {
+     "paginas": [
+      1,
+      2,
+      4,
+      5,
+      6
+     ],
+     "assunto": "Capa, expediente, ficha catalográfica, sumário e divisória",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Estrutural. Nomes de autoridades da época não entram; o sumário orienta a ordem das seções.",
+     "consulta": [
+      "pnta"
+     ]
+    },
+    {
+     "paginas": [
+      3
+     ],
+     "assunto": "O CITA: decreto, coordenação e membros",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "historia-politica"
+     ],
+     "evidencias": [
+      "10.094"
+     ]
+    },
+    {
+     "paginas": [
+      7
+     ],
+     "assunto": "Conceito de tecnologia assistiva e histórico de ajuda técnica",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "ta-lei"
+     ],
+     "evidencias": [
+      "3.298",
+      "art. 3º"
+     ]
+    },
+    {
+     "paginas": [
+      8
+     ],
+     "assunto": "Fim do conceito; base legal: Declaração Universal, duas fases dos direitos humanos, documentos internacionais",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "ta-lei",
+      "deficiencia",
+      "historia-politica"
+     ],
+     "evidencias": [
+      "segunda fase",
+      "Salamanca"
+     ]
+    },
+    {
+     "paginas": [
+      9
+     ],
+     "assunto": "Convenção da ONU, Decreto 6.949, deficiência como interação, termo e oito princípios",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "deficiencia"
+     ],
+     "evidencias": [
+      "6.949",
+      "empoderamento"
+     ]
+    },
+    {
+     "paginas": [
+      10
+     ],
+     "assunto": "Viver sem Limite, LBI art. 75, OMS: um bilhão e 15%",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "historia-politica",
+      "quantas"
+     ],
+     "evidencias": [
+      "Viver sem Limite",
+      "15%"
+     ]
+    },
+    {
+     "paginas": [
+      11
+     ],
+     "assunto": "Desigualdade de acesso; história das perguntas do censo",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "quantas"
+     ],
+     "evidencias": [
+      "1872"
+     ]
+    },
+    {
+     "paginas": [
+      12
+     ],
+     "assunto": "Quadro 1: censos 2000 e 2010 por tipo e grau",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Os números da visão entram na Figura 1 e no exercício 1; os de audição e motora ficam como totais por tipo.",
+     "consulta": [
+      "quantas",
+      "exercicios"
+     ],
+     "evidencias": [
+      "29,21",
+      "45,6"
+     ]
+    },
+    {
+     "paginas": [
+      13
+     ],
+     "assunto": "Totais 2000 e 2010, urbano e rural, regiões (Gráfico 1)",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Gráfico 1 lido pelo texto; a pegadinha explica que os percentuais regionais são fatias do total do país.",
+     "consulta": [
+      "quantas"
+     ],
+     "evidencias": [
+      "38,5",
+      "9,7%"
+     ]
+    },
+    {
+     "paginas": [
+      14
+     ],
+     "assunto": "Quadro 2: prevalência por estado",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "quantas"
+     ],
+     "evidencias": [
+      "27,86%",
+      "21,26%"
+     ]
+    },
+    {
+     "paginas": [
+      15
+     ],
+     "assunto": "Prevalência por tipo e por sexo (Gráfico 2)",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Gráfico 2 conferido pelo Quadro 3, que traz os mesmos percentuais por sexo.",
+     "consulta": [
+      "quantas"
+     ],
+     "evidencias": [
+      "18,6%",
+      "26,5%"
+     ]
+    },
+    {
+     "paginas": [
+      16
+     ],
+     "assunto": "Quadro 3 por sexo e idade; índice de envelhecimento",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Definição do índice de envelhecimento acrescentada como base, identificada como de fora do PNTA.",
+     "consulta": [
+      "quantas"
+     ],
+     "evidencias": [
+      "30,7",
+      "17,4 milhões"
+     ]
+    },
+    {
+     "paginas": [
+      17
+     ],
+     "assunto": "Gráfico 3 por idade; linha de corte de Washington",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "quantas"
+     ],
+     "evidencias": [
+      "80,61%",
+      "12,7 milhões"
+     ]
+    },
+    {
+     "paginas": [
+      18
+     ],
+     "assunto": "Idosos 63,4% para 23,5%, próximo censo, pandemia; início da estrutura federal (1981, Comitê Nacional)",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "quantas",
+      "historia-politica"
+     ],
+     "evidencias": [
+      "63,4%",
+      "1981"
+     ]
+    },
+    {
+     "paginas": [
+      19
+     ],
+     "assunto": "Plano de Ação Conjunta, CORDE, Subsecretaria e Secretaria Nacional",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "historia-politica"
+     ],
+     "evidencias": [
+      "CORDE",
+      "2010"
+     ]
+    },
+    {
+     "paginas": [
+      20
+     ],
+     "assunto": "SNDPD; MCTI: tema prioritário, SEMPI, seleção pública 2020",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "governo"
+     ],
+     "evidencias": [
+      "Empreendedorismo e Inovação"
+     ]
+    },
+    {
+     "paginas": [
+      21
+     ],
+     "assunto": "Centro de Uberlândia; Rede de Cuidados; meta de OPM; Conitec",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "produzir",
+      "governo",
+      "ta-lei"
+     ],
+     "evidencias": [
+      "35 milhões",
+      "10 milhões",
+      "12.401"
+     ]
+    },
+    {
+     "paginas": [
+      22
+     ],
+     "assunto": "Atribuições da SCTIE/DGITIS; MEC e Portal de Ajudas Técnicas",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "governo"
+     ],
+     "evidencias": [
+      "custo-efetividade",
+      "Portal de Ajudas Técnicas"
+     ]
+    },
+    {
+     "paginas": [
+      23
+     ],
+     "assunto": "Salas de recursos, PNLD Acessível, Ministério da Cidadania e SUAS",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "governo"
+     ],
+     "evidencias": [
+      "PNLD"
+     ]
+    },
+    {
+     "paginas": [
+      24
+     ],
+     "assunto": "SUAS, BPC (4,6 milhões), CRAS e Criança Feliz",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "governo"
+     ],
+     "evidencias": [
+      "4,6 milhões",
+      "Criança Feliz"
+     ]
+    },
+    {
+     "paginas": [
+      25
+     ],
+     "assunto": "CREAS, Centro Dia, acolhimento; colegiados CONADE e CITA",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "governo",
+      "historia-politica"
+     ],
+     "evidencias": [
+      "Centro Dia",
+      "CONADE"
+     ]
+    },
+    {
+     "paginas": [
+      26,
+      30,
+      32,
+      48,
+      68
+     ],
+     "assunto": "Divisórias de capítulo",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Estrutural, sem texto.",
+     "consulta": [
+      "pnta"
+     ]
+    },
+    {
+     "paginas": [
+      27
+     ],
+     "assunto": "Introdução às diretrizes; dimensão biopsicossocial",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "deficiencia",
+      "pnta"
+     ],
+     "evidencias": [
+      "biopsicossocial"
+     ]
+    },
+    {
+     "paginas": [
+      28
+     ],
+     "assunto": "Cuidado como tecnologia assistiva; diretrizes I e II",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "ta-lei",
+      "pnta"
+     ],
+     "evidencias": [
+      "cuidado como tecnologia assistiva",
+      "eliminar barreiras"
+     ]
+    },
+    {
+     "paginas": [
+      29
+     ],
+     "assunto": "Diretrizes III a V",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "pnta"
+     ],
+     "evidencias": [
+      "empreendedorismo, indústria nacional"
+     ]
+    },
+    {
+     "paginas": [
+      31
+     ],
+     "assunto": "Objetivo geral e cinco objetivos específicos",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "pnta"
+     ],
+     "evidencias": [
+      "crédito subsidiado",
+      "importação"
+     ]
+    },
+    {
+     "paginas": [
+      33
+     ],
+     "assunto": "Eixo I: CNRTA",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "produzir"
+     ],
+     "evidencias": [
+      "CNRTA"
+     ]
+    },
+    {
+     "paginas": [
+      34
+     ],
+     "assunto": "Núcleo 3D, rede nacional de núcleos, centro de Uberlândia",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "produzir"
+     ],
+     "evidencias": [
+      "5.000",
+      "108 projetos"
+     ]
+    },
+    {
+     "paginas": [
+      35
+     ],
+     "assunto": "Autossustentação do centro e ações do eixo I",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "produzir"
+     ],
+     "evidencias": [
+      "baixo custo"
+     ]
+    },
+    {
+     "paginas": [
+      36
+     ],
+     "assunto": "Eixo II: Bolsa-Formação, CRTA, PGPTA",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "produzir"
+     ],
+     "evidencias": [
+      "3.914",
+      "Rio Grande do Sul"
+     ]
+    },
+    {
+     "paginas": [
+      37
+     ],
+     "assunto": "Bolsistas do PGPTA, Fiocruz, OSCs, ações do eixo II",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "produzir"
+     ],
+     "evidencias": [
+      "172",
+      "Apaes"
+     ]
+    },
+    {
+     "paginas": [
+      38
+     ],
+     "assunto": "Eixo III: Finep e Quadro 4",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "produzir"
+     ],
+     "evidencias": [
+      "52,7",
+      "325"
+     ]
+    },
+    {
+     "paginas": [
+      39
+     ],
+     "assunto": "Quadro 5 e seleção de 2020",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "produzir"
+     ],
+     "evidencias": [
+      "784",
+      "151,7"
+     ]
+    },
+    {
+     "paginas": [
+      40
+     ],
+     "assunto": "Quadro 6 e laboratório de biomecânica da UFSC",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Taxas de aprovação calculadas e identificadas como conta nossa.",
+     "consulta": [
+      "produzir"
+     ],
+     "evidencias": [
+      "21,4",
+      "quadril"
+     ]
+    },
+    {
+     "paginas": [
+      41
+     ],
+     "assunto": "Ações do eixo III e início do eixo IV",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "produzir",
+      "chegar"
+     ],
+     "evidencias": [
+      "encomendas tecnológicas",
+      "transferência de tecnologia"
+     ]
+    },
+    {
+     "paginas": [
+      42
+     ],
+     "assunto": "Maturidade tecnológica, laboratório de Campina Grande, normas da ABNT",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "chegar"
+     ],
+     "evidencias": [
+      "maturidade tecnológica",
+      "Campina Grande"
+     ]
+    },
+    {
+     "paginas": [
+      43
+     ],
+     "assunto": "Certificação Inmetro e registro na Anvisa; ações do eixo IV; eixo V no SUAS",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "chegar"
+     ],
+     "evidencias": [
+      "Inmetro",
+      "categorizar"
+     ]
+    },
+    {
+     "paginas": [
+      44
+     ],
+     "assunto": "Acolhimento como tecnologia assistiva; concessão no SUS; projeto de revisão",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "chegar"
+     ],
+     "evidencias": [
+      "oficinas ortopédicas",
+      "rever a lista"
+     ]
+    },
+    {
+     "paginas": [
+      45
+     ],
+     "assunto": "Serviços digitais, Meu INSS, telecentros",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "chegar"
+     ],
+     "evidencias": [
+      "4.137",
+      "13%"
+     ]
+    },
+    {
+     "paginas": [
+      46
+     ],
+     "assunto": "Ações do eixo V",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "chegar"
+     ],
+     "evidencias": [
+      "reposição de peças"
+     ]
+    },
+    {
+     "paginas": [
+      47
+     ],
+     "assunto": "Página de logotipos",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Estrutural, sem texto.",
+     "consulta": [
+      "pnta"
+     ]
+    },
+    {
+     "paginas": [
+      49,
+      50
+     ],
+     "assunto": "Iniciativas 1 e 2",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "iniciativas",
+      "pnta"
+     ],
+     "evidencias": [
+      "rodízio",
+      "2 campanhas"
+     ]
+    },
+    {
+     "paginas": [
+      51,
+      52,
+      53,
+      54
+     ],
+     "assunto": "Iniciativas 3 a 7",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "iniciativas"
+     ],
+     "evidencias": [
+      "1.000 vagas",
+      "Semana Nacional"
+     ]
+    },
+    {
+     "paginas": [
+      55,
+      56,
+      57
+     ],
+     "assunto": "Iniciativas 8 a 11",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "iniciativas"
+     ],
+     "evidencias": [
+      "+5%",
+      "40 h"
+     ]
+    },
+    {
+     "paginas": [
+      58
+     ],
+     "assunto": "Iniciativas 12 e 13",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "iniciativas"
+     ],
+     "evidencias": [
+      "acessibilidade comunicacional",
+      "Catálogo Nacional"
+     ]
+    },
+    {
+     "paginas": [
+      59,
+      60,
+      61
+     ],
+     "assunto": "Iniciativas 14 a 16",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "iniciativas"
+     ],
+     "evidencias": [
+      "câmaras técnicas",
+      "tecnovigilância"
+     ]
+    },
+    {
+     "paginas": [
+      62,
+      63,
+      64,
+      65,
+      66,
+      67
+     ],
+     "assunto": "Iniciativas 17 a 24",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "iniciativas"
+     ],
+     "evidencias": [
+      "15 a 29",
+      "2022"
+     ]
+    },
+    {
+     "paginas": [
+      69
+     ],
+     "assunto": "Monitoramento e acompanhamento",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "pnta"
+     ],
+     "evidencias": [
+      "reavaliado"
+     ]
+    },
+    {
+     "paginas": [
+      70
+     ],
+     "assunto": "Documentos de referência",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Estrutural. As normas citadas aparecem na linha do tempo.",
+     "consulta": [
+      "historia-politica"
+     ]
+    },
+    {
+     "paginas": [
+      71,
+      72
+     ],
+     "assunto": "Página em branco e contracapa",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Estrutural, sem texto.",
+     "consulta": [
+      "pnta"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pires-2019-ysb",
+   "url": "https://www.revistas.unijui.edu.br/index.php/desenvolvimentoemquestao/article/view/6846",
+   "escopo": "Pires, Luzio dos Santos e Mostagi, Negócios sociais em foco: o caso da Yunus Social Business, Desenvolvimento em Questão 17(47), p. 102-119. 18 páginas do PDF (p. 1 do PDF = p. 102 impressa).",
+   "acesso": "integral",
+   "metodo": "Extração de texto das 18 páginas; Figuras 1 e 2 (p. 14 e 15 do PDF) conferidas na imagem.",
+   "totalUnidades": 18,
+   "unidades": [
+    {
+     "paginas": [
+      1
+     ],
+     "assunto": "Resumo e palavras-chave",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "crises",
+      "limites"
+     ],
+     "evidencias": [
+      "paliativa"
+     ]
+    },
+    {
+     "paginas": [
+      2
+     ],
+     "assunto": "Multicrises: financeira, social e ambiental; sociedade de organizações",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "crises"
+     ],
+     "evidencias": [
+      "Oxfam",
+      "sociedade de organizações"
+     ]
+    },
+    {
+     "paginas": [
+      3
+     ],
+     "assunto": "Negócios sociais como alternativa; definição de Yunus; objetivo do artigo",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "negocio-social"
+     ],
+     "evidencias": [
+      "Nobel"
+     ]
+    },
+    {
+     "paginas": [
+      4
+     ],
+     "assunto": "Consenso de Washington, crises, dados de desigualdade e ambientais",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "O número de 1,3 milhão de pessoas abaixo de um dólar por dia foi sinalizado como provável erro de digitação.",
+     "consulta": [
+      "crises"
+     ],
+     "evidencias": [
+      "Argentina",
+      "800 milhões",
+      "230 bilhões"
+     ]
+    },
+    {
+     "paginas": [
+      5
+     ],
+     "assunto": "Foladori; propósito dos negócios sociais; definição da SEKN",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "O trecho 'com fins lucrativos (ONGs)' foi sinalizado como erro de digitação.",
+     "consulta": [
+      "crises",
+      "negocio-social"
+     ],
+     "evidencias": [
+      "Foladori",
+      "SEKN"
+     ]
+    },
+    {
+     "paginas": [
+      6
+     ],
+     "assunto": "Diferença para empresas e OSCs; modelo Yunus; início do Grameen",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "negocio-social",
+      "grameen"
+     ],
+     "evidencias": [
+      "capital inicial",
+      "Chittagong"
+     ]
+    },
+    {
+     "paginas": [
+      7
+     ],
+     "assunto": "Grameen: mulheres, crédito em grupo, Grameen Danone; dois tipos",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "grameen",
+      "negocio-social"
+     ],
+     "evidencias": [
+      "Danone",
+      "Tipo 2"
+     ]
+    },
+    {
+     "paginas": [
+      8
+     ],
+     "assunto": "Limites: medidas de desempenho, valor compartilhado e críticos",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "limites"
+     ],
+     "evidencias": [
+      "Porter",
+      "O'Connor"
+     ]
+    },
+    {
+     "paginas": [
+      9
+     ],
+     "assunto": "Laville; metodologia do estudo",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "limites",
+      "ysb"
+     ],
+     "evidencias": [
+      "Laville",
+      "estudo de caso"
+     ]
+    },
+    {
+     "paginas": [
+      10
+     ],
+     "assunto": "Fundação da YSB, regiões, aceleração, Haiti",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "ysb"
+     ],
+     "evidencias": [
+      "Saskia",
+      "SAP"
+     ]
+    },
+    {
+     "paginas": [
+      11
+     ],
+     "assunto": "Quadro 1; Colômbia, Índia, Albânia",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "ysb"
+     ],
+     "evidencias": [
+      "McCain",
+      "Kosovo"
+     ]
+    },
+    {
+     "paginas": [
+      12
+     ],
+     "assunto": "Brasil, Uganda, Tunísia, Costa Rica; limitações dos dados; serviços",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "ysb"
+     ],
+     "evidencias": [
+      "Yale",
+      "rede universitária"
+     ]
+    },
+    {
+     "paginas": [
+      13
+     ],
+     "assunto": "Serviços não financeiros; apoio pós-investimento; critérios e empréstimos",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "ysb",
+      "financiamento-ysb"
+     ],
+     "evidencias": [
+      "investment readiness",
+      "25%"
+     ]
+    },
+    {
+     "paginas": [
+      14
+     ],
+     "assunto": "Figura 1: doadores e credores; contradição da YSB",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Figura 1 conferida na imagem e transformada em tabela.",
+     "consulta": [
+      "financiamento-ysb"
+     ],
+     "evidencias": [
+      "credor filantrópico",
+      "depende de doações"
+     ]
+    },
+    {
+     "paginas": [
+      15
+     ],
+     "assunto": "KPIs e relatórios; Figura 2: US$ 8,6 milhões por região",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Figura 2 (mapa) conferida na imagem; valores por região transcritos e somados (US$ 8,61 mi).",
+     "consulta": [
+      "financiamento-ysb"
+     ],
+     "evidencias": [
+      "KPIs",
+      "8,6"
+     ]
+    },
+    {
+     "paginas": [
+      16
+     ],
+     "assunto": "Considerações finais e limitações da pesquisa",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "limites"
+     ],
+     "evidencias": [
+      "recursos plurais",
+      "realista"
+     ]
+    },
+    {
+     "paginas": [
+      17,
+      18
+     ],
+     "assunto": "Referências",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Estrutural. Autores citados aparecem nas seções.",
+     "consulta": [
+      "limites"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "olhar-digital-2023",
+   "url": "https://olhardigital.com.br/2023/01/02/pro/acessibilidade-na-tecnologia-qual-sua-importancia/",
+   "escopo": "Adriano Camargo, Acessibilidade na tecnologia: qual sua importância?, Olhar Digital, 02/01/2023. Unidades = 7 parágrafos do texto, sem anúncios e chamadas.",
+   "acesso": "integral",
+   "metodo": "Texto da página lido no navegador. O vídeo da campanha da Apple não foi assistido.",
+   "totalUnidades": 7,
+   "unidades": [
+    {
+     "paginas": [
+      1
+     ],
+     "assunto": "Definição de tecnologia assistiva",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "ta-lei"
+     ],
+     "evidencias": [
+      "Olhar Digital"
+     ]
+    },
+    {
+     "paginas": [
+      2
+     ],
+     "assunto": "Vocoder de 1928",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "ta-lei"
+     ],
+     "evidencias": [
+      "Vocoder",
+      "Homer Dudley"
+     ]
+    },
+    {
+     "paginas": [
+      3
+     ],
+     "assunto": "Voz sintética e visão computacional hoje",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "ta-lei"
+     ],
+     "evidencias": [
+      "visão computacional"
+     ]
+    },
+    {
+     "paginas": [
+      4,
+      5
+     ],
+     "assunto": "Campanha da Apple: músico com deficiência visual e a Siri",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Cena descrita como a reportagem descreve; o vídeo não foi assistido.",
+     "consulta": [
+      "ta-lei"
+     ],
+     "evidencias": [
+      "1,2 metro",
+      "Siri"
+     ]
+    },
+    {
+     "paginas": [
+      6
+     ],
+     "assunto": "Importância da acessibilidade para a independência",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "ta-lei"
+     ],
+     "evidencias": [
+      "autonomia"
+     ]
+    },
+    {
+     "paginas": [
+      7
+     ],
+     "assunto": "Mais de um bilhão de pessoas e envelhecimento",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Conteúdo integrado na seção indicada.",
+     "consulta": [
+      "quantas"
+     ],
+     "evidencias": [
+      "envelhecimento"
+     ]
+    }
+   ]
+  }
+ ]
+}

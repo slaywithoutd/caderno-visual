@@ -1,0 +1,63 @@
+{
+  "aula": "m8/comp/15-sistemas-ciberfisicos",
+  "data": "2026-11-18",
+  "criterio": "Aula nova. Cada página do capítulo e cada seção das duas páginas do Mokxi foi inventariada e ligada à seção do consulta.html que a cobre, com uma evidência textual. Complementos (SPI do Mokxi, especificação do nRF24L01+, código da RF24, MouseJack) estão no meta.json e não entram nesta matriz. Rastreabilidade não prova equivalência semântica.",
+  "fontes": [
+    {
+      "id": "petroni-cps",
+      "url": "https://www.researchgate.net/publication/329451552_Sistemas_Cyber_Fisicos",
+      "escopo": "Petroni, Gloria Jr. e Gonçalves, cap. 3 (Sistemas ciber-físicos) de Indústria 4.0: conceitos e fundamentos, Blucher, 2018. 9 páginas de PDF = p. 47 a 55 impressas.",
+      "acesso": "integral",
+      "metodo": "PDF do capítulo (cópia enviada pelo autor ao ResearchGate, salva pela dona em Downloads como 19.Cap_Sistemas_CPS.pdf). Texto extraído com pdftotext; páginas 2, 3 e 6 renderizadas para conferir as Figuras 3.1 e 3.2.",
+      "totalUnidades": 9,
+      "unidades": [
+        { "paginas": [1], "assunto": "p. 47 · Introdução: industrialização, 1ª a 4ª revolução industrial, CPS e IoT", "antes": "conteudo-novo-da-aula", "justificativa": "Tabela das revoluções e a Indústria 4.0.", "consulta": ["cps"], "evidencias": ["vapor", "eletricidade", "internet das coisas"] },
+        { "paginas": [2], "assunto": "p. 48 · Definição de CPS; áreas da Indústria 4.0; 3.2 estrutura: duas camadas, protocolos de automação, sensores e atuadores, decisão descentralizada; camada física; funções da camada cyber (gêmeo, dashboards, controle descentralizado, big data)", "antes": "conteudo-novo-da-aula", "justificativa": "Definição, camadas e as funções da cyber.", "consulta": ["cps", "camadas", "cyber"], "evidencias": ["testar e simular", "caldeiras", "protocolos de automacao", "big data"] },
+        { "paginas": [3], "assunto": "p. 49 · Integração da cadeia de valor; Figura 3.1; sensores e atuadores como ponte; gêmeo virtual; ERP, MES e PLM", "antes": "conteudo-novo-da-aula", "justificativa": "Figura 3.1 redesenhada na margem; legenda sem texto no original.", "consulta": ["camadas", "cyber"], "evidencias": ["figura 3.1", "plm", "fornecedores e clientes"] },
+        { "paginas": [4], "assunto": "p. 50 · Exemplo da montadora (PCP, RFID, MES); BI; MES com fornecedores (just in time) e cliente acompanhando o pedido; 3.3 National Critical Technologies Panel, Atlas (1996), IoT como condição inicial", "antes": "conteudo-novo-da-aula", "justificativa": "Figura passo a passo da montadora; contexto histórico em aplicações.", "consulta": ["cyber", "aplicacoes", "cps"], "evidencias": ["just in time", "atlas, 1996", "condicao inicial"] },
+        { "paginas": [5], "assunto": "p. 51 · Flexibilidade e produtividade; CLP, IoT, IA, robôs colaborativos; corrosão por CLP; 3.4 avanços esperados, mecatrônica vira CPS, integração horizontal e vertical, produção inteligente, demanda e produção; exemplo de redes sem fio", "antes": "conteudo-novo-da-aula", "justificativa": "Seção de aplicações.", "consulta": ["aplicacoes"], "evidencias": ["corrosao", "resiliencia", "integracao horizontal", "redes sem fio"] },
+        { "paginas": [6], "assunto": "p. 52 · Exemplos (ratos, cidades inteligentes, monitoramento médico, kit Arduino); Figura 3.2; benefícios segundo Witkowski; início de 3.5 sensores", "antes": "conteudo-novo-da-aula", "justificativa": "Tabela de exemplos, Figura 3.2 redesenhada e definição de sensor.", "consulta": ["aplicacoes", "sensores"], "evidencias": ["ratos", "witkowski", "figura 3.2", "acidez"] },
+        { "paginas": [7], "assunto": "p. 53 · Sensor analógico e digital; tipos de sensor; atuadores e a analogia do corpo; tipos de atuador; RFID, códigos de barra e QR, marcações no piso", "antes": "conteudo-novo-da-aula", "justificativa": "Tabelas de sensores e atuadores.", "consulta": ["sensores", "atuadores"], "evidencias": ["encoder", "fotossensor", "musculos", "motor de passo", "marcacoes no piso"] },
+        { "paginas": [8], "assunto": "p. 54 · Considerações finais: customização em massa e produção em massa, impactos (emprego, capacitação, segurança da informação, privacidade), novos modelos de negócio; início das referências", "antes": "conteudo-novo-da-aula", "justificativa": "Fecho do capítulo na seção de CPS.", "consulta": ["cps"], "evidencias": ["customizacao em massa", "privacidade", "modelos de negocio"] },
+        { "paginas": [9], "assunto": "p. 55 · Referências (continuação)", "antes": "informacao-ausente-na-fonte", "justificativa": "Só referências bibliográficas; as citadas no texto aparecem com autor e ano nas seções.", "consulta": ["aplicacoes"], "evidencias": ["liu, 2015"] }
+      ]
+    },
+    {
+      "id": "mokxi-simulador",
+      "url": "https://mokxi.com/nrf24l01-simulator",
+      "escopo": "Página do simulador, 7 partes: abertura, What you can do here, What the running circuit shows, How the radio is modeled, How it works e partes de divulgação (exemplos, avaliações, novidades, outros simuladores), FAQ, e o sketch do circuito (projeto Send a heartbeat).",
+      "acesso": "integral",
+      "metodo": "Versão em markdown da página (nrf24l01-simulator.md, atualizada em 13/11/2026) e página do projeto heartbeat-pair, lidas em 18/11/2026.",
+      "totalUnidades": 7,
+      "unidades": [
+        { "paginas": [1], "assunto": "Abertura: simulador gratuito no navegador, sem conta; dois Unos com rádio, botão e LED, mesmo sketch RF24", "antes": "conteudo-novo-da-aula", "justificativa": "Mokxi e o circuito do heartbeat.", "consulta": ["simulador", "heartbeat"], "evidencias": ["mokxi", "mesmo sketch"] },
+        { "paginas": [2], "assunto": "What you can do here: mandar pacote de qualquer placa, ler o bool do write(), apagar um rádio, begin/openWritingPipe/startListening, conferir CE, CSN e SPI", "antes": "conteudo-novo-da-aula", "justificativa": "Experimentos no simulador e a API.", "consulta": ["simulador", "ack-radio"], "evidencias": ["apagar o radio", "write()"] },
+        { "paginas": [3], "assunto": "What the running circuit shows: endereço HEART, pipes de leitura e escrita, parar de ouvir para mandar, 8 bytes, ACK em hardware, nobody answered, 3V3 e sinais tolerantes a 5 V", "antes": "conteudo-novo-da-aula", "justificativa": "Seção do heartbeat e do módulo.", "consulta": ["heartbeat", "nrf24"], "evidencias": ["heart", "nobody answered", "tolerantes a 5 v"] },
+        { "paginas": [4], "assunto": "How the radio is modeled: registradores, FIFOs de 3, 1,5 ms e 130 µs, Enhanced ShockBurst, CE/CSN errado quebra, ar compartilhado, outro canal ou taxa não ouve; sem distância, paredes, Wi-Fi, potência; capacitor de 10 µF", "antes": "conteudo-novo-da-aula", "justificativa": "Tabela modelo × fora do modelo.", "consulta": ["simulador", "nrf24"], "evidencias": ["fifos de 3 pacotes", "interferencia de wi-fi", "10 µf"] },
+        { "paginas": [5], "assunto": "How it works (abrir editor, ligar e escrever, Run) e partes de divulgação (exemplos, avaliações, novidades, lista de simuladores)", "antes": "conteudo-novo-da-aula", "justificativa": "Só o caminho de uso entra; divulgação não é conteúdo da aula.", "consulta": ["simulador"], "evidencias": ["sem login", "monitor serial"] },
+        { "paginas": [6], "assunto": "FAQ: grátis e sem conta, dois Arduinos por nRF24L01, por que write() devolve false, precisa de 3,3 V, placas suportadas, compilação no navegador, navegadores, celular, planos, turmas, privacidade, Mokxi AI", "antes": "conteudo-novo-da-aula", "justificativa": "Perguntas sobre o rádio cobertas nas seções; perguntas de planos e turmas não são conteúdo da aula.", "consulta": ["simulador", "ack-radio", "nrf24"], "evidencias": ["conta gratuita", "no answer", "3v3"] },
+        { "paginas": [7], "assunto": "Sketch Send a heartbeat (projeto heartbeat-pair): fade e beat por PWM, setPALevel LOW, pipe de escrita e pipe de leitura 1, borda com wasPressed, stopListening/write/startListening, available/read", "antes": "conteudo-novo-da-aula", "justificativa": "Trecho do loop() e explicação do setup() e do fade.", "consulta": ["heartbeat"], "evidencias": ["waspressed", "openreadingpipe(1, address)", "442 ms"] }
+      ]
+    },
+    {
+      "id": "mokxi-campainha",
+      "url": "https://mokxi.com/learn/arduino-nrf24l01",
+      "escopo": "Tutorial A wireless doorbell with two Arduinos and nRF24L01 radios, 10 partes: abertura, What you need, Wiring, Both radios must agree, Delivered or no answer, The receiver, Try it in the editor, Common mistakes, Questions, e a página do projeto Radio doorbell com os dois sketches completos.",
+      "acesso": "integral",
+      "metodo": "Versão em markdown (arduino-nrf24l01.md, atualizada em 07/11/2026) e HTML da página do projeto radio-doorbell para os blocos de código, lidos em 18/11/2026.",
+      "totalUnidades": 10,
+      "unidades": [
+        { "paginas": [1], "assunto": "Abertura: rádio de 2,4 GHz com antena na placa, controle remoto, campainha, sensor; o circuito ding dong", "antes": "conteudo-novo-da-aula", "justificativa": "Definição do módulo.", "consulta": ["nrf24"], "evidencias": ["controle remoto", "2,4 ghz"] },
+        { "paginas": [2], "assunto": "What you need: dois Unos, dois rádios, botão, LED e resistor de 220 Ω, protoboard; capacitor de 10 µF", "antes": "conteudo-novo-da-aula", "justificativa": "Tabela de ligação e capacitor.", "consulta": ["nrf24"], "evidencias": ["220 ω", "capacitor de desacoplamento"] },
+        { "paginas": [3], "assunto": "Wiring: VCC 3,3 V, GND, CE 7, CSN 8, SCK 13, MOSI 11, MISO 12, IRQ solto, botão no 2 com pull-up, LED no 5", "antes": "conteudo-novo-da-aula", "justificativa": "Tabela de pinos.", "consulta": ["nrf24"], "evidencias": ["irq", "input_pullup"] },
+        { "paginas": [4], "assunto": "Both radios must agree: sem pareamento, canal 76, taxa, endereço 00001; openWritingPipe/stopListening e openReadingPipe/startListening", "antes": "conteudo-novo-da-aula", "justificativa": "Seção do que os rádios combinam.", "consulta": ["combinar"], "evidencias": ["pareamento", "00001", "2476 mhz"] },
+        { "paginas": [5], "assunto": "Delivered or no answer: ACK em hardware, write() espera e devolve true ou false depois de tentativas; no answer como ferramenta de depuração", "antes": "conteudo-novo-da-aula", "justificativa": "Seção do ACK e figura 2.", "consulta": ["ack-radio"], "evidencias": ["ferramenta de depuracao", "delivered"] },
+        { "paginas": [6], "assunto": "The receiver: available, read para buffer, imprime, LED por 300 ms, payload até 32 bytes", "antes": "conteudo-novo-da-aula", "justificativa": "Código do receptor comentado.", "consulta": ["campainha"], "evidencias": ["300 ms", "32 bytes"] },
+        { "paginas": [7], "assunto": "Try it in the editor: setChannel(90) de um lado, número de potenciômetro com analogRead, analisador lógico no pino ANT", "antes": "conteudo-novo-da-aula", "justificativa": "Experimentos do simulador e o exemplo do canal.", "consulta": ["simulador", "combinar"], "evidencias": ["potenciometro", "pino ant", "setchannel(90)"] },
+        { "paginas": [8], "assunto": "Common mistakes: 5 V, 3,3 V fraco, CE e CSN invertidos, parâmetros diferentes, true não prova que o sketch fez algo", "antes": "conteudo-novo-da-aula", "justificativa": "Pegadinhas espalhadas nas seções donas.", "consulta": ["nrf24", "campainha", "ack-radio"], "evidencias": ["ce primeiro", "so que o outro radio"] },
+        { "paginas": [9], "assunto": "Questions: como ligar, por que false, alcance não modelado, pino de antena escondido e colisões", "antes": "conteudo-novo-da-aula", "justificativa": "Respostas nas seções do simulador e do ACK.", "consulta": ["simulador", "ack-radio"], "evidencias": ["pino de antena", "colisao"] },
+        { "paginas": [10], "assunto": "Página do projeto Radio doorbell: lista de peças, tabela de fios, sketch do transmissor e do receptor completos, walkthrough de setup e loop, troubleshooting", "antes": "conteudo-novo-da-aula", "justificativa": "Os dois sketches inteiros com comentários e a tabela de monitores.", "consulta": ["campainha"], "evidencias": ["presses % 10", "rf24_pa_min", "press the button to ring"] }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "numero": "15",
+  "data": "2026-11-18",
+  "titulo": "Sistemas ciberfísicos e dois Arduinos por rádio",
+  "tema": "Interface com dispositivos embarcados",
+  "modos": [
+    "consulta"
+  ],
+  "resumo": "O que é um sistema ciberfísico (camadas física e cyber, gêmeo virtual, sensores e atuadores, Indústria 4.0) e a versão mínima dele: dois Arduinos Uno com rádios nRF24L01 ligados por SPI, que combinam canal, taxa e endereço e confirmam a entrega com ACK em hardware; os códigos do transmissor e do receptor linha a linha, o simulador Mokxi e a segurança do rádio.",
+  "topicos": [
+    "Sistema ciberfísico e Indústria 4.0",
+    "Camadas física e cyber",
+    "Gêmeo virtual, MES e RFID",
+    "Sensores e atuadores",
+    "SPI",
+    "nRF24L01: ligação e alimentação",
+    "Canal, taxa e endereço",
+    "ACK e retransmissão",
+    "Transmissor e receptor",
+    "Mokxi",
+    "Segurança do rádio",
+    "TAPI: aviso ao cuidador"
+  ],
+  "secoes": [],
+  "fontes": [
+    {
+      "tipo": "Livro",
+      "titulo": "Petroni, Gloria Jr. e Gonçalves · Sistemas ciber-físicos, cap. 3 de Indústria 4.0: conceitos e fundamentos (Blucher, 2018), p. 47–55",
+      "url": "https://www.researchgate.net/publication/329451552_Sistemas_Cyber_Fisicos",
+      "secao": "cps",
+      "nota": "Autoestudo. Capítulo lido por inteiro (9 páginas, PDF enviado pelo autor ao ResearchGate), com as duas figuras conferidas visualmente."
+    },
+    {
+      "tipo": "Tutorial",
+      "titulo": "Mokxi · An nRF24L01 simulator: two Arduinos talking by radio",
+      "url": "https://mokxi.com/nrf24l01-simulator",
+      "secao": "simulador",
+      "nota": "Autoestudo. Lido por inteiro em 18/11/2026, com o sketch do circuito da página (projeto Send a heartbeat)."
+    },
+    {
+      "tipo": "Tutorial",
+      "titulo": "Mokxi · A wireless doorbell with two Arduinos and nRF24L01 radios (com os sketches do transmissor e do receptor)",
+      "url": "https://mokxi.com/learn/arduino-nrf24l01",
+      "secao": "campainha",
+      "nota": "Autoestudo: é o tutorial que a página do simulador indica. Lido por inteiro, com a página do projeto Radio doorbell (código completo)."
+    },
+    {
+      "tipo": "Tutorial",
+      "titulo": "Mokxi · SPI: a clock, two data lines and a chip select",
+      "url": "https://mokxi.com/learn/spi-explained",
+      "secao": "spi",
+      "nota": "Complemento linkado pelo tutorial do nRF24L01, usado para a base de SPI."
+    },
+    {
+      "tipo": "Documentação",
+      "titulo": "Nordic Semiconductor · nRF24L01+ Product Specification v1.0",
+      "url": "https://www.sparkfun.com/datasheets/Components/SMD/nRF24L01Pluss_Preliminary_Product_Specification_v1_0.pdf",
+      "secao": "ack-radio",
+      "nota": "Complemento para formato do pacote, canais, taxas, consumo, tempos, FIFO e retransmissão."
+    },
+    {
+      "tipo": "Código",
+      "titulo": "Biblioteca RF24 (nRF24/RF24: RF24.cpp e RF24.h)",
+      "url": "https://github.com/nRF24/RF24",
+      "secao": "combinar",
+      "nota": "Complemento para os padrões do begin(): canal 76, 1 Mbps, setRetries(5, 15), payload fixo de 32 bytes completado com zeros, níveis de potência em dBm."
+    },
+    {
+      "tipo": "Artigo",
+      "titulo": "Bastille · MouseJack: injecting keystrokes into wireless mice (2016)",
+      "url": "https://bastille.net/?p=1632",
+      "secao": "seguranca",
+      "nota": "Complemento para a caixa de segurança."
+    }
+  ],
+  "observacao": "Os dois autoestudos foram lidos por inteiro. SPI em detalhe, números do nRF24L01+, padrões da RF24 e o MouseJack vêm dos complementos listados. A legenda da Figura 3.1 do capítulo não tem texto; a leitura dos símbolos é a do próprio capítulo. Exercícios, contas (tempo no ar, 28 ms sem ACK, 442 ms do beat) e a decisão de projeto são autorais e não são do professor. Sem slides do encontro anterior deste eixo no caderno."
+}

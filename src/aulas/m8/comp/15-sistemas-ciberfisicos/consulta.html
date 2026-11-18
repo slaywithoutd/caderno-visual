@@ -1,0 +1,608 @@
+<!-- Aula 15 de Computação (18/11/2026), eixo "Interface com dispositivos embarcados", só modo Consulta.
+     Um conceito por seção, em ordem de dependência. Estrutura de cada seção:
+     h2 → p.cs-def → .cs-formula → .cs-uso → .cs-pegadinhas → .cs-ponderada → visuais.
+     Os visuais estão escritos aqui mesmo; não há conteudo.html. -->
+
+<!-- ================= Resumo ================= -->
+<section class="cs" id="encontro" data-grupo="Resumo" data-termos="">
+  <h2>Resumo</h2>
+  <p class="cs-def">Um sistema ciberfísico sente o mundo com sensores, decide num computador e age com atuadores; dois Arduinos com rádios nRF24L01 são a menor versão disso que ainda fala sem fio.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 126"><rect class="am" x="2" y="8" width="52" height="26" rx="5"/><text x="28" y="21">botão</text><path class="s" d="M28,36 V52" marker-end="url(#mnarrow)"/><rect class="bl" x="2" y="54" width="52" height="26" rx="5"/><text x="28" y="67">Uno A</text><rect class="acf" x="64" y="54" width="44" height="26" rx="5"/><text x="86" y="67">rádio</text><path class="s" d="M56,67 H62"/><path class="s" d="M112,62 C130,46 146,46 164,62" style="stroke-dasharray:3 3" marker-end="url(#mnarrow)"/><text class="tm" x="138" y="40">pacote</text><path class="s" d="M164,76 C146,92 130,92 112,76" style="stroke-dasharray:3 3" marker-end="url(#mnarrow)"/><text class="tm" x="138" y="104">ACK</text><rect class="acf" x="166" y="54" width="44" height="26" rx="5"/><text x="188" y="67">rádio</text><rect class="bl" x="214" y="54" width="24" height="26" rx="5"/><text x="226" y="67" style="font-size:9px">B</text><path class="s" d="M226,52 V36" marker-end="url(#mnarrow)"/><rect class="gr" x="200" y="8" width="38" height="26" rx="5"/><text x="219" y="21">LED</text><text class="tm" x="120" y="122">sensor → decide → rádio → atuador</text></svg>O botão é o sensor, o LED é o atuador e o rádio é a ponte. O ACK volta sozinho.</aside>
+  <ul class="b">
+    <li>Sistema ciberfísico (CPS): computação ligada ao mundo físico para monitorar e controlar em tempo real. Tem uma camada física (máquinas, pessoas) e uma camada cyber (gêmeo virtual, painéis, dados), e a ponte entre elas são sensores e atuadores.</li>
+    <li>Sensor transforma uma grandeza física num sinal elétrico (analógico, lido por ADC, ou digital). Atuador faz o caminho de volta: motor, relé, válvula, LED.</li>
+    <li>O nRF24L01 fala com o Uno por SPI (SCK 13, MOSI 11, MISO 12, mais CE e CSN) e é alimentado em 3,3 V. As entradas aguentam 5 V.</li>
+    <li>Não existe pareamento: os dois rádios precisam combinar canal (76 por padrão, 2476 MHz), taxa no ar (1 Mbps) e endereço ("00001"). Um diferente e nada chega.</li>
+    <li>O receptor devolve um ACK em hardware. <code>radio.write()</code> devolve <code>true</code> só se o ACK voltou, depois de até 15 retransmissões. Esse <code>bool</code> separa "entregue" de "perdido".</li>
+    <li>O rádio não cifra nada: o endereço viaja aberto, e quem acerta canal e endereço lê e injeta pacotes (MouseJack, 2016).</li>
+  </ul>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li><code>write()</code> devolvendo <code>true</code> quer dizer que o outro rádio recebeu. Não quer dizer que o sketch de lá leu, nem que acendeu o LED.</li>
+    <li>VCC do rádio no 3V3 do Uno, nunca no 5V. Só os pinos de sinal aguentam 5 V.</li>
+    <li><code>RF24 radio(7, 8)</code>: CE primeiro, CSN depois. Trocar a ordem e o rádio não responde.</li>
+    <li>O simulador não tem distância, parede nem Wi-Fi. Link que funciona no Mokxi pode falhar na bancada por alimentação fraca.</li>
+  </ul></div>
+</section>
+
+<!-- ================= Antes de começar ================= -->
+<section class="cs" id="antes" data-grupo="Antes de começar" data-termos="sketch,entrada-saida-digital,pull-up,string-c,sizeof-endereco,terra-comum">
+  <h2>Antes de começar</h2>
+  <p class="cs-def">Os sketches do tutorial usam o básico do Arduino, um pouco de C e duas ideias de eletricidade. Quem já sabe, fecha as caixas.</p>
+  <details class="base" open>
+    <summary><span class="base-tag">Base</span> O que vem de aulas anteriores</summary>
+    <ul class="b">
+      <li>UART, baud rate, quadro, ACK, checksum e enquadramento de mensagem: <a href="/m8/comp/10-web-serial">aula 10</a>. O <code>Serial.begin(9600)</code> dos sketches é a UART dessa aula, ligada ao monitor serial.</li>
+      <li>Superloop: <a href="/m8/comp/04-processos-threads">aula 04</a>. O <code>loop()</code> roda para sempre, uma coisa depois da outra; um <code>delay()</code> trava todo o resto.</li>
+      <li>Polling, debounce e sistema de tempo real: <a href="/m8/comp/06-gerencia-recursos">aula 06</a>. Ler o botão a cada volta do laço é polling.</li>
+      <li>Sistema embarcado, GPIO e o Uno (ATmega328P): <a href="/m8/comp/02-fundamentos-memoria">aula 02</a>.</li>
+    </ul>
+  </details>
+  <details class="base" open>
+    <summary><span class="base-tag">Base</span> Arduino em 3 minutos</summary>
+    <ul class="b">
+      <li>Um <b>sketch</b> tem duas funções. <code>setup()</code> roda uma vez quando a placa liga; <code>loop()</code> é chamada de novo assim que termina.</li>
+      <li><b>pinMode, digitalRead e digitalWrite</b>: <code>pinMode(5, OUTPUT)</code> faz o pino 5 mandar; <code>digitalWrite(5, HIGH)</code> põe 5 V nele e acende o LED; <code>digitalRead(2)</code> devolve <code>HIGH</code> ou <code>LOW</code>.</li>
+      <li>Um pino de entrada solto lê ruído. O <b>resistor de pull-up</b> o puxa para HIGH. Com <code>INPUT_PULLUP</code> e o botão ligado ao GND, solto lê HIGH e apertado lê LOW. Por isso os sketches testam <code>== LOW</code> para "apertado".</li>
+      <li><code>Serial.print</code> e <code>Serial.println</code> escrevem no monitor serial (o <code>println</code> acrescenta a quebra de linha).</li>
+    </ul>
+  </details>
+  <details class="base" open>
+    <summary><span class="base-tag">Base</span> C em 2 minutos</summary>
+    <ul class="b">
+      <li>Uma <b>string em C</b> é um array de <code>char</code> terminado pelo byte 0. <code>"00001"</code> tem 5 letras e ocupa 6 bytes; daí <code>address[6]</code>.</li>
+      <li><code>char message[32] = "ding dong ";</code> reserva 32 bytes, copia os 10 caracteres e zera o resto. O texto termina no primeiro zero.</li>
+      <li><b>sizeof</b> e o operador <code>&amp;</code>: <code>&amp;message</code> é o endereço do array; <code>sizeof(message)</code> é 32. <code>radio.write(&amp;message, sizeof(message))</code> manda os 32 bytes a partir daquele endereço.</li>
+      <li><code>condição ? a : b</code> vale <code>a</code> se a condição for verdadeira e <code>b</code> se não.</li>
+    </ul>
+  </details>
+  <details class="base" open>
+    <summary><span class="base-tag">Base</span> Eletricidade mínima</summary>
+    <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 92"><rect class="bl" x="4" y="30" width="40" height="30" rx="4"/><text x="24" y="45">pino 5</text><path class="s" d="M44,45 H64"/><rect class="am" x="64" y="38" width="44" height="14" rx="3"/><text class="tm" x="86" y="30">220 Ω</text><path class="s" d="M108,45 H130"/><path class="gr" d="M130,33 L130,57 L152,45 Z"/><path class="s" d="M152,33 V57"/><text class="tm" x="141" y="72">LED</text><path class="s" d="M152,45 H190 V70"/><path class="s" d="M178,70 H202 M182,75 H198 M186,80 H194"/><text class="tm" x="216" y="74">GND</text><text class="tm st" x="4" y="14">(5 − 2) V ÷ 220 Ω ≈ 14 mA</text></svg>O resistor limita a corrente do LED. Sem ele, o LED e o pino sofrem.</aside>
+    <ul class="b">
+      <li>O <b>terra comum</b> (GND) é a referência de 0 V. Todo componente do circuito liga nele, ou as tensões não batem.</li>
+      <li>LED sempre com resistor em série. Supondo 2 V no LED vermelho: (5 − 2) ÷ 220 ≈ 14 mA.</li>
+      <li>O Uno trabalha em 5 V e tem um pino 3V3, que fornece 3,3 V com corrente limitada. É dele que o rádio se alimenta.</li>
+    </ul>
+  </details>
+  <div class="tbl prose"><table>
+    <thead><tr><th>Você vê</th><th>Leia como</th></tr></thead>
+    <tbody>
+      <tr><td><code>RF24 radio(7, 8);</code></td><td>crie o objeto <code>radio</code>, com CE no pino 7 e CSN no 8</td></tr>
+      <tr><td><code>const byte address[6] = "00001";</code></td><td>5 bytes de endereço, mais o zero do fim</td></tr>
+      <tr><td><code>if (!radio.available()) return;</code></td><td>sem pacote esperando? saia do <code>loop()</code> e tente na próxima volta</td></tr>
+      <tr><td><code>presses % 10</code></td><td>o resto da divisão por 10: o último dígito do contador</td></tr>
+      <tr><td><code>(char)('0' + 7)</code></td><td>o caractere "7": o código do "0" (48) mais 7</td></tr>
+      <tr><td>2,4 GHz, 2476 MHz</td><td>2,4 bilhões e 2,476 bilhões de oscilações por segundo</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ================= Sistema ciberfísico ================= -->
+<section class="cs" id="cps" data-grupo="Sistema ciberfísico" data-termos="sistema-ciberfisico,industria-40,revolucoes-industriais,iot,customizacao-massa">
+  <h2>Sistema ciberfísico e Indústria 4.0</h2>
+  <p class="cs-def">Um <b>sistema ciberfísico</b> (CPS, de cyber-physical system) junta computação e mundo físico para monitorar e controlar coisas físicas em tempo real e para testar e simular o que acontece no físico a partir do virtual.</p>
+  <aside class="mn loop" data-loop="ciclo" data-ms="6000" data-still="0.55" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>O ciclo de um CPS: o sensor mede, o computador decide, o atuador muda o mundo, e o sensor mede de novo.</aside>
+  <ul class="b">
+    <li>Exemplo pequeno: a campainha desta aula. O botão mede, o Uno decide, o rádio leva, o outro Uno decide e o LED acende.</li>
+    <li>O capítulo põe os CPS no centro da <b>Indústria 4.0</b>, a quarta das <b>revoluções industriais</b> (tabela). Cada uma trouxe uma tecnologia nova e um jeito novo de gerir.</li>
+    <li>A condição inicial da Indústria 4.0, segundo o capítulo, é ter equipamentos e objetos com capacidade de comunicação em toda a produção: a <b>internet das coisas</b> (IoT). Com isso as máquinas se integram entre si.</li>
+    <li>A Indústria 4.0 junta áreas que antes andavam separadas: automação integrada, cadeias produtiva e logística globais, matéria-prima, energia e gestão de ativos.</li>
+    <li>A promessa do capítulo: juntar <b>customização em massa</b> e produção em larga escala, dois conceitos que até então quase não andavam juntos.</li>
+  </ul>
+  <div class="cs-uso"><ul class="b">
+    <li>O que fica em aberto, segundo as considerações finais: emprego e substituição de mão de obra, formação do novo profissional, segurança da informação e privacidade. O ganho é uma rede de objetos inteligentes que flexibiliza a produção e abre mercados e modelos de negócio novos.</li>
+  </ul></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Errado: "CPS é o mesmo que IoT". Certo: IoT é a capacidade de comunicação dos objetos; o CPS é o sistema que usa essa comunicação para medir e controlar o físico.</li>
+    <li>Errado: "o capítulo dá datas para cada revolução". Certo: ele só diz a tecnologia de cada uma, e lembra que alguns contam a 2ª como parte da 1ª.</li>
+  </ul></div>
+  <div class="tbl prose"><table>
+    <thead><tr><th>Revolução</th><th>Base tecnológica (Petroni et al.)</th></tr></thead>
+    <tbody>
+      <tr><td>1ª</td><td>vapor como energia e máquinas automáticas mecânicas; produção centralizada em larga escala</td></tr>
+      <tr><td>2ª</td><td>eletricidade e automação eletromecânica</td></tr>
+      <tr><td>3ª</td><td>redes de informação e comunicação: computadores e internet</td></tr>
+      <tr><td>4ª</td><td>mundo real e digital misturados: automação, troca de muita informação, CPS e IoT</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="cs" id="camadas" data-grupo="Sistema ciberfísico" data-termos="camada-fisica,camada-cyber,ot-ti,controle-descentralizado">
+  <h2>Camada física e camada cyber</h2>
+  <p class="cs-def">Toda arquitetura de CPS tem duas camadas: a <b>camada física</b>, que transforma a realidade, e a <b>camada cyber</b>, feita de aplicações de TI. Sensores sobem informação da física para a cyber; atuadores descem comandos.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><rect class="bl" x="34" y="4" width="172" height="52" rx="5"/><text class="tm st" x="40" y="14">camada cyber</text><rect class="k" x="42" y="22" width="44" height="26" rx="4"/><text class="tm" x="64" y="35">gêmeo</text><ellipse class="k" cx="118" cy="30" rx="16" ry="5"/><path class="s" d="M102,30 V44 M134,30 V44"/><ellipse class="k" cx="118" cy="44" rx="16" ry="5"/><rect class="k" x="150" y="22" width="48" height="26" rx="4"/><text class="tm" x="174" y="35">painel</text><rect class="am" x="34" y="94" width="172" height="40" rx="5"/><text class="tm st" x="40" y="104">camada física</text><text class="tm" x="120" y="122">máquinas · esteira · pessoas</text><path class="s" d="M76,92 V60" marker-end="url(#mnarrow)"/><circle class="gr" cx="76" cy="88" r="4"/><text class="tm" x="58" y="78">sensor</text><path class="s" d="M164,60 V90" marker-end="url(#mnarrow)"/><text class="tm" x="190" y="78">atuador</text><path class="s" d="M2,30 H30" marker-end="url(#mnarrow)"/><text class="tm" x="18" y="22">forn.</text><path class="s" d="M210,30 H238" marker-end="url(#mnarrow)"/><text class="tm" x="216" y="22" style="font-size:8.5px">cliente</text></svg>Redesenho da Figura 3.1. A legenda do original não tem texto; a leitura "pirulito = sensor, seta = atuador, cilindro = banco de dados" segue o próprio capítulo.</aside>
+  <ul class="b">
+    <li>Na camada física ficam máquinas operatrizes, esteiras, robôs, braços mecânicos, fornos, caldeiras, tanques reatores, a própria planta da fábrica e os trabalhadores.</li>
+    <li>Na camada cyber ficam o gêmeo virtual, os painéis, o controle automático, os dados e a ligação com fornecedores e clientes (<a href="#cyber">próxima seção</a>).</li>
+    <li>Os protocolos de comunicação de um CPS podem ser diferentes dos de TI e ficam mais perto dos protocolos de automação. É o encontro de <b>tecnologia operacional (TO) e TI</b>.</li>
+    <li>Com equipamentos "inteligentes" dá para ter <b>controle descentralizado</b>: cada unidade decide sozinha, em tempo real, e coopera com as pessoas.</li>
+  </ul>
+  <div class="cs-uso"><ul class="b">
+    <li>Na campainha: camada física = botão, LED, rádios, a pessoa que aperta. Camada cyber = os dois sketches e o monitor serial que mostra "delivered". O Uno receptor decide sozinho acender o LED: controle descentralizado em miniatura.</li>
+  </ul></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Errado: "a camada física é só hardware". Certo: o capítulo põe nela também a planta da fábrica e os trabalhadores humanos.</li>
+    <li>Errado: "sensor e atuador ficam numa terceira camada". Certo: são a ponte entre as duas; o sensor sobe, o atuador desce.</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="cyber" data-grupo="Sistema ciberfísico" data-termos="gemeo-virtual,dashboard,big-data,erp,pcp,mes,plm,cadeia-valor,just-in-time">
+  <h2>O que a camada cyber faz</h2>
+  <p class="cs-def">A camada cyber junta cinco funções: uma cópia virtual do mundo físico, painéis para pessoas, controle automático descentralizado, dados em grande quantidade e integração com a cadeia de valor. O diferencial do CPS é fazer isso em tempo real com o chão de fábrica.</p>
+  <ul class="b">
+    <li><b>Gêmeo virtual</b>: modelo que reproduz o ambiente físico. Um jeito novo de produzir, ou uma mudança no atual, é testado primeiro nele, com menos custo e risco.</li>
+    <li><b>Dashboard</b>: painel na tela para uma pessoa acompanhar e controlar o físico em tempo real.</li>
+    <li>Controle automático descentralizado por unidades autônomas na linha, com inteligência artificial, apoiado em redes de sensores e atuadores.</li>
+    <li><b>Big data e BI</b>: capturar e guardar muito dado; o BI transforma esses dados em análise para decisões estratégicas.</li>
+    <li>Sistemas de gestão que já existiam antes do CPS: <b>ERP</b> (gestão integrada), com o <b>PCP</b> dentro dele (o plano da produção), o <b>MES</b> (acompanha a produção no chão de fábrica) e o <b>PLM</b> (ciclo de vida do produto).</li>
+    <li><b>Cadeia de valor</b>: o MES pode falar direto com sistemas e máquinas de fornecedores para entregas <b>just in time</b> mais certeiras, e o cliente acompanha ou muda o pedido customizado em tempo real.</li>
+  </ul>
+  <div class="cs-uso"><ul class="b">
+    <li>O exemplo do capítulo está na figura abaixo: uma montadora com a sequência de carros planejada no PCP, um problema que troca a ordem e a etiqueta RFID que avisa a fábrica toda.</li>
+  </ul></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Errado: "ERP e MES são invenções do CPS". Certo: o capítulo diz que eles já existiam; a novidade é ligá-los em tempo real ao físico.</li>
+    <li>Simular o circuito no Mokxi é testar no virtual antes de montar, como o gêmeo propõe. Mas o Mokxi não acompanha um circuito real seu enquanto ele roda: é um modelo de simulação, sem a ligação em tempo real.</li>
+  </ul></div>
+  <figure class="fig" id="fig-sequencia">
+    <div class="fig-head"><span class="fig-title">Figura 1 · A montadora que trocou a ordem dos carros</span><div class="fig-tabs"></div></div>
+    <div class="fig-body">
+      <div class="fig-stage"><svg id="sequencia-svg" viewBox="0 0 640 300"></svg></div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+</section>
+
+<section class="cs" id="aplicacoes" data-grupo="Sistema ciberfísico" data-termos="integracao-horizontal-vertical,producao-inteligente,clp,robo-colaborativo,mecatronica">
+  <h2>Onde os CPS aparecem</h2>
+  <p class="cs-def">Um sistema mecatrônico comum vira parte de um CPS quando ganha comunicação (IoT) e autonomia. Ligando esses sistemas em rede, de lado e de cima a baixo, a fábrica chega à produção inteligente.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 92"><rect class="acf" x="4" y="8" width="232" height="24" rx="4"/><text x="120" y="20">CPS</text><rect class="k" x="2" y="40" width="57" height="24" rx="4"/><text class="tm" x="30" y="52" style="font-size:8px">gestão</text><rect class="k" x="61" y="40" width="57" height="24" rx="4"/><text class="tm" x="89" y="52" style="font-size:8px">clientes</text><rect class="k" x="120" y="40" width="57" height="24" rx="4"/><text class="tm" x="148" y="52" style="font-size:8px">manufatura</text><rect class="k" x="179" y="40" width="59" height="24" rx="4"/><text class="tm" x="208" y="52" style="font-size:8px">suprimentos</text><text class="tm" x="120" y="82">um CPS por cima de toda a organização</text></svg>Redesenho da Figura 3.2: os CPS integram elementos da organização em níveis diferentes.</aside>
+  <ul class="b">
+    <li>Desde os anos 1990, segundo o National Critical Technologies Panel citado no capítulo, equipamento de processamento inteligente puxa a fabricação: a linha detecta as propriedades do produto e tem inteligência local para controlá-las (Atlas, 1996).</li>
+    <li>Dispositivos que ajudam a Indústria 4.0 vão do <b>CLP</b> (controlador lógico programável) dos anos 1990 a aplicações de IoT, inteligência artificial e <b>robôs colaborativos</b>. Exemplo do capítulo: um computador gerindo ensaios de corrosão em equipamentos controlados por CLP.</li>
+    <li>Sistemas de <b>mecatrônica</b> isolados viram elementos de CPS com funções de comunicação e autonomia sobre influências externas e configurações guardadas.</li>
+    <li><b>Integração horizontal</b> (redes de valor) e integração vertical (sistemas de fabricação em rede) montam a <b>produção inteligente</b> (Liu, 2015).</li>
+    <li>A aplicação de maior destaque é ligar demanda e produção: atender o pedido individual e flexibilizar a produção conforme o mercado e a concorrência.</li>
+    <li>Os avanços esperados: capacidade, adaptabilidade, escalabilidade, resiliência, segurança e usabilidade além dos embarcados atuais.</li>
+  </ul>
+  <div class="cs-uso">
+    <div class="tbl prose"><table>
+      <thead><tr><th>Exemplo do capítulo</th><th>O que o CPS faz</th></tr></thead>
+      <tbody>
+        <tr><td>Redes sem fio (Qu, 2015)</td><td>escalona a transmissão de pacotes para estabilizar o sistema (rede elétrica inteligente)</td></tr>
+        <tr><td>Agricultura (Mehdipour, 2014)</td><td>sistema de detecção de ratos (RDS) para controle de pragas no campo</td></tr>
+        <tr><td>Cidades inteligentes (Ghaemi, 2017)</td><td>apoia estratégias de crescimento urbano</td></tr>
+        <tr><td>Saúde (Quarto, 2017)</td><td>dispositivos vestíveis com sensores e internet para acompanhar pessoas idosas e doentes à distância</td></tr>
+        <tr><td>Educação (Wong, 2016)</td><td>kit de robótica barato com Arduino para ensino e pesquisa de CPS</td></tr>
+      </tbody>
+    </table></div>
+    <ul class="b">
+      <li>Por que ajuda, segundo Witkowski (2017): entrega mais confiável e rápida; serviço sob medida; cadeia de suprimentos segmentada pela demanda, com menos custo e mais flexibilidade; monitoramento de segurança e risco; e dados para análise estratégica.</li>
+      <li>O resultado é transparência: monitorar em tempo real, ensaiar no gêmeo virtual com menos custo e risco, e ganhar flexibilidade e produtividade na cadeia inteira.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Errado: "horizontal é dentro da fábrica". Certo: horizontal liga os elos da cadeia de valor; vertical liga os níveis dentro da fábrica.</li>
+  </ul></div>
+</section>
+
+<!-- ================= Sensores e atuadores ================= -->
+<section class="cs" id="sensores" data-grupo="Sensores e atuadores" data-termos="sensor,sensor-analogico-digital,adc,sensor-presenca-proximidade,encoder,fotossensor,acelerometro,rfid,codigo-barras-qr">
+  <h2>Sensores</h2>
+  <p class="cs-def">Um <b>sensor</b> responde a uma condição física ou química (luz, temperatura, pressão, acidez, corrente, aceleração, posição) e a transforma num sinal elétrico que um circuito consegue ler.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 120"><text class="tm st" x="4" y="10">analógico: tensão contínua</text><path class="ac" d="M4,50 C30,20 50,20 70,40 S110,64 116,36" style="fill:none"/><path class="s" d="M122,40 H140" marker-end="url(#mnarrow)"/><rect class="am" x="142" y="28" width="36" height="24" rx="4"/><text x="160" y="40">ADC</text><path class="s" d="M180,40 H198" marker-end="url(#mnarrow)"/><text class="tb" x="220" y="40">512</text><text class="tm st" x="4" y="76">digital: já chega em bits</text><path class="gr" d="M4,108 H24 V88 H54 V108 H70 V88 H100 V108 H116" style="fill:none"/><text class="tm" x="178" y="100">0 a 1023 no Uno</text></svg>Sensor analógico precisa de ADC; sensor digital já entrega números.</aside>
+  <ul class="b">
+    <li><b>Sensor analógico e digital</b>: o analógico (mais antigo, comum na automação convencional) dá uma tensão que varia junto com a grandeza; o digital é compatível direto com sistemas computadorizados como os CPS.</li>
+    <li>Para ler um analógico, o microcontrolador usa um <b>ADC</b>. No Uno, <code>analogRead(A0)</code> devolve de 0 a 1023 para 0 a 5 V.</li>
+    <li>O botão da campainha é o sensor mais simples que existe: digital, de dois valores.</li>
+  </ul>
+  <div class="cs-uso">
+    <div class="tbl prose"><table>
+      <thead><tr><th>Sensor (Petroni et al.)</th><th>Mede</th><th>Uso no capítulo</th></tr></thead>
+      <tbody>
+        <tr><td><b>Sensor de presença</b></td><td>material ou pessoa, sem contato</td><td>fio rompido, pessoa ou objeto presente, densidade</td></tr>
+        <tr><td>Sensor de proximidade</td><td>quão perto algo está, por ondas de rádio ou som</td><td>robô para antes de atingir quem invadiu seu espaço</td></tr>
+        <tr><td><b>Encoder</b></td><td>deslocamento angular ou linear</td><td>posição e velocidade de esteira; radares que devolvem bytes</td></tr>
+        <tr><td><b>Fotossensor</b></td><td>presença ou ausência de luz</td><td>posicionamento com laser, rotação, parada</td></tr>
+        <tr><td><b>Acelerômetro</b></td><td>variação de velocidade</td><td>vibração, choque, impacto</td></tr>
+        <tr><td>Pressão e temperatura</td><td>pressão, temperatura</td><td>controle de reações químicas e segurança industrial</td></tr>
+      </tbody>
+    </table></div>
+    <ul class="b">
+      <li>Além de sensores, a camada física usa elementos de identificação: <b>RFID</b> (etiqueta lida por rádio, à distância), <b>código de barras e QR</b> (lidos por leitor ótico) e marcações no piso para guiar robôs e veículos autônomos.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Errado: "o botão manda 1 quando apertado". Certo: com INPUT_PULLUP, apertado lê LOW (0). O sentido depende da ligação.</li>
+    <li>Errado: "RFID e QR são a mesma coisa". Certo: RFID responde por rádio, sem precisar estar à vista; QR precisa do leitor ótico enxergando.</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="atuadores" data-grupo="Sensores e atuadores" data-termos="atuador,valvula-solenoide,servomotor,motor-passo,rele,pwm">
+  <h2>Atuadores</h2>
+  <p class="cs-def">Um <b>atuador</b> age no meio físico a partir de um sinal ou comando eletrônico. Na analogia do capítulo, sensores são os órgãos dos sentidos e atuadores são os músculos.</p>
+  <aside class="mn loop" data-loop="pwm" data-ms="6000" data-still="0.3" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>PWM: o pino só liga e desliga. A fração de tempo ligado decide o brilho que você vê.</aside>
+  <ul class="b">
+    <li>O atuador da campainha é o LED no pino 5. <code>digitalWrite</code> só acende ou apaga.</li>
+    <li>O heartbeat faz o LED "pulsar" com <b>PWM</b>: <code>analogWrite(5, v)</code> com <code>v</code> de 0 a 255 liga o pino durante v/255 de cada ciclo. A 64, fica ligado 25% do tempo.</li>
+  </ul>
+  <div class="cs-uso">
+    <div class="tbl prose"><table>
+      <thead><tr><th>Atuador (Petroni et al.)</th><th>O que faz</th></tr></thead>
+      <tbody>
+        <tr><td><b>Válvula solenoide</b></td><td>abre ou fecha uma válvula hidráulica ou pneumática por sinal elétrico</td></tr>
+        <tr><td><b>Servomotor</b></td><td>motor com feedback eletroeletrônico: controla posição, força e torque</td></tr>
+        <tr><td><b>Motor de passo</b></td><td>gira de forma controlada, em pequenos ângulos discretos</td></tr>
+        <tr><td><b>Relé</b></td><td>liga uma corrente intensa a partir de um sinal fraco (interruptor elétrico)</td></tr>
+        <tr><td>Aquecedor e resfriador</td><td>interferência térmica</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Errado: "analogWrite gera uma tensão intermediária". Certo: no Uno, o pino continua só em 0 ou 5 V; muda a fração do tempo em cada um.</li>
+    <li>Errado: "servo e motor de passo são iguais". Certo: o servo mede a própria posição (feedback); o de passo conta pulsos e não confere.</li>
+    <li>Um relé ou motor não sai direto do pino do Uno: o pino dá dezenas de mA. Por isso existe o relé, e os drivers de motor.</li>
+  </ul></div>
+</section>
+
+<!-- ================= O rádio ================= -->
+<section class="cs" id="spi" data-grupo="O rádio" data-termos="spi,chip-select,mosi-miso,full-duplex,modo-spi">
+  <h2>SPI: o fio entre o Uno e o rádio</h2>
+  <p class="cs-def">O <b>SPI</b> é um barramento serial com clock: o controlador gera o clock, um fio leva dados ao periférico, outro traz de volta, e cada periférico tem o seu fio de chip select. É por ele que o Uno configura o rádio e passa os bytes da mensagem.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 128"><rect class="bl" x="4" y="8" width="70" height="112" rx="6"/><text x="39" y="22">Uno</text><text class="tm" x="39" y="36">controlador</text><rect class="acf" x="166" y="8" width="70" height="112" rx="6"/><text x="201" y="22">nRF24</text><text class="tm" x="201" y="36">periférico</text><path class="s" d="M74,50 H164" marker-end="url(#mnarrow)"/><text class="tm" x="120" y="45">SCK · 13</text><path class="s" d="M74,70 H164" marker-end="url(#mnarrow)"/><text class="tm" x="120" y="65">MOSI · 11</text><path class="s" d="M164,90 H76" marker-end="url(#mnarrow)"/><text class="tm" x="120" y="85">MISO · 12</text><path class="s" d="M74,110 H164" marker-end="url(#mnarrow)"/><text class="tm" x="120" y="105">CSN · 8 (LOW = fale)</text></svg>Quatro fios do SPI. O CE (pino 7) vai à parte: ele não é do SPI.</aside>
+  <ul class="b">
+    <li><b>SCK, MOSI e MISO</b>: SCK é o clock, só o controlador gera. MOSI (controller out, peripheral in, também COPI) leva dados ao periférico; MISO (CIPO) traz de volta. No Uno, 13, 11 e 12.</li>
+    <li><b>Chip select</b> (CS, SS; no rádio, CSN) é ativo em LOW. O chip ignora o clock até o CS descer, e a transferência termina quando ele sobe. Para um segundo periférico, divide-se SCK, MOSI e MISO e dá-se outro CS: não há endereço.</li>
+    <li>Cada pulso de clock move um bit em cada sentido ao mesmo tempo: o SPI é <b>full duplex</b>.</li>
+    <li><b>Modo SPI</b>: CPOL (clock parado em 0 ou 1) e CPHA (lê na 1ª ou na 2ª borda). Modo 0, o mais comum, é clock parado em 0 e leitura na subida. Bit errado de modo desloca todos os bytes de um bit, sem erro nenhum avisando.</li>
+    <li>Não há ACK nem checagem de erro no SPI. Fio longo em velocidade alta pode contar um bit duas vezes.</li>
+  </ul>
+  <div class="cs-uso"><ul class="b">
+    <li>No Uno real, o SPI de hardware chega a 8 MHz; o nRF24L01+ aceita até 10 MHz. Configurar o rádio são poucos bytes, e um payload de 32 bytes passa em dezenas de microssegundos.</li>
+    <li>O pino 10 do Uno precisa ficar como saída mesmo que o CS use outro pino, ou o SPI do chip pode virar periférico. O <code>SPI.begin()</code>, que a RF24 chama, já deixa o 10 como saída.</li>
+    <li>Comparando com a aula 10: a UART usa 2 fios mais GND e os dois lados no mesmo baud; o SPI usa 4 fios mais GND e aceita a velocidade que o periférico suportar, porque o clock vai junto.</li>
+  </ul></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Errado: "SPI é a mesma serial da aula 10". Certo: a UART não tem clock e combina o baud; o SPI leva o clock num fio próprio.</li>
+    <li>Errado: "o CE é o chip select". Certo: o CSN é o chip select do SPI; o CE liga o rádio para ouvir ou transmitir.</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="nrf24" data-grupo="O rádio" data-termos="nrf24l01,banda-24ghz,pino-ce,capacitor-desacoplamento,dbm,nivel-logico">
+  <h2>O módulo nRF24L01 e a ligação</h2>
+  <p class="cs-def">O <b>nRF24L01</b> é um rádio de 2,4 GHz que manda pacotes curtos entre microcontroladores sem fio. Fala com o Uno por SPI, é alimentado em 3,3 V e confirma a entrega em hardware.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 118"><rect class="gr" x="4" y="10" width="150" height="96" rx="6"/><path class="s" d="M154,22 h20 v12 h-14 v12 h14 v12 h-14 v12 h14 v12 h-14 v12 h20" style="fill:none"/><text class="tm" x="210" y="58">antena</text><text class="tm" x="210" y="70">na placa</text><g><rect class="k" x="12" y="22" width="30" height="14" rx="2"/><text class="tm" x="27" y="29">GND</text><rect class="k" x="46" y="22" width="30" height="14" rx="2"/><text class="tm" x="61" y="29">VCC</text><rect class="k" x="12" y="42" width="30" height="14" rx="2"/><text class="tm" x="27" y="49">CE</text><rect class="k" x="46" y="42" width="30" height="14" rx="2"/><text class="tm" x="61" y="49">CSN</text><rect class="k" x="12" y="62" width="30" height="14" rx="2"/><text class="tm" x="27" y="69">SCK</text><rect class="k" x="46" y="62" width="30" height="14" rx="2"/><text class="tm" x="61" y="69">MOSI</text><rect class="k" x="12" y="82" width="30" height="14" rx="2"/><text class="tm" x="27" y="89">MISO</text><rect class="k" x="46" y="82" width="30" height="14" rx="2"/><text class="tm" x="61" y="89">IRQ</text></g><text class="tm" x="116" y="50">3,3 V</text><text class="tm" x="116" y="62">sinais 5 V ok</text></svg>Oito pinos em duas fileiras. O IRQ quase sempre fica sem ligar.</aside>
+  <ul class="b">
+    <li>Trabalha na <b>banda ISM</b> de 2,4 GHz, a mesma do Wi-Fi e do Bluetooth. É a escolha comum para controle remoto, campainha e sensor que reporta do outro lado da sala.</li>
+    <li>Alimentação de 1,9 a 3,6 V: VCC no 3V3 do Uno. As entradas são <b>tolerantes a 5 V</b>, por isso os pinos de sinal ligam direto no Uno, sem conversor de nível.</li>
+    <li>O <b>pino CE</b> (chip enable) põe o rádio para ouvir ou dispara o envio. Ele e o CSN podem ir em quaisquer dois pinos, desde que o sketch diga quais: <code>RF24 radio(7, 8)</code>.</li>
+    <li>Ao transmitir, o rádio puxa corrente em rajadas. Na bancada, um <b>capacitor de desacoplamento</b> de 10 µF entre VCC e GND, colado no módulo, conserta muitos links que funcionam só às vezes.</li>
+    <li>A potência de transmissão vai em <b>dBm</b>: <code>RF24_PA_MIN</code> é −18 dBm (≈ 0,016 mW) e <code>RF24_PA_MAX</code> é 0 dBm (1 mW). A campainha usa MIN; o heartbeat, LOW (−12 dBm).</li>
+  </ul>
+  <div class="cs-uso">
+    <div class="tbl prose"><table>
+      <thead><tr><th>Pino do nRF24L01</th><th>No Uno</th><th>Por quê</th></tr></thead>
+      <tbody>
+        <tr><td>VCC</td><td>3V3</td><td>o rádio vai de 1,9 a 3,6 V; 5 V pode queimar</td></tr>
+        <tr><td>GND</td><td>GND</td><td>terra comum</td></tr>
+        <tr><td>CE</td><td>7</td><td>chip enable; o sketch escolhe</td></tr>
+        <tr><td>CSN</td><td>8</td><td>chip select do SPI; o sketch escolhe</td></tr>
+        <tr><td>SCK</td><td>13</td><td>clock do SPI do Uno</td></tr>
+        <tr><td>MOSI</td><td>11</td><td>dados para o rádio</td></tr>
+        <tr><td>MISO</td><td>12</td><td>dados do rádio</td></tr>
+        <tr><td>IRQ</td><td>sem ligar</td><td>aviso por interrupção; os sketches usam polling</td></tr>
+        <tr><td>Botão (transmissor)</td><td>2 e GND</td><td>INPUT_PULLUP: apertado lê LOW</td></tr>
+        <tr><td>LED (receptor)</td><td>5, resistor de 220 Ω, GND</td><td>o atuador</td></tr>
+      </tbody>
+    </table></div>
+    <ul class="b">
+      <li>Números da especificação do nRF24L01+ (Nordic, rev. 1.0): 11,3 mA transmitindo a 0 dBm, 13,5 mA recebendo a 2 Mbps, 900 nA desligado; até 1,5 ms para ligar a partir do modo desligado e 130 µs para começar a transmitir ou receber.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Errado: VCC no 5V "porque o Uno é 5 V". Certo: VCC no 3V3; só os sinais aguentam 5 V. No Mokxi nada queima, na bancada pode ser o fim do módulo.</li>
+    <li>Errado: "o rádio liga no 3V3, então está bem alimentado". Certo: o 3V3 do Uno pode não dar conta das rajadas de transmissão; daí o capacitor.</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="combinar" data-grupo="O rádio" data-termos="canal-rf,taxa-ar,endereco-radio,pipe-radio">
+  <h2>O que os dois rádios combinam</h2>
+  <p class="cs-def">Não há etapa de pareamento. Os dois lados conversam se usam o mesmo <b>canal</b>, a mesma <b>taxa no ar</b> e o mesmo <b>endereço do rádio</b>. Mude um dos três de um lado só e as mensagens não chegam.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 96"><path class="s" d="M8,50 H232"/><g class="tm"><text x="18" y="66">2400</text><text x="120" y="66">2462</text><text x="222" y="66">2525</text></g><path class="s" d="M8,46 V54 M120,46 V54 M232,46 V54"/><rect class="acf" x="80" y="30" width="16" height="20" rx="2"/><text class="tam" x="88" y="22">76</text><rect class="am" x="96" y="30" width="16" height="20" rx="2" style="opacity:.5"/><text class="tm" x="104" y="22">90</text><text class="tm" x="120" y="86">76 → 2476 MHz · 90 → 2490 MHz</text></svg>Canais de 1 MHz a partir de 2400 MHz. A RF24 começa no 76.</aside>
+  <ul class="b">
+    <li><b>Canal</b>: f = 2400 + canal, em MHz, com canal de 0 a 125. A RF24 usa 76 (2476 MHz) por padrão; <code>radio.setChannel(90)</code> muda.</li>
+    <li><b>Taxa no ar</b>: 250 kbps, 1 Mbps ou 2 Mbps no nRF24L01+. A RF24 começa em 1 Mbps, que todas as versões do chip suportam. Um rádio noutra taxa não ouve nada.</li>
+    <li><b>Endereço do rádio</b>: 5 bytes no começo de cada pacote. A campainha usa "00001"; o heartbeat, "HEART". O receptor só aceita o endereço que abriu.</li>
+    <li><b>Pipes</b>: o receptor tem 6 "ouvidos" (pipes 0 a 5), cada um com um endereço. <code>openReadingPipe(n, endereço)</code> abre um; <code>openWritingPipe(endereço)</code> diz para quem se manda.</li>
+  </ul>
+  <div class="cs-formula"><div class="formula">f = 2400 + canal  [MHz]   ·   canal ∈ {0, 1, …, 125}</div><ul class="b"><li>f é a frequência central em MHz; o canal é o número que você passa em setChannel.</li></ul></div>
+  <div class="cs-uso"><ul class="b">
+    <li>Transmissor da campainha: <code>openWritingPipe(address)</code> e <code>stopListening()</code>. Receptor: <code>openReadingPipe(0, address)</code> e <code>startListening()</code>. É a configuração inteira.</li>
+    <li>Heartbeat: cada placa abre o pipe de escrita e o pipe de leitura 1 com o mesmo "HEART", e fica ouvindo. Qualquer um começa.</li>
+    <li>Experimento do tutorial: <code>setChannel(90)</code> só no transmissor e todo aperto dá "no answer". Ponha no receptor também e eles voltam a falar.</li>
+    <li>A 1 Mbps os canais vizinhos já não se sobrepõem (1 MHz de separação); a 2 Mbps, a especificação pede 2 MHz entre canais usados.</li>
+  </ul></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Errado: "o endereço protege a conversa". Certo: ele viaja aberto no ar; é filtro, não senha (<a href="#seguranca">segurança</a>).</li>
+    <li>O pipe 0 também recebe os ACKs de quem transmite. Por isso a RF24 sobrescreve o endereço dele em <code>openWritingPipe</code>; o heartbeat usa o pipe 1 para ouvir.</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="ack-radio" data-grupo="O rádio" data-termos="enhanced-shockburst,pacote-radio,payload,auto-ack,retransmissao,fifo-radio,colisao">
+  <h2>O pacote, o ACK e a retransmissão</h2>
+  <p class="cs-def">O próprio chip roda o <b>Enhanced ShockBurst</b>: monta o pacote, confere o CRC, devolve o ACK e retransmite sozinho. <code>radio.write()</code> espera esse ACK e devolve <code>true</code> se ele chegou ou <code>false</code> depois da última tentativa.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 70"><rect class="k" x="2" y="14" width="18" height="26"/><text class="tm" x="11" y="27">P</text><rect class="bl" x="20" y="14" width="40" height="26"/><text class="tm" x="40" y="27">end. 5</text><rect class="am" x="60" y="14" width="22" height="26"/><text class="tm" x="71" y="27">9b</text><rect class="gr" x="82" y="14" width="124" height="26"/><text class="tm" x="144" y="27">payload até 32 B</text><rect class="rd" x="206" y="14" width="32" height="26"/><text class="tm" x="222" y="27">CRC</text><text class="tm st" x="2" y="58">8·(1 + 5 + 32 + 2) + 9 = 329 bits</text></svg>Um pacote cheio: preâmbulo, endereço, controle, payload e CRC de 2 bytes.</aside>
+  <ul class="b">
+    <li>O <b>pacote</b> tem preâmbulo (1 byte), endereço (3 a 5), campo de controle (9 bits), <b>payload</b> (0 a 32 bytes) e CRC (1 ou 2 bytes). A RF24 usa payload fixo de 32 bytes e completa com zeros.</li>
+    <li><b>ACK automático</b>: o receptor que recebe um pacote com endereço e CRC certos devolve um ACK curto, em hardware, antes de o sketch olhar. É o ACK da <a href="/m8/comp/10-web-serial">aula 10</a>, só que feito pelo chip.</li>
+    <li><b>Retransmissão automática</b>: sem ACK, o transmissor espera o intervalo ARD e manda de novo. A RF24 configura 1500 µs e até 15 retransmissões (<code>setRetries(5, 15)</code>; ARD = (5 + 1) × 250 µs).</li>
+    <li>O pacote que chega espera numa <b>FIFO de recepção</b> de 3 lugares até o sketch chamar <code>read()</code>. Com a FIFO cheia, o pacote é descartado e não há ACK.</li>
+    <li>Todos os rádios dividem o mesmo ar. Dois transmitindo juntos no mesmo canal causam <b>colisão</b>: os pacotes se estragam, falta o ACK e a retransmissão tenta de novo.</li>
+  </ul>
+  <div class="cs-formula"><div class="formula">bits no ar = 8 × (1 + endereço + payload + CRC) + 9<br>tempo no ar = bits ÷ taxa</div><ul class="b"><li>endereço, payload e CRC em bytes; o 1 é o preâmbulo e o 9 é o campo de controle. A 1 Mbps, cada bit leva 1 µs.</li></ul></div>
+  <div class="cs-uso"><ul class="b">
+    <li>Pacote cheio a 1 Mbps: 329 bits → 329 µs no ar. A 250 kbps, 1316 µs; por isso a RF24 usa ARD de 1500 µs, que serve até para o caso mais lento.</li>
+    <li>Ninguém responde (conta autoral, com os padrões da RF24): 16 envios de 329 µs e 15 esperas de 1500 µs dão 5,3 + 22,5 ≈ 28 ms. Esse tempo o <code>write()</code> fica preso e o <code>loop()</code> para junto.</li>
+    <li>Na campainha: "ding dong 1: delivered" quando o ACK veio; "ding dong 1: no answer" quando acabaram as tentativas.</li>
+    <li>"No answer" é uma ferramenta de depuração: o problema está no link ou na outra placa, não no botão nem no código deste lado.</li>
+  </ul></div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Errado: "<code>true</code> quer dizer que o outro sketch tratou a mensagem". Certo: quer dizer só que o outro rádio a recebeu e a pôs na FIFO.</li>
+    <li>Errado: "mandar 8 bytes em vez de 32 economiza tempo no ar". Certo: com o payload fixo de 32 da RF24, vão 32 bytes de qualquer jeito, com zeros no fim.</li>
+    <li>Errado: "<code>false</code> quer dizer que o pacote não chegou". Certo: pode ter chegado e o ACK ter se perdido na volta. O receptor descarta a cópia repetida, mas o transmissor não sabe disso.</li>
+  </ul></div>
+  <figure class="fig" id="fig-ack">
+    <div class="fig-head"><span class="fig-title">Figura 2 · Um aperto da campainha, com e sem resposta</span><div class="fig-tabs"></div></div>
+    <div class="fig-body">
+      <div class="fig-stage"><svg id="ack-svg" viewBox="0 0 640 300"></svg></div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+</section>
+
+<!-- ================= Os sketches ================= -->
+<section class="cs" id="campainha" data-grupo="Os sketches" data-termos="rf24,ptx-prx">
+  <h2>Transmissor e receptor da campainha</h2>
+  <p class="cs-def">Dois sketches com a <b>biblioteca RF24</b>: o transmissor espera o botão, monta "ding dong" com um dígito e chama <code>write()</code>; o receptor pergunta <code>available()</code> a cada volta, lê com <code>read()</code>, imprime e pisca o LED por 300 ms.</p>
+  <ul class="b">
+    <li>O rádio está sempre num de dois modos: transmitindo ou ouvindo, nunca os dois (<b>startListening e stopListening</b>). Trocar leva 130 µs.</li>
+    <li>Os dois lados incluem <code>SPI.h</code>, <code>nRF24L01.h</code> e <code>RF24.h</code>, criam <code>RF24 radio(7, 8)</code> e usam o mesmo <code>address</code>.</li>
+  </ul>
+  <div class="cs-uso">
+<pre><code>// Transmissor (Mokxi, Radio doorbell, a ponta que manda)
+#include &lt;SPI.h&gt;
+#include &lt;nRF24L01.h&gt;
+#include &lt;RF24.h&gt;
+
+RF24 radio(7, 8);                 // CE no 7, CSN no 8
+const byte address[6] = "00001";  // 5 bytes + o zero do fim
+
+const int BUTTON = 2;
+int presses = 0;
+
+void setup()
+{
+    Serial.begin(9600);
+    pinMode(BUTTON, INPUT_PULLUP);   // solto = HIGH, apertado = LOW
+    radio.begin();                   // canal 76, 1 Mbps, retries (5, 15)
+    radio.openWritingPipe(address);  // para quem mandar
+    radio.setPALevel(RF24_PA_MIN);   // -18 dBm
+    radio.stopListening();           // modo transmissor
+    Serial.println("Press the button to ring.");
+}
+
+void loop()
+{
+    if (digitalRead(BUTTON) == HIGH) {   // solto: nada a fazer nesta volta
+        return;
+    }
+    presses++;
+    char message[32] = "ding dong ";     // 10 caracteres + 22 zeros
+    message[10] = (char)('0' + presses % 10);   // o 11º caractere: um dígito
+    bool heard = radio.write(&amp;message, sizeof(message));  // espera o ACK
+    Serial.print(message);
+    Serial.println(heard ? ": delivered" : ": no answer");
+    // espera soltar o botão, para um aperto ser um toque só
+    while (digitalRead(BUTTON) == LOW) {
+        delay(10);
+    }
+    delay(50);
+}</code></pre>
+<pre><code>// Receptor (Mokxi, Radio doorbell, a ponta que toca)
+#include &lt;SPI.h&gt;
+#include &lt;nRF24L01.h&gt;
+#include &lt;RF24.h&gt;
+
+RF24 radio(7, 8);                 // CE no 7, CSN no 8
+const byte address[6] = "00001";  // o mesmo do transmissor
+
+const int LED = 5;
+
+void setup()
+{
+    Serial.begin(9600);
+    pinMode(LED, OUTPUT);
+    radio.begin();
+    radio.openReadingPipe(0, address);   // ouvir este endereço no pipe 0
+    radio.setPALevel(RF24_PA_MIN);
+    radio.startListening();              // modo receptor
+    Serial.println("Listening.");
+}
+
+void loop()
+{
+    if (!radio.available()) {        // nenhum pacote na FIFO
+        return;
+    }
+    char message[32] = "";
+    radio.read(&amp;message, sizeof(message));   // tira o pacote da FIFO
+    Serial.print("heard: ");
+    Serial.println(message);
+    digitalWrite(LED, HIGH);         // o atuador
+    delay(300);
+    digitalWrite(LED, LOW);
+}</code></pre>
+    <ul class="b">
+      <li>Os comentários em português são acréscimos; o código é o do projeto Radio doorbell do Mokxi, sem mudança.</li>
+      <li>O transmissor lê o botão a cada volta (polling) e só segue quando está apertado. Depois espera soltar e mais 50 ms: um aperto vira um envio, e o pulo do contato ao soltar não conta como outro aperto.</li>
+      <li><code>presses % 10</code> faz o dígito ir de 1 a 9 e voltar ao 0. O 11º aperto manda "ding dong 1" de novo.</li>
+      <li>Os dois lados usam buffer de 32 bytes, o maior payload possível.</li>
+    </ul>
+    <div class="tbl prose"><table>
+      <thead><tr><th>Situação</th><th>Monitor do transmissor</th><th>Monitor do receptor</th></tr></thead>
+      <tbody>
+        <tr><td>Tudo certo, 1º aperto</td><td>ding dong 1: delivered</td><td>heard: ding dong 1</td></tr>
+        <tr><td>Receptor sem programa ou sem 3,3 V</td><td>ding dong 1: no answer</td><td>(nada)</td></tr>
+        <tr><td><code>setChannel(90)</code> só no transmissor</td><td>no answer</td><td>(nada)</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Errado: <code>RF24 radio(8, 7)</code> com CE no 7. Certo: o construtor recebe CE primeiro, CSN depois.</li>
+    <li>Errado: abrir o pipe de leitura e esquecer o <code>startListening()</code>. Certo: sem ele o rádio não escuta, não há ACK e o outro lado imprime "no answer".</li>
+    <li>O <code>delay(300)</code> do receptor trava o laço, mas não perde pacote: o rádio confirma e guarda até 3 na FIFO enquanto isso.</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="heartbeat" data-grupo="Os sketches" data-termos="deteccao-borda">
+  <h2>O heartbeat: o mesmo sketch nas duas pontas</h2>
+  <p class="cs-def">No circuito da página do simulador, as duas placas rodam o mesmo sketch: ficam sempre ouvindo, param de ouvir só no instante de mandar, e cada uma é transmissor quando o botão dela é apertado e receptor no resto do tempo.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 116"><text class="tm st" x="2" y="10">pressed</text><path class="ac" d="M50,30 H90 V12 H170 V30 H236" style="fill:none"/><text class="tm st" x="2" y="52">wasPressed</text><path class="am" d="M50,70 H104 V52 H184 V70 H236" style="fill:none;stroke:var(--amber)"/><path class="s" d="M90,80 V94" marker-end="url(#mnarrow)" style="stroke:var(--accent)"/><text class="tam" x="90" y="108">envia 1 vez</text><text class="tm" x="190" y="108">solto: nada</text></svg>pressed sobe antes de wasPressed: só nessa volta os dois discordam, e o envio acontece uma vez.</aside>
+  <ul class="b">
+    <li>Endereço "HEART", mensagem de 8 bytes ("beat"), potência LOW.</li>
+    <li>Para mandar: <code>stopListening()</code>, <code>write()</code>, <code>startListening()</code>. O rádio é half duplex: enquanto transmite, não ouve.</li>
+    <li>Em vez de esperar soltar o botão como a campainha, o heartbeat usa <b>detecção de borda</b>: guarda a leitura anterior em <code>wasPressed</code> e só envia quando passa de solto para apertado.</li>
+    <li>Com ACK: imprime "Heartbeat 1 sent and received" e faz um brilho fraco (<code>fade(60, 300)</code>). Sem ACK: "Heartbeat 1: nobody answered".</li>
+    <li>Quem recebe imprime "A heartbeat for you" e chama <code>beat()</code>: dois pulsos de PWM, lub (até 255) e dub (até 150).</li>
+  </ul>
+  <div class="cs-uso">
+<pre><code>void loop() {
+  bool pressed = digitalRead(BUTTON_PIN) == LOW;
+  if (pressed &amp;&amp; !wasPressed) {          // borda: acabou de apertar
+    sent++;
+    char message[8] = "beat";
+    radio.stopListening();                // para de ouvir só para mandar
+    bool heard = radio.write(&amp;message, sizeof(message));
+    radio.startListening();
+    Serial.print("Heartbeat ");
+    Serial.print(sent);
+    if (heard) {
+      Serial.println(" sent and received");
+      fade(60, 300);                      // brilho fraco: chegou
+    } else {
+      Serial.println(": nobody answered");
+    }
+    delay(50);
+  }
+  wasPressed = pressed;
+
+  if (radio.available()) {                // chegou um heartbeat do outro
+    char message[8] = "";
+    radio.read(&amp;message, sizeof(message));
+    Serial.println("A heartbeat for you");
+    beat();                               // lub-dub no LED, por PWM
+  }
+}</code></pre>
+    <ul class="b">
+      <li>Trecho do sketch "Send a heartbeat" do Mokxi. O <code>setup()</code> faz <code>setPALevel(RF24_PA_LOW)</code>, <code>openWritingPipe(address)</code>, <code>openReadingPipe(1, address)</code> e <code>startListening()</code>.</li>
+      <li><code>fade(pico, ms)</code> sobe o PWM de 0 ao pico em passos de 15 e desce de volta, com <code>delay(ms / 34)</code> a cada passo.</li>
+      <li>Conta autoral: o <code>beat()</code> leva 36 × 7 + 80 + 22 × 5 = 442 ms. Nesse tempo o laço não lê o botão nem o rádio; os pacotes que chegam esperam na FIFO.</li>
+      <li>O comentário do próprio sketch: o rádio alcança uma casa, não uma cidade. Para duas casas longe, a mesma ideia roda por Wi-Fi num ESP32.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Errado: testar só <code>if (pressed)</code>. Certo: com o botão segurado, isso manda um heartbeat a cada volta do laço; a borda manda um.</li>
+    <li>Errado: esquecer o <code>startListening()</code> depois do <code>write()</code>. Certo: a placa fica surda, e o outro lado passa a ver "nobody answered".</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="simulador" data-grupo="Os sketches" data-termos="mokxi,analisador-logico">
+  <h2>No simulador: montar, testar e o que ele não mostra</h2>
+  <p class="cs-def">O <b>Mokxi</b> compila o sketch no navegador e roda num modelo do chip. O nRF24L01 é simulado como a especificação descreve, mas o ar é ideal: sem distância, sem parede, sem interferência.</p>
+  <ul class="b">
+    <li>Conta: o editor e a simulação funcionam sem login. A conta gratuita serve para salvar o projeto na nuvem e compartilhar por link.</li>
+    <li>Caminho: abra a página do simulador (o heartbeat já roda) ou o projeto Radio doorbell no editor. Cada placa tem seu sketch numa aba; o monitor serial marca de qual placa veio cada linha.</li>
+    <li>Cada rádio tem um pino de antena escondido (ANT), e o Mokxi liga todos eles: esse fio é a "sala". Dois rádios que transmitem juntos estragam os pacotes um do outro.</li>
+  </ul>
+  <div class="cs-uso">
+    <div class="tbl prose"><table>
+      <thead><tr><th>O modelo tem</th><th>O modelo não tem</th></tr></thead>
+      <tbody>
+        <tr><td>todos os registradores com o valor de reset</td><td>distância e alcance</td></tr>
+        <tr><td>FIFOs de 3 pacotes</td><td>paredes e obstáculos</td></tr>
+        <tr><td>1,5 ms para ligar e 130 µs para assentar</td><td>interferência de Wi-Fi</td></tr>
+        <tr><td>Enhanced ShockBurst com ACK e retransmissão</td><td>efeito da potência (guardada, mas sem efeito)</td></tr>
+        <tr><td>CE ou CSN no pino errado quebra como na protoboard</td><td>queda do 3V3 do Uno numa rajada de transmissão</td></tr>
+        <tr><td>outro canal ou outra taxa: não ouve nada</td><td>componente queimado por 5 V</td></tr>
+      </tbody>
+    </table></div>
+    <ul class="b">
+      <li>Experimentos que o tutorial sugere: apagar o rádio (ou o fio de 3,3 V) do receptor e ver "no answer"; <code>setChannel(90)</code> de um lado só; mandar um número de um potenciômetro com <code>analogRead()</code> em vez de texto, começo de um controle remoto; prender um <b>analisador lógico</b> no pino ANT para ver cada pacote passar byte a byte e o ACK curto voltar.</li>
+      <li>Para ver o SPI, o tutorial de SPI do Mokxi põe o analisador em SCK, MOSI e CS com decodificador SPI. Ali o Mokxi avisa que o modelo do ATmega328P não tem o periférico SPI de hardware: o driver da matriz de LEDs mexe nos pinos por software. Fiação, pacotes e modo são os do hardware; só o clock é mais lento.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Errado: "funcionou no Mokxi, vai funcionar na bancada". Certo: alcance e alimentação, os dois problemas mais comuns com o módulo real, não existem no simulador.</li>
+    <li>Errado: "o Mokxi mostra o alcance com a potência". Certo: ele guarda o nível de potência e não usa.</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="seguranca" data-grupo="Os sketches" data-termos="sniffing,injecao-pacote,mousejack,replay">
+  <h2>Segurança: o rádio não cifra</h2>
+  <p class="cs-def">O nRF24L01 não tem criptografia nem autenticação. Quem acerta canal, taxa e endereço ouve tudo (<b>sniffing</b>) e manda pacotes que o receptor confirma e entrega ao sketch (<b>injeção de pacotes</b>).</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 110"><rect class="bl" x="4" y="40" width="54" height="28" rx="5"/><text x="31" y="54">Uno A</text><rect class="bl" x="182" y="40" width="54" height="28" rx="5"/><text x="209" y="54">Uno B</text><path class="s" d="M60,54 H180" style="stroke-dasharray:3 3" marker-end="url(#mnarrow)"/><text class="tm" x="120" y="46">"00001", canal 76</text><rect class="rd" x="94" y="78" width="52" height="26" rx="5"/><text x="120" y="91">intruso</text><path class="s" d="M120,76 V60" marker-end="url(#mnarrow)"/><path class="s" d="M146,84 C170,84 196,80 204,70" marker-end="url(#mnarrow)"/><text class="tm" x="64" y="94">ouve</text><text class="tm" x="188" y="94">injeta</text></svg>Com o mesmo canal e endereço, o intruso é só mais um rádio na sala.</aside>
+  <div class="cs-uso">
+    <div class="def"><span class="lab">Segurança · MouseJack (Bastille, 2016)</span>
+      <ul class="b">
+        <li>O ataque: mouses e teclados sem fio (não Bluetooth) de Logitech, Microsoft, Dell, HP, Lenovo e outros usavam rádios nRF24L. O tráfego do mouse ia sem criptografia, e o receptor USB aceitava pacotes de teclado falsos. Com cerca de US$ 15 de hardware, dava para digitar comandos no computador da vítima à distância.</li>
+        <li>A decisão de arquitetura explorada: o receptor confiava em qualquer pacote com o endereço certo. É exatamente o que a campainha faz.</li>
+        <li>Defesa: cifrar e autenticar o payload no sketch (por exemplo, AES com um código de autenticação, assunto da <a href="/m8/mat/01-fundamentos-criptografia">Matemática</a>), com um contador que só cresce contra <b>ataque de repetição</b>, e não aceitar comando que não passe nessa conferência.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Errado: "o CRC do pacote protege contra ataque". Certo: o CRC só pega bit trocado por ruído; qualquer um calcula um CRC válido.</li>
+    <li>Errado: "o ACK prova que falei com a placa certa". Certo: um intruso no mesmo endereço também responde ACK.</li>
+    <li>Interferir no canal (jamming) silencia o link sem invadir nada. Um sistema que só avisa quando algo acontece não percebe que parou de ouvir.</li>
+  </ul></div>
+</section>
+
+<!-- ================= Treino ================= -->
+<section class="cs" id="exercicios" data-grupo="Treino" data-termos="">
+  <h2>Treino · exercícios autorais</h2>
+  <p class="cs-def">Exercícios autorais, do mecânico ao aberto, com o Uno, o nRF24L01 e os dois sketches. Não são do professor. Cada resposta termina com uma Leitura do número.</p>
+  <div class="cs-uso">
+    <details class="treino"><summary><span class="q">Exercício 1</span> Em que frequência fala o rádio no canal padrão da RF24? E no canal 90 do tutorial? Qual o canal mais alto?</summary><p>Canal 76: 2400 + 76 = 2476 MHz. Canal 90: 2490 MHz. O mais alto é 125: 2525 MHz. Leitura: os dois experimentos do tutorial ficam 14 MHz longe um do outro; a 1 Mbps um canal ocupa cerca de 1 MHz, então um rádio no 76 não ouve nada do 90.</p></details>
+    <details class="treino"><summary><span class="q">Exercício 2</span> Quanto tempo um pacote cheio (endereço de 5 bytes, payload de 32, CRC de 2) passa no ar a 2 Mbps, 1 Mbps e 250 kbps? Compare com mandar os mesmos 32 bytes pela UART da aula 10 a 9600 baud.</summary><p>8 × (1 + 5 + 32 + 2) + 9 = 329 bits. 2 Mbps: 164,5 µs; 1 Mbps: 329 µs; 250 kbps: 1316 µs. UART a 9600 em 8N1: 32 ÷ 960 = 33,3 ms. Leitura: a 1 Mbps o rádio é cerca de 100 vezes mais rápido que a serial dos sketches; o gargalo da campainha é o <code>delay</code>, não o rádio.</p></details>
+    <details class="treino"><summary><span class="q">Exercício 3</span> A placa receptora está desligada. Quanto tempo o <code>write()</code> da campainha fica preso antes de devolver <code>false</code>, com os padrões da RF24? O que isso faz com o <code>loop()</code>?</summary><p>1 envio + 15 retransmissões = 16 envios de 329 µs (5,3 ms) e 15 esperas de 1500 µs (22,5 ms): cerca de 28 ms, sem contar os 130 µs de cada troca de modo. O superloop fica parado esse tempo todo. Leitura: 28 ms passa despercebido numa campainha, mas é uma volta de laço inteira perdida; num sistema que também precisa tocar um som a cada 5 ms, o envio não pode ficar no mesmo laço sem cuidado (<code>setRetries</code> menor ou envio em outra tarefa, <a href="/m8/comp/06-gerencia-recursos">aula 06</a>).</p></details>
+    <details class="treino"><summary><span class="q">Exercício 4</span> O heartbeat manda <code>char message[8]</code>. Quantos bytes de payload vão no ar? E se você mudar para 32?</summary><p>32 nos dois casos: a RF24 usa payload fixo de 32 e completa com zeros. Para economizar ar, seria preciso <code>setPayloadSize(8)</code> dos dois lados ou payload dinâmico. Leitura: <code>sizeof(message)</code> decide quantos bytes o sketch entrega ao rádio, não quantos vão no ar.</p></details>
+    <details class="treino"><summary><span class="q">Exercício 5</span> No heartbeat, a placa B está no meio de um <code>beat()</code> (442 ms) quando a placa A manda cinco heartbeats seguidos, um a cada 50 ms. O que A imprime?</summary><p>Os 3 primeiros entram na FIFO de recepção de B e são confirmados: "sent and received". A partir do 4º a FIFO está cheia, B descarta e não responde ACK; A retransmite 15 vezes (≈ 28 ms) e imprime "nobody answered" para o 4º e o 5º. Leitura: o <code>false</code> pode vir de uma placa viva e ocupada, não só de uma placa fora do ar.</p></details>
+    <details class="treino"><summary><span class="q">Exercício 6</span> Você quer um controle remoto: um potenciômetro no transmissor, lido com <code>analogRead(A0)</code>, controla o brilho do LED do receptor. Como fica o envio e o recebimento?</summary><p>Transmissor: <code>int valor = analogRead(A0);</code> (0 a 1023) e <code>radio.write(&amp;valor, sizeof(valor));</code>, que no Uno manda 2 bytes. Receptor: <code>int valor; radio.read(&amp;valor, sizeof(valor)); analogWrite(LED, valor / 4);</code>, porque o PWM vai de 0 a 255. Leitura: os dois lados precisam concordar no tipo e no tamanho; um ESP32 do outro lado tem <code>int</code> de 4 bytes e leria lixo. Use <code>int16_t</code> dos dois lados.</p></details>
+    <details class="treino"><summary><span class="q">Exercício 7</span> Na bancada, a campainha dá "delivered" em 7 de cada 10 apertos com as placas a 1 metro. No Mokxi, 10 de 10. Liste o que você confere, em ordem.</summary><p>1) Capacitor de 10 µF entre VCC e GND colado em cada módulo (o 3V3 do Uno pode cair na rajada). 2) VCC realmente no 3V3 e GND comum. 3) Fios de SPI curtos. 4) Wi-Fi no mesmo pedaço da banda: trocar de canal dos dois lados, para longe dos canais do Wi-Fi da casa. 5) Taxa menor (<code>setDataRate(RF24_250KBPS)</code>) dos dois lados. Leitura: 10 de 10 no simulador e 7 de 10 na bancada aponta para o que o simulador não tem, alimentação e ar, e não para o código, que é o mesmo.</p></details>
+  </div>
+</section>
+
+<section class="cs" id="projeto" data-grupo="Treino" data-termos="">
+  <h2>Projeto: o módulo do TAPI como sistema ciberfísico</h2>
+  <p class="cs-def">O módulo de controle do TAPI já é um CPS pequeno: o botão é o sensor, a luz e o som são os atuadores, o interpretador da rotina decide. O rádio desta aula seria o caminho do aviso ao cuidador.</p>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 124"><rect class="am" x="2" y="8" width="112" height="70" rx="6"/><text x="58" y="22">módulo</text><text class="tm" x="58" y="38" style="font-size:8px">botão: sensor</text><text class="tm" x="58" y="50" style="font-size:8px">luz e som: atuadores</text><text class="tm" x="58" y="62" style="font-size:8px">rotina: decide</text><rect class="gr" x="150" y="8" width="88" height="70" rx="6"/><text x="194" y="22">base</text><text class="tm" x="194" y="38" style="font-size:8px">com o cuidador</text><text class="tm" x="194" y="50" style="font-size:8px">LED e som</text><path class="s" d="M116,30 H148" style="stroke-dasharray:3 3" marker-end="url(#mnarrow)"/><text class="tm" x="132" y="24" style="font-size:8px">10 s</text><path class="s" d="M116,56 H148" style="stroke-dasharray:3 3;stroke:var(--red)" marker-end="url(#mnarrow)"/><text class="tm" x="132" y="70" style="font-size:8px">ajuda</text><text class="tm" x="120" y="100">silêncio por 30 s também é alarme</text></svg>O módulo manda sinal de vida e pedidos de ajuda; a base trata o silêncio como problema.</aside>
+  <ul class="b">
+    <li>Camada física: a pessoa que se veste, o botão, a luz, o som e o cuidador em outro cômodo. Camada cyber: a rotina compilada na IDE do terapeuta (<a href="/m8/comp/10-web-serial">aula 10</a>), o interpretador no módulo e o registro do que aconteceu.</li>
+    <li>O público do TAPI tem dificuldade cognitiva com a motricidade preservada. O aviso ao cuidador é para quando a sequência trava, não para força ou alcance.</li>
+  </ul>
+  <div class="cs-uso">
+    <p>Um exemplo de decisão (autoral, não é gabarito), no formato de quatro partes:</p>
+    <ul class="b">
+      <li>Decisão: o módulo usa um nRF24L01 para falar com uma base perto do cuidador. Manda um sinal de vida a cada 10 s e um pedido de ajuda quando a rotina passa do tempo; a base dispara o alarme no pedido e também se ficar 30 s sem ouvir nada.</li>
+      <li>Do que abre mão e quem sente: de alcance fora de casa e de aviso no celular; quem sente é o cuidador que sai de casa. Abre mão também de criptografia pronta: sem cifrar no sketch, um vizinho com um módulo de poucos reais consegue disparar ou imitar o sinal de vida.</li>
+      <li>Um número que pesou: sem resposta, o <code>write()</code> segura o laço por cerca de 28 ms. O som e a luz da rotina não podem esperar isso; o envio vai para depois da tarefa de som ou com <code>setRetries</code> menor.</li>
+      <li>O que faria mudar: se o cuidador não fica em casa, o caminho vira Wi-Fi (ESP32) ou celular; se a família tem vizinhos próximos com o mesmo kit, entra a autenticação do payload antes de qualquer teste com pessoas.</li>
+    </ul>
+    <p>Pergunta para levar ao parceiro: o cuidador costuma estar no mesmo imóvel durante a rotina, e quanto tempo de silêncio já deve virar alarme?</p>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Um sistema que só manda mensagem quando algo dá errado não percebe quando o próprio rádio parou. O sinal de vida periódico é o que transforma silêncio em informação.</li>
+  </ul></div>
+</section>

@@ -16,7 +16,7 @@ export const modulos = [
         eixos: [
           { slug: 'lfa', titulo: 'Linguagens formais e autômatos', descricao: 'Linguagens, gramáticas e as máquinas que as reconhecem.' },
           { slug: 'sistemas', titulo: 'Do silício ao sistema operacional', descricao: 'Arquitetura de computadores e sistemas operacionais: do processador e da memória até processos, sincronização e gerência de recursos.' },
-          { slug: 'interface', titulo: 'Interface com dispositivos embarcados', descricao: 'Como um programa no computador, inclusive uma página no navegador, conversa com um microcontrolador: porta serial, USB e Web Serial API.' },
+          { slug: 'interface', titulo: 'Interface com dispositivos embarcados', descricao: 'Como um programa conversa com um microcontrolador e como microcontroladores conversam entre si para sentir e agir no mundo: porta serial, USB, Web Serial API, sistemas ciberfísicos, SPI e rádio.' },
         ],
       },
       {

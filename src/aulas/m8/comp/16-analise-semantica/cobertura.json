@@ -1,0 +1,151 @@
+{
+  "aula": "m8/comp/16-analise-semantica",
+  "data": "2026-11-24",
+  "criterio": "Conferência das transcrições completas dos quatro vídeos (inventário bloco a bloco por leitura integral, feito por subagentes, com os trechos de código e as contas refeitos e testados) e do cap. 7 do Thain, lido inteiro, contra as seções do modo Consulta. Os capítulos do Louden e o cap. 7 de livro não identificado não foram acessados; não há equivalência declarada a eles.",
+  "fontes": [
+    {
+      "id": "lucredio-aula10",
+      "url": "https://www.youtube.com/watch?v=vJ1RT8AVeCc",
+      "escopo": "D. Lucrédio, Construção de Compiladores, Aula 10: Tópico 07, Análise Semântica, parte 1, 42:09; unidades = blocos de 2 minutos da transcrição (1 = 0:00–2:00; o 22 tem 9 s)",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube (youtube-transcript-api), lida inteira por subagente com inventário bloco a bloco. Reconhecimento ruim interpretado pelo contexto; a tela não foi vista e o código foi reconstruído pela fala.",
+      "totalUnidades": 22,
+      "unidades": [
+        { "paginas": [1, 2], "assunto": "Fases, front-end, o que o sintático despreza (aspectos não livres de contexto, nomes) e o que o semântico faz", "antes": "conteudo-novo-da-aula", "justificativa": "Papel do semântico; as fases moram na aula 07.", "consulta": ["papel"], "evidencias": ["coleta os tipos das variaveis e dos parametros", "autômato com pilha"] },
+        { "paginas": [3], "assunto": "Identificador não declarado; SDD × SDT; o curso foca SDT por usar geradores", "antes": "conteudo-novo-da-aula", "justificativa": "Exemplo em papel; SDD e SDT em sdd-sdt.", "consulta": ["papel", "sdd-sdt"], "evidencias": ["sem total declarado", "por isso o lucredio foca nele"] },
+        { "paginas": [4], "assunto": "Projeto ANTLR com a gramática de expressões sem recursão à esquerda (expressao2, termo2, sem divisão)", "antes": "conteudo-novo-da-aula", "justificativa": "Versão Python testada da mesma gramática.", "consulta": ["sdd-sdt"], "evidencias": ["expressao2", "termo2"] },
+        { "paginas": [5, 6, 7, 8], "assunto": "returns [int val], $NUM.text, atributo herdado como parâmetro entre colchetes, o erro de calcular o produto no termo2, a ordem da subtração, alternativa vazia copiando o herdado", "antes": "conteudo-novo-da-aula", "justificativa": "Conceitos em atributos; a calculadora, a notação ANTLR e os dois erros em sdd-sdt.", "consulta": ["atributos", "sdd-sdt"], "evidencias": ["2 * 3 * 4 * 5", "herdado - termo", "returns"] },
+        { "paginas": [9, 10, 11], "assunto": "Fechando o SDT, classe principal, testes (2 + 3 * 4 = 14) e a crítica: tirar a recursão à esquerda espalha a expressão", "antes": "conteudo-novo-da-aula", "justificativa": "Testes e crítica na seção da calculadora.", "consulta": ["sdd-sdt"], "evidencias": ["2 + 3 * 4", "espalhou uma expressao por quatro regras"] },
+        { "paginas": [12, 13], "assunto": "Segunda gramática com *, rótulos = e +=, gramática limpa, pom.xml com visitor", "antes": "conteudo-novo-da-aula", "justificativa": "Rótulos e configuração do visitor.", "consulta": ["visitor"], "evidencias": ["outrostermos+=termo", "pom.xml"] },
+        { "paginas": [14, 15], "assunto": "Visitor e BaseVisitor gerados, visitChildren, contexto, visitor depois do sintático, custo e vantagens, extends BaseVisitor<Integer>", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto na seção do visitor.", "consulta": ["visitor"], "evidencias": ["visitchildren", "uma passada a mais"] },
+        { "paginas": [16, 17, 18, 19], "assunto": "visitPrograma, visitExpressao com for e ctx.op1(i).getText(), visitTermo, visitFator testando ctx.NUM() != null", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto na seção do visitor.", "consulta": ["visitor"], "evidencias": ["ctx.op1(i).gettext()", "ctx.num() != null"] },
+        { "paginas": [20, 21, 22], "assunto": "Principal com ProgramaContext, tipo genérico, conclusão: recomenda visitors e vários visitors no mesmo compilador", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto na seção do visitor.", "consulta": ["visitor"], "evidencias": ["o lucredio recomenda visitor", "varios visitors"] }
+      ]
+    },
+    {
+      "id": "lucredio-aula11",
+      "url": "https://www.youtube.com/watch?v=QdGgYKDzEm8",
+      "escopo": "D. Lucrédio, Construção de Compiladores, Aula 11: Tópico 07, Análise Semântica, parte 2, 73:43; unidades = blocos de 2 minutos da transcrição",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube (youtube-transcript-api), lida inteira por subagente com inventário bloco a bloco. Código reconstruído pela fala; programas em Pascal e C e o slide de parâmetros estavam só na tela.",
+      "totalUnidades": 37,
+      "unidades": [
+        { "paginas": [1, 2], "assunto": "Tabela de símbolos: atributos (cadeia, token, categoria, tipo, valor), vetor com tamanho e limites, inserir, verificar, remover, eficiência, estática × dinâmica, lista, árvore, hash", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto na seção da tabela.", "consulta": ["tabela-simbolos"], "evidencias": ["cadeia", "tamanho e dos limites", "arvore de busca"] },
+        { "paginas": [3], "assunto": "Busca sequencial, binária e hash; tamanho; uma tabela ou várias; uma por escopo", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto na seção da tabela.", "consulta": ["tabela-simbolos"], "evidencias": ["centenas a milhares", "uma por categoria"] },
+        { "paginas": [4, 5], "assunto": "Escopo, declaração antes do uso, aninhamento mais próximo, escopo estático, Pascal com sub-rotinas aninhadas, C com blocos (3 2), coexistência e restauração", "antes": "conteudo-novo-da-aula", "justificativa": "O exemplo em C é autoral no mesmo formato (o código estava só na tela).", "consulta": ["escopo"], "evidencias": ["imprime 3 2", "sub-rotinas aninhadas", "restaura a oculta"] },
+        { "paginas": [6], "assunto": "Quando inserir, verificar e remover; a linguagem let … in", "antes": "conteudo-novo-da-aula", "justificativa": "Operações na tabela; linguagem no exemplo.", "consulta": ["tabela-simbolos", "let-in"], "evidencias": ["no fim do bloco ou da funcao", "cada let abre um escopo novo"] },
+        { "paginas": [7, 8], "assunto": "Exemplo que vale 10, as quatro regras e o exercício que vale 13", "antes": "conteudo-novo-da-aula", "justificativa": "Regras, exercício e figura.", "consulta": ["let-in"], "evidencias": ["regra 4", "vale 13"] },
+        { "paginas": [9], "assunto": "Projeto ExprParser3, entrada da tabela com nome e valor, HashMap, sem remover", "antes": "conteudo-novo-da-aula", "justificativa": "Implementação comparada na pilha de escopos.", "consulta": ["pilha-escopos"], "evidencias": ["nunca se remove um simbolo solto"] },
+        { "paginas": [10, 11, 12], "assunto": "verificar com get devolvendo null; classe Escopos como pilha em LinkedList; criarNovoEscopo, obterEscopoAtual, percorrerEscoposAninhados, abandonarEscopo", "antes": "conteudo-novo-da-aula", "justificativa": "Tabela de três versões e nota do HashMap.", "consulta": ["pilha-escopos", "tabela-simbolos"], "evidencias": ["linkedlist", "percorrerescoposaninhados"] },
+        { "paginas": [13, 14], "assunto": "Gramática ANTLR da linguagem let … in com rótulos", "antes": "conteudo-novo-da-aula", "justificativa": "Gramática reproduzida no exemplo.", "consulta": ["let-in"], "evidencias": ["listadecls : decl"] },
+        { "paginas": [15, 16, 17, 18], "assunto": "Visitor Calculador: expressão, termo com quatro alternativas, busca do topo ao fundo, erro de não declarada, let cria e abandona escopo", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto no exemplo do let.", "consulta": ["let-in"], "evidencias": ["calculador", "abandonarescopo()"] },
+        { "paginas": [19, 20], "assunto": "visitDecl: escopo atual, erro de declarada duas vezes, insere o valor", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto no exemplo do let.", "consulta": ["let-in"], "evidencias": ["declarada duas vezes no mesmo escopo"] },
+        { "paginas": [21], "assunto": "Classe principal e testes: 10, 13, redeclaração, não declarada, escopo mais próximo", "antes": "conteudo-novo-da-aula", "justificativa": "Resultados no exemplo do let.", "consulta": ["let-in"], "evidencias": ["nao foi declarado antes do uso"] },
+        { "paginas": [22], "assunto": "Recapitulação com pilha e hash; verificação de tipos: atribuição, condição booleana, operandos, conversão", "antes": "conteudo-novo-da-aula", "justificativa": "Conceito de verificação de tipos.", "consulta": ["verificacao-tipos"], "evidencias": ["condicao de if e while"] },
+        { "paginas": [23], "assunto": "Projeto da Alguma: TipoAlguma (INTEIRO, REAL, INVALIDO), tabela com nome e tipo, adicionar, existe, verificar", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto na verificação de tipos.", "consulta": ["verificacao-tipos"], "evidencias": ["tipoalguma"] },
+        { "paginas": [24, 25], "assunto": "AlgumaSemanticoUtils: lista estática de erros com linha e coluna do token, verificarTipo da expressão", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto na verificação de tipos.", "consulta": ["verificacao-tipos"], "evidencias": ["ctx.start", "linha e coluna"] },
+        { "paginas": [26, 27], "assunto": "Compatibilidade na expressão: primeiro termo dá o tipo, diferente gera erro e INVALIDO, erro uma vez só", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto na verificação de tipos e na figura 3.", "consulta": ["verificacao-tipos"], "evidencias": ["contem tipos incompativeis", "nao reclama de novo"] },
+        { "paginas": [28, 29], "assunto": "Termo e fator: 2 + 3 * x mais preciso; fator inteiro, real, parênteses e variável não declarada", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto na verificação de tipos.", "consulta": ["verificacao-tipos"], "evidencias": ["2 + 3 * x"] },
+        { "paginas": [30], "assunto": "verificarTipo de nome; na Alguma todas as variáveis são globais; classe AlgumaSemantico", "antes": "conteudo-novo-da-aula", "justificativa": "Tabela única citada na pilha de escopos.", "consulta": ["pilha-escopos"], "evidencias": ["uma tabela so basta"] },
+        { "paginas": [31, 32], "assunto": "visitPrograma cria a tabela; visitDeclaracao converte o tipo e acusa variável que já existe", "antes": "conteudo-novo-da-aula", "justificativa": "Mesma regra na Mini-bloco (declarar) e na tabela.", "consulta": ["classe"], "evidencias": ["ja foi declarada neste bloco"] },
+        { "paginas": [33, 34], "assunto": "visitComandoAtribuicao: tipo da expressão, variável não declarada, tipo incompatível; leitura e toda expressão aritmética", "antes": "conteudo-novo-da-aula", "justificativa": "Regra na pegadinha da verificação de tipos.", "consulta": ["verificacao-tipos"], "evidencias": ["visitcomandoatribuicao"] },
+        { "paginas": [35, 36], "assunto": "Principal imprime os erros; testes com numero3, numero4, numero5, 2 + 2.4 e 2.3 + 5.0 * 2.7", "antes": "conteudo-novo-da-aula", "justificativa": "Mensagens na verificação de tipos; a tabela de resultados da Mini-bloco faz o mesmo papel.", "consulta": ["verificacao-tipos", "classe"], "evidencias": ["expressao … contem tipos incompativeis", "programa com erros"] },
+        { "paginas": [37], "assunto": "Parâmetros formais × atuais (10, 2.3), (10, 22); a semântica não se formaliza como BNF; próxima aula: geração de código", "antes": "conteudo-novo-da-aula", "justificativa": "Parâmetros em outras; BNF em papel.", "consulta": ["outras", "papel"], "evidencias": ["p(10, 22)", "nao existe um bnf da semantica"] }
+      ]
+    },
+    {
+      "id": "judson-aula10",
+      "url": "https://www.youtube.com/watch?v=msv_0QqXz7s",
+      "escopo": "Judson Santiago, Aula 10: Análise Semântica, Árvore Sintática, Verificação Sintática e de Tipos, 127:06; unidades = blocos de 4 minutos da transcrição (1 = 0:00–4:00)",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube (youtube-transcript-api), lida inteira por subagente com inventário bloco a bloco. Nomes exatos de classes e enums estavam só na tela.",
+      "totalUnidades": 32,
+      "unidades": [
+        { "paginas": [1, 2], "assunto": "Abertura (notas, 2ª unidade), recapitulação do front-end, representações em árvore e linear, a árvore passa entre fases na memória", "antes": "conteudo-novo-da-aula", "justificativa": "Avisos administrativos omitidos; papel das fases já está na aula 07.", "consulta": ["nos"], "evidencias": ["cada construcao vira um no"] },
+        { "paginas": [3], "assunto": "Exemplos de árvore sintática (9 - 5 + 2, if, while) e diferença para a árvore de derivação; ordem dos filhos", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em nós.", "consulta": ["nos"], "evidencias": ["9 - 5 + 2", "a ordem dos filhos"] },
+        { "paginas": [4, 5], "assunto": "Esquema de tradução que constrói a árvore (stmt.n, new If, Seq, Assign, Rel, factor.n = expr.n); Node, Expr e Stmt", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em nós.", "consulta": ["nos"], "evidencias": ["stmt.n = new if(expr.n, stmt₁.n)", "factor.n = expr.n"] },
+        { "paginas": [6, 7], "assunto": "Eval, Seq terminando em nulo, declarações fora da árvore, precedência por níveis de não terminal", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em nós; precedência por níveis está na aula 08.", "consulta": ["nos"], "evidencias": ["eval(expr.n)", "declaracoes nao viram no"] },
+        { "paginas": [8], "assunto": "Agrupar operadores com as mesmas regras de tipo e de código: rel, aritmético, cond, not, menos unário, assign, access", "antes": "conteudo-novo-da-aula", "justificativa": "Tabela em nós.", "consulta": ["nos"], "evidencias": ["access"] },
+        { "paginas": [9, 10, 11], "assunto": "Verificação estática; tempo de compilação × execução; endereço relativo de globais e estáticas; godbolt (10 + 5 vira 15); rand(); const e constexpr", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em estatico.", "consulta": ["estatico"], "evidencias": ["godbolt", "10 + rand()", "loader"] },
+        { "paginas": [12], "assunto": "Erro do constexpr; verificações estáticas: sintáticas fora da gramática (declarada, um id por escopo, break em laço) e de tipos; conversão inserida na árvore", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em estatico e conversao.", "consulta": ["estatico", "conversao"], "evidencias": ["constexpr", "break"] },
+        { "paginas": [13], "assunto": "Valor L e valor R: i = 5, j = i + 1, vet[2]; int& e int&&", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em lvalue.", "consulta": ["lvalue"], "evidencias": ["func(5)", "vet[2]"] },
+        { "paginas": [14], "assunto": "Pergunta: declarar variável dentro de case exige bloco", "antes": "conteudo-novo-da-aula", "justificativa": "Uma linha em outras.", "consulta": ["outras"], "evidencias": ["case"] },
+        { "paginas": [15], "assunto": "Variável isolada é valor L; em expressão, valor R; depuração do exemplo", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em lvalue; a depuração no Visual Studio não entra.", "consulta": ["lvalue"], "evidencias": ["sozinha, uma variavel e valor l"] },
+        { "paginas": [16], "assunto": "Lado esquerdo precisa ser variável; verificação de tipos: if com condição booleana, E1 <= E2; processador não mistura tipos", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em lvalue e verificacao-tipos.", "consulta": ["lvalue", "verificacao-tipos"], "evidencias": ["o processador nao tem instrucao que mistura tipos"] },
+        { "paginas": [17], "assunto": "Ação if (E1.type == E2.type) E.type = boolean; coerção (2 * 3.14); flexibilizar o <=; sobrecarga do +", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em verificacao-tipos e conversao.", "consulta": ["verificacao-tipos", "conversao"], "evidencias": ["e.type = boolean", "2 * 3.14", "concatena duas strings"] },
+        { "paginas": [18], "assunto": "Resumo da teoria; projeto lab10/AST e sua gramática", "antes": "conteudo-novo-da-aula", "justificativa": "A gramática do lab10 é usada nas regras de nós e tipos.", "consulta": ["verificacao-tipos"], "evidencias": ["lab10"] },
+        { "paginas": [19], "assunto": "Arquivo de teste; Program e Block com nova tabela ao entrar e restaurar ao sair", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto na pilha de escopos.", "consulta": ["pilha-escopos"], "evidencias": ["block() cria uma tabela nova"] },
+        { "paginas": [20, 21, 22], "assunto": "ast.h: enums, Node, Statement, Expression (tipo e token), nós de expressão e de comando, DoWhile invertido; main com scanner global", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em nós.", "consulta": ["nos"], "evidencias": ["dowhile(stmt, expr)", "constant"] },
+        { "paginas": [23], "assunto": "Start retorna a raiz; TestParse; Decls insere na tabela; Stmts devolve Seq com nulo", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em nós.", "consulta": ["nos"], "evidencias": ["outro seq ou nulo"] },
+        { "paginas": [24], "assunto": "Stmt (atribuição e if); análise semântica nos construtores; Logical exige bool", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em visitor e verificacao-tipos.", "consulta": ["visitor", "verificacao-tipos"], "evidencias": ["logical recusa operandos"] },
+        { "paginas": [25], "assunto": "Mensagem de erro; Relational, Arithmetic, unário, Assign; make debug", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em verificacao-tipos.", "consulta": ["verificacao-tipos"], "evidencias": ["assign quer variavel e expressao do mesmo tipo"] },
+        { "paginas": [26], "assunto": "Erro semântico × sintático: nomenclatura misturada; erro de lógica que nenhuma fase pega", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em papel.", "consulta": ["papel"], "evidencias": ["a nomenclatura e misturada", "* 24"] },
+        { "paginas": [27], "assunto": "Saída do teste em árvore, Traverse, erro forçado j = 9.2 na linha 6", "antes": "conteudo-novo-da-aula", "justificativa": "O caso do 9.2 entra em verificacao-tipos.", "consulta": ["verificacao-tipos"], "evidencias": ["9.2"] },
+        { "paginas": [28], "assunto": "Onde o tipo nasce: Local procura na tabela, Factor cria constantes, o léxico separa inteiro de real pelo ponto", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em verificacao-tipos.", "consulta": ["verificacao-tipos"], "evidencias": ["o tipo nasce em dois lugares"] },
+        { "paginas": [29], "assunto": "Mais erros forçados; atividade de conversão int ↔ bool; resumo", "antes": "conteudo-novo-da-aula", "justificativa": "A atividade vira o treino 2 e o molde da coerção.", "consulta": ["treino", "conversao"], "evidencias": ["0 vira false", "atividade do judson"] },
+        { "paginas": [30, 31], "assunto": "Encerramento, plano do curso (só front-end, ferramentas geradoras)", "antes": "administrativo", "justificativa": "Plano do curso dele; sem conteúdo novo. Registrado no destino geral.", "consulta": ["papel"], "evidencias": [] },
+        { "paginas": [32], "assunto": "Pergunta sobre YAML; front-end em leitores de formatos; próxima aula: código intermediário", "antes": "administrativo", "justificativa": "Aplicação citada de passagem; sem conteúdo novo.", "consulta": ["papel"], "evidencias": [] }
+      ]
+    },
+    {
+      "id": "univesp-sdt",
+      "url": "https://www.youtube.com/watch?v=_kGAgukarkk",
+      "escopo": "UNIVESP, Linguagens e Compiladores: Tradução dirigida por sintaxe, 27:12; unidades = blocos de 2 minutos da transcrição",
+      "acesso": "integral",
+      "metodo": "Transcrição automática do YouTube (youtube-transcript-api), lida inteira por subagente com inventário bloco a bloco. O professor quase não lê os slides; regras reconstruídas pela fala.",
+      "totalUnidades": 14,
+      "unidades": [
+        { "paginas": [1], "assunto": "Agenda; dependência de contexto; variáveis e subprogramas; Ada end xpto", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em papel.", "consulta": ["papel"], "evidencias": ["end xpto"] },
+        { "paginas": [2, 3], "assunto": "Semântica estática; gramática de atributos; valores e predicados; atributos intrínsecos; regra geral Y → X₁…Xₙ", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em papel e atributos.", "consulta": ["papel", "atributos"], "evidencias": ["semantica estatica", "y → x₁ x₂ … xₙ"] },
+        { "paginas": [4, 5, 6], "assunto": "Sintetizado e herdado; soma dos dígitos ascendente e descendente; árvores anotadas de 34", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em atributos com a figura 1.", "consulta": ["atributos"], "evidencias": ["x₁.h = x.h + num.v", "34"] },
+        { "paginas": [7, 8], "assunto": "Ordem de avaliação; S-atribuído e L-atribuído; grafo; o curso usa JavaCC", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em sdd-sdt.", "consulta": ["sdd-sdt"], "evidencias": ["javacc"] },
+        { "paginas": [9], "assunto": "Exemplo S-atribuído com expressões e a transformação genérica para L-atribuído", "antes": "conteudo-novo-da-aula", "justificativa": "Fórmula da transformação em sdd-sdt.", "consulta": ["sdd-sdt"], "evidencias": ["r₁.h = g(r.h, y.y)"] },
+        { "paginas": [10], "assunto": "Construção da árvore com geraNo e geraFolha, de baixo para cima e de cima para baixo", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em sdd-sdt.", "consulta": ["sdd-sdt"], "evidencias": ["gerano(", "gerafolha(num)"] },
+        { "paginas": [11], "assunto": "Função R(h) do tradutor preditivo, que recebe e devolve ponteiro para nó", "antes": "conteudo-novo-da-aula", "justificativa": "Ligada ao mais_fatores da Mini-bloco.", "consulta": ["sdd-sdt"], "evidencias": ["a funcao r(h) da univesp"] },
+        { "paginas": [12, 13], "assunto": "Tabela de símbolos: o que guarda, um nível (COBOL, Fortran), blocos (Algol e descendentes), uma tabela por escopo, visibilidade com a, b, p, q, r", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em tabela-simbolos e escopo. Trecho ininteligível sobre qual b cada posição vê não foi usado.", "consulta": ["tabela-simbolos", "escopo"], "evidencias": ["cobol", "r declarado dentro de"] },
+        { "paginas": [14], "assunto": "Encerramento: próximo é o back-end", "antes": "administrativo", "justificativa": "Sem conteúdo novo.", "consulta": ["papel"], "evidencias": [] }
+      ]
+    },
+    {
+      "id": "thain-cap7",
+      "url": "https://dthain.github.io/books/compiler/chapter7.pdf",
+      "escopo": "Douglas Thain, Introduction to Compilers and Language Design, 2ª ed. (revisão de 28/07/2026), cap. 7, Semantic Analysis, p. 99–118; complemento no lugar dos livros do autoestudo. Unidades: 1 abertura, 2 7.1, 3 7.2, 4 7.3, 5 7.4, 6 7.5, 7 7.6, 8 7.7, 9 7.8 exercícios, 10 7.9 leituras",
+      "acesso": "integral",
+      "metodo": "PDF gratuito do autor, texto extraído com pdftotext e lido inteiro. Figuras 7.1 a 7.5 conferidas pelo texto extraído.",
+      "totalUnidades": 10,
+      "unidades": [
+        { "paginas": [1], "assunto": "Semântica, verificação de tipos, resolução de nomes, outras verificações", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em papel e pilha-escopos.", "consulta": ["papel", "pilha-escopos"], "evidencias": ["resolucao de nomes"] },
+        { "paginas": [2], "assunto": "Para que servem os tipos; seguro × inseguro, estático × dinâmico, explícito × implícito", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em tipos.", "consulta": ["tipos"], "evidencias": ["addl", "indexoutofrangeexception", "auto x = 32.5"] },
+        { "paginas": [3], "assunto": "Tipos atômicos, do usuário, enum, struct, union, variante; o que fazer com tipos diferentes", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em tipos e conversao.", "consulta": ["tipos", "conversao"], "evidencias": ["type month is range 1..12", "$b = @days"] },
+        { "paginas": [4], "assunto": "O sistema de tipos do B-Minor e suas regras", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em tipos.", "consulta": ["tipos"], "evidencias": ["b-minor"] },
+        { "paginas": [5], "assunto": "struct symbol (kind, type, name, which), tabela como pilha de hash, exemplo com três x (10 hello false), API scope_enter … scope_lookup_current", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em tabela-simbolos, escopo e pilha-escopos.", "consulta": ["tabela-simbolos", "escopo", "pilha-escopos"], "evidencias": ["which", "10 hello false", "scope_lookup_current"] },
+        { "paginas": [6], "assunto": "Resolução de nomes: decl_resolve e expr_resolve, ponteiro para o símbolo no nó", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em pilha-escopos e visitor.", "consulta": ["pilha-escopos", "visitor"], "evidencias": ["e-&gt;symbol = scope_lookup(e-&gt;name)", "decl_resolve"] },
+        { "paginas": [7], "assunto": "type_equals, expr_typecheck em pós-ordem, casos ADD, EQ e DEREF, decl_typecheck, stmt_typecheck", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em verificacao-tipos e outras.", "consulta": ["verificacao-tipos", "outras"], "evidencias": ["expr_typecheck", "expr_deref"] },
+        { "paginas": [8], "assunto": "Mensagens de erro informativas", "antes": "conteudo-novo-da-aula", "justificativa": "Coberto em verificacao-tipos.", "consulta": ["verificacao-tipos"], "evidencias": ["nao da para comparar um boolean (b) com um integer (5)"] },
+        { "paginas": [9], "assunto": "Exercícios de implementação (símbolos, escopo, resolução, typecheck, myprintf)", "antes": "conteudo-novo-da-aula", "justificativa": "O treino cobre a mesma ideia em Python (treinos 1 e 3).", "consulta": ["treino"], "evidencias": ["avisar uma vez so"] },
+        { "paginas": [10], "assunto": "Leituras recomendadas (SICP, Pierce, The Little Typer)", "antes": "administrativo", "justificativa": "Só referências; não entram.", "consulta": ["tipos"], "evidencias": [] }
+      ]
+    },
+    {
+      "id": "louden-cap6",
+      "url": "sem URL: livro indicado no roteiro de autoestudo",
+      "escopo": "Louden, Compiladores: princípios e práticas, cap. 6, Análise Semântica, p. 259–337",
+      "acesso": "indisponivel",
+      "limitacao": "A dona não tem o livro e nenhuma cópia autorizada foi encontrada em Downloads, Desktop ou Documents. Nada da aula vem dele; o cap. 7 do Thain entra como substituto escrito, sem equivalência garantida."
+    },
+    {
+      "id": "cap7-126-140",
+      "url": "sem URL: livro indicado no roteiro de autoestudo",
+      "escopo": "Capítulo 7, Análise Semântica, p. 126–140 (livro não identificado; indicado junto com o Louden)",
+      "acesso": "indisponivel",
+      "limitacao": "Livro e edição não identificados; nenhuma cópia encontrada. Nada da aula vem dele."
+    },
+    {
+      "id": "resina-drive",
+      "url": "https://drive.google.com/drive/folders/13sRb90dY3lCeEfUiM5jgQwYO9PZoCFsO",
+      "escopo": "Pasta da semana no Drive da disciplina (prof. Resina) e slides do próximo encontro",
+      "acesso": "indisponivel",
+      "limitacao": "O Drive pediu login no navegador embutido em 24/11/2026 e não foi aberto. A aula segue o último deck (semana 5, em notas/ da aula 11), cujo fim anuncia a árvore sintática como entrada do analisador semântico, e o exemplo do robô com AST (ex_sintatico_arvore_desafio.py). Integrar os slides com integrar-notas depois do encontro."
+    }
+  ]
+}

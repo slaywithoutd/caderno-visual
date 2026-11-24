@@ -1,0 +1,87 @@
+{
+  "numero": "16",
+  "titulo": "Análise semântica",
+  "tema": "Linguagens formais e autômatos",
+  "modos": [
+    "consulta"
+  ],
+  "resumo": "O que o semântico confere depois do sintático: atributos sintetizados e herdados, SDD e SDT, nós da AST, visitor, tabela de símbolos, escopo estático com pilha de tabelas, sistema e verificação de tipos, conversões, valor L e R, num analisador em Python na classe da aula.",
+  "topicos": [
+    "Semântico em Python (classe da aula)",
+    "O que sobra para o semântico",
+    "Compilação × execução",
+    "Atributos sintetizados e herdados",
+    "SDD, SDT, S e L-atribuído",
+    "Nós da AST",
+    "Visitor",
+    "Tabela de símbolos",
+    "Escopo estático",
+    "Pilha de tabelas",
+    "Sistema de tipos",
+    "Verificação de tipos",
+    "Conversão e sobrecarga",
+    "Valor L e valor R",
+    "Parâmetros e outras verificações"
+  ],
+  "secoes": [],
+  "fontes": [
+    {
+      "tipo": "Vídeo",
+      "titulo": "Construção de Compiladores · Aula 10 · Análise Semântica, parte 1 (D. Lucrédio, UFSCar)",
+      "url": "https://www.youtube.com/watch?v=vJ1RT8AVeCc",
+      "duracao": "42 min",
+      "secao": "sdd-sdt",
+      "nota": "Autoestudo. Transcrição automática do YouTube lida inteira (inventário bloco a bloco); a tela não foi vista, então o código ANTLR e Java é reconstruído pela fala."
+    },
+    {
+      "tipo": "Vídeo",
+      "titulo": "Construção de Compiladores · Aula 11 · Análise Semântica, parte 2 (D. Lucrédio, UFSCar)",
+      "url": "https://www.youtube.com/watch?v=QdGgYKDzEm8",
+      "duracao": "74 min",
+      "secao": "pilha-escopos",
+      "nota": "Autoestudo. Tabela de símbolos, escopos com pilha de tabelas, a linguagem let … in e a verificação de tipos da Alguma. Transcrição automática lida inteira; programas em Pascal e C e o slide de parâmetros estavam só na tela."
+    },
+    {
+      "tipo": "Vídeo",
+      "titulo": "Judson Santiago · Aula 10 · Análise Semântica, Árvore Sintática, Verificação Sintática e de Tipos",
+      "url": "https://www.youtube.com/watch?v=msv_0QqXz7s",
+      "duracao": "127 min",
+      "secao": "nos",
+      "nota": "Autoestudo. Nós da árvore, compilação × execução, valor L e R, verificação nos construtores do projeto lab10/AST em C++. Transcrição automática lida inteira; nomes exatos de classes e enums estavam só na tela."
+    },
+    {
+      "tipo": "Vídeo",
+      "titulo": "UNIVESP · Linguagens e Compiladores · Tradução dirigida por sintaxe",
+      "url": "https://www.youtube.com/watch?v=_kGAgukarkk",
+      "duracao": "27 min",
+      "secao": "atributos",
+      "nota": "Autoestudo. Gramática de atributos, sintetizado e herdado, S e L-atribuído, construção da árvore e tabela de símbolos por escopo. Transcrição automática lida inteira; as regras dos slides foram reconstruídas pela fala."
+    },
+    {
+      "tipo": "Livro",
+      "titulo": "Louden, Compiladores: princípios e práticas, cap. 6, Análise Semântica (p. 259–337)",
+      "secao": "tipos",
+      "nota": "Autoestudo. Não consultado: o livro não estava acessível. Nada da aula vem dele."
+    },
+    {
+      "tipo": "Livro",
+      "titulo": "Cap. 7, Análise Semântica (p. 126–140), indicado junto com o Louden",
+      "secao": "tipos",
+      "nota": "Autoestudo. Não consultado: livro e edição não identificados nem acessíveis."
+    },
+    {
+      "tipo": "Livro",
+      "titulo": "Thain, Introduction to Compilers and Language Design, 2ª ed., cap. 7, Semantic Analysis (p. 99–118)",
+      "url": "https://dthain.github.io/books/compiler/chapter7.pdf",
+      "secao": "tipos",
+      "nota": "Complemento escrito no lugar dos capítulos do autoestudo, sem equivalência garantida. PDF gratuito do autor, lido inteiro."
+    },
+    {
+      "tipo": "Código",
+      "titulo": "ex_sintatico_arvore_desafio.py (rotina do robô com AST, prof. Resina)",
+      "secao": "classe",
+      "nota": "Padrão de Token, NoInterno, NoFolha e comparar usado no código da aula."
+    }
+  ],
+  "observacao": "Escrita a partir das quatro transcrições completas e do cap. 7 do Thain, lido inteiro como substituto. Os dois capítulos indicados (Louden, cap. 6, p. 259–337, e um cap. 7, p. 126–140, de livro não identificado) não foram consultados: nada aqui promete equivalência a eles. A pasta do Drive da disciplina pediu login e não foi aberta; a aula continua o último deck (semana 5), que anunciava a árvore sintática para as próximas fases. O código Python da Mini-bloco, a versão com coerção, as figuras e o treino são autorais e foram testados com Python 3.13; o código ANTLR, Java e C++ dos vídeos é reconstruído pela fala."
+}

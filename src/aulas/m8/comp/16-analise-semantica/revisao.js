@@ -1,0 +1,40 @@
+/* Revisão da aula: cartões (pergunta, resposta, seção) e cola de uma página (tópico, resumo, seção).
+   O 3º item é o id da seção do consulta.html onde o assunto mora. Pode usar HTML simples. */
+export const cartoes = [
+  ['Na Mini-bloco, o que o sintático entrega ao semântico e o que o semântico guarda?', 'A AST com <code>NoInterno</code> e <code>NoFolha</code>, cada folha com a linha. O semântico guarda <code>escopos</code> (lista de dicts, o último é o atual) e <code>erros</code>, e devolve a lista de erros sem parar no primeiro.', 'classe'],
+  ['Por que <code>total = 1;</code> sem declaração passa no sintático?', 'A regra é ID = expressão, e a gramática livre de contexto não liga o uso de um nome à declaração. Quem confere é o semântico, com a tabela de símbolos.', 'papel'],
+  ['O que se decide em tempo de compilação e o que só em execução?', 'Compilação: tipo e escopo das variáveis, endereço relativo das globais, valor de 10 + 5 (dobra de constantes). Execução: 10 + rand(), valor digitado, endereço de um new.', 'estatico'],
+  ['Qual a diferença entre atributo sintetizado e herdado, e como cada um aparece na descida recursiva?', 'Sintetizado sobe dos filhos (é o retorno da função); herdado desce do pai ou de um irmão à esquerda (é um parâmetro).', 'atributos'],
+  ['Escreva a soma dos dígitos sem recursão à esquerda, com herdado.', '<code>N → num {X.h = num.v} X {N.v = X.s}</code>; <code>X → num {X₁.h = X.h + num.v} X₁ {X.s = X₁.s}</code>; <code>X → ε {X.s = X.h}</code>. Para 34: X.h = 3, X₁.h = 7, sobe 7.', 'atributos'],
+  ['S-atribuído e L-atribuído: o que são e com que análise combinam?', 'S: só sintetizados, ações no fim, análise ascendente. L: herdados vindos do pai e dos irmãos à esquerda mais sintetizados, análise descendente. Fora disso, grafo de dependências.', 'sdd-sdt'],
+  ['Na calculadora com herdado, que dois erros o Lucrédio aponta?', 'Calcular herdado × fator no termo2 e descartar a chamada recursiva (2 * 3 * 4 * 5 dá 6), e inverter a subtração (termo − herdado faz 10 − 3 − 2 dar 9).', 'sdd-sdt'],
+  ['Como uma lista de comandos fica na árvore?', 'Como nós Seq encadeados: o comando de um lado, o resto do outro, terminando em nulo. Na Mini-bloco, <code>listaCmd(cmd, prox)</code> até <code>None</code>.', 'nos'],
+  ['Ações na gramática ou visitor: qual a diferença?', 'Ações rodam durante a análise sintática. O visitor percorre a árvore pronta, um método por tipo de nó: gramática limpa, várias passadas possíveis, custo de uma passada a mais.', 'visitor'],
+  ['Quais as três operações da tabela de símbolos e quando cada uma acontece?', 'Inserir na declaração (depois de conferir o escopo atual), verificar em cada uso, remover quando o nome deixa de valer (fim do bloco ou da função).', 'tabela-simbolos'],
+  ['Quais as duas regras do escopo estático?', 'Declaração antes do uso e aninhamento mais próximo. A declaração interna sombreia a externa, que volta a valer ao sair do bloco.', 'escopo'],
+  ['Como a pilha de tabelas implementa escopo?', 'Uma tabela por escopo: empilha ao entrar, desempilha a tabela inteira ao sair. Declarar olha só o topo; buscar vai do topo ao fundo.', 'pilha-escopos'],
+  ['No exercício do let do Lucrédio (<code>x = 2, y = 3</code>; dentro, <code>x = x + 1</code> e <code>y = let z = 3, x = 4 in x + y + z</code>; no fim, <code>x + y</code>), quanto vale o programa?', '13. O novo x vale 3; no let interno, 4 + 3 + 3 = 10 (o y é o 3 de fora, porque o y do meio ainda não existe); 3 + 10 = 13.', 'let-in'],
+  ['Segura × insegura, estática × dinâmica, explícita × implícita: o que cada eixo diz?', 'Segura: nenhum programa quebra as estruturas (a[100] vira exceção). Estática: tipos conferidos na compilação. Explícita: quem programa escreve o tipo.', 'tipos'],
+  ['Como se calcula o tipo de uma expressão, e para que serve o tipo inválido?', 'Em pós-ordem: folha pelo literal ou pela tabela, operador conferindo os filhos. Erro devolve inválido, e quem recebe inválido não reclama de novo: uma mensagem só.', 'verificacao-tipos'],
+  ['O que o verificador faz com <code>i + 2.5</code> numa linguagem com coerção de int para real?', 'Põe um nó de conversão (int_para_real) em cima do i, e a soma fica real. Real em variável int continua erro, porque perde a parte decimal.', 'conversao'],
+  ['O que é valor L e valor R?', 'Valor L é um lugar na memória (i, vet[2]), o que pode ficar à esquerda do =. Valor R é só um valor (5, i + 1).', 'lvalue'],
+  ['O que se confere numa chamada de procedimento?', 'Que os argumentos concordam com os parâmetros formais em número e em tipo; a tabela guarda a lista de parâmetros com tipos.', 'outras'],
+];
+
+export const cola = [
+  ['Mini-bloco', 'sintático devolve NoInterno/NoFolha; semântico: escopos = [dicts], erros = [ ]', 'classe'],
+  ['Papel', 'nomes e tipos: o que a gramática livre de contexto não lembra', 'papel'],
+  ['Estático', 'compilação: tipo, escopo, 10 + 5 · execução: rand(), new', 'estatico'],
+  ['Atributos', 'sintetizado sobe (retorno) · herdado desce (parâmetro)', 'atributos'],
+  ['S × L', 'S: só sobe, ascendente · L: desce da esquerda e sobe, descendente', 'sdd-sdt'],
+  ['Herdado na conta', 'termo2(herdado * fator) · subtração: herdado − termo', 'sdd-sdt'],
+  ['Nós', 'If(cond, cmd) · Seq(cmd, resto) até nulo · sem ( ) e declarações', 'nos'],
+  ['Visitor', 'passada sobre a árvore pronta; um método por nó', 'visitor'],
+  ['Tabela', 'inserir na declaração · verificar no uso · remover no fim do escopo', 'tabela-simbolos'],
+  ['Escopo', 'declaração antes do uso · aninhamento mais próximo · sombreamento', 'escopo'],
+  ['Pilha de tabelas', 'entra: push · sai: pop da tabela inteira · declarar: topo · buscar: topo → fundo', 'pilha-escopos'],
+  ['Tipos', 'pós-ordem; erro devolve inválido; uma mensagem só', 'verificacao-tipos'],
+  ['Conversão', 'nó int_para_real na árvore; real → int perde e é erro', 'conversao'],
+  ['Valor L / R', 'lugar na memória × só valor', 'lvalue'],
+  ['Chamadas', 'argumentos × parâmetros formais: número e tipo', 'outras'],
+];

@@ -1,0 +1,877 @@
+<!-- Aula 16 · Análise semântica. Aula somente Consulta: figuras, loops e desenhos estão aqui mesmo.
+     Um conceito por seção, na ordem das dependências. Fases, tabela de símbolos (definição) e coerção moram na aula 07;
+     sistema de tipos e sintaxe abstrata, na 09; ação semântica e montagem da AST na descida, na 12. Aqui são só link.
+     Os blocos de código vêm dos arquivos Python testados (Python 3.13). Os ids usados por figuras.js e loops.js estão nesta página. -->
+
+<!-- ================= Resumo ================= -->
+<section class="cs" id="encontro" data-grupo="Resumo" data-termos="">
+  <h2>Resumo</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 190"><rect class="k" x="4" y="6" width="104" height="26" rx="5"/><text x="56" y="19" style="font-size:9.5px">x = y + 1 ;</text><text class="tm" x="172" y="19">tokens</text><path class="s" d="M56 34 V48" marker-end="url(#mnarrow)"/><rect class="bl" x="4" y="50" width="104" height="24" rx="5"/><text x="56" y="62" style="font-size:9.5px">sintático: aceita</text><path class="s" d="M56 76 V90" marker-end="url(#mnarrow)"/><circle class="k" cx="56" cy="104" r="11"/><text x="56" y="104">=</text><line class="s" x1="48" y1="113" x2="30" y2="128"/><line class="s" x1="64" y1="113" x2="82" y2="128"/><text x="26" y="136" style="font-size:9.5px">x</text><circle class="k" cx="86" cy="136" r="9"/><text x="86" y="136">+</text><text class="tm" x="172" y="104">AST</text><rect class="am" x="128" y="122" width="108" height="40" rx="5"/><text class="st" x="134" y="135" style="font-size:9px">tabela: x → int</text><text class="st" x="134" y="150" style="font-size:9px">y → ?</text><path class="s" d="M100 140 H124" marker-end="url(#mnarrow)"/><rect class="rd" x="4" y="164" width="232" height="22" rx="5"/><text x="120" y="175" style="font-size:9.5px">semântico: 'y' não foi declarada</text></svg>O sintático deixa passar; o semântico consulta a tabela e recusa.</aside>
+  <p class="cs-def">Análise semântica é a fase que anda pela árvore sintática e confere o que a gramática não consegue: se cada nome foi declarado, qual declaração vale em cada ponto e se os tipos combinam.</p>
+  <ul class="b">
+    <li>O sintático aceita <code>x = y + 1;</code> sem <code>y</code> declarado: a gramática livre de contexto não lembra nomes. Quem lembra é a tabela de símbolos, preenchida nas declarações e consultada nos usos.</li>
+    <li>Atributo sintetizado sobe (é o retorno da função do não terminal); atributo herdado desce (é um parâmetro). Sem recursão à esquerda, o que já foi calculado à esquerda desce como herdado: <code>mais_fatores(herdado)</code>.</li>
+    <li>As verificações rodam dentro do sintático, como ações nas regras, ou depois, numa passada sobre a árvore pronta: o visitor, um método por tipo de nó.</li>
+    <li>Escopo estático tem duas regras: declaração antes do uso e aninhamento mais próximo. Implementação: uma pilha de tabelas, um dict por bloco, busca do topo para o fundo, e ao sair do bloco a tabela inteira é desempilhada.</li>
+    <li>Tipos se calculam em pós-ordem: a folha dá o tipo (pelo literal ou pela tabela), cada operador confere os filhos e devolve o seu. Uma expressão com erro devolve <code>invalido</code>, e a mensagem aparece uma vez só.</li>
+    <li>Também é do semântico: o lado esquerdo do <code>=</code> ser um lugar na memória, os argumentos concordarem com os parâmetros em número e tipo, <code>break</code> só dentro de laço.</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Declarar o mesmo nome duas vezes é erro só no mesmo bloco. Num bloco interno é sombreamento, e vale.</li>
+      <li>Ao sair de um bloco, nenhum símbolo é apagado da tabela de fora: sai a tabela do bloco, e a declaração externa volta a valer.</li>
+      <li>Com herdado, a subtração é <code>herdado - termo</code>. Na ordem trocada, 10 − 3 − 2 dá 9 no lugar de 5.</li>
+      <li><code>int + real</code> só é erro se a linguagem não converte. Com coerção, o verificador põe um nó de conversão na árvore; real guardado em variável int perde a parte decimal e costuma continuar proibido.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= Na classe do professor ================= -->
+<section class="cs" id="classe" data-grupo="Na classe do professor" data-termos="">
+  <h2>O semântico em Python, na classe da aula</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 170"><rect class="gr" x="6" y="6" width="228" height="30" rx="5"/><text class="st" x="12" y="17" style="font-size:9px">Token('ID', 'x', 4)</text><text class="st" x="12" y="29" style="font-size:9px">tipo · valor · linha</text><path class="s" d="M120 38 V52" marker-end="url(#mnarrow)"/><rect class="bl" x="6" y="54" width="228" height="30" rx="5"/><text class="st" x="12" y="65" style="font-size:9px">AnalisadorSintatico: comparar devolve o token</text><text class="st" x="12" y="77" style="font-size:9px">cada método devolve NoInterno / NoFolha</text><path class="s" d="M120 86 V100" marker-end="url(#mnarrow)"/><rect class="am" x="6" y="102" width="228" height="42" rx="5"/><text class="st" x="12" y="113" style="font-size:9px">AnalisadorSemantico: visitar(no)</text><text class="st" x="12" y="125" style="font-size:9px">escopos = [ {…}, {…} ]   topo = [-1]</text><text class="st" x="12" y="137" style="font-size:9px">tipoDe(no) em pós-ordem · erros = [ ]</text><text class="tm" x="120" y="160">a linha viaja do token até a mensagem</text></svg>Duas classes: uma monta a árvore, a outra anda nela.</aside>
+  <p class="cs-def">O código abaixo pega a gramática da dinâmica de 12/11, acrescenta declarações com tipo e blocos aninhados (a Mini-bloco) e escreve duas classes: o sintático no padrão da aula, que devolve a AST, e o semântico, que anda nessa árvore com uma pilha de tabelas de símbolos e junta os erros numa lista.</p>
+  <ul class="b">
+    <li><code>Token(tipo, valor, linha)</code>, <code>NoInterno(op, **kwargs)</code>, <code>NoFolha(op, valor, linha)</code> e o <code>comparar</code> que devolve o token consumido são os do exemplo da rotina do robô (<code>ex_sintatico_arvore_desafio.py</code>). <code>tokenCorrente</code>, <code>proximoToken</code> e <code>analisar</code> terminando em <code>comparar('EOF')</code> são os da <a href="/m8/comp/12-descendente-recursiva/consulta#aula-resina">aula 12</a>.</li>
+    <li><code>lista_cmd</code> devolve <code>NoInterno('listaCmd', cmd=…, prox=…)</code> e termina em <code>None</code>, como o <code>listaAcoes</code> do robô: a lista de comandos é uma cadeia que acaba em nulo (o <a href="#nos">nó Seq</a>).</li>
+    <li><code>mais_fatores(herdado)</code> recebe a árvore montada até ali e devolve a árvore maior. É o <a href="#atributos">atributo herdado</a> que deixa <code>1 + 2 + 3</code> associativo à esquerda sem recursão à esquerda.</li>
+    <li>O semântico guarda <code>escopos</code> (uma lista de dicts; o último é o escopo atual) e <code>erros</code>. <code>visitar</code> decide pelo <code>no.op</code>, como um <a href="#visitor">visitor</a> escrito à mão; <code>tipoDe</code> calcula o tipo em <a href="#verificacao-tipos">pós-ordem</a>.</li>
+    <li>Regras desta linguagem: nome declarado antes do uso; nada de declarar duas vezes no mesmo bloco; bloco interno pode sombrear; <code>+</code> só entre tipos iguais; a variável recebe o tipo dela. Sem conversão automática, como na Alguma do Lucrédio e no <code>lab10</code> do Judson.</li>
+    <li>O <code>lexico</code> é só um apoio para escrever os testes em texto; nos exemplos do professor a lista de tokens vem escrita à mão. Código autoral, testado com Python 3.13.</li>
+  </ul>
+  <div class="prose"><pre class="code">'''
+Mini-bloco: a gramática da dinâmica de 12/11 crescida com declarações, tipos e blocos aninhados.
+
+&lt;programa&gt;     ::= &lt;bloco&gt;
+&lt;bloco&gt;        ::= ABREBLOCO &lt;lista_cmd&gt; FECHABLOCO
+&lt;lista_cmd&gt;    ::= &lt;cmd&gt; &lt;lista_cmd&gt; | ε
+&lt;cmd&gt;          ::= &lt;decl&gt; | &lt;atribuicao&gt; | &lt;bloco&gt;
+&lt;decl&gt;         ::= TIPO ID SEMICOLON
+&lt;atribuicao&gt;   ::= ID ASSIGN &lt;expr&gt; SEMICOLON
+&lt;expr&gt;         ::= &lt;fator&gt; &lt;mais_fatores&gt;
+&lt;mais_fatores&gt; ::= MAIS &lt;fator&gt; &lt;mais_fatores&gt; | ε
+&lt;fator&gt;        ::= ID | INT | REAL
+'''
+import re
+
+
+# ---------- Token e nós: os mesmos do exemplo do robô (ex_sintatico_arvore_desafio.py) ----------
+class Token:
+    def __init__(self, tipo, valor, linha):
+        self.tipo = tipo
+        self.valor = valor
+        self.linha = linha
+
+    def __repr__(self):
+        return f'Token({self.tipo!r}, {self.valor!r}, {self.linha})'
+
+
+class NoInterno:
+    def __init__(self, op, **kwargs):
+        self.op = op
+        self.d = {}
+        for k, v in kwargs.items():
+            self.d[k] = v
+
+    def get(self, k):
+        return self.d.get(k)
+
+    def __repr__(self):
+        atributos = ", ".join(f"{k}={repr(v)}" for k, v in self.d.items())
+        return f'NoInterno(op="{self.op}", {atributos})'
+
+
+class NoFolha:
+    def __init__(self, op, valor, linha):
+        self.op = op
+        self.valor = valor
+        self.linha = linha
+
+    def __repr__(self):
+        return f'NoFolha(op="{self.op}", valor="{self.valor}", linha={self.linha})'
+
+
+# ---------- Léxico de apoio: só para não escrever a lista de tokens à mão ----------
+PADROES = [
+    ('REAL', r'\d+\.\d+'), ('INT', r'\d+'), ('TIPO', r'\b(?:int|real)\b'), ('ID', r'[A-Za-z_]\w*'),
+    ('ABREBLOCO', r'\{'), ('FECHABLOCO', r'\}'), ('ASSIGN', r'='), ('MAIS', r'\+'), ('SEMICOLON', r';'),
+    ('COMENTARIO', r'//[^\n]*'), ('ESPACO', r'[ \t]+'), ('LINHA', r'\n'),
+]
+REGEX = re.compile('|'.join(f'(?P&lt;{t}&gt;{p})' for t, p in PADROES))
+
+
+def lexico(codigo):
+    tokens, linha = [], 1
+    for m in REGEX.finditer(codigo):
+        tipo = m.lastgroup
+        if tipo == 'LINHA':
+            linha += 1
+        elif tipo not in ('ESPACO', 'COMENTARIO'):
+            tokens.append(Token(tipo, m.group(), linha))
+    tokens.append(Token('EOF', 'EOF', linha))
+    return tokens
+
+
+# ---------- Sintático: a classe do professor, devolvendo a AST ----------
+class AnalisadorSintatico:
+    def __init__(self, tokens):
+        self.tokens = tokens
+        self.tokenCorrente = None
+        self.posicao = -1
+        self.proximoToken()
+
+    def proximoToken(self):
+        if self.posicao &lt;= len(self.tokens) - 2:
+            self.posicao += 1
+            self.tokenCorrente = self.tokens[self.posicao]
+        else:
+            self.tokenCorrente = None
+
+    def comparar(self, tipoEsperado):
+        if self.tokenCorrente is not None and self.tokenCorrente.tipo == tipoEsperado:
+            token_consumido = self.tokenCorrente
+            self.proximoToken()
+            return token_consumido
+        tipo_atual = self.tokenCorrente.tipo if self.tokenCorrente else "None"
+        raise Exception(f"Erro sintático: esperava '{tipoEsperado}', mas obtive '{tipo_atual}'")
+
+    def analisar(self):
+        arvore = self.bloco()
+        self.comparar('EOF')
+        return arvore
+
+    # &lt;bloco&gt; ::= ABREBLOCO &lt;lista_cmd&gt; FECHABLOCO
+    def bloco(self):
+        abre = self.comparar('ABREBLOCO')
+        lista = self.lista_cmd()
+        self.comparar('FECHABLOCO')
+        return NoInterno('bloco', listaCmd=lista, linha=abre.linha)
+
+    # &lt;lista_cmd&gt; ::= &lt;cmd&gt; &lt;lista_cmd&gt; | ε
+    def lista_cmd(self):
+        if self.tokenCorrente is not None and self.tokenCorrente.tipo in ('TIPO', 'ID', 'ABREBLOCO'):
+            cmd = self.cmd()
+            prox = self.lista_cmd()
+            return NoInterno('listaCmd', cmd=cmd, prox=prox)
+        return None                                   # ε: o fim da lista é None
+
+    # &lt;cmd&gt; ::= &lt;decl&gt; | &lt;atribuicao&gt; | &lt;bloco&gt;
+    def cmd(self):
+        if self.tokenCorrente.tipo == 'TIPO':
+            return self.decl()
+        if self.tokenCorrente.tipo == 'ID':
+            return self.atribuicao()
+        return self.bloco()
+
+    # &lt;decl&gt; ::= TIPO ID SEMICOLON
+    def decl(self):
+        tipo = self.comparar('TIPO')
+        nome = self.comparar('ID')
+        self.comparar('SEMICOLON')
+        return NoInterno('decl', tipo=NoFolha('tipo', tipo.valor, tipo.linha),
+                         nome=NoFolha('id', nome.valor, nome.linha))
+
+    # &lt;atribuicao&gt; ::= ID ASSIGN &lt;expr&gt; SEMICOLON
+    def atribuicao(self):
+        nome = self.comparar('ID')
+        self.comparar('ASSIGN')
+        expr = self.expr()
+        self.comparar('SEMICOLON')
+        return NoInterno('atribuicao', nome=NoFolha('id', nome.valor, nome.linha), expr=expr)
+
+    # &lt;expr&gt; ::= &lt;fator&gt; &lt;mais_fatores&gt;
+    def expr(self):
+        esquerda = self.fator()
+        return self.mais_fatores(esquerda)           # atributo herdado: a árvore até aqui
+
+    # &lt;mais_fatores&gt; ::= MAIS &lt;fator&gt; &lt;mais_fatores&gt; | ε
+    def mais_fatores(self, herdado):
+        if self.tokenCorrente is not None and self.tokenCorrente.tipo == 'MAIS':
+            mais = self.comparar('MAIS')
+            direita = self.fator()
+            novo = NoInterno('soma', esq=herdado, dir=direita, linha=mais.linha)
+            return self.mais_fatores(novo)           # passa a árvore maior para baixo
+        return herdado                                # ε: o herdado vira o sintetizado
+
+    # &lt;fator&gt; ::= ID | INT | REAL
+    def fator(self):
+        if self.tokenCorrente is not None and self.tokenCorrente.tipo == 'ID':
+            t = self.comparar('ID')
+            return NoFolha('id', t.valor, t.linha)
+        if self.tokenCorrente is not None and self.tokenCorrente.tipo == 'INT':
+            t = self.comparar('INT')
+            return NoFolha('int', t.valor, t.linha)
+        t = self.comparar('REAL')
+        return NoFolha('real', t.valor, t.linha)
+
+
+# ---------- Semântico: anda na AST com uma pilha de tabelas de símbolos ----------
+class AnalisadorSemantico:
+    def __init__(self):
+        self.escopos = []          # pilha de tabelas: escopos[-1] é o escopo atual
+        self.erros = []            # não para no primeiro erro: junta todos
+
+    def erro(self, linha, mensagem):
+        self.erros.append(f"Erro semântico na linha {linha}: {mensagem}")
+
+    # --- tabela de símbolos ---
+    def criarEscopo(self):
+        self.escopos.append({})
+
+    def abandonarEscopo(self):
+        self.escopos.pop()         # remove a tabela inteira, nunca um símbolo solto
+
+    def declarar(self, nome, tipo, linha):
+        atual = self.escopos[-1]
+        if nome in atual:
+            self.erro(linha, f"'{nome}' já foi declarada neste bloco")
+        else:
+            atual[nome] = tipo
+
+    def buscar(self, nome):
+        for tabela in reversed(self.escopos):       # do topo para o fundo
+            if nome in tabela:
+                return tabela[nome]
+        return None
+
+    # --- percurso ---
+    def analisar(self, arvore):
+        self.visitar(arvore)
+        return self.erros
+
+    def visitar(self, no):
+        if no is None:
+            return
+        if no.op == 'bloco':
+            self.criarEscopo()
+            self.visitar(no.get('listaCmd'))
+            self.abandonarEscopo()
+        elif no.op == 'listaCmd':
+            self.visitar(no.get('cmd'))
+            self.visitar(no.get('prox'))
+        elif no.op == 'decl':
+            nome = no.get('nome')
+            self.declarar(nome.valor, no.get('tipo').valor, nome.linha)
+        elif no.op == 'atribuicao':
+            self.atribuicao(no)
+
+    def atribuicao(self, no):
+        nome = no.get('nome')
+        tipo_var = self.buscar(nome.valor)
+        tipo_expr = self.tipoDe(no.get('expr'))
+        if tipo_var is None:
+            self.erro(nome.linha, f"'{nome.valor}' não foi declarada")
+        elif tipo_expr != 'invalido' and tipo_var != tipo_expr:
+            self.erro(nome.linha, f"'{nome.valor}' é {tipo_var} e recebe uma expressão {tipo_expr}")
+
+    def tipoDe(self, no):
+        if no.op == 'int':
+            return 'int'
+        if no.op == 'real':
+            return 'real'
+        if no.op == 'id':
+            tipo = self.buscar(no.valor)
+            if tipo is None:
+                self.erro(no.linha, f"'{no.valor}' não foi declarada")
+                return 'invalido'
+            return tipo
+        # soma: pós-ordem, primeiro os filhos
+        esq = self.tipoDe(no.get('esq'))
+        dir = self.tipoDe(no.get('dir'))
+        if 'invalido' in (esq, dir):
+            return 'invalido'                         # o erro já foi contado lá embaixo
+        if esq != dir:
+            self.erro(no.get('linha'), f"'+' entre {esq} e {dir}")
+            return 'invalido'
+        return esq
+
+
+def compilar(codigo):
+    arvore = AnalisadorSintatico(lexico(codigo)).analisar()
+    return arvore, AnalisadorSemantico().analisar(arvore)</pre></div>
+  <div class="cs-uso">
+    <p>Rodando <code>compilar</code> num programa certo e num com cinco erros:</p>
+    <div class="tbl prose"><table>
+      <thead><tr><th>linha</th><th>programa com erros</th><th>o que o semântico diz</th></tr></thead>
+      <tbody>
+        <tr><td>1–2</td><td><code>{ int x;</code></td><td>abre o escopo do bloco; x → int</td></tr>
+        <tr><td>3</td><td><code>int x;</code></td><td>'x' já foi declarada neste bloco</td></tr>
+        <tr><td>4</td><td><code>x = y + 1;</code></td><td>'y' não foi declarada (e a soma vira invalido, sem segunda mensagem)</td></tr>
+        <tr><td>5–6</td><td><code>real z; z = x + 2.5;</code></td><td>'+' entre int e real</td></tr>
+        <tr><td>7</td><td><code>x = 2.5;</code></td><td>'x' é int e recebe uma expressão real</td></tr>
+        <tr><td>8–10</td><td><code>{ int w; }</code></td><td>w existe só dentro do bloco interno</td></tr>
+        <tr><td>11</td><td><code>w = 1; }</code></td><td>'w' não foi declarada</td></tr>
+      </tbody>
+    </table></div>
+    <ul class="b">
+      <li>O programa certo, com <code>real x</code> num bloco interno sombreando o <code>int x</code> de fora, devolve a lista vazia. Depois do bloco, <code>x = x + 1</code> volta a achar o int.</li>
+      <li><code>compilar('{ x = 1 + 2 + 3; }')[0]</code> mostra a soma de 1 e 2 dentro da soma com 3: <code>soma(esq=soma(1, 2), dir=3)</code>.</li>
+      <li>Erro sintático para antes: <code>{ int x }</code> lança "Erro sintático: esperava 'SEMICOLON', mas obtive 'FECHABLOCO'" e o semântico nem roda.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>O sintático da aula para no primeiro erro (lança Exception). O semântico não para: junta tudo em <code>erros</code> e devolve a lista, para mostrar todos os problemas de uma vez.</li>
+      <li><code>q = r + r;</code> sem <code>r</code> declarado gera duas mensagens iguais, uma por uso. O treino 3 mostra como avisar uma vez só.</li>
+      <li>Sem a linha no token, a folha não teria a linha, e a mensagem sairia sem dizer onde. Por isso <code>comparar</code> devolve o token inteiro, não só o tipo.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= O que o semântico faz ================= -->
+<section class="cs" id="papel" data-grupo="O que o semântico faz" data-termos="semantica-estatica,erro-semantico">
+  <h2>O que sobra para o semântico</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><text class="st" x="6" y="14" style="font-size:9.5px">total = 1 ;   (total nunca declarado)</text><rect class="gr" x="6" y="26" width="228" height="26" rx="5"/><text class="st" x="14" y="39" style="font-size:9.5px">léxico: ID ASSIGN INT SEMICOLON   ok</text><rect class="gr" x="6" y="58" width="228" height="26" rx="5"/><text class="st" x="14" y="71" style="font-size:9.5px">sintático: ID = expr ;   ok</text><rect class="rd" x="6" y="90" width="228" height="26" rx="5"/><text class="st" x="14" y="103" style="font-size:9.5px">semântico: 'total' não foi declarada</text><text class="tm" x="120" y="136">a gramática não liga o uso à declaração</text></svg>Duas fases dizem sim; a terceira diz não.</aside>
+  <p class="cs-def">O sintático só confere a forma. O semântico confere as regras que dependem de lembrar nomes e tipos, que uma gramática livre de contexto não consegue guardar.</p>
+  <ul class="b">
+    <li>Dois programas que passam no léxico e no sintático e estão errados: <code>x = "oi";</code> com <code>x</code> inteiro (a regra é "variável = expressão", e um literal é uma expressão) e <code>total = 1;</code> sem <code>total</code> declarado.</li>
+    <li>Amarrar o uso de um nome à sua declaração é sensível ao contexto (<a href="/m8/comp/01-conceitos/consulta">aula 01</a>). O sintático ignora isso de propósito, para continuar sendo um autômato com pilha simples; o resto vem depois, com a tabela de símbolos.</li>
+    <li>O que o semântico faz: coleta os tipos das variáveis e dos parâmetros, verifica e às vezes converte tipos, e liga cada nome ao seu significado. As fases estão na <a href="/m8/comp/07-analise-lexica/consulta#fases">aula 07</a>; o que nenhuma gramática resolve, na <a href="/m8/comp/07-analise-lexica/consulta#sintaxe">mesma aula</a>.</li>
+    <li>Ada repete o nome do subprograma no fim: <code>procedure xpto is … end xpto;</code>. Conferir que os dois nomes são iguais é comparar com o nome guardado na tabela, sem gramática sensível ao contexto.</li>
+    <li>Esse conjunto de regras se chama <b>semântica estática</b>: o significado conferido sem rodar o programa.</li>
+    <li>Quebrar uma delas é um <b>erro semântico</b>. Parte dos livros e o Judson chamam os mesmos erros de erros de sintaxe, porque ferem regras da linguagem que a gramática não escreve. A nomenclatura é misturada.</li>
+    <li>Não existe um BNF da semântica. Como cada linguagem pede verificações diferentes, não há gerador automático como para o sintático: o semântico é escrito à mão, quase sempre em volta da tabela de símbolos.</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Erro semântico do compilador não é erro de lógica. Escrever <code>horas = dias * 60</code> no lugar de <code>* 24</code> compila sem aviso: nenhuma fase sabe o que você quis dizer.</li>
+      <li>O semântico só roda em programa sintaticamente certo. Se o parser recusou, não existe árvore para ele andar.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="estatico" data-grupo="O que o semântico faz" data-termos="verificacao-estatica,tempo-compilacao,tempo-execucao,dobra-constantes">
+  <h2>Decidido na compilação ou só na execução</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><line class="s" x1="10" y1="40" x2="230" y2="40" marker-end="url(#mnarrow)"/><circle class="bl" cx="60" cy="40" r="6"/><text class="tb" x="60" y="22">compila</text><circle class="am" cx="180" cy="40" r="6"/><text class="tam" x="180" y="22">roda</text><rect class="bl" x="6" y="58" width="110" height="80" rx="5"/><text class="st" x="12" y="72" style="font-size:9px">tipo de x</text><text class="st" x="12" y="86" style="font-size:9px">escopo de x</text><text class="st" x="12" y="100" style="font-size:9px">10 + 5 → 15</text><text class="st" x="12" y="114" style="font-size:9px">endereço relativo</text><text class="st" x="12" y="128" style="font-size:9px">de uma global</text><rect class="am" x="124" y="58" width="110" height="80" rx="5"/><text class="st" x="130" y="72" style="font-size:9px">10 + rand()</text><text class="st" x="130" y="86" style="font-size:9px">valor digitado</text><text class="st" x="130" y="100" style="font-size:9px">endereço do new</text><text class="st" x="130" y="114" style="font-size:9px">a[i] fora do vetor</text></svg>Do lado azul, o código basta; do âmbar, só rodando.</aside>
+  <p class="cs-def">A <b>verificação estática</b> é feita em <b>tempo de compilação</b>, só com o que está escrito no código. O que depende de um valor que só existe com o programa rodando fica para o <b>tempo de execução</b>.</p>
+  <ul class="b">
+    <li>Dá para decidir na compilação: o tipo e o escopo de cada variável (as declarações e as chaves dizem); o endereço das variáveis globais e dos membros estáticos de classe, de forma relativa (a primeira no 0, a seguinte 4 bytes depois), que o loader transforma em endereço real ao carregar; o valor de uma expressão só com constantes.</li>
+    <li>Só na execução: o endereço de um objeto criado com <code>new</code> (o compilador nem sabe se aquele <code>new</code> roda, se está dentro de um if), e o resultado de <code>10 + rand()</code> ou de <code>10 + x</code> com x digitado.</li>
+    <li>Calcular <code>10 + 5</code> na compilação é a <b>dobra de constantes</b>. No godbolt.org, <code>int x = 10 + 5;</code> vira um <code>mov</code> de 15 no assembly, sem instrução de soma.</li>
+    <li>As verificações estáticas do semântico são de dois tipos: as regras de sintaxe que a gramática não escreve (nome declarado, um nome por escopo, <code>break</code> dentro de laço) e a <a href="#verificacao-tipos">verificação de tipos</a>.</li>
+    <li>Algumas cabem durante a construção da árvore (o Judson as põe nos construtores dos nós); outras precisam olhar pedaços grandes da árvore pronta.</li>
+  </ul>
+  <div class="cs-uso">
+    <div class="prose"><pre class="code">const int x = 10 + 10;          // o compilador pode trocar por 20
+const int y = 10 + rand();      // constante válida: calculada ao rodar, depois não muda
+constexpr int z = 10 + rand();  // erro: rand não é constexpr, não roda em compilação
+// g++ -std=c++17 constexpr.cpp -o constexpr</pre></div>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li><code>const</code> diz "não muda depois de pronto", não "conhecido na compilação". Quem exige o valor em compilação é o <code>constexpr</code>.</li>
+      <li>Endereço de global "conhecido na compilação" é relativo. O absoluto só aparece quando o loader põe o programa na memória.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= Atributos e tradução ================= -->
+<section class="cs" id="atributos" data-grupo="Atributos e tradução" data-termos="gramatica-atributos,atributo-sintetizado,atributo-herdado,atributo-intrinseco,predicado-semantico">
+  <h2>Atributos: o valor que sobe e o valor que desce</h2>
+  <aside class="mn loop" data-loop="herda" data-ms="8000" data-still="0.45" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>34: o 3 desce como herdado, soma com o 4 e volta como sintetizado.</aside>
+  <p class="cs-def">Uma <b>gramática de atributos</b> pendura valores nos símbolos e diz, em cada regra, como calculá-los. O <b>atributo sintetizado</b> sobe dos filhos para o pai; o <b>atributo herdado</b> desce do pai, ou de um irmão à esquerda, para o filho.</p>
+  <ul class="b">
+    <li>Exemplo: somar os dígitos de um número. <code>123</code> dá 6 e <code>34</code> dá 7. Com a gramática que lê da esquerda para a direita e recursão à esquerda, tudo é sintetizado:</li>
+  </ul>
+  <div class="cs-formula"><div class="formula">N → N₁ num   { N.v = N₁.v + num.v }
+N → num      { N.v = num.v }</div>
+    <ul class="b">
+      <li><code>N.v</code> é o atributo <code>v</code> do nó N. <code>N₁</code> é o mesmo N; o índice só separa as duas ocorrências na regra.</li>
+      <li><code>num.v</code> é o valor do dígito, que chega pronto do léxico: um <b>atributo intrínseco</b>, sempre numa folha.</li>
+    </ul>
+  </div>
+  <ul class="b">
+    <li>Na análise descendente a recursão à esquerda trava (<a href="/m8/comp/11-analise-sintatica/consulta#recursao-esquerda">aula 11</a>). Sem ela, o valor de baixo ainda não existe quando você desce, e a conta precisa ir descendo: aparece o herdado (<code>.h</code>), que no fim vira sintetizado (<code>.s</code>).</li>
+  </ul>
+  <div class="cs-formula"><div class="formula">N → num { X.h = num.v } X { N.v = X.s }
+X → num { X₁.h = X.h + num.v } X₁ { X.s = X₁.s }
+X → ε { X.s = X.h }</div>
+    <ul class="b"><li>Leia: desça somando no herdado até o ε; no ε, o herdado vira sintetizado; suba copiando até N. A Figura 1 faz as duas versões com 34.</li></ul>
+  </div>
+  <ul class="b">
+    <li>Na descida recursiva, sintetizado é o valor de retorno e herdado é um parâmetro. A função <code>X</code> recebe o herdado e devolve o sintetizado:</li>
+  </ul>
+  <div class="prose"><pre class="code"># Soma dos dígitos, L-atribuída:  N → num X ;  X → num X₁ | ε
+class SomaDigitos(AnalisadorSintatico):
+    def analisar(self):
+        v = self.N()
+        self.comparar('EOF')
+        return v
+
+    def N(self):
+        v = int(self.comparar('NUM').valor)    # num.v: atributo intrínseco
+        return self.X(v)                       # X.h = num.v   e   N.v = X.s
+
+    def X(self, h):                            # h: o atributo herdado de X
+        if self.tokenCorrente.tipo == 'NUM':
+            v = int(self.comparar('NUM').valor)
+            return self.X(h + v)               # X₁.h = X.h + num.v   e   X.s = X₁.s
+        return h                               # X → ε:   X.s = X.h</pre></div>
+  <ul class="b">
+    <li>Regra geral: numa produção <code>Y → X₁ X₂ … Xₙ</code>, um atributo de Y é uma função de alguns atributos dos Xᵢ. O que não se calcula, se confere: um <b>predicado</b> é uma função booleana na regra, por exemplo "o tipo desta soma é inteiro", que dá falso se há um real no meio.</li>
+    <li>Em <code>mais_fatores(herdado)</code> da <a href="#classe">Mini-bloco</a> o herdado é a árvore à esquerda, e não um número: a mesma técnica monta a AST associativa à esquerda.</li>
+  </ul>
+  <figure class="fig" id="fig-digitos">
+    <div class="fig-head"><span class="fig-title">Figura 1 · Árvore anotada de 34: só sintetizado (esquerda) e com herdado (direita)</span></div>
+    <div class="fig-body">
+      <div class="fig-stage"><svg id="dig-svg" viewBox="0 0 640 290"></svg></div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Herdado não vem só do pai. Em <code>X₁.h = X.h + num.v</code>, o <code>num.v</code> é de um irmão à esquerda.</li>
+      <li>Esquecer <code>X.s = X.h</code> no ε deixa a conta sem resultado: o valor desceu inteiro e não tem por onde voltar.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="sdd-sdt" data-grupo="Atributos e tradução" data-termos="sdd,sdt,s-atribuido,l-atribuido,grafo-dependencias">
+  <h2>Onde as contas ficam: SDD, SDT, S e L-atribuído</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><text class="tb" x="60" y="14">S-atribuído</text><circle class="k" cx="60" cy="40" r="11"/><circle class="k" cx="30" cy="90" r="11"/><circle class="k" cx="90" cy="90" r="11"/><path class="gr" style="fill:none" d="M34 78 L52 52" marker-end="url(#mnarrow)"/><path class="gr" style="fill:none" d="M86 78 L68 52" marker-end="url(#mnarrow)"/><text class="tm" x="60" y="120">só sobe</text><text class="tm" x="60" y="134">ascendente</text><text class="tam" x="180" y="14">L-atribuído</text><circle class="k" cx="180" cy="40" r="11"/><circle class="k" cx="150" cy="90" r="11"/><circle class="k" cx="210" cy="90" r="11"/><path class="am" style="fill:none" d="M172 50 L156 78" marker-end="url(#mnarrow)"/><path class="am" style="fill:none" d="M162 90 H196" marker-end="url(#mnarrow)"/><path class="gr" style="fill:none" d="M206 78 L190 52" marker-end="url(#mnarrow)"/><text class="tm" x="180" y="120">desce da esquerda e sobe</text><text class="tm" x="180" y="134">descendente</text></svg>A direção das setas decide qual análise consegue fazer as contas.</aside>
+  <p class="cs-def">Uma <b>definição dirigida pela sintaxe</b> põe as contas ao lado de cada regra, sem dizer quando rodam. A <b>tradução dirigida pela sintaxe</b> (SDT) põe as <a href="/m8/comp/12-descendente-recursiva/consulta#ast">ações semânticas</a> dentro do corpo da regra, na posição em que devem rodar, e o analisador as executa ao passar por ali.</p>
+  <ul class="b">
+    <li>SDD serve de especificação para quem escreve o compilador à mão. SDT é o formato dos geradores (ANTLR, JavaCC, yacc), que copiam as ações para o analisador gerado; por isso o Lucrédio foca nele.</li>
+    <li>A ordem importa: na descida, um sintetizado não sai antes do herdado de que depende. Dois esquemas garantem uma ordem que funciona:</li>
+    <li><b>S-atribuído</b>: só sintetizados, ações sempre no fim da regra. Combina com a análise ascendente (<a href="/m8/comp/11-analise-sintatica/consulta#ascendente">aula 11</a>), que monta de baixo para cima.</li>
+    <li><b>L-atribuído</b>: herdados que dependem só do pai e dos irmãos à esquerda, ações no meio e no fim. Dá para fazer tudo lendo da esquerda para a direita, por isso combina com a descendente. O curso da UNIVESP usa JavaCC, logo L-atribuído.</li>
+    <li>Fora desses dois, a ordem das contas sai de um <b>grafo de dependências</b>: uma seta de cada atributo para os que dependem dele.</li>
+  </ul>
+  <div class="cs-formula"><div class="formula">A → A₁ Y { A.a = g(A₁.a, Y.y) }  |  X { A.a = f(X.x) }
+⇓  sem recursão à esquerda
+A → X { R.h = f(X.x) } R { A.a = R.s }
+R → Y { R₁.h = g(R.h, Y.y) } R₁ { R.s = R₁.s }
+R → ε { R.s = R.h }</div>
+    <ul class="b"><li>A receita geral: o que era sintetizado no A da esquerda vira herdado do R seguinte. É a mesma conta dos dígitos, com f e g quaisquer.</li></ul>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>A calculadora do Lucrédio (projeto 1, em ANTLR com <code>returns [int val]</code> e <code>termo2[$fator.val]</code>), escrita em Python na classe da aula. <code>2 + 3 * 4</code> dá 14, <code>(2 + 3) * 4</code> dá 20 e <code>10 - 3 - 2</code> dá 5:</li>
+    </ul>
+    <div class="prose"><pre class="code">class Calculadora(AnalisadorSintatico):
+    def analisar(self):
+        v = self.expressao()
+        self.comparar('EOF')
+        return v
+
+    # &lt;expressao&gt; ::= &lt;termo&gt; &lt;expressao2&gt;
+    def expressao(self):
+        return self.expressao2(self.termo())
+
+    # &lt;expressao2&gt; ::= MAIS &lt;termo&gt; &lt;expressao2&gt; | MENOS &lt;termo&gt; &lt;expressao2&gt; | ε
+    def expressao2(self, herdado):
+        if self.tokenCorrente.tipo == 'MAIS':
+            self.comparar('MAIS')
+            return self.expressao2(herdado + self.termo())
+        if self.tokenCorrente.tipo == 'MENOS':
+            self.comparar('MENOS')
+            return self.expressao2(herdado - self.termo())   # o de antes menos o termo
+        return herdado
+
+    # &lt;termo&gt; ::= &lt;fator&gt; &lt;termo2&gt;
+    def termo(self):
+        return self.termo2(self.fator())
+
+    # &lt;termo2&gt; ::= VEZES &lt;fator&gt; &lt;termo2&gt; | ε
+    def termo2(self, herdado):
+        if self.tokenCorrente.tipo == 'VEZES':
+            self.comparar('VEZES')
+            return self.termo2(herdado * self.fator())
+        return herdado
+
+    # &lt;fator&gt; ::= ABREPAR &lt;expressao&gt; FECHAPAR | NUM
+    def fator(self):
+        if self.tokenCorrente.tipo == 'ABREPAR':
+            self.comparar('ABREPAR')
+            v = self.expressao()
+            self.comparar('FECHAPAR')
+            return v
+        return int(self.comparar('NUM').valor)</pre></div>
+    <ul class="b">
+      <li>No ANTLR a mesma regra fica <code>termo2[int herdado] returns [int val] : '*' fator t=termo2[$herdado * $fator.val] { $val = $t.val; } | { $val = $herdado; } ;</code>. O argumento entre colchetes é o herdado; o <code>returns</code>, o sintetizado.</li>
+      <li>A crítica do próprio Lucrédio: tirar a recursão à esquerda espalhou uma expressão por quatro regras e obrigou a passar valores para cima e para baixo. Com o <code>*</code> do ANTLR, ou com um while, a conta fica num laço só (<a href="/m8/comp/12-descendente-recursiva/consulta#repeticao">aula 12</a>).</li>
+      <li>Para montar árvore em vez de valor, troque a conta por um nó: <code>E.ptr = geraNo('+', E₁.ptr, T.ptr)</code> e <code>F.ptr = geraFolha(num)</code> na versão ascendente; na descendente, <code>R₁.h = geraNo(op, R.h, T.ptr)</code>. A função <code>R(h)</code> da UNIVESP recebe um ponteiro para nó e devolve outro: é o <code>mais_fatores</code> da Mini-bloco.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Calcular <code>herdado * fator</code> dentro do <code>termo2</code> e jogar fora o que a chamada recursiva devolve: <code>2 * 3 * 4 * 5</code> dá 6, porque só o primeiro par entra na conta. O produto parcial tem de descer.</li>
+      <li>Na subtração, <code>herdado - termo</code>. Com <code>termo - herdado</code>, <code>10 - 3 - 2</code> vira (3 − 10) e depois 2 − (−7) = 9.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="nos" data-grupo="Atributos e tradução" data-termos="no-seq">
+  <h2>Que nós a árvore ganha</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 140"><rect class="bl" x="6" y="10" width="46" height="24" rx="5"/><text class="tb" x="29" y="22">Seq</text><rect class="bl" x="84" y="10" width="46" height="24" rx="5"/><text class="tb" x="107" y="22">Seq</text><rect class="k" x="162" y="10" width="46" height="24" rx="5" style="stroke-dasharray:3 3"/><text class="tm" x="185" y="22">nulo</text><path class="s" d="M52 22 H80" marker-end="url(#mnarrow)"/><path class="s" d="M130 22 H158" marker-end="url(#mnarrow)"/><path class="s" d="M29 34 V58" marker-end="url(#mnarrow)"/><path class="s" d="M107 34 V58" marker-end="url(#mnarrow)"/><rect class="am" x="2" y="60" width="54" height="24" rx="5"/><text x="29" y="72" style="font-size:9.5px">While</text><rect class="am" x="84" y="60" width="46" height="24" rx="5"/><text x="107" y="72" style="font-size:9.5px">If</text><text class="tm" x="120" y="110">o comando de um lado, o resto do outro</text><text class="tm" x="120" y="124">a lista sempre acaba em nulo</text></svg>while …; if …; vira Seq(While, Seq(If, nulo)).</aside>
+  <p class="cs-def">Cada construção vira um nó, e as partes que importam viram filhos: <code>If(cond, cmd)</code>, <code>While(cond, cmd)</code>, <code>Assign(lugar, expr)</code>. Pontuação, parênteses e declarações ficam fora. A AST em si está na <a href="/m8/comp/09-especificacao-linguagem/consulta#concreta-abstrata">aula 09</a> e a montagem na descida, na <a href="/m8/comp/12-descendente-recursiva/consulta#ast">aula 12</a>.</p>
+  <ul class="b">
+    <li>O esquema do Judson monta a árvore com ações: <code>stmt → if ( expr ) stmt₁ { stmt.n = new If(expr.n, stmt₁.n) }</code>. Todo não terminal tem um atributo <code>n</code>, o seu nó.</li>
+    <li>Comando sem palavra-chave ganha um nome que diz o que ele faz: <code>stmt → expr ;</code> vira <code>Eval(expr.n)</code>.</li>
+    <li>Lista de comandos vira o <b>nó Seq</b>: <code>stmts → stmt stmts₁ { new Seq(stmt.n, stmts₁.n) } | ε { nulo }</code>. A informação fica sempre de um lado; do outro, outro Seq ou nulo. Na Mini-bloco é o <code>listaCmd(cmd, prox)</code>.</li>
+    <li><code>factor → ( expr ) { factor.n = expr.n }</code>: os parênteses não criam nó. A forma da árvore já guarda a precedência; <code>9 - 5 + 2</code> vira <code>+(−(9, 5), 2)</code>.</li>
+    <li>Declarações não viram nó no compilador do Judson: elas vão direto para a tabela de símbolos durante a análise. Na Mini-bloco, <code>decl</code> vira nó porque quem preenche a tabela é o semântico, numa passada separada.</li>
+    <li>A ordem dos filhos é uma combinação: escolha uma e use a mesma ao percorrer. No <code>DoWhile(stmt, expr)</code> do Judson o comando vem primeiro, como no texto.</li>
+    <li>Classes: <code>Node</code> com duas filhas, <code>Expression</code> (guarda o tipo e o token, para a mensagem de erro) e <code>Statement</code>. <code>Constant</code>, <code>Identifier</code>, <code>Logical</code>, <code>Relational</code>, <code>Arithmetic</code> e o unário são expressões; <code>Seq</code>, <code>Assign</code>, <code>If</code>, <code>While</code>, <code>DoWhile</code>, comandos.</li>
+    <li>Operadores com as mesmas regras de tipo e de geração de código dividem um nó, e a árvore fica com menos tipos de nó:</li>
+  </ul>
+  <div class="tbl prose"><table>
+    <thead><tr><th>na sintaxe concreta</th><th>nó</th><th>por quê</th></tr></thead>
+    <tbody>
+      <tr><td><code>== != &lt; &lt;= &gt; &gt;=</code></td><td>Rel</td><td>dois operandos do mesmo tipo, resultado booleano</td></tr>
+      <tr><td><code>+ - * /</code></td><td>Arith</td><td>dois operandos do mesmo tipo, resultado desse tipo</td></tr>
+      <tr><td><code>|| &amp;&amp;</code></td><td>Cond (lógico)</td><td>dois booleanos</td></tr>
+      <tr><td><code>!</code></td><td>Not</td><td>unário: regras diferentes do Cond</td></tr>
+      <tr><td><code>-</code> unário</td><td>Unário</td><td>um filho só</td></tr>
+      <tr><td><code>=</code></td><td>Assign</td><td>lado esquerdo precisa ser um lugar</td></tr>
+      <tr><td><code>[ ]</code></td><td>Access</td><td>acesso a posição de vetor</td></tr>
+    </tbody>
+  </table></div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>O Judson chama a AST de "árvore sintática" e a árvore com todos os símbolos de "árvore de derivação". Em outros materiais, árvore sintática é a de derivação. Confira de qual o texto fala pela presença dos parênteses e do <code>;</code>.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="visitor" data-grupo="Atributos e tradução" data-termos="visitor">
+  <h2>Durante a análise ou numa passada depois</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><circle class="k" cx="120" cy="22" r="13"/><text x="120" y="22" style="font-size:9px">prog</text><circle class="k" cx="70" cy="70" r="13"/><text x="70" y="70" style="font-size:9px">expr</text><circle class="k" cx="170" cy="70" r="13"/><text x="170" y="70" style="font-size:9px">expr</text><circle class="k" cx="40" cy="118" r="11"/><circle class="k" cx="100" cy="118" r="11"/><line class="s" x1="110" y1="32" x2="80" y2="60"/><line class="s" x1="130" y1="32" x2="160" y2="60"/><line class="s" x1="62" y1="81" x2="46" y2="108"/><line class="s" x1="78" y1="81" x2="94" y2="108"/><path class="am" style="fill:none;stroke-dasharray:4 3" d="M104 16 C70 20 50 50 56 66 C40 84 24 104 30 124 C52 140 100 140 112 116 C130 96 150 96 160 84" marker-end="url(#mnarrow)"/><text class="tam" x="196" y="128">visitar(no)</text><text class="tm" x="196" y="142">um método por op</text></svg>Com a árvore pronta, o visitor anda nela quantas vezes quiser.</aside>
+  <p class="cs-def">As verificações podem rodar dentro do sintático, como ações nas regras, ou depois, numa passada que percorre a árvore pronta. A segunda forma é o <b>visitor</b>: uma classe com um método por tipo de nó.</p>
+  <ul class="b">
+    <li>Ações na gramática: o projeto 1 do Lucrédio, e o Judson pondo as conferências nos construtores dos nós (<code>Logical</code> recusa operandos que não são booleanos na hora em que é criado).</li>
+    <li>Visitor no ANTLR: ligue a opção visitor no plugin do <code>pom.xml</code> e o ANTLR gera a interface <code>…Visitor</code> e a classe <code>…BaseVisitor</code>, com um <code>visitX</code> por regra. No BaseVisitor cada método só faz <code>visitChildren(ctx)</code>: anda pela árvore sem fazer nada.</li>
+    <li>Você estende o BaseVisitor e sobrescreve só o que interessa: <code>class Calculador extends ExpressoesBaseVisitor&lt;Integer&gt;</code>. O tipo entre <code>&lt; &gt;</code> é o retorno de todos os métodos.</li>
+    <li>Com a árvore pronta, um método "estica o braço" até os filhos: <code>visitExpressao</code> pega <code>ctx.termo1</code>, percorre <code>ctx.outrosTermos</code> num for e lê o operador com <code>ctx.op1(i).getText()</code>. Rótulos na gramática dão os nomes: <code>termo1=termo</code> para um, <code>outrosTermos+=termo</code> para a lista.</li>
+    <li>Alternativas se descobrem pelo filho que não é nulo: <code>if (ctx.NUM() != null)</code> é número, senão é expressão entre parênteses.</li>
+    <li>Custo: uma passada a mais sobre a árvore, quase nada fora de árvores gigantes. Ganho: gramática limpa, e vários visitors no mesmo compilador (um para tipos, um para calcular, um para gerar código). O Lucrédio recomenda visitor; ação na gramática só para coisa muito simples.</li>
+    <li>O Thain faz duas passadas: primeiro resolve os nomes (<code>decl_resolve</code>, <code>expr_resolve</code>), depois confere os tipos (<code>expr_typecheck</code>). Na Mini-bloco, <code>visitar</code> faz as duas coisas numa passada só.</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Implementar a interface <code>…Visitor</code> obriga a escrever todos os métodos. Estender o <code>…BaseVisitor</code> deixa escolher.</li>
+      <li>Sem rótulos, <code>termo (op1 termo)*</code> gera uma lista só de termos, e o primeiro é o índice 0. Com <code>termo1=</code> e <code>outrosTermos+=</code>, cada um tem nome.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= Nomes e escopos ================= -->
+<section class="cs" id="tabela-simbolos" data-grupo="Nomes e escopos" data-termos="tabela-hash,categoria-simbolo">
+  <h2>O que a tabela de símbolos guarda</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 120"><rect class="k" x="4" y="6" width="232" height="22" rx="4"/><text class="st" x="10" y="17" style="font-size:8.5px">cadeia   token   categoria     tipo   valor</text><rect class="bl" x="4" y="32" width="232" height="22" rx="4"/><text class="st" x="10" y="43" style="font-size:8.5px">x        id      variável      int    —</text><rect class="bl" x="4" y="58" width="232" height="22" rx="4"/><text class="st" x="10" y="69" style="font-size:8.5px">imprime  id      procedimento  —      —</text><rect class="bl" x="4" y="84" width="232" height="22" rx="4"/><text class="st" x="10" y="95" style="font-size:8.5px">2        num     —             int    2</text><text class="tm" x="120" y="116">uma tabela, três categorias, colunas vazias</text></svg>Cada linha é um nome; cada coluna, algo que o compilador lembra.</aside>
+  <p class="cs-def">A <a href="/m8/comp/07-analise-lexica/consulta#fases">tabela de símbolos</a> guarda, para cada nome do programa, o que o compilador precisa lembrar dele: a <b>categoria do símbolo</b> (variável, constante, procedimento), o tipo, o valor e o que mais a linguagem pedir.</p>
+  <ul class="b">
+    <li>Vetor precisa do tamanho e dos limites. Função precisa da lista de parâmetros com tipos e do tipo de retorno. Procedimento não tem tipo nem valor: na tabela única, essas colunas ficam vazias.</li>
+    <li>O Thain guarda em cada símbolo: <code>kind</code> (LOCAL, PARAM ou GLOBAL), <code>type</code>, <code>name</code> e <code>which</code> (a posição entre os locais ou parâmetros, usada depois para achar o lugar na memória).</li>
+    <li>Três operações. Inserir: na declaração, depois de conferir que o nome não existe no escopo atual. Verificar (buscar): em cada uso. Remover: quando o nome deixa de valer, no fim do bloco ou da função.</li>
+    <li>Questões de projeto: a tabela é consultada a compilação inteira, então precisa ser rápida. Estática (vetor de tamanho fixo) ou dinâmica (cresce); hoje dá para usar dinâmica sem medo. Tamanho típico: de centenas a milhares de linhas.</li>
+    <li>Estrutura: lista (busca sequencial, uma posição por vez), árvore de busca (busca binária) ou <b>tabela hash</b>, que leva o nome direto à posição. O dict do Python e o HashMap do Java são hash.</li>
+    <li>Uma tabela para tudo (com colunas vazias) ou uma por categoria; uma tabela para o programa ou uma por escopo. Linguagem de um nível só, como COBOL e Fortran antigos, se vira com uma lista linear. Com blocos aninhados (Algol, Pascal, C, Java), uma tabela por escopo é o jeito natural (<a href="#pilha-escopos">pilha de tabelas</a>).</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>No <code>HashMap</code> do Java, <code>get</code> de um nome que não existe devolve <code>null</code>, sem erro. No dict do Python, <code>tabela[nome]</code> lança KeyError; use <code>nome in tabela</code> ou <code>tabela.get(nome)</code>.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="escopo" data-grupo="Nomes e escopos" data-termos="escopo,escopo-estatico,declaracao-antes-uso,aninhamento-proximo,sombreamento">
+  <h2>Escopo: qual declaração vale aqui</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 170"><rect class="k" x="4" y="4" width="232" height="146" rx="6"/><text class="st" x="12" y="18" style="font-size:9px">int a = 1, b = 1;</text><rect class="bl" x="16" y="26" width="212" height="100" rx="6"/><text class="st" x="24" y="40" style="font-size:9px">int b = 2;</text><rect class="am" x="28" y="48" width="188" height="48" rx="6"/><text class="st" x="36" y="62" style="font-size:9px">int a = 3;</text><text class="st" x="36" y="80" style="font-size:9px">print(a, b)   → 3 2</text><text class="st" x="24" y="116" style="font-size:9px">print(a, b)     → 1 2</text><text class="st" x="12" y="142" style="font-size:9px">print(a, b)       → 1 1</text><text class="tm" x="120" y="164">vale a caixa mais funda que tem o nome</text></svg>Cada caixa é um escopo; o print procura de dentro para fora.</aside>
+  <p class="cs-def"><b>Escopo</b> é o trecho em que uma declaração vale. No <b>escopo estático</b>, o que a maioria das linguagens usa, isso se decide pelo texto: basta olhar as chaves, sem rodar o programa.</p>
+  <ul class="b">
+    <li>Nomes iguais em escopos diferentes são coisas diferentes, e o compilador precisa saber qual vale em cada uso. Duas regras resolvem:</li>
+    <li><b>Declaração antes do uso</b>: o nome tem de estar declarado no escopo atual ou num escopo de fora.</li>
+    <li><b>Aninhamento mais próximo</b>: com vários iguais visíveis, vale o do escopo mais interno.</li>
+    <li>No desenho, o print do meio enxerga <code>a = 3</code> (o mais interno) e <code>b = 2</code> (o do bloco do meio): imprime 3 2. Ao sair de cada bloco, a declaração de fora volta a valer.</li>
+    <li>A declaração interna faz <b>sombreamento</b> da externa, que continua existindo. Consequência para a tabela: inserir oculta a anterior sem sobrescrever; buscar acha a mais interna; remover tira só a interna e restaura a oculta.</li>
+    <li>O Thain declara <code>x</code> três vezes: global inteiro valendo 10, parâmetro string de <code>f</code> e booleano num bloco dentro de <code>f</code>. <code>main</code> imprime x e chama <code>f("hello")</code>, que imprime o parâmetro e depois o do bloco: sai 10 hello false.</li>
+    <li>Visibilidade com procedimentos (UNIVESP): globais <code>a</code> e <code>b</code>, procedimentos <code>p</code> e <code>q</code>, e <code>r</code> declarado dentro de <code>q</code>. O corpo do programa vê a, b, p e q, mas não r. Dentro de r se vê tudo o que é global e o próprio r, que pode chamar a si mesmo.</li>
+    <li>Pascal tem sub-rotinas aninhadas (g e h dentro de f, dentro do programa), e o <code>j</code> local de g pode ter o mesmo nome do <code>j</code> do programa. C aninha blocos com chaves.</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Redeclarar no mesmo bloco é erro; num bloco interno é sombreamento. Na Mini-bloco, <code>{ int a; int a; }</code> dá erro e <code>{ int a; { real a; } }</code> não.</li>
+      <li>Depois do bloco interno, o nome interno some: <code>{ { int t; } t = 1; }</code> dá "'t' não foi declarada".</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="pilha-escopos" data-grupo="Nomes e escopos" data-termos="pilha-tabelas,resolucao-nomes">
+  <h2>Pilha de tabelas: um dict por bloco</h2>
+  <aside class="mn loop" data-loop="pilha" data-ms="9000" data-still="0.55" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Entra no bloco: empilha. Sai: desempilha a tabela inteira.</aside>
+  <p class="cs-def">A <b>pilha de tabelas</b> implementa o escopo estático: uma tabela por escopo, empilhada ao entrar no bloco e desempilhada ao sair. Declarar mexe só no topo; buscar vai do topo para o fundo e para na primeira que tem o nome.</p>
+  <ul class="b">
+    <li>Nunca se remove um símbolo solto: quando o escopo acaba, sai a tabela inteira. A remoção com restauração vem de graça, porque a tabela de baixo nunca foi tocada.</li>
+    <li>As mesmas operações em três versões:</li>
+  </ul>
+  <div class="tbl prose"><table>
+    <thead><tr><th>o quê</th><th>Thain (C)</th><th>Lucrédio (Java)</th><th>Mini-bloco (Python)</th></tr></thead>
+    <tbody>
+      <tr><td>entrar no bloco</td><td><code>scope_enter()</code></td><td><code>criarNovoEscopo()</code>: push</td><td><code>criarEscopo()</code>: append({})</td></tr>
+      <tr><td>sair do bloco</td><td><code>scope_exit()</code></td><td><code>abandonarEscopo()</code>: pop</td><td><code>abandonarEscopo()</code>: pop()</td></tr>
+      <tr><td>declarar</td><td><code>scope_bind(nome, sym)</code></td><td><code>obterEscopoAtual().inserir</code></td><td><code>declarar</code>: em <code>escopos[-1]</code></td></tr>
+      <tr><td>já existe aqui?</td><td><code>scope_lookup_current</code></td><td><code>escopoAtual.verificar</code></td><td><code>nome in escopos[-1]</code></td></tr>
+      <tr><td>buscar um uso</td><td><code>scope_lookup</code></td><td>for em <code>percorrerEscoposAninhados()</code></td><td><code>buscar</code>: reversed(escopos)</td></tr>
+      <tr><td>quantos níveis</td><td><code>scope_level()</code></td><td>(não tem)</td><td><code>len(escopos)</code></td></tr>
+    </tbody>
+  </table></div>
+  <ul class="b">
+    <li>O Lucrédio usa <code>LinkedList</code> como pilha (<code>push</code>, <code>pop</code>, <code>peek</code>). Percorrer a lista do começo é percorrer do topo para o fundo. O construtor já cria o escopo global.</li>
+    <li>No Thain, cada tabela é hash; existe o escopo global, o dos parâmetros e locais de cada função e um a cada par de chaves. <code>scope_level() &gt; 1</code> diz se uma declaração é local ou global.</li>
+    <li>No Judson, <code>Block()</code> cria uma tabela nova ao entrar e restaura a anterior ao sair, e <code>Local()</code> procura o nome: não achou, "variável não declarada"; achou, o símbolo traz o tipo.</li>
+    <li>Ligar cada uso à declaração que vale ali é a <b>resolução de nomes</b>. O Thain guarda no nó da AST um ponteiro para o símbolo (<code>e-&gt;symbol = scope_lookup(e-&gt;name)</code>); a verificação de tipos depois só segue o ponteiro.</li>
+    <li>Na Alguma do Lucrédio todas as variáveis são globais, e uma tabela só basta.</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Declarar olha só o topo; usar olha a pilha toda. Buscar a pilha toda ao declarar proíbe o sombreamento; buscar só o topo ao usar não acha as globais.</li>
+      <li>Desempilhar antes de usar o valor do bloco perde as declarações dele. No <code>let</code>, primeiro calcula a expressão do <code>in</code>, depois abandona o escopo.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="let-in" data-grupo="Nomes e escopos" data-termos="">
+  <h2>Exemplo: let … in com escopos aninhados</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 120"><rect class="k" x="4" y="8" width="232" height="30" rx="5"/><text class="st" x="10" y="23" style="font-size:9.5px">let x = 2 + 1, y = 3 + 4 in x + y</text><path class="s" d="M60 40 V58" marker-end="url(#mnarrow)"/><rect class="bl" x="10" y="60" width="100" height="24" rx="5"/><text x="60" y="72" style="font-size:9.5px">{ x: 3, y: 7 }</text><path class="s" d="M180 40 V58" marker-end="url(#mnarrow)"/><rect class="gr" x="140" y="60" width="80" height="24" rx="5"/><text x="180" y="72" style="font-size:9.5px">3 + 7 = 10</text><text class="tm" x="120" y="104">let abre escopo; in usa; fim do let fecha</text></svg>O let declara, o in calcula.</aside>
+  <p class="cs-def">A linguagem de cálculo do Lucrédio declara variáveis com <code>let</code> e usa depois do <code>in</code>. Cada <code>let</code> abre um escopo novo, e o resultado do programa é o valor da expressão.</p>
+  <ul class="b">
+    <li>Gramática (ANTLR): <code>expressao : termo1=termo ('+' outrosTermos+=termo)* ;</code>, <code>termo : '(' expressao ')' | VAR | NUM | 'let' listaDecls 'in' expressao ;</code>, <code>listaDecls : decl (',' decl)* ;</code>, <code>decl : nome=VAR '=' expressao ;</code>. Só soma.</li>
+    <li>Regra 1: nada de dois nomes iguais na mesma lista de declarações.</li>
+    <li>Regra 2: usar um nome não declarado é erro; ele precisa estar no escopo atual ou num de fora.</li>
+    <li>Regra 3: o escopo de cada declaração vai até o fim do corpo, com aninhamento mais próximo.</li>
+    <li>Regra 4: a lista é sequencial. Cada declaração já vale para a próxima da mesma lista; a que está sendo calculada ainda não vale.</li>
+    <li>O visitor <code>Calculador</code> (retorno Double) faz, no <code>let</code>: <code>criarNovoEscopo()</code>, visita as declarações (cada uma insere no topo), calcula a subexpressão do <code>in</code>, <code>abandonarEscopo()</code> e devolve o valor. Numa variável, percorre os escopos do topo ao fundo e devolve o valor da primeira que tem o nome.</li>
+  </ul>
+  <div class="cs-uso">
+    <div class="prose"><pre class="code">let x = 2, y = 3 in
+  let x = x + 1,
+      y = let z = 3, x = 4 in x + y + z
+  in x + y                              -- vale 13</pre></div>
+    <ul class="b">
+      <li>O <code>x</code> de <code>x + 1</code> é o de fora (2): o novo x vale 3.</li>
+      <li>No let mais interno, <code>x + y + z</code> = 4 + 3 + 3 = 10. O x é o 4 (mais interno); o y é o 3 de fora, porque o y que está sendo declarado ainda não existe.</li>
+      <li>Esse 10 vira o y do meio, e <code>x + y</code> = 3 + 10 = 13. A Figura 2 mostra a pilha em cada passo.</li>
+      <li><code>let x = 2, x = 3 in x + 1</code> dá "x declarada duas vezes no mesmo escopo". Usar <code>y</code> só com <code>x</code> declarado dá "y não foi declarado antes do uso".</li>
+    </ul>
+  </div>
+  <figure class="fig" id="fig-letin">
+    <div class="fig-head"><span class="fig-title">Figura 2 · A pilha de tabelas no exercício do let, que vale 13</span></div>
+    <div class="fig-body">
+      <div class="fig-stage">
+        <div class="lbl">onde a análise está</div>
+        <pre class="code" id="li-prog"></pre>
+        <div class="lbl">pilha de tabelas (topo em cima)</div>
+        <div class="tks chips fases" id="li-pilha" style="flex-direction:column-reverse;align-items:flex-start"></div>
+        <div class="lbl">busca</div>
+        <pre class="code" id="li-busca"></pre>
+      </div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Achar 15 no exercício é usar o y do meio dentro do let interno. Ele só existe depois que a sua expressão termina.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= Tipos ================= -->
+<section class="cs" id="tipos" data-grupo="Tipos" data-termos="tipagem-estatica,tipagem-dinamica,linguagem-segura,tipagem-explicita,tipo-atomico,tipo-composto">
+  <h2>Sistema de tipos: para que serve e como se classifica</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 130"><text class="st" x="6" y="18" style="font-size:9.5px">segura</text><line class="s" x1="60" y1="14" x2="180" y2="14"/><text class="st" x="186" y="18" style="font-size:9.5px">insegura</text><circle class="gr" cx="76" cy="14" r="5"/><text class="tm" x="76" y="30">Java, Python</text><circle class="rd" cx="166" cy="14" r="5"/><text class="tm" x="166" y="30">C</text><text class="st" x="6" y="60" style="font-size:9.5px">estática</text><line class="s" x1="60" y1="56" x2="180" y2="56"/><text class="st" x="186" y="60" style="font-size:9.5px">dinâmica</text><circle class="bl" cx="76" cy="56" r="5"/><text class="tm" x="76" y="72">C, Java</text><circle class="am" cx="166" cy="56" r="5"/><text class="tm" x="166" y="72">Python</text><text class="st" x="6" y="102" style="font-size:9.5px">explícita</text><line class="s" x1="60" y1="98" x2="180" y2="98"/><text class="st" x="186" y="102" style="font-size:9.5px">implícita</text><circle class="bl" cx="76" cy="98" r="5"/><text class="tm" x="76" y="114">int x</text><circle class="am" cx="166" cy="98" r="5"/><text class="tm" x="166" y="114">auto x</text></svg>Três eixos independentes.</aside>
+  <p class="cs-def">O <a href="/m8/comp/09-especificacao-linguagem/consulta#realizacao">sistema de tipos</a> dá a quem programa um jeito de fazer afirmações ("isto é inteiro") que o compilador confere sozinho. Para descrevê-lo, a linguagem diz quais tipos existem, como se combinam e o que acontece quando tipos diferentes se encontram.</p>
+  <ul class="b">
+    <li>Para que serve: correção (atribuir inteiro a ponteiro é quase certamente erro); desempenho (o compilador escolhe a instrução: <code>a+b</code> vira ADDL para inteiros e FADD para reais no x86); expressividade (o <code>print</code> do B-Minor não precisa saber o tipo, ele é deduzido).</li>
+    <li>Segura ou insegura. Numa <b>linguagem segura</b>, nenhum programa quebra as estruturas da linguagem: em C#, <code>a[i]</code> com i até 100 num vetor de 10 lança IndexOutOfRangeException. Em C, que é insegura, o mesmo laço escreve por cima de qualquer coisa.</li>
+    <li>Estática ou dinâmica. Na <b>tipagem estática</b>, tudo é conferido na compilação e o código final nem guarda os tipos. Na <b>tipagem dinâmica</b>, o tipo fica junto do valor na memória e cada operação confere ao rodar; dá até para perguntar o tipo, como o <code>instanceof</code> do Java.</li>
+    <li>Explícita ou implícita (<b>tipagem explícita</b> e implícita). Em C você escreve o tipo, e <code>int x = 32.5;</code> deveria gerar aviso; em C++11, <code>auto x = 32.5;</code> deduz double.</li>
+    <li><b>Tipo atômico</b>: inteiro, real, booleano, caractere; a linguagem precisa dizer a faixa (8, 16, 32 ou 64 bits; ASCII ou Unicode). Tipos do usuário restringem um atômico: em Ada, <code>type Month is range 1..12;</code> recusa 13 e não mistura com Day. O <code>typedef</code> de C só dá outro nome, e <code>Day d = m;</code> passa.</li>
+    <li>Enumeração (<code>enum Fuzzy { True, False, Uncertain }</code> em Rust) é um inteiro por dentro, mas o compilador impede valor ilegal; em C, enum e int se misturam.</li>
+    <li><b>Tipo composto</b>: struct (latitude e longitude juntas), union (em C, <code>n.i</code> e <code>n.f</code> ocupam a mesma memória: gravar 10 em <code>n.i</code> e ler <code>n.f</code> dá lixo), tipo variante (o <code>enum Expression</code> do Rust, com ADD, MULTIPLY, INTEGER e NAME, só deixa usar os campos do caso certo), vetor e função.</li>
+    <li>O B-Minor do Thain é seguro, estático e explícito. Regras: valor só vai para variável do mesmo tipo, argumento só para parâmetro do mesmo tipo, return com o tipo da função, operador binário com o mesmo tipo dos dois lados; <code>== !=</code> em qualquer tipo menos void, vetor e função; <code>&lt; &lt;= &gt;= &gt;</code> só em inteiros; <code>! &amp;&amp; ||</code> só em booleanos; aritméticos só em inteiros. Comparações e lógicos devolvem boolean.</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Os três eixos são independentes. Java é estática e segura; C é estática e insegura; Python é dinâmica e segura.</li>
+      <li>Union e variante parecem iguais. A union deixa ler o campo errado; a variante não.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="verificacao-tipos" data-grupo="Tipos" data-termos="verificacao-tipos,tipo-invalido">
+  <h2>Verificação de tipos na árvore</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150"><circle class="k" cx="120" cy="20" r="12"/><text x="120" y="20">+</text><circle class="k" cx="70" cy="66" r="12"/><text x="70" y="66">x</text><circle class="k" cx="170" cy="66" r="12"/><text x="170" y="66">*</text><circle class="k" cx="140" cy="112" r="12"/><text x="140" y="112">3</text><circle class="k" cx="200" cy="112" r="12"/><text x="200" y="112">2.0</text><line class="s" x1="111" y1="29" x2="79" y2="57"/><line class="s" x1="129" y1="29" x2="161" y2="57"/><line class="s" x1="163" y1="76" x2="147" y2="102"/><line class="s" x1="177" y1="76" x2="193" y2="102"/><text class="tam" x="40" y="66">int</text><text class="tam" x="140" y="134">int</text><text class="tam" x="214" y="134">real</text><text class="ta" style="fill:var(--red)" x="206" y="56">invalido</text><text class="ta" style="fill:var(--red)" x="172" y="12">invalido</text></svg>As folhas dão o tipo; cada operador decide o seu.</aside>
+  <p class="cs-def">A <b>verificação de tipos</b> calcula o tipo de cada expressão a partir das folhas e confere se cada operador, atribuição, condição e chamada recebe os tipos que aceita.</p>
+  <ul class="b">
+    <li>Onde se confere: atribuição (o lado esquerdo aceita o tipo do direito), condição de <code>if</code> e <code>while</code> (booleana, ou conversível), operandos de cada operador, argumentos de cada chamada.</li>
+    <li>Por que tanto cuidado: o processador não tem instrução que mistura tipos. Soma é de dois inteiros ou de dois reais; misturar exige que a linguagem converta antes.</li>
+    <li>Em pós-ordem, como o <code>expr_typecheck</code> do Thain: primeiro os filhos, depois o nó. Folha literal tem o tipo do literal; folha de nome tem o tipo da tabela. Nó interno compara os filhos com as regras e devolve o tipo do operador.</li>
+    <li>O tipo nasce em dois lugares. No léxico: o Judson devolve token real quando o número tem ponto, e <code>9.2</code> vira constante float. Na tabela: o símbolo guarda o tipo da declaração, e o identificador recebe esse tipo.</li>
+    <li>A ação do Judson para <code>E → E₁ &lt;= E₂</code>: <code>if (E₁.type == E₂.type) E.type = boolean; else error;</code>. No <code>lab10</code>, os construtores conferem: Logical quer dois bool, Relational e Arithmetic querem tipos iguais, Assign quer variável e expressão do mesmo tipo.</li>
+    <li>Na Alguma do Lucrédio, o <code>enum TipoAlguma</code> tem INTEIRO, REAL e INVALIDO, e há um <code>verificarTipo</code> para expressão, termo, fator e nome. Na expressão, o primeiro termo dá o tipo; um termo diferente gera "Expressão … contém tipos incompatíveis" com linha e coluna do primeiro token (<code>ctx.start</code>) e marca a expressão como <b>tipo inválido</b>.</li>
+    <li>O inválido evita <a href="/m8/comp/07-analise-lexica/consulta#erros">erros em cascata</a>: quem recebe um inválido não reclama de novo. O Thain diz o mesmo de outro jeito: depois do erro, devolva um tipo válido para continuar e achar o maior número de erros.</li>
+    <li>Conferir no termo e na expressão deixa a mensagem mais precisa: em <code>2 + 3 * x</code> com x real, o erro aponta o termo <code>3*x</code>.</li>
+    <li>Mensagem boa diz os tipos e as expressões. Em vez de "incompatibilidade de tipos na expressão", o Thain imprime "não dá para comparar um boolean (b) com um integer (5)" e depois "não dá para somar um boolean (b&lt;5) com uma string (s)".</li>
+  </ul>
+  <figure class="fig" id="fig-tipos">
+    <div class="fig-head"><span class="fig-title">Figura 3 · Tipos em pós-ordem em a = a + b + 1, com a int e b real</span></div>
+    <div class="fig-body">
+      <div class="fig-stage"><svg id="ti-svg" viewBox="0 0 640 300"></svg></div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Sem o inválido, <code>a + b + 1</code> daria duas mensagens: uma para <code>a + b</code> e outra para o resultado somado com 1, que não tem erro próprio.</li>
+      <li>Expressão inválida não se compara com a variável. O <code>visitComandoAtribuicao</code> do Lucrédio só confere o tipo da variável se o da expressão não é INVALIDO.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="conversao" data-grupo="Tipos" data-termos="sobrecarga">
+  <h2>Tipos diferentes juntos: proibir, converter ou sobrecarregar</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 140"><circle class="k" cx="120" cy="20" r="12"/><text x="120" y="20">+</text><rect class="am" x="30" y="52" width="86" height="24" rx="5"/><text x="73" y="64" style="font-size:9px">int_para_real</text><circle class="k" cx="73" cy="110" r="12"/><text x="73" y="110">i</text><circle class="k" cx="170" cy="64" r="14"/><text x="170" y="64" style="font-size:9px">2.5</text><line class="s" x1="112" y1="29" x2="84" y2="52"/><line class="s" x1="128" y1="29" x2="160" y2="52"/><line class="s" x1="73" y1="76" x2="73" y2="98"/><text class="tam" x="30" y="110">int</text><text class="tam" x="210" y="64">real</text><text class="tam" x="160" y="20">real</text></svg>A coerção vira um nó a mais, colocado pelo verificador.</aside>
+  <p class="cs-def">Quando dois tipos diferentes se encontram, a linguagem escolhe uma saída: recusar, copiar os bits, converter para um valor equivalente ou reinterpretar o valor.</p>
+  <ul class="b">
+    <li>Recusar: o B-Minor dá erro e, se você quer mesmo, chama uma função como <code>IntToFloat</code>. É o que a Mini-bloco faz.</li>
+    <li>Copiar os bits: raro e perigoso, nada garante que os bits façam sentido no outro tipo. Acontece entre tipos de ponteiro em C.</li>
+    <li>Converter: inteiro e real, com sinal e sem sinal. É a <a href="/m8/comp/07-analise-lexica/consulta#fases">coerção</a>: em <code>2 * 3.14</code>, o 2 vira 2.0. O verificador põe um nó de conversão na árvore, e a geração de código vê a conversão como qualquer outro nó.</li>
+    <li>Reinterpretar: em Perl, <code>$b = @days;</code> guarda em b o tamanho da lista, não a lista.</li>
+    <li>Na chamada: com <code>p(int a, real b)</code>, <code>p(10, 22)</code> passa, porque 22 vira real sem perder nada.</li>
+    <li>Flexibilizar o <code>&lt;=</code> do Judson: em vez de exigir tipos iguais, aceitar se E₁ converte para o tipo de E₂ ou o contrário, converter e comparar.</li>
+    <li><b>Sobrecarga</b>: o significado do operador sai dos tipos dos operandos. <code>+</code> soma dois números e concatena duas strings; string com número só se o número converter para string.</li>
+  </ul>
+  <div class="cs-uso">
+    <ul class="b"><li>A Mini-bloco com coerção de int para real (exercício no estilo da atividade do Judson, solução autoral). Em <code>r = i + 2.5;</code> o <code>i</code> ganha um nó <code>int_para_real</code>; <code>r = 3;</code> também passa; <code>i = r + 1;</code> continua erro, porque real em int perde a parte decimal:</li></ul>
+    <div class="prose"><pre class="code">class SemanticoComConversao(AnalisadorSemantico):
+    def converter(self, no):
+        return NoInterno('int_para_real', expr=no)
+
+    def tipoDe(self, no):
+        if no.op == 'int_para_real':
+            return 'real'
+        if no.op != 'soma':
+            return super().tipoDe(no)
+        esq = self.tipoDe(no.get('esq'))
+        dir = self.tipoDe(no.get('dir'))
+        if 'invalido' in (esq, dir):
+            return 'invalido'
+        if esq == 'int' and dir == 'real':
+            no.d['esq'] = self.converter(no.get('esq'))
+            return 'real'
+        if esq == 'real' and dir == 'int':
+            no.d['dir'] = self.converter(no.get('dir'))
+            return 'real'
+        return esq
+
+    def atribuicao(self, no):
+        nome = no.get('nome')
+        tipo_var = self.buscar(nome.valor)
+        tipo_expr = self.tipoDe(no.get('expr'))
+        if tipo_var is None:
+            self.erro(nome.linha, f"'{nome.valor}' não foi declarada")
+        elif tipo_var == 'real' and tipo_expr == 'int':
+            no.d['expr'] = self.converter(no.get('expr'))      # alarga: não perde nada
+        elif tipo_expr != 'invalido' and tipo_var != tipo_expr:
+            self.erro(nome.linha, f"'{nome.valor}' é {tipo_var} e recebe uma expressão {tipo_expr}")</pre></div>
+    <ul class="b"><li>No mesmo programa, a classe sem conversão dá três erros (linhas 4, 5 e 6); a com conversão dá um, o da linha 6.</li></ul>
+  </div>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>Conversão automática pode perder informação mesmo "alargando": um float de 32 bits tem 24 bits de mantissa, e 16 777 217 convertido vira 16 777 216.</li>
+      <li>A conversão tem de mudar a árvore. Só devolver <code>real</code> como tipo, sem o nó, deixa a geração de código somar um inteiro com um real.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="cs" id="lvalue" data-grupo="Tipos" data-termos="lvalue,rvalue">
+  <h2>Valor L e valor R</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 110"><rect class="bl" x="10" y="20" width="60" height="36" rx="5"/><text class="tb" x="40" y="34">i</text><text class="tm" x="40" y="48">endereço</text><text x="104" y="38" style="font-size:14px">=</text><rect class="am" x="136" y="20" width="94" height="36" rx="5"/><text class="tam" x="183" y="34">i + 1</text><text class="tm" x="183" y="48">um valor</text><text class="tb" x="40" y="76">valor L</text><text class="tam" x="183" y="76">valor R</text><text class="tm" x="120" y="100">5 = i  é erro: 5 não é lugar</text></svg>À esquerda, um lugar; à direita, um valor.</aside>
+  <p class="cs-def">À esquerda do <code>=</code> precisa estar um lugar na memória, um <b>valor L</b>. À direita basta um valor, um <b>valor R</b>.</p>
+  <ul class="b">
+    <li><code>i = 5;</code>: i é valor L (uma variável tem endereço). <code>j = i + 1;</code>: aqui i é usado como valor R, o programa só lê o valor dele.</li>
+    <li>Têm valor L: identificador, posição de vetor (<code>vet[2]</code>), campo de registro. Uma constante como <code>5</code> só tem valor R e não pode ficar à esquerda.</li>
+    <li>Em gramáticas com expressões mais livres, o parser aceita um número à esquerda, e quem recusa é o semântico. Na Mini-bloco, a regra <code>ID ASSIGN &lt;expr&gt;</code> já exige um nome à esquerda.</li>
+    <li>Sozinha, uma variável é valor L, porque todo nome está ligado a um bloco de memória. Dentro de uma expressão, ela faz o papel de valor R.</li>
+    <li>C++ separa os dois nas referências: <code>int&amp;</code> recebe valor L e <code>int&amp;&amp;</code> recebe valor R. Com as duas versões de <code>func</code>, <code>func(val)</code> chama a de <code>int&amp;</code> e <code>func(5)</code>, a de <code>int&amp;&amp;</code>.</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b"><li><code>vet[i + 1] = 0</code> é válido: o resultado do acesso é um lugar, mesmo com uma conta dentro dos colchetes.</li></ul>
+  </div>
+</section>
+
+<section class="cs" id="outras" data-grupo="Tipos" data-termos="parametro-formal">
+  <h2>Outras verificações: chamadas, break, return, vetores</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 140"><rect class="k" x="6" y="6" width="228" height="22" rx="5"/><text class="st" x="12" y="17" style="font-size:9.5px">procedure p(int a, real b)</text><text class="st" x="12" y="46" style="font-size:9.5px">p(10, 2.3)</text><text class="ta" style="fill:var(--green)" x="200" y="46">ok</text><text class="st" x="12" y="68" style="font-size:9.5px">p(10, 22)</text><text class="ta" style="fill:var(--green)" x="200" y="68">ok, 22 → real</text><text class="st" x="12" y="90" style="font-size:9.5px">p(2.5, 1.0)</text><text class="ta" style="fill:var(--red)" x="200" y="90">1º tipo</text><text class="st" x="12" y="112" style="font-size:9.5px">p(10)</text><text class="ta" style="fill:var(--red)" x="200" y="112">número</text><text class="tm" x="120" y="132">a tabela guarda os parâmetros com tipos</text></svg>Cada chamada confere número e tipo.</aside>
+  <p class="cs-def">Cada linguagem acrescenta as suas verificações. As mais comuns, além de nomes e tipos de expressão, são as de chamada, de controle e de vetor.</p>
+  <ul class="b">
+    <li><b>Parâmetro formal</b> e argumento concordam em número e em tipo. Para conferir, a tabela guarda, junto do nome da função, a lista dos parâmetros com seus tipos.</li>
+    <li><code>break</code> só dentro de laço; a gramática não diz isso em lugar nenhum. Um nome por escopo (<a href="#escopo">escopo</a>).</li>
+    <li><code>return</code> com o tipo de retorno da função (B-Minor). Função void não devolve valor.</li>
+    <li>Acesso <code>a[i]</code>: a precisa ser vetor, i precisa ser inteiro, e o resultado é o tipo dos elementos (o <code>EXPR_DEREF</code> do Thain). Se a não é vetor, o erro sai e um tipo válido volta, para continuar.</li>
+    <li>Índice dentro dos limites quase nunca se confere em compilação: C não confere nunca, C# confere ao rodar.</li>
+    <li>Em C++, declarar variável dentro de um <code>case</code> exige chaves: o switch pode pular direto para outro case e passar por cima da inicialização.</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b"><li>Concordar em tipo pode incluir conversão: <code>p(10, 22)</code> passa, mas <code>p(2.5, 1.0)</code> não, porque o 2.5 iria para um int e perderia a parte decimal.</li></ul>
+  </div>
+</section>
+
+<!-- ================= No projeto ================= -->
+<section class="cs" id="projeto" data-grupo="No projeto" data-termos="">
+  <h2>No projeto da nova linguagem</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 136"><rect class="gr" x="6" y="6" width="228" height="22" rx="5"/><text class="st" x="14" y="17" style="font-size:9.5px">1. regras: nomes, escopos, conversões</text><rect class="bl" x="6" y="32" width="228" height="22" rx="5"/><text class="st" x="14" y="43" style="font-size:9.5px">2. AST do sintático (aula 12)</text><rect class="bl" x="6" y="58" width="228" height="22" rx="5"/><text class="st" x="14" y="69" style="font-size:9.5px">3. pilha de tabelas + tipoDe</text><rect class="am" x="6" y="84" width="228" height="22" rx="5"/><text class="st" x="14" y="95" style="font-size:9.5px">4. erros com linha, sem cascata</text><rect class="k" x="6" y="110" width="228" height="22" rx="5"/><text class="st" x="14" y="121" style="font-size:9.5px">5. exemplos inválidos viram testes</text></svg>Do papel ao semântico.</aside>
+  <p class="cs-def">No projeto, o semântico recebe a AST do sintático da <a href="/m8/comp/12-descendente-recursiva/consulta#projeto">aula 12</a> e confere as regras que a especificação da <a href="/m8/comp/09-especificacao-linguagem/consulta#especificacao">aula 09</a> descreve em texto e a gramática não expressa.</p>
+  <ul class="b">
+    <li>Escreva as regras antes do código: precisa declarar antes de usar? Bloco interno pode sombrear? Que conversões são automáticas? Cada resposta é uma linha do semântico.</li>
+    <li>Se a linguagem tem blocos ou funções, use a pilha de tabelas da Mini-bloco; se tudo é global, uma tabela basta, como na Alguma.</li>
+    <li>Calcule tipos em pós-ordem, com um tipo inválido para não repetir mensagem, e guarde a linha nas folhas para as mensagens.</li>
+    <li>Os exemplos com erro da especificação viram testes: cada um tem de gerar a mensagem certa na linha certa; os válidos, a lista vazia.</li>
+  </ul>
+</section>
+
+<!-- ================= Treino ================= -->
+<section class="cs" id="treino" data-grupo="Treino" data-termos="">
+  <h2>Treino: exercícios autorais</h2>
+  <p class="cs-def">Exercícios escritos para treinar com o código desta aula. Não são do professor. Tente antes de abrir a resposta.</p>
+  <div class="prose">
+    <details><summary>1 · Que mensagens a Mini-bloco dá para este programa, todo na linha 1?</summary>
+      <pre class="code">{ real a; int b; b = a;
+  { int a; a = b + 1; }
+  a = a + 1; }</pre>
+      <details><summary>Uma resposta</summary><p>Duas. <code>b = a</code>: "'b' é int e recebe uma expressão real". No bloco interno, <code>a</code> é o int, e <code>a = b + 1</code> passa. Fora, <code>a = a + 1</code> soma o real de fora com o int 1: "'+' entre real e int".</p></details>
+    </details>
+    <details><summary>2 · A atividade do Judson pede conversão automática de int para bool: 0 vira false, qualquer outro valor vira true. Onde ela entra, se a Mini-bloco tivesse um operador lógico <code>e</code>?</summary>
+      <details><summary>Uma resposta</summary><p>No ramo do nó lógico de <code>tipoDe</code>: calcule o tipo dos dois filhos; o que vier int ganha um nó <code>NoInterno('int_para_bool', expr=filho)</code> no lugar dele, e o nó devolve bool. Real continua erro. É o mesmo molde do <code>SemanticoComConversao</code>, trocando o tipo de destino.</p></details>
+    </details>
+    <details><summary>3 · <code>q = r + r;</code> sem <code>r</code> declarado avisa duas vezes. Mude o semântico para avisar uma vez só.</summary>
+      <details><summary>Uma resposta</summary><p>No ramo <code>id</code> de <code>tipoDe</code>, depois de registrar o erro, faça <code>self.escopos[-1][no.valor] = 'invalido'</code>. O segundo uso acha o nome com tipo inválido e não reclama. A soma recebe inválido e também fica quieta.</p></details>
+    </details>
+    <details><summary>4 · Desenhe as duas árvores anotadas da soma dos dígitos para <code>507</code>. Que valores aparecem?</summary>
+      <details><summary>Uma resposta</summary><p>Só sintetizado: o N mais fundo vale 5, o do meio 5 + 0 = 5, o de cima 5 + 7 = 12. Com herdado: X.h = 5, X₁.h = 5 + 0 = 5, X₂.h = 5 + 7 = 12; no ε, X₂.s = 12, e 12 sobe até N.v.</p></details>
+    </details>
+    <details><summary>5 · Quanto vale este programa?</summary>
+      <pre class="code">let a = 1 in
+  let a = a + 1, b = a + a in a + b</pre>
+      <details><summary>Uma resposta</summary><p>6. No let interno, o primeiro <code>a</code> usa o de fora: a = 2. A lista é sequencial, então <code>b = a + a</code> já usa o novo a: b = 4. <code>a + b</code> = 2 + 4.</p></details>
+    </details>
+    <details><summary>6 · O que este trecho em C imprime?</summary>
+      <pre class="code">int a = 1;
+{ int a = 2;
+  { a = a + 1; print(a); }
+  print(a); }
+print(a);</pre>
+      <details><summary>Uma resposta</summary><p>3, 3 e 1. O bloco mais interno não declara a: <code>a = a + 1</code> acha o a = 2 do bloco do meio e muda ele para 3. O print do meio vê o mesmo 3. Fora, o a global nunca mudou.</p></details>
+    </details>
+    <details><summary>7 · Escreva o <code>termo2</code> da calculadora com divisão inteira (<code>DIV</code>). Que cuidado vale também para a divisão?</summary>
+      <details><summary>Uma resposta</summary><p>Acrescente <code>if self.tokenCorrente.tipo == 'DIV': self.comparar('DIV'); return self.termo2(herdado // self.fator())</code>. O mesmo da subtração: o herdado vem antes. <code>12 / 3 / 2</code> tem de dar (12 // 3) // 2 = 2, e não 12 // (3 // 2) = 12.</p></details>
+    </details>
+    <details><summary>8 · Com <code>f(int a, int b)</code>, numa linguagem que converte int para real e nunca o contrário, quais chamadas passam: <code>f(1, 2)</code>, <code>f(1)</code>, <code>f(1.0, 2)</code>, <code>f(1, 2, 3)</code>?</summary>
+      <details><summary>Uma resposta</summary><p>Só <code>f(1, 2)</code>. <code>f(1)</code> e <code>f(1, 2, 3)</code> erram o número; <code>f(1.0, 2)</code> passaria um real para int, que perde informação e não é conversão permitida.</p></details>
+    </details>
+  </div>
+</section>

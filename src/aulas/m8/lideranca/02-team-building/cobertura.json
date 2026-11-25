@@ -1,0 +1,68 @@
+{
+  "aula": "m8/lideranca/02-team-building",
+  "criterio": "Conferência do artigo da Zendesk (lido por inteiro, seção por seção) e do texto do Google Docs (exportado como texto e lido inteiro). A página do Table Group complementa a descrição das cinco disfunções, que foram apresentadas no encontro. Os vídeos incorporados no artigo não foram assistidos. Base, curiosidades, a tabela disfunção × dinâmica, o roteiro da atividade e os exercícios são marcados como fora do autoestudo ou autorais e ficam fora da revisão.",
+  "fontes": [
+    {
+      "id": "zendesk-team-building",
+      "url": "https://www.zendesk.com.br/blog/team-building/",
+      "escopo": "Zendesk, Team building: o que é e como aplicar com sua equipe? Última atualização visível em 17/02/2026, sem autor individual. Unidade = bloco do artigo na ordem da página (resumo do topo, H2 e H3).",
+      "acesso": "integral",
+      "metodo": "Página lida inteira e inventariada por seção. CTAs de venda e o bloco de histórias relacionadas não viram conteúdo.",
+      "totalUnidades": 19,
+      "unidades": [
+        { "paginas": [1], "assunto": "Resumo do topo: tradução, benefícios, estrutura e pós-evento", "antes": "conteudo-novo-da-aula", "justificativa": "Os quatro tópicos do resumo são desdobrados nas seções de definição, benefícios, passos e depois.", "consulta": ["team-building", "por-que", "roteiro", "depois"], "evidencias": ["construção de equipe"] },
+        { "paginas": [2], "assunto": "O que é team building: ritual, laços de confiança, alta performance, dinâmicas lúdicas, relações mudam resultados", "antes": "conteudo-novo-da-aula", "justificativa": "Seção própria com desenho.", "consulta": ["team-building"], "evidencias": ["ritual", "lúdicas"] },
+        { "paginas": [3], "assunto": "Os cinco desafios das equipes (Lencioni): lista, pirâmide com confiança na base, conflitos produtivos, comprometimento, foco em confiança", "antes": "conteudo-novo-da-aula", "justificativa": "Seção própria com figura passo a passo e tabela; descrições complementadas pelo Table Group.", "consulta": ["disfuncoes"], "evidencias": ["Os 5 desafios das equipes", "solidificar a confiança"] },
+        { "paginas": [4], "assunto": "Importância: cinco benefícios, tempo no trabalho, pressão e divergências, Sodexo 86% e 70%, PwC 87%, 82%, 79% e 80%", "antes": "conteudo-novo-da-aula", "justificativa": "Seção própria com gráfico de barras na margem e pegadinha sobre o alcance dos números.", "consulta": ["por-que"], "evidencias": ["86%", "87%", "79%"] },
+        { "paginas": [5], "assunto": "Quando fazer: baixa performance, relacionamento, novos integrantes, novo líder; raiz do problema; TED de Tom Wujec", "antes": "conteudo-novo-da-aula", "justificativa": "Seção própria com desenho; o TED vira curiosidade ligada à aula 01.", "consulta": ["quando"], "evidencias": ["raiz do problema", "Tom Wujec"] },
+        { "paginas": [6], "assunto": "Passo 1: participantes, no máximo 30, dividir times, squad", "antes": "conteudo-novo-da-aula", "justificativa": "Primeiro item do roteiro.", "consulta": ["roteiro"], "evidencias": ["30 pessoas", "squad"] },
+        { "paginas": [7], "assunto": "Passo 2: local fora do escritório, sala o dia todo, on-line com Miro", "antes": "conteudo-novo-da-aula", "justificativa": "Segundo item do roteiro.", "consulta": ["roteiro"], "evidencias": ["coworking", "Miro"] },
+        { "paginas": [8], "assunto": "Passo 3: agenda de exemplo (10h às 17h), propósito, planos de ação, expectativas anotadas", "antes": "conteudo-novo-da-aula", "justificativa": "Agenda no desenho de margem; propósito e expectativas nos bullets.", "consulta": ["roteiro"], "evidencias": ["almoço do time", "anota"] },
+        { "paginas": [9], "assunto": "Passo 4: criatividade e cooperação, quebra-gelo, regras, vulnerabilidades, dores e soluções", "antes": "conteudo-novo-da-aula", "justificativa": "Quarto item do roteiro; quebra-gelo é termo da seção.", "consulta": ["roteiro"], "evidencias": ["quebra-gelo", "vulnerabilidades"] },
+        { "paginas": [10], "assunto": "Passo 5: acordos de convivência e planos de ação, exemplo das brincadeiras desrespeitosas", "antes": "conteudo-novo-da-aula", "justificativa": "Seção própria com desenho do ciclo.", "consulta": ["acordos"], "evidencias": ["brincadeiras desrespeitosas"] },
+        { "paginas": [11], "assunto": "Passo 6: próximo encontro, a cada três ou seis meses", "antes": "conteudo-novo-da-aula", "justificativa": "Fecho da seção de acordos.", "consulta": ["acordos"], "evidencias": ["três ou seis meses"] },
+        { "paginas": [12], "assunto": "Ideias de atividades: novas, renovar, protagonismo, debate depois, contexto do time", "antes": "conteudo-novo-da-aula", "justificativa": "Bullets da seção de dinâmicas.", "consulta": ["dinamicas"], "evidencias": ["protagonista"] },
+        { "paginas": [13], "assunto": "2 verdades e 1 mentira, com variação", "antes": "conteudo-novo-da-aula", "justificativa": "Linha da tabela de dinâmicas.", "consulta": ["dinamicas"], "evidencias": ["2 verdades e 1 mentira"] },
+        { "paginas": [14], "assunto": "Valores: 20, 10, 5, 3 e a lista de 53 valores", "antes": "conteudo-novo-da-aula", "justificativa": "Linha da tabela, loop do funil e a lista completa numa caixa recolhível.", "consulta": ["dinamicas"], "evidencias": ["Abnegação", "53 valores"] },
+        { "paginas": [15], "assunto": "Linha do tempo", "antes": "conteudo-novo-da-aula", "justificativa": "Linha da tabela de dinâmicas.", "consulta": ["dinamicas"], "evidencias": ["Linha do tempo"] },
+        { "paginas": [16], "assunto": "Match do time e as categorias", "antes": "conteudo-novo-da-aula", "justificativa": "Linha da tabela de dinâmicas.", "consulta": ["dinamicas"], "evidencias": ["Match do time", "último dia de vida"] },
+        { "paginas": [17], "assunto": "Descrever a pessoa em uma palavra", "antes": "conteudo-novo-da-aula", "justificativa": "Linha da tabela de dinâmicas.", "consulta": ["dinamicas"], "evidencias": ["post-its"] },
+        { "paginas": [18], "assunto": "Extra: escape room", "antes": "conteudo-novo-da-aula", "justificativa": "Linha da tabela de dinâmicas.", "consulta": ["dinamicas"], "evidencias": ["Escape room"] },
+        { "paginas": [19], "assunto": "E depois: 1:1 vertical e horizontal, 20% e 80%, 50%, acompanhar acordos, insumos e ferramenta (CTA)", "antes": "conteudo-novo-da-aula", "justificativa": "Seção própria com desenho das proporções; o CTA aparece só como exemplo do artigo.", "consulta": ["depois"], "evidencias": ["20%", "80%"] }
+      ]
+    },
+    {
+      "id": "doc-pink-sinek",
+      "url": "https://docs.google.com/document/d/1LhCbQ1Z2KnKkYCFgOGTtKAwPOQRXj5H3H5Yjln_-GZ8/edit?usp=sharing",
+      "escopo": "Estabelecendo objetivos compartilhados: uma abordagem prática inspirada em Pink e Sinek (Google Docs), sem autor nem data. Unidade = bloco do texto na ordem dos títulos.",
+      "acesso": "integral",
+      "metodo": "Documento exportado como texto (cerca de 6,9 mil caracteres) e lido inteiro.",
+      "totalUnidades": 12,
+      "unidades": [
+        { "paginas": [1], "assunto": "Introdução: objetivos compartilhados, propósito comum, Pink (Drive) e Sinek (Start with Why), atividade de team building", "antes": "conteudo-novo-da-aula", "justificativa": "Os autores e livros aparecem nas seções de cada um; a atividade vira a seção da oficina.", "consulta": ["sinek", "pink"], "evidencias": ["Start with Why", "Drive"] },
+        { "paginas": [2], "assunto": "O poder do porquê: propósito claro, porquê coletivo, crenças e valores, brainstorming", "antes": "conteudo-novo-da-aula", "justificativa": "Seção própria com Base do Círculo Dourado.", "consulta": ["sinek"], "evidencias": ["brainstorming", "crenças e valores"] },
+        { "paginas": [3], "assunto": "Equilibrando prioridades: negociar meio-termo, votação democrática ou consenso", "antes": "conteudo-novo-da-aula", "justificativa": "Seção própria com tabela votação × consenso.", "consulta": ["prioridades"], "evidencias": ["meio-termo", "votação democrática"] },
+        { "paginas": [4], "assunto": "Tríade de Pink: autonomia, maestria, propósito e o efeito de cada um", "antes": "conteudo-novo-da-aula", "justificativa": "Seção própria com desenho.", "consulta": ["pink"], "evidencias": ["valorizado e responsável", "engajamento"] },
+        { "paginas": [5], "assunto": "Caso prático: oficina com projeto comunitário, ideias, discussão e votação", "antes": "conteudo-novo-da-aula", "justificativa": "Seção própria com fluxograma.", "consulta": ["oficina"], "evidencias": ["projeto comunitário"] },
+        { "paginas": [6], "assunto": "Startup de tecnologia: workshops sobre o porquê, produtos novos, produtividade e satisfação", "antes": "conteudo-novo-da-aula", "justificativa": "Bullets da seção da oficina, com pegadinha sobre a falta de dados.", "consulta": ["oficina"], "evidencias": ["startup", "produtos novos"] },
+        { "paginas": [7], "assunto": "Desafios e o Dilema do Prisioneiro: cooperar ou competir, teoria dos jogos", "antes": "conteudo-novo-da-aula", "justificativa": "Seção própria com Base e figura passo a passo que completa o caso de os dois competirem.", "consulta": ["dilema"], "evidencias": ["teoria dos jogos", "cooperar ou competir"] },
+        { "paginas": [8], "assunto": "Aplicação nas organizações: sucesso coletivo × metas pessoais, ganho imediato prejudica coesão", "antes": "conteudo-novo-da-aula", "justificativa": "Bullet da seção do dilema.", "consulta": ["dilema"], "evidencias": ["coesão"] },
+        { "paginas": [9], "assunto": "Individualismo na cultura ocidental; validar aspirações e direcionar para o coletivo", "antes": "conteudo-novo-da-aula", "justificativa": "Bullets da seção do dilema; individualismo × coletivismo é termo da seção.", "consulta": ["dilema"], "evidencias": ["cultura ocidental", "validar"] },
+        { "paginas": [10], "assunto": "Motivação extrínseca × intrínseca como variação do dilema; transição para a intrínseca", "antes": "conteudo-novo-da-aula", "justificativa": "Os dois termos moram na seção de Pink, com tabela; a ligação com o dilema é um link.", "consulta": ["pink"], "evidencias": ["variação do", "cultura que valoriza a motivação intrínseca"] },
+        { "paginas": [11], "assunto": "Estratégias: diálogos abertos; confiança e transparência", "antes": "conteudo-novo-da-aula", "justificativa": "Último bullet da seção do dilema e última nota da figura.", "consulta": ["dilema"], "evidencias": ["diálogo aberto", "transparência"] },
+        { "paginas": [12], "assunto": "Conclusão: reconhecer os dilemas e alinhar interesses para uma colaboração genuína", "antes": "conteudo-novo-da-aula", "justificativa": "Resumida no último bullet do Resumo.", "consulta": ["encontro"], "evidencias": ["mudam a conta"] }
+      ]
+    },
+    {
+      "id": "tablegroup-disfuncoes",
+      "url": "https://www.tablegroup.com/topics-and-resources/teamwork-5-dysfunctions/",
+      "escopo": "The Table Group, Teamwork: The Five Dysfunctions of a Team, lida em 25/11/2026. Complemento de fora do autoestudo. Unidade única: a descrição das cinco disfunções.",
+      "acesso": "integral",
+      "metodo": "Página lida inteira. O livro de Lencioni não foi lido; nada além da página é atribuído ao autor.",
+      "totalUnidades": 1,
+      "unidades": [
+        { "paginas": [1], "assunto": "Cinco disfunções numeradas e o que trava cada uma: vulnerabilidade, harmonia artificial, clareza e adesão, desconforto de cobrar, status pessoal", "antes": "conteudo-novo-da-aula", "justificativa": "Coluna da tabela e notas da figura 1; número de cópias e idiomas na curiosidade.", "consulta": ["disfuncoes"], "evidencias": ["harmonia artificial", "status pessoal", "3 milhões"] }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "numero": "02",
+  "titulo": "Team building: desenhando rotinas colaborativas",
+  "tema": "Equipes e colaboração",
+  "modos": [
+    "consulta"
+  ],
+  "resumo": "O que é team building, as cinco disfunções de uma equipe (Lencioni), como montar e acompanhar uma sessão, e como Pink, Sinek e o dilema do prisioneiro ajudam a criar objetivos compartilhados.",
+  "topicos": [
+    "Team building",
+    "Cinco disfunções de uma equipe",
+    "Roteiro em seis passos",
+    "Dinâmicas",
+    "Propósito (Sinek)",
+    "Autonomia, maestria e propósito (Pink)",
+    "Dilema do prisioneiro",
+    "A atividade: uma sessão contra uma disfunção"
+  ],
+  "secoes": [],
+  "fontes": [
+    {
+      "tipo": "Artigo",
+      "titulo": "Zendesk · Team building: o que é e como aplicar com sua equipe? (atualizado em 17/02/2026)",
+      "url": "https://www.zendesk.com.br/blog/team-building/",
+      "secao": "team-building",
+      "nota": "Autoestudo. Lido por inteiro. Os dois vídeos incorporados (Simon Sinek sobre times de confiança e o TED de Tom Wujec) não foram assistidos."
+    },
+    {
+      "tipo": "Texto",
+      "titulo": "Estabelecendo objetivos compartilhados: uma abordagem prática inspirada em Pink e Sinek (Google Docs da disciplina)",
+      "url": "https://docs.google.com/document/d/1LhCbQ1Z2KnKkYCFgOGTtKAwPOQRXj5H3H5Yjln_-GZ8/edit?usp=sharing",
+      "secao": "sinek",
+      "nota": "Autoestudo. Lido por inteiro. Não traz autor nem data."
+    },
+    {
+      "tipo": "Site",
+      "titulo": "The Table Group (empresa de Patrick Lencioni) · Teamwork: The Five Dysfunctions of a Team",
+      "url": "https://www.tablegroup.com/topics-and-resources/teamwork-5-dysfunctions/",
+      "secao": "disfuncoes",
+      "nota": "Fora do autoestudo, lido em 25/11/2026. Usado para descrever cada disfunção com as palavras do próprio autor. O livro não foi lido."
+    }
+  ],
+  "observacao": "Síntese do artigo da Zendesk e do texto sobre Pink e Sinek. As cinco disfunções foram apresentadas no encontro; a descrição de cada uma vem da página do Table Group, e o livro de Lencioni não foi lido. O Círculo Dourado e a tabela de penas do dilema do prisioneiro são base de fora dos autoestudos. A tabela disfunção × dinâmica, o roteiro da atividade e os exercícios são leitura autoral, não do professor. Caixas tracejadas marcadas como Curiosidade não entram na revisão."
+}

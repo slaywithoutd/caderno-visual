@@ -1,0 +1,70 @@
+/* Matemática · aula 02. Só peças desta aula; toda cor vem dos tokens do :root. */
+[data-aula="m8/mat/02-hash-integridade"] {
+  /* régua A = 0 … Z = 25 (igual à aula 01) */
+  & table.regua td { text-align: center; padding: 3px 4px; font-family: var(--f-mono); font-size: .82rem; min-width: 1.6em; }
+  & table.regua tr:nth-child(odd) td { font-weight: 600; color: var(--fg); }
+  & table.regua tr:nth-child(even) td { color: var(--muted); font-size: .74rem; border-bottom: 1px solid var(--line); }
+
+  & .resp { font-weight: 600; color: var(--fg); }
+  & details.ds-item > summary { font-weight: 600; line-height: 1.45; }
+  & details.ds-item p.muted { font-size: .88rem; margin: .5rem 0; }
+  & details.ds-resp { margin: .5rem 0 .3rem; }
+  & section.cs h3 { margin: 1.6rem 0 .5rem; font-size: 1rem; }
+  & .mono { font-family: var(--f-mono); font-size: .86em; overflow-wrap: anywhere; }
+
+  /* Fig XOR */
+  & #xor-svg .xr-cel { fill: var(--surface); stroke: var(--line2); stroke-width: 1.5; }
+  & #xor-svg .xr-cel.xr-ve { fill: var(--red-soft); stroke: var(--red); }
+  & #xor-svg .xr-cel.xr-am { fill: var(--amber-soft); stroke: var(--amber); }
+  & #xor-svg .xr-cel.xr-res { fill: var(--blue-soft); stroke: var(--blue); }
+  & #xor-svg .xr-cel.xr-apag { opacity: .35; }
+  & #xor-svg text { font-family: var(--f-mono); fill: var(--fg); text-anchor: middle; dominant-baseline: central; }
+  & #xor-svg .xr-bit { font-size: 15px; }
+  & #xor-svg .xr-op { fill: var(--muted); font-size: 14px; }
+  & #xor-svg .xr-tit { font-size: 14px; font-weight: 600; }
+  & #xor-svg .xr-tit.xr-az { fill: var(--blue); }
+  & #xor-svg .xr-tit.xr-ver { fill: var(--red); }
+  & #xor-svg .xr-lab, & #xor-svg .xr-nota { fill: var(--muted); font-size: 12px; }
+  & #xor-svg .xr-lab { text-anchor: start; }
+  & #xor-svg .xr-regua { stroke: var(--fg2); stroke-width: 1.5; }
+
+  /* Cadeia e HMAC de brinquedo */
+  & .cd-svg text { font-family: var(--f-mono); fill: var(--fg); text-anchor: middle; dominant-baseline: central; }
+  & .cd-svg .cd-num { font-size: 15px; }
+  & .cd-svg .cd-ftxt { font-size: 16px; font-style: italic; fill: var(--fg); }
+  & .cd-svg .cd-lab, & .cd-svg .cd-conta { fill: var(--muted); font-size: 12px; }
+  & .cd-svg .cd-esq, & .cd-svg .cd-tit, & .cd-svg .cd-res { text-anchor: start; }
+  & .cd-svg .cd-tit { font-size: 13px; fill: var(--fg2); }
+  & .cd-svg .cd-res { font-size: 13px; font-weight: 600; fill: var(--green); }
+  & .cd-svg .cd-resmal { fill: var(--red); }
+  & .cd-svg .cd-iv { fill: var(--surface2); stroke: var(--line2); stroke-width: 1.5; stroke-dasharray: 4 3; }
+  & .cd-svg .cd-bloco { fill: var(--amber-soft); stroke: var(--amber); stroke-width: 1.5; }
+  & .cd-svg .cd-f { fill: var(--surface); stroke: var(--fg2); stroke-width: 1.5; }
+  & .cd-svg .cd-h { fill: var(--surface); stroke: var(--blue); stroke-width: 1.5; }
+  & .cd-svg .cd-h.cd-novo { fill: var(--blue-soft); }
+  & .cd-svg .cd-mal { fill: var(--red-soft); stroke: var(--red); }
+  & .cd-svg .cd-seta { stroke: var(--fg2); stroke-width: 1.4; }
+  & .cd-svg .cd-pontaf { fill: var(--fg2); }
+  & .cd-svg .cd-apag { opacity: .3; }
+
+  /* SHA-512 por dentro */
+  & #sha-svg text { font-family: var(--f-mono); fill: var(--fg); dominant-baseline: central; font-size: 12.5px; }
+  & #sha-svg .sh-th { fill: var(--muted); font-size: 12px; }
+  & #sha-svg .sh-nome { fill: var(--muted); }
+  & #sha-svg .sh-txt { font-size: 12px; fill: var(--fg2); }
+  & #sha-svg .sh-dest { fill: var(--blue); font-weight: 600; }
+  & #sha-svg .sh-mid, & #sha-svg .sh-lab { text-anchor: middle; }
+  & #sha-svg .sh-lab { fill: var(--muted); font-size: 11px; }
+  & #sha-svg .sh-cx { fill: var(--surface); stroke: var(--line2); stroke-width: 1.2; }
+  & #sha-svg .sh-novo { fill: var(--blue-soft); stroke: var(--blue); stroke-width: 1.4; }
+  & #sha-svg .sh-am { fill: var(--amber-soft); stroke: var(--amber); stroke-width: 1.4; }
+  & #sha-svg .sh-seta { stroke: var(--line2); stroke-width: 1.2; }
+
+  /* widget do efeito avalanche */
+  & #avalanche label { display: inline-flex; gap: 6px; align-items: center; font-family: var(--f-mono); font-size: .86rem; }
+  & #avalanche .av-hex { font-family: var(--f-mono); font-size: .78rem; overflow-wrap: anywhere; line-height: 1.5; color: var(--muted); }
+  & #avalanche .av-hex mark { background: var(--amber-soft); color: var(--fg); border-radius: 2px; }
+  & #av-grade { display: grid; grid-template-columns: repeat(32, 1fr); gap: 2px; max-width: 420px; }
+  & #av-grade .av-b { aspect-ratio: 1; border-radius: 2px; background: var(--surface); border: 1px solid var(--line); }
+  & #av-grade .av-b.av-dif { background: var(--blue); border-color: var(--blue); }
+}

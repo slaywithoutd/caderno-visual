@@ -1,0 +1,939 @@
+<!-- Matemática · aula 02 · Funções de hash e integridade (semana 7, prof. Leandro Mundim).
+     Aula somente Consulta. A espinha é o deck CC08-S07 (60 slides): as três perguntas 2.1 (o resumo e as colisões),
+     2.2 (o aniversário e os três ataques) e 2.3 (a cadeia, o MAC e o HMAC), depois as atividades resolvidas.
+     O apêndice "Além da aula" traz o que o livro (§11.2, §11.5) e os vídeos acrescentam: a família SHA, o SHA-512 por dentro
+     e os números aleatórios. Contas conferidas por script (Python 3.13, hashlib; SHA-512 refeito em JS e comparado). -->
+
+<!-- ================= Resumo ================= -->
+<section class="cs" id="encontro" data-grupo="Resumo" data-termos="">
+  <h2>Resumo</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 200">
+    <rect class="k" x="6" y="8" width="96" height="40" rx="6"/><text x="54" y="28">M: qualquer</text>
+    <path class="s" d="M104 28 H134" marker-end="url(#mnarrow)"/>
+    <rect class="bl" x="138" y="8" width="40" height="40" rx="6"/><text class="tb" x="158" y="28">H</text>
+    <path class="s" d="M180 28 H200" marker-end="url(#mnarrow)"/>
+    <rect class="acf" x="204" y="14" width="30" height="28" rx="5"/><text x="219" y="28" style="font-size:11px">n</text>
+    <text class="tm" x="120" y="64">infinitas entradas, 2ⁿ resumos</text>
+    <text class="tam" x="120" y="82">colisões existem sempre</text>
+    <text class="tm" x="64" y="110">pré-imagem</text><text class="tb" x="64" y="128">2ⁿ⁻¹</text>
+    <text class="tm" x="176" y="110">colisão</text><text class="tb" x="176" y="128">2ⁿᐟ²</text>
+    <rect class="am" x="6" y="146" width="228" height="32" rx="8"/>
+    <text x="120" y="162" style="font-size:12px">HMAC = H(K2 ‖ H(K1 ‖ M))</text>
+    <text class="tm" x="120" y="194">sem chave, qualquer um recalcula</text>
+  </svg>Resumo de tamanho fixo, colisão pela raiz, autenticação só com chave.</aside>
+  <p class="cs-def">Uma função de hash H leva uma mensagem de qualquer tamanho a um resumo de n bits. Como há infinitas mensagens e só 2ⁿ resumos, H nunca é injetora: colisões existem sempre. O que protege é o custo de achá-las, e o resumo só autentica quem enviou se entrar uma chave na conta.</p>
+  <ul class="b">
+    <li>H : {0, 1}* → {0, 1}ⁿ é determinística: a mesma mensagem dá sempre o mesmo resumo. O SHA-256 dá 256 bits, escritos como 64 dígitos hexadecimais.</li>
+    <li>Casa dos pombos: se há mais entradas do que saídas, nenhuma função é injetora. Então toda função de hash tem colisões. Resumos iguais não provam mensagens iguais.</li>
+    <li>Três ataques, do mais caro ao mais barato: pré-imagem (dado h, ache M) custa 2ⁿ⁻¹ testes em média; segunda pré-imagem (dada M, ache outra) custa o mesmo; colisão (ache duas quaisquer) custa 2ⁿᐟ² pelo paradoxo do aniversário. SHA-256: 2²⁵⁵ e 2¹²⁸.</li>
+    <li>Pares crescem depressa: q pessoas formam q(q − 1)/2 pares. 23 pessoas, 253 pares, e a chance de dois aniversários no mesmo dia já é 0,5073.</li>
+    <li>O SHA lê a mensagem em blocos numa cadeia: h₀ = IV, hᵢ = f(hᵢ₋₁, mᵢ), e o resumo é o último estado. Por isso H(K ‖ M) vaza: quem vê o resumo continua a cadeia sem a chave.</li>
+    <li>Sem chave, o Mallory troca a mensagem e recalcula o resumo. O MAC mistura uma chave secreta; o HMAC faz duas passadas, H(K2 ‖ H(K1 ‖ M)), e esconde o estado de dentro.</li>
+  </ul>
+  <div class="cs-pegadinhas">
+    <ul class="b">
+      <li>A raiz vale só para a colisão. Pré-imagem de n bits custa 2ⁿ⁻¹, nunca 2ⁿᐟ².</li>
+      <li>Um SHA-256 forte não salva um download se o invasor troca o arquivo e o resumo da mesma página. O resumo precisa vir de outra fonte confiável, ou de uma chave.</li>
+      <li>Na cadeia de brinquedo, multiplique o estado por 3 antes de somar o bloco. Somar só os blocos (2 + 5 + 4) é o erro mais comum.</li>
+      <li>Pares são q(q − 1)/2: sem dividir por 2 você conta cada par duas vezes.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= No encontro ================= -->
+<section class="cs" id="hoje" data-grupo="No encontro" data-termos="">
+  <h2>Para participar do encontro da semana 7</h2>
+  <p class="cs-def">O encontro tem três perguntas, uma por parte, e alterna explicação curta, votações e prática no sistema em duplas. Os slides marcados "Para autoestudo" o professor espera que você já tenha visto. Os quatro quadros "Memorize" estão marcados nesta aula como "cai na prova".</p>
+  <div class="tbl prose"><table>
+    <thead><tr><th>Parte</th><th>Pergunta do slide</th><th>Tempo</th><th>No caderno</th></tr></thead>
+    <tbody>
+      <tr><td>2.1</td><td>Por que toda função de hash tem colisões?</td><td>22 min</td><td><a href="#hash">resumo</a>, <a href="#colisao">colisão</a>, <a href="#xor-simples">XOR</a></td></tr>
+      <tr><td>2.2</td><td>Quanto custa achar uma colisão?</td><td>23 min</td><td><a href="#ataques">três ataques</a>, <a href="#aniversario">aniversário</a></td></tr>
+      <tr><td>2.3</td><td>Por que o resumo da autenticação precisa ser protegido?</td><td>27 min</td><td><a href="#mac">MAC</a>, <a href="#cadeia">cadeia</a>, <a href="#hmac">HMAC</a></td></tr>
+    </tbody>
+  </table></div>
+  <div class="cs-uso">
+    <h3>A pergunta de abertura (slide 6)</h3>
+    <p>"Por que o valor de hash usado para autenticar uma mensagem precisa ser protegido?" O professor pede para anotar a resposta antes; a parte 2.3 responde. Em três frases:</p>
+    <ol>
+      <li>A função de hash não tem chave: qualquer pessoa calcula H de qualquer mensagem.</li>
+      <li>No slide, a Alice manda SIM com o resumo 8. O Mallory troca por NAO, calcula H(NAO) = 7 e manda NAO com 7. O Bob confere 7 = 7 e aceita.</li>
+      <li>Para o Bob perceber, o resumo tem de depender de algo que o Mallory não tem: encriptado com uma chave ou misturado com um segredo (<a href="#mac">MAC</a>, <a href="#hmac">HMAC</a>).</li>
+    </ol>
+    <h3>As perguntas soltas dos slides</h3>
+    <ul class="b">
+      <li>Slide 4, "para que serve uma função de hash?": para calcular um código curto e de tamanho fixo que representa a entrada inteira. Os quatro usos do livro estão em <a href="#usos">para que serve</a>.</li>
+      <li>Slide 7, "uma função de infinitas mensagens em 2²⁵⁶ valores pode ser injetora?": não. Injetora exige uma saída diferente para cada entrada, e faltam saídas (<a href="#colisao">casa dos pombos</a>).</li>
+      <li>Slide 10, "códigos iguais provam arquivos iguais?": não provam, porque colisões existem. Na prática, achar dois arquivos com o mesmo SHA-256 custa cerca de 2¹²⁸ cálculos, então resumo igual é evidência forte. E só vale se o código publicado for confiável.</li>
+      <li>Slide 23, "numa sala com 23 pessoas, a chance de dois aniversários iguais passa de metade?": passa, 0,5073. O que cresce depressa são os pares: 253 (<a href="#aniversario">aniversário</a>).</li>
+      <li>Slide 43, "o que o atacante precisa achar e quanto custa a busca?": uma entrada que sirva; em média ele testa metade das candidatas (<a href="#ataques">busca</a>).</li>
+      <li>Slide 49, "como a função lê uma mensagem de qualquer tamanho?": em blocos de tamanho fixo, numa cadeia, depois de completar o último bloco (<a href="#cadeia">cadeia</a>, <a href="#preenchimento">preenchimento</a>).</li>
+    </ul>
+    <h3>Prática deliberada no sistema</h3>
+    <p>Três pausas de 8 a 10 min, em duplas, cada uma numa aba do sistema "Funções de hash e integridade". A devolutiva do professor aponta os erros abaixo; os exercícios parecidos estão <a href="#atividades">resolvidos</a>.</p>
+    <div class="tbl prose"><table>
+      <thead><tr><th>Aba</th><th>Alvo</th><th>Erro que a devolutiva procura</th></tr></thead>
+      <tbody>
+        <tr><td>1 · O resumo</td><td>Resumos com a régua, colisões, H é injetora?</td><td>Esquecer de guardar só o resto. Achar que resumo igual prova arquivo igual.</td></tr>
+        <tr><td>2 · O aniversário</td><td>Contar pares, custo da pré-imagem e da colisão</td><td>Esquecer de dividir os pares por 2. Usar 2ⁿᐟ² na pré-imagem.</td></tr>
+        <tr><td>3 · A cadeia e a chave</td><td>Cadeia e HMAC de brinquedo, colisões na cadeia</td><td>Somar os blocos. Não saber dizer por que o Mallory não refaz o HMAC sem a chave.</td></tr>
+      </tbody>
+    </table></div>
+    <h3>Dossiês secretos: a atividade em grupo do apêndice</h3>
+    <p>Atividade opcional (slide 42): um dossiê por grupo, um bloco por dupla, 10 min no papel. Depois o professor sorteia a letra do grupo e uma pessoa explica em 2 min. A e B estudam as colisões e os três ataques; C, D e E estudam o sal, os pares e a cadeia continuada.</p>
+    <details class="ds-item"><summary>Grupo A · colisões (2 min)</summary>
+      <ul class="b">
+        <li>O resumo tem n bits: só 2ⁿ valores. As mensagens são infinitas. Mais pombos que casas: pelo menos duas mensagens caem no mesmo resumo.</li>
+        <li>Exemplo com o hash de brinquedo (soma das letras, resto por 10): SIM = 18 + 8 + 12 = 38 → 8 e BIT = 1 + 8 + 19 = 28 → 8. Colidem.</li>
+        <li>A soma nem vê a ordem: AB e BA dão 1.</li>
+        <li>Fecho: toda função de hash tem colisões. A segurança vem de ser caro achá-las.</li>
+      </ul>
+    </details>
+    <details class="ds-item"><summary>Grupo B · os três ataques (2 min)</summary>
+      <ul class="b">
+        <li>Pré-imagem: me dão o resumo h, eu procuro uma M com H(M) = h. Segunda pré-imagem: me dão uma M, eu procuro outra com o mesmo resumo. Colisão: eu escolho as duas.</li>
+        <li>Na pré-imagem, testo em média metade das 2ⁿ candidatas: 2ⁿ⁻¹. Na colisão, comparo pares, e os pares crescem com o quadrado: 2ⁿᐟ² basta.</li>
+        <li>No SHA-256: pré-imagem 2²⁵⁵, colisão 2¹²⁸. A colisão é o ataque mais barato.</li>
+      </ul>
+    </details>
+    <details class="ds-item"><summary>Grupo C · o sal (2 min)</summary>
+      <ul class="b">
+        <li>Sem sal, o atacante calcula o resumo de cada PIN uma vez e compara com todos os registros: 10⁶ cálculos, 0,001 s a 10⁹ por segundo.</li>
+        <li>Com um sal diferente por registro, a conta muda de registro para registro: 10⁶ × 10⁶ = 10¹² cálculos, 1.000 s.</li>
+        <li>Fecho: o sal não fortalece a senha; ele multiplica o trabalho pelo número de registros. Para senha de verdade, derivação lenta (bcrypt, Argon2).</li>
+      </ul>
+    </details>
+    <details class="ds-item"><summary>Grupo D · os pares (2 min)</summary>
+      <ul class="b">
+        <li>Com q pessoas há q(q − 1)/2 pares. 23 pessoas: 23 × 22 / 2 = 253 pares.</li>
+        <li>Chance de ninguém repetir: 365/365 × 364/365 × … × 343/365 = 0,4927. Então repetir é 0,5073: mais que metade.</li>
+        <li>Num resumo de n bits, a colisão aparece com uns 2ⁿᐟ² resumos: a raiz do espaço.</li>
+      </ul>
+    </details>
+    <details class="ds-item"><summary>Grupo E · a cadeia continuada (2 min)</summary>
+      <ul class="b">
+        <li>A cadeia faz h₀ = IV e hᵢ = f(hᵢ₋₁, mᵢ). O resumo é o último estado.</li>
+        <li>Se o site publica H(K ‖ M), publica o estado da cadeia. Com o resumo 6 e o bloco 5: 3·6 + 5 = 23 → 3. O Mallory tem o resumo de K ‖ M ‖ 5 sem saber K.</li>
+        <li>O HMAC resolve com duas passadas: o resumo de dentro nunca sai, e o de fora começa com outra parte da chave.</li>
+      </ul>
+    </details>
+    <h3>Depois do encontro</h3>
+    <ul class="b">
+      <li>Abas 1 a 3 do sistema "Funções de hash e integridade". Feedback na Adalove.</li>
+      <li>Leitura indicada no slide 39: Stallings (2015), §§11.1–11.3, §11.5 e §12.5.</li>
+      <li>Semana 9: criptografia simétrica ("cifrar muitos dados com chave curta", cap. 3, 5 e 6). Semana 10: chave pública e RSA.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= Base ================= -->
+<section class="cs" id="leia-como" data-grupo="Base" data-termos="">
+  <h2>Antes de começar: como ler os símbolos</h2>
+  <p class="cs-def">Os slides trazem a leitura de cada símbolo embaixo dele. Esta tabela junta todos, na ordem em que aparecem; cada um é explicado na seção indicada.</p>
+  <div class="tbl prose"><table>
+    <thead><tr><th>Escrito</th><th>Leia como</th><th>Exemplo</th><th>Seção</th></tr></thead>
+    <tbody>
+      <tr><td>{0, 1}ⁿ</td><td>as sequências de exatamente n bits</td><td>{0, 1}² = {00, 01, 10, 11}</td><td><a href="#bits">bits</a></td></tr>
+      <tr><td>{0, 1}*</td><td>zero-um estrela: as sequências de bits de qualquer tamanho</td><td>0, 1, 00, 101, …</td><td><a href="#hash">resumo</a></td></tr>
+      <tr><td>H : {0, 1}* → {0, 1}ⁿ</td><td>H leva qualquer sequência de bits a uma de n bits</td><td>SHA-256: n = 256</td><td><a href="#hash">resumo</a></td></tr>
+      <tr><td>h = H(M)</td><td>h é igual a H de M: o resumo de M</td><td>H(NAO) = 7</td><td><a href="#hash">resumo</a></td></tr>
+      <tr><td>2²⁵⁶</td><td>2 elevado a 256</td><td>2⁴ = 16</td><td></td></tr>
+      <tr><td>M′, M ≠ M′</td><td>M linha; M diferente de M linha</td><td>SIM ≠ BIT</td><td><a href="#colisao">colisão</a></td></tr>
+      <tr><td>|A| &gt; |B|</td><td>A tem mais elementos que B</td><td>|{A, …, Z}| = 26</td><td><a href="#colisao">colisão</a></td></tr>
+      <tr><td>⊕</td><td>XOR, "ou exclusivo"</td><td>1011 ⊕ 0110 = 1101</td><td><a href="#bits">bits</a></td></tr>
+      <tr><td>H⁻¹(h)</td><td>imagem inversa de h: o conjunto das M com H(M) = h</td><td>H⁻¹(7) = {H, R}</td><td><a href="#ataques">ataques</a></td></tr>
+      <tr><td>{ M : H(M) = h }</td><td>o conjunto das mensagens M tais que H de M é h</td><td></td><td><a href="#ataques">ataques</a></td></tr>
+      <tr><td>Pr[…], ≈, ⋯</td><td>probabilidade de…, aproximadamente, e assim por diante</td><td>Pr[repetição] ≈ 0,51</td><td><a href="#aniversario">aniversário</a></td></tr>
+      <tr><td>q(q − 1)/2</td><td>q vezes q menos 1, sobre 2</td><td>23·22/2 = 253</td><td><a href="#aniversario">aniversário</a></td></tr>
+      <tr><td>M ‖ S</td><td>M concatenado com S: um depois do outro</td><td>10 ‖ 11 = 1011</td><td><a href="#bits">bits</a></td></tr>
+      <tr><td>E(K, H(M))</td><td>E de K e H de M: encripta o resumo com a chave K</td><td></td><td><a href="#mac">MAC</a></td></tr>
+      <tr><td>IV, hᵢ = f(hᵢ₋₁, mᵢ)</td><td>valor inicial; h índice i é f de h índice i menos 1 e m índice i</td><td>h₁ = f(0, 3) = 3</td><td><a href="#cadeia">cadeia</a></td></tr>
+      <tr><td>ℓ</td><td>"ele", a letra l cursiva: o tamanho da mensagem em bits</td><td>ℓ = 200</td><td><a href="#preenchimento">preenchimento</a></td></tr>
+      <tr><td>HMAC(K, ·)</td><td>HMAC de K, ponto: a chave fixa, a entrada livre</td><td></td><td><a href="#hmac">HMAC</a></td></tr>
+      <tr><td>a mod n</td><td>o resto de a dividido por n</td><td>17 mod 10 = 7</td><td><a href="/m8/mat/01-fundamentos-criptografia/consulta#resto">aula 01</a></td></tr>
+    </tbody>
+  </table></div>
+  <div class="cs-uso">
+    <p>A régua da semana 6 volta no hash de brinquedo: cada letra vale a sua posição, começando do zero.</p>
+    <div class="tbl prose"><table class="regua">
+      <tbody>
+        <tr><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td><td>G</td><td>H</td><td>I</td><td>J</td><td>K</td><td>L</td><td>M</td></tr>
+        <tr><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td></tr>
+        <tr><td>N</td><td>O</td><td>P</td><td>Q</td><td>R</td><td>S</td><td>T</td><td>U</td><td>V</td><td>W</td><td>X</td><td>Y</td><td>Z</td></tr>
+        <tr><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<section class="cs" id="revisao-funcao" data-grupo="Base" data-termos="">
+  <h2>Revisão: injetora, sobrejetora e bijetora</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 140">
+    <text x="40" y="20">1</text><text x="40" y="48">2</text><text x="40" y="76">3</text><text x="40" y="104">4</text>
+    <text class="tb" x="196" y="42">a</text><text class="tb" x="196" y="86">b</text>
+    <path class="s" d="M48 20 L188 40" marker-end="url(#mnarrow)"/><path class="s" d="M48 76 L188 44" marker-end="url(#mnarrow)"/>
+    <path class="am" style="fill:none" d="M48 48 L188 84" marker-end="url(#mnarrow)"/><path class="am" style="fill:none" d="M48 104 L188 88" marker-end="url(#mnarrow)"/>
+    <text class="tm" x="120" y="128">4 entradas, 2 saídas: repete com certeza</text>
+  </svg>g do slide 8: todo mundo recebe flecha, mas 1 e 3 dividem o a.</aside>
+  <p class="cs-def">Revisão da semana 6, que a aula usa o tempo todo. Uma função é <a href="/m8/mat/01-fundamentos-criptografia/consulta#bijecao">injetora</a> quando entradas diferentes dão saídas diferentes, sobrejetora quando todo elemento do contradomínio recebe flecha, e bijetora quando é as duas coisas; só a bijetora tem inversa.</p>
+  <div class="cs-uso">
+    <p>Exercício do slide 8: g : {1, 2, 3, 4} → {a, b}, com g(1) = g(3) = a e g(2) = g(4) = b.</p>
+    <ul class="b">
+      <li>g é injetora? Não: 1 ≠ 3, mas g(1) = g(3).</li>
+      <li>g é sobrejetora? Sim: a e b recebem flecha.</li>
+      <li>g tem inversa? Não: não é bijetora. Se você está no a, não sabe se veio do 1 ou do 3.</li>
+    </ul>
+    <p>A pergunta que o slide 7 deixa para a parte 2.1: uma função de infinitas mensagens em 2²⁵⁶ valores pode ser injetora? Guarde o exemplo do g: quatro entradas não cabem sem repetir em duas saídas. A resposta está em <a href="#colisao">colisão</a>.</p>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Sobrejetora não implica injetora. O g cobre as duas saídas e mesmo assim repete.</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="bits" data-grupo="Base" data-termos="cr-bit,cr-hex,cr-xor,cr-concatenacao,cr-rotacao">
+  <h2>Bits, hexadecimal e XOR</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 170">
+    <text class="tm" x="120" y="12">XOR coluna por coluna</text>
+    <text class="st" x="40" y="36" style="font-family:var(--f-mono)">  1 0 1 1</text>
+    <text class="st" x="40" y="58" style="font-family:var(--f-mono)">⊕ 0 1 1 0</text>
+    <line class="s" x1="40" y1="68" x2="150" y2="68"/>
+    <text class="st tb" x="40" y="84" style="font-family:var(--f-mono)">  1 1 0 1</text>
+    <text class="tm" x="196" y="58">iguais → 0</text><text class="tm" x="196" y="76">diferentes → 1</text>
+    <text class="tm" x="120" y="112">hexadecimal: 4 bits por dígito</text>
+    <text class="st" x="30" y="134" style="font-family:var(--f-mono)">1011 0110 = b6</text>
+    <text class="tm" x="120" y="160">256 bits = 64 dígitos = 32 bytes</text>
+  </svg>O XOR soma coluna por coluna sem "vai um".</aside>
+  <p class="cs-def">Um <b>bit</b> é um 0 ou um 1; oito bits formam um byte. Resumos são escritos em <b>hexadecimal</b>, que usa 16 símbolos (0 a 9 e a a f) e guarda 4 bits por dígito. O <b>XOR</b> de dois bits dá 1 quando eles são diferentes e 0 quando são iguais.</p>
+  <div class="cs-formula">
+    <div class="formula">0 ⊕ 0 = 0 &nbsp; 0 ⊕ 1 = 1 &nbsp; 1 ⊕ 0 = 1 &nbsp; 1 ⊕ 1 = 0</div>
+    <p>Em blocos, o XOR opera bit a bit, coluna por coluna. É a soma módulo 2 sem "vai um".</p>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Exemplo resolvido do slide 16: 1011 ⊕ 0110 = 1101. Coluna a coluna: 1 e 0 dão 1, 0 e 1 dão 1, 1 e 1 dão 0, 1 e 0 dão 1.</li>
+      <li>Por que 4 bits por dígito hexadecimal: 16 = 2⁴. Então 0000 = 0, 1001 = 9, 1010 = a, 1111 = f. O SHA-256 tem 256/4 = 64 dígitos.</li>
+      <li>Duas propriedades que o Mallory usa: x ⊕ x = 0 e x ⊕ 0 = x. Fazer XOR duas vezes com o mesmo valor desfaz: (x ⊕ y) ⊕ y = x.</li>
+      <li><b>Concatenação</b>, escrita ‖, põe uma sequência de bits depois da outra: 10 ‖ 11 = 1011. K ‖ M é a chave seguida da mensagem.</li>
+      <li><b>Rotação</b> à esquerda de 1 bit: o bit da ponta esquerda sai e volta pela direita. 1011 vira 0111. Nada se perde, ao contrário do deslocamento, que joga o bit fora e põe 0 no lugar.</li>
+      <li>Letra vira bits pelo código ASCII: a = 97 = 0x61 = 01100001. O "0x" avisa que o número está em hexadecimal.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Dividir os bits por 8 dá bytes, e não dígitos hexadecimais. 256 bits são 32 bytes e 64 dígitos (slide 13).</li>
+    <li>XOR não é OU: 1 ou 1 é 1, mas 1 ⊕ 1 é 0.</li>
+  </ul></div>
+</section>
+
+<!-- ================= 2.1 O resumo ================= -->
+<section class="cs" id="hash" data-grupo="2.1 · O resumo e as colisões" data-termos="cr-funcao-hash,cr-resumo,cr-digito-verificador,cr-avalanche">
+  <h2>Função de hash: um resumo de tamanho fixo</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150">
+    <rect class="k" x="6" y="10" width="34" height="24" rx="4"/><rect class="k" x="42" y="10" width="34" height="24" rx="4"/><rect class="k" x="78" y="10" width="34" height="24" rx="4"/><rect class="k" x="114" y="10" width="34" height="24" rx="4"/><text class="tm" x="168" y="22">…</text>
+    <text class="tm" x="90" y="48">mensagem: qualquer tamanho</text>
+    <path class="s" d="M120 56 V78" marker-end="url(#mnarrow)"/>
+    <rect class="bl" x="98" y="80" width="44" height="28" rx="6"/><text class="tb" x="120" y="94">H</text>
+    <path class="s" d="M120 110 V124" marker-end="url(#mnarrow)"/>
+    <rect class="acf" x="70" y="126" width="100" height="20" rx="4"/><text x="120" y="136" style="font-size:11px">n bits</text>
+  </svg>Figura 11.1 do livro, como no slide 12: entra qualquer tamanho, sai sempre n bits.</aside>
+  <p class="cs-def">Uma <b>função de hash</b> H leva uma mensagem M de qualquer tamanho a um valor de hash h de n bits, sempre o mesmo para a mesma M. O valor de hash também se chama <b>resumo</b> (em inglês, digest).</p>
+  <div class="cs-formula">
+    <div class="formula">H : {0, 1}* → {0, 1}ⁿ, &nbsp; h = H(M)</div>
+    <p>Domínio {0, 1}*: as mensagens de qualquer tamanho, infinitas. Contradomínio {0, 1}ⁿ: só 2ⁿ resumos possíveis. H é determinística: calcular duas vezes dá o mesmo resultado.</p>
+  </div>
+  <div class="cs-uso">
+    <h3>O download (slide 10)</h3>
+    <p>Você baixou um instalador. Ao lado do link há um código de 64 dígitos. Você calcula o resumo do arquivo baixado e compara com o publicado: iguais, o arquivo chegou sem alteração, desde que o código publicado seja confiável (<a href="#usos">referência confiável</a>).</p>
+    <h3>De onde vem a ideia: o dígito verificador</h3>
+    <p>O vídeo da UNIVESP começa por um primo pobre do hash: o <b>dígito verificador</b> do CPF e do boleto. Uma versão simplificada (o CPF real usa a mesma ideia com outra regra final):</p>
+    <ul class="b">
+      <li>Números 2 3 5 9 2, pesos 2 3 4 5 6: 2·2 + 3·3 + 5·4 + 9·5 + 2·6 = 4 + 9 + 20 + 45 + 12 = 90. 90 = 8·11 + 2, dígito verificador 2.</li>
+      <li>Erro de digitação (troque o 5 por 6): a soma vira 94 e o resto vira 6. Pegou o erro.</li>
+      <li>Ataque de propósito: some 1 no número de peso 4 (+4) e tire 2 do número de peso 2 (−4). 0 3 6 9 2 dá 90 de novo, resto 2. Passa. O dígito protege contra acidente, não contra quem quer enganar.</li>
+    </ul>
+    <h3>Um hash de brinquedo e um de verdade</h3>
+    <ul class="b">
+      <li>O vídeo do Practical Networking soma a posição das letras (a = 1): hello = 8 + 5 + 12 + 12 + 15 = 52; cello = 47. Serve para comparar, mas tem defeitos: a saída cresce com o tamanho da mensagem e uma letra trocada muda pouco o número.</li>
+      <li>Função de hash de verdade: o SHA-256 de CASA e o de CASC (slide 13).</li>
+    </ul>
+    <p class="mono">CASA → b28b9584a67d8c0dcb79a857d39ad92a2d2566f081bc5296df67feec251ac9fc<br>CASC → 884cbb6997d6f80b8e4f72169d8a8126cfb716ed42e794bf177384e7ea324500</p>
+    <ul class="b">
+      <li>Uma letra mudou na entrada; na saída, 117 dos 256 bits mudaram. Isso é o <b>efeito avalanche</b>: uma mudança pequena na mensagem muda cerca de metade dos bits do resumo, e o resumo não dá pista nenhuma de como era a mensagem.</li>
+      <li>Por dentro, a avalanche vem da repetição: o algoritmo mistura os bits por muitas rodadas, e a diferença que começa pequena se espalha (vídeo do Practical Networking; detalhes em <a href="#sha512">SHA-512 por dentro</a>).</li>
+    </ul>
+  </div>
+  <p class="prova">Função de hash: H : {0, 1}* → {0, 1}ⁿ, h = H(M). Domínio infinito, contradomínio com 2ⁿ elementos; H é determinística e o valor de hash também se chama resumo.</p>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Hash não é encriptação: não tem chave e não tem volta. Ninguém "decripta" um resumo.</li>
+    <li>"Determinística" não quer dizer "previsível": você sabe que CASA dá sempre o mesmo resumo, mas não adivinha qual é sem fazer a conta.</li>
+  </ul></div>
+  <div class="widget prose" id="avalanche">
+    <div class="wrow"><span class="resp">Efeito avalanche</span><span class="muted">mude uma letra e veja quantos bits mudam</span></div>
+    <div class="wrow">
+      <input type="text" id="av-a" value="CASA" spellcheck="false" aria-label="primeira mensagem">
+      <input type="text" id="av-b" value="CASC" spellcheck="false" aria-label="segunda mensagem">
+      <label>função <select id="av-alg"><option>SHA-256</option><option>SHA-512</option><option>SHA-1</option></select></label>
+    </div>
+    <div id="av-saida" aria-live="polite"></div>
+    <div id="av-grade" aria-hidden="true"></div>
+  </div>
+  <div class="curio"><p>"Hash" vem do francês hacher, "picar": é o mesmo hash do hash brown, a batata picada. Na computação, a ideia de picar a chave para espalhá-la numa tabela apareceu num memorando interno da IBM de Hans Peter Luhn, em 1953. O mesmo Luhn inventou o dígito verificador dos cartões de crédito, o "algoritmo de Luhn".</p><p class="cs-fonte">Donald Knuth, The Art of Computer Programming, vol. 3, §6.4 (notas históricas).</p></div>
+</section>
+
+<section class="cs" id="usos" data-grupo="2.1 · O resumo e as colisões" data-termos="cr-assinatura-digital,cr-referencia-confiavel">
+  <h2>Para que serve: quatro usos e uma condição</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 170">
+    <text class="tm" x="64" y="12">página original</text><text class="tm" x="180" y="12">página trocada</text>
+    <rect class="gr" x="20" y="22" width="88" height="26" rx="5"/><text x="64" y="35" style="font-size:11px">arquivo</text>
+    <rect class="gr" x="20" y="54" width="88" height="26" rx="5"/><text x="64" y="67" style="font-size:11px">resumo 4e7a…</text>
+    <rect class="rd" x="136" y="22" width="88" height="26" rx="5"/><text x="180" y="35" style="font-size:11px">arquivo falso</text>
+    <rect class="rd" x="136" y="54" width="88" height="26" rx="5"/><text x="180" y="67" style="font-size:11px">resumo b0c2…</text>
+    <text class="tam" x="120" y="104">troca os dois juntos</text>
+    <text class="tm" x="120" y="124">H(falso) = b0c2…: a conferência passa</text>
+    <text class="tm" x="120" y="152">o resumo precisa vir de outro lugar</text>
+  </svg>Slide 11: quem troca o arquivo na página troca também o resumo.</aside>
+  <p class="cs-def">Nos quatro usos do livro, a função de hash calcula um código curto e de tamanho fixo para a entrada inteira, e quem confere compara códigos em vez de comparar a entrada. O código só protege se vier de uma <b>referência confiável</b>, um lugar que o atacante não consegue alterar.</p>
+  <div class="cs-uso">
+    <div class="tbl prose"><table>
+      <thead><tr><th>Uso (slide 5)</th><th>O que o hash faz</th><th>Onde aprofundar</th></tr></thead>
+      <tbody>
+        <tr><td>Autenticar mensagens</td><td>O Bob confere se a mensagem chegou intacta e veio da Alice.</td><td><a href="#mac">MAC</a>, <a href="#hmac">HMAC</a></td></tr>
+        <tr><td><b>Assinatura digital</b></td><td>A assinatura protege o resumo, e não o arquivo inteiro.</td><td>abaixo</td></tr>
+        <tr><td>Arquivo de senhas</td><td>O sistema guarda o resumo da senha, e não a senha.</td><td><a href="#sal">sal</a></td></tr>
+        <tr><td>Intrusão e vírus</td><td>O resumo H(F) de cada arquivo fica guardado num local seguro; se um vírus mexer em F, o resumo muda.</td><td>abaixo</td></tr>
+      </tbody>
+    </table></div>
+    <ul class="b">
+      <li>Assinatura digital: a Alice encripta o resumo com a chave privada dela (<a href="/m8/mat/01-fundamentos-criptografia/consulta#rsa">RSA</a>, semana 10). Qualquer um confere com a chave pública, e só ela podia ter assinado. Assinar o resumo sai muito mais barato que assinar um arquivo de gigabytes. Por isso colisão é grave aqui: se duas mensagens têm o mesmo resumo, a assinatura de uma vale para a outra (vídeo da UNIVESP).</li>
+      <li>Intrusão e vírus: o livro guarda os resumos num local seguro. O resumo, sozinho, fica no mesmo lugar que o arquivo e pode ser trocado junto.</li>
+      <li>O livro cita ainda dois usos: construir uma função pseudoaleatória e um gerador de números pseudoaleatórios (<a href="#aleatorios">números aleatórios</a>).</li>
+      <li>No torrent (vídeo da UNIVESP), o arquivo .torrent traz o resumo de cada pedaço. Você baixa pedaços de desconhecidos, calcula o resumo de cada um e joga fora o que não bate.</li>
+    </ul>
+    <h3>O resumo protege só com uma referência confiável (slide 11)</h3>
+    <ul class="b">
+      <li>O resumo e o arquivo vieram do mesmo lugar: quem troca um troca o outro.</li>
+      <li>Sem chave, qualquer pessoa calcula o resumo. Ele não identifica quem enviou.</li>
+      <li>Por isso o resumo de um download tem de vir por um canal seguro: outro site, uma página com HTTPS de quem publica, ou uma assinatura.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>"Usei SHA-256, então está seguro" falha no slide 38: o invasor troca o arquivo e o SHA-256 da página, e a conferência passa. A força do hash não resolve a referência.</li>
+    <li>O resumo protege a integridade. A autenticação (de quem veio) pede uma chave.</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="colisao" data-grupo="2.1 · O resumo e as colisões" data-termos="cr-colisao,cr-pombos">
+  <h2>Colisões: por que toda função de hash tem</h2>
+  <aside class="mn loop" data-loop="pombos" data-ms="9000" data-still="0.9" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>10 resumos, 11 mensagens: duas dividem a gaveta.</aside>
+  <p class="cs-def">Duas mensagens diferentes com o mesmo resumo formam uma <b>colisão</b>. Pela <b>casa dos pombos</b>, se o domínio tem mais elementos que o contradomínio, nenhuma função é injetora; como as mensagens são infinitas e os resumos são 2ⁿ, toda função de hash tem colisões.</p>
+  <div class="cs-formula">
+    <div class="formula">M ≠ M′ e H(M) = H(M′)</div>
+    <p>Lê-se "M diferente de M linha e H de M igual a H de M linha".</p>
+    <div class="formula">|A| &gt; |B| ⟹ nenhuma f : A → B é injetora</div>
+    <p>Se as entradas de b bits se espalham por igual nos 2ⁿ resumos, cada resumo recebe 2ᵇ/2ⁿ = 2ᵇ⁻ⁿ mensagens.</p>
+  </div>
+  <div class="cs-uso">
+    <h3>O hash de brinquedo (slide 14)</h3>
+    <p>Cada letra vale o seu número na régua. Some e guarde o resto por 10.</p>
+    <div class="tbl prose"><table>
+      <thead><tr><th>Mensagem</th><th>Soma</th><th>Resto por 10</th></tr></thead>
+      <tbody>
+        <tr><td>SIM</td><td>18 + 8 + 12 = 38 = 3·10 + 8</td><td>8</td></tr>
+        <tr><td>NAO</td><td>13 + 0 + 14 = 27 = 2·10 + 7</td><td>7</td></tr>
+        <tr><td>BIT</td><td>1 + 8 + 19 = 28 = 2·10 + 8</td><td>8</td></tr>
+      </tbody>
+    </table></div>
+    <ul class="b">
+      <li>SIM e BIT colidem: a função de brinquedo não é injetora.</li>
+      <li>Com uma letra só também: H vale 7 e R vale 17 = 1·10 + 7. Os dois dão 7.</li>
+      <li>Por que não dá para escapar: são 10 resumos. Na 11ª mensagem, pelo menos uma gaveta já tem dono (o desenho ao lado).</li>
+      <li>O vídeo do Practical Networking faz o mesmo com um resumo inventado de 3 bits: 2³ = 8 resumos possíveis. Oito mensagens podem cair em resumos diferentes; a nona colide com certeza. Resumo maior não evita colisões, só as torna mais raras.</li>
+      <li>Com o SHA-256 vale o mesmo raciocínio, só que com 2²⁵⁶ gavetas. As colisões existem; ninguém sabe apontar uma.</li>
+      <li>Para um hash ideal, a chance de dois resumos específicos coincidirem é 1/2ⁿ (1/2²⁵⁶ no SHA-256, slide 3).</li>
+    </ul>
+  </div>
+  <p class="prova">Colisão: duas mensagens M ≠ M′ com H(M) = H(M′). Uma função com colisão não é injetora. Pela casa dos pombos, toda função de hash tem colisões: resumos iguais não provam mensagens iguais.</p>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Vote extra (slide 17): com 26 letras e 10 resumos, H pode ser sobrejetora (A a J cobrem 0 a 9), mas não injetora (H(A) = H(K) = 0). Mais entradas que saídas proíbe só a injetora.</li>
+    <li>O vídeo da Simplilearn chama de "colisão" dois usuários com a mesma senha. Não é: a mesma entrada dar o mesmo resumo é o hash funcionando. Colisão exige entradas diferentes.</li>
+    <li>O vídeo do Practical Networking diz que o resumo é "único" para a mensagem. Pela casa dos pombos, não é; ele só é difícil de repetir de propósito.</li>
+  </ul></div>
+  <div class="curio"><p>O princípio da casa dos pombos é atribuído a Dirichlet, que o usou em 1834 com o nome de Schubfachprinzip, "princípio das gavetas". Por isso o slide desenha escaninhos. "Pombos" vem do inglês pigeonhole, o escaninho de correspondência, que lembra um pombal.</p><p class="cs-fonte">Jeff Miller, Earliest Known Uses of Some of the Words of Mathematics, verbete "pigeonhole principle".</p></div>
+</section>
+
+<section class="cs" id="xor-simples" data-grupo="2.1 · O resumo e as colisões" data-termos="cr-lrc">
+  <h2>XOR de blocos: uma função de hash simples demais</h2>
+  <p class="cs-def">A função de hash mais simples do livro (§11.2) parte a mensagem em blocos de n bits e faz o XOR de todos: o resultado é o resumo. Ela pega erros acidentais, mas qualquer um fabrica uma mensagem com o resumo que quiser.</p>
+  <div class="cs-formula">
+    <div class="formula">Cᵢ = bᵢ₁ ⊕ bᵢ₂ ⊕ ⋯ ⊕ bᵢₘ</div>
+    <p>Cᵢ é o bit i do resumo; bᵢⱼ é o bit i do bloco j; m é o número de blocos. Cada coluna é um bit de paridade: o livro chama isso de <b>verificação de redundância longitudinal</b> (LRC).</p>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Exemplo do slide 16: blocos 1011, 0110 e 1100. 1011 ⊕ 0110 ⊕ 1100 = 0001.</li>
+      <li>O Mallory escolhe 1111 e 0000 à vontade e calcula o terceiro bloco: 1111 ⊕ 0000 ⊕ 0001 = 1110. A mensagem dele (1111, 0000, 1110) também dá 0001. Ele usou x ⊕ x = 0: o bloco forjado cancela tudo o que veio antes e deixa o resumo desejado.</li>
+      <li>Contra erro aleatório, funciona razoavelmente: se os dados forem aleatórios, a chance de um erro passar despercebido é 2⁻ⁿ.</li>
+      <li>Com dados formatados, piora. Em texto ASCII o bit mais alto de cada byte é sempre 0, então os bits do resumo nessas posições são sempre 0: num resumo de 128 bits, a eficácia cai de 2⁻¹²⁸ para 2⁻¹¹².</li>
+      <li>A melhoria do livro gira o resumo 1 bit para a esquerda antes de cada XOR. Agora a ordem dos blocos importa e os dados ficam mais espalhados. Mas o Mallory continua forjando: ele calcula o último bloco do mesmo jeito (passos 6 e 7 da figura).</li>
+      <li>O livro mostra ainda que nem encriptar a mensagem e o resumo juntos (no modo CBC, que vem na semana 9) salva essa função: dá para permutar os blocos cifrados sem mudar o resumo.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>O XOR não vê a ordem: 1011, 0110, 1100 e 1100, 0110, 1011 dão o mesmo resumo. É o mesmo defeito do AB e BA no hash de brinquedo.</li>
+  </ul></div>
+  <figure class="fig" id="fig-xor">
+    <div class="fig-head"><span class="fig-title">Figura 1 · XOR de blocos e o bloco forjado do Mallory</span><div class="fig-tabs"></div></div>
+    <div class="fig-body">
+      <div class="fig-stage"><svg id="xor-svg" viewBox="0 0 640 300"></svg></div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+</section>
+
+<!-- ================= 2.2 O aniversário ================= -->
+<section class="cs" id="ataques" data-grupo="2.2 · O aniversário" data-termos="cr-imagem-inversa,cr-pre-imagem,cr-segunda-pre-imagem,cr-resistencia">
+  <h2>A imagem inversa e os três ataques</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 180">
+    <text class="tm" x="40" y="12">fixado</text><text class="tm" x="168" y="12">o atacante procura</text>
+    <rect class="k" x="4" y="22" width="72" height="40" rx="6"/><text x="40" y="36" style="font-size:11px">o resumo h</text><text class="tm" x="40" y="52">pré-imagem</text>
+    <text x="168" y="42" style="font-size:11px">M com H(M) = h</text>
+    <rect class="k" x="4" y="72" width="72" height="40" rx="6"/><text x="40" y="86" style="font-size:11px">a mensagem M</text><text class="tm" x="40" y="102">2ª pré-imagem</text>
+    <text x="168" y="92" style="font-size:11px">M′ ≠ M, mesmo resumo</text>
+    <rect class="am" x="4" y="122" width="72" height="40" rx="6"/><text x="40" y="136" style="font-size:11px">nada</text><text class="tm" x="40" y="152">colisão</text>
+    <text x="168" y="142" style="font-size:11px">quaisquer M ≠ M′</text>
+    <text class="tam" x="168" y="174">menos fixado, mais barato</text>
+  </svg>Tabela 11.1 do livro, como no slide 22.</aside>
+  <p class="cs-def">A <b>imagem inversa</b> H⁻¹(h) é o conjunto das mensagens cujo resumo é h; cada uma é uma <b>pré-imagem</b> de h. Os três ataques mudam o que fica fixado: o resumo (pré-imagem), uma mensagem (<b>segunda pré-imagem</b>) ou nada (colisão). Uma função de hash criptográfica tem de ter <b>resistência</b> aos três.</p>
+  <div class="cs-formula">
+    <div class="formula">H⁻¹(h) = { M : H(M) = h }</div>
+    <p>Lê-se "o conjunto das mensagens M tais que H de M é igual a h". No hash de brinquedo, H⁻¹(7) = {H, R} nas mensagens de uma letra.</p>
+    <div class="formula">busca: em média, metade das candidatas &nbsp;→&nbsp; pré-imagem de n bits: 2ⁿ/2 = 2ⁿ⁻¹ testes</div>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Pré-imagem: dado h, ache M com H(M) = h. É o que um ladrão de senhas quer: ele tem o resumo guardado e procura uma senha que dê aquele resumo.</li>
+      <li>Segunda pré-imagem: dada M, ache M′ ≠ M em H⁻¹(H(M)). É o falsificador que tem um contrato e quer outro com o mesmo resumo.</li>
+      <li>Colisão: ache dois elementos de um mesmo H⁻¹(h), qualquer h. É o ataque mais barato, porque o atacante tem toda a liberdade.</li>
+      <li>A busca (slide 44): o atacante testa candidatas uma de cada vez e, em média, acerta na metade. PIN de 6 dígitos: 10⁶ candidatas, 500.000 testes em média. Resumo de n bits: 2ⁿ candidatas, 2ⁿ⁻¹ testes. 2²⁵⁶ tem 78 algarismos.</li>
+      <li>Pré-imagem difícil é o que faz do hash uma <a href="/m8/mat/01-fundamentos-criptografia/consulta#rsa">função de mão única</a>: fácil de calcular, impossível de desfazer na prática.</li>
+    </ul>
+    <h3>Os mesmos requisitos nos vídeos</h3>
+    <div class="tbl prose"><table>
+      <thead><tr><th>Requisito</th><th>UNIVESP</th><th>Practical Networking</th></tr></thead>
+      <tbody>
+        <tr><td>Pré-imagem</td><td>resistência à primeira inversão, custo 2ⁿ</td><td>impossível extrair a mensagem; inviável produzir um resumo dado</td></tr>
+        <tr><td>Segunda pré-imagem</td><td>dada uma mensagem, achar outra com o mesmo resumo</td><td>(não separa)</td></tr>
+        <tr><td>Colisão</td><td>quaisquer duas; custo da ordem de 2ⁿᐟ²</td><td>colisões são inevitáveis; resumo maior as torna mais raras</td></tr>
+        <tr><td>Avalanche, tamanho fixo</td><td></td><td>mudança pequena, resumo muito diferente; resumo sempre do mesmo tamanho</td></tr>
+      </tbody>
+    </table></div>
+    <p>O livro organiza tudo isso na Tabela 11.1 (§11.3), que o slide 22 recorta.</p>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>H⁻¹(h) é um conjunto, e não uma função inversa. H não tem inversa (não é bijetora); H⁻¹(h) só junta quem cai em h.</li>
+    <li>Busca em média é metade: 2ⁿ⁻¹, e não 2ⁿ. O pior caso é 2ⁿ.</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="aniversario" data-grupo="2.2 · O aniversário" data-termos="cr-aniversario">
+  <h2>O paradoxo do aniversário: a colisão custa a raiz</h2>
+  <aside class="mn loop" data-loop="aniversario" data-ms="10000" data-still="0.99" aria-hidden="true"><span class="loop-tag">em loop</span><svg></svg>Cada pessoa nova forma um par com cada uma que já está na sala.</aside>
+  <p class="cs-def">O <b>paradoxo do aniversário</b>: numa sala com 23 pessoas, a chance de duas fazerem aniversário no mesmo dia já passa de metade. O que cresce depressa são os pares. Num resumo de n bits, o mesmo efeito acha uma colisão com cerca de 2ⁿᐟ² resumos, a raiz do espaço.</p>
+  <div class="cs-formula">
+    <div class="formula">pares = q(q − 1)/2</div>
+    <p>q pessoas (ou resumos). Cada uma forma par com as q − 1 outras; dividir por 2 tira a contagem dupla. q = 23: 23·22/2 = 253 pares.</p>
+    <div class="formula">Pr[sem repetição] = 365/365 · 364/365 · ⋯ · 343/365 ≈ 0,4927</div>
+    <p>A primeira pessoa pode nascer em qualquer dia; a segunda precisa fugir da primeira (364/365); a 23ª precisa fugir de 22 (343/365). Então Pr[repetição] ≈ 1 − 0,4927 = 0,5073.</p>
+    <div class="formula">colisão genérica: 2ⁿᐟ² &nbsp; &nbsp; pré-imagem: 2ⁿ⁻¹</div>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Palpite comum: "precisa de umas 183 pessoas, metade de 365". Esse é o número para alguém fazer aniversário num dia fixo, o seu. Para quaisquer duas, bastam 23, porque 23 pessoas fazem 253 comparações.</li>
+      <li>De onde vem a raiz: com q resumos há uns q²/2 pares, e cada par coincide com chance 1/2ⁿ. A colisão fica provável quando q²/2 chega perto de 2ⁿ, ou seja, q perto de 2ⁿᐟ².</li>
+      <li>SHA-256: colisão em 2¹²⁸, pré-imagem em 2²⁵⁶ (2²⁵⁵ em média).</li>
+      <li>Contra colisão, segurança de s bits pede resumo de n = 2s bits. s = 112 pede n = 224. Por isso o vídeo da UNIVESP recomenda 256 bits: mesmo pela raiz sobram 128 bits de segurança.</li>
+      <li>Num resumo de 40 bits (avaliação de saída): pré-imagem 2³⁹, colisão 2²⁰ ≈ 1 milhão. Um notebook faz isso em segundos.</li>
+    </ul>
+    <h3>A chance exata com números pequenos (slide 51)</h3>
+    <p>Resumo de 4 bits: 16 valores. Três arquivos recebem resumos ao acaso. Pr[sem colisão] = 16/16 · 15/16 · 14/16 = 3.360/4.096 ≈ 0,82. Então Pr[colisão] = 1 − 0,82 = 0,18, cerca de 18%.</p>
+  </div>
+  <p class="prova">A colisão custa a raiz do espaço: q resumos formam q(q − 1)/2 pares; a colisão genérica custa 2ⁿᐟ² e a pré-imagem 2ⁿ⁻¹ testes em média. SHA-256: colisão em 2¹²⁸, pré-imagem em 2²⁵⁶.</p>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Vote 1 (slide 25): a função dia-do-aniversário dos 23 estudantes é "não injetora com chance de cerca de 0,51". Não é "não injetora com certeza": a casa dos pombos exige mais de 365 estudantes.</li>
+    <li>Parar no produto: 0,4927 é a chance de não repetir. A resposta é 1 menos o produto.</li>
+    <li>As estimativas valem para o ataque genérico, que trata H como sorteio. Um ataque que explora a estrutura de H (como os do MD5 e do SHA-1) pode ser bem mais barato.</li>
+  </ul></div>
+  <div class="curio"><p>O ataque de aniversário contra assinaturas foi descrito por Gideon Yuval em 1979, num artigo com o título "How to swindle Rabin" ("como trapacear o Rabin"): prepare muitas versões de um contrato honesto e de um desonesto, mexendo em vírgulas e espaços, até duas terem o mesmo resumo; peça a assinatura do honesto e use-a no outro.</p><p class="cs-fonte">G. Yuval, "How to swindle Rabin", Cryptologia 3(3), 1979. Stallings conta o ataque no §11.3.</p></div>
+</section>
+
+<section class="cs" id="sal" data-grupo="2.2 · O aniversário" data-termos="cr-arquivo-senhas,cr-sal,cr-pimenta,cr-derivacao-lenta">
+  <h2>Senhas: o sal multiplica o trabalho</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150">
+    <text class="tm" x="60" y="12">sem sal</text><text class="tm" x="180" y="12">com sal</text>
+    <rect class="k" x="14" y="22" width="92" height="30" rx="6"/><text x="60" y="37" style="font-size:11px">D resumos</text>
+    <text class="tm" x="60" y="68">uma tabela serve</text><text class="tm" x="60" y="82">para todos</text>
+    <rect class="am" x="134" y="22" width="92" height="30" rx="6"/><text x="180" y="37" style="font-size:11px">U · D resumos</text>
+    <text class="tm" x="180" y="68">uma conta por</text><text class="tm" x="180" y="82">registro</text>
+    <text class="tb" x="60" y="112">10⁻³ s</text><text class="tb" x="180" y="112">1.000 s</text>
+    <text class="tm" x="120" y="140">U = D = 10⁶, 10⁹ resumos por segundo</text>
+  </svg>Slide 45: o sal obriga a refazer a conta por registro.</aside>
+  <p class="cs-def">O <b>arquivo de senhas</b> guarda o resumo de cada senha, e não a senha. O <b>sal</b> é um valor aleatório e público, um por registro, que entra junto com a senha no hash; ele não fortalece a senha, mas obriga o atacante a refazer a conta para cada registro.</p>
+  <div class="cs-formula">
+    <div class="formula">sem sal: D cálculos &nbsp; &nbsp; com sal: U · D cálculos</div>
+    <p>U é o número de registros (usuários) e D o número de senhas candidatas.</p>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>No login, o sistema calcula o resumo da senha digitada e compara com o guardado. Se o banco vazar, só vazam resumos (vídeo da Simplilearn).</li>
+      <li>Guardar a senha em claro: qualquer funcionário lê e um vazamento entrega tudo. Encriptar: a chave de decriptar fica no mesmo servidor e vaza junto. O resumo não tem volta.</li>
+      <li>Sem sal (slide 45): U = 10⁶ registros, D = 10⁶ PINs, 10⁹ resumos por segundo. O atacante calcula o resumo de cada PIN uma vez e procura nos registros: 10⁶/10⁹ = 10⁻³ s.</li>
+      <li>Com sal: cada registro tem o seu sal, então o resumo de "123456" é diferente em cada um. U·D = 10¹² cálculos, 10¹²/10⁹ = 1.000 s.</li>
+      <li>Duas pessoas com a mesma senha ficam com resumos diferentes, e o atacante não sabe que as senhas são iguais.</li>
+      <li>A <b>pimenta</b> (pepper) é um segredo único para todos os registros, guardado fora do banco (no código do sistema, por exemplo). Quem rouba só o banco não tem a pimenta (vídeo da Simplilearn).</li>
+      <li>Hash rápido com sal ainda não basta: 1.000 s é pouco. Senha real pede uma <b>derivação lenta</b>, como bcrypt ou Argon2, feita para custar caro a cada tentativa. O vídeo da Computerphile separa os dois mundos: hash de senha precisa ser lento; o de assinatura e MAC, rápido.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Erro comum do slide 48: somar registros e candidatas (U + D). O sal multiplica: U · D.</li>
+    <li>O vídeo da Simplilearn diz que o sal "reduz colisões" e que, com o sal em mãos, o ataque "fica muito rápido". O sal é público mesmo; o que ele faz é impedir que uma conta só sirva para todos os registros.</li>
+  </ul></div>
+</section>
+
+<!-- ================= 2.3 A cadeia e a chave ================= -->
+<section class="cs" id="mac" data-grupo="2.3 · A cadeia e a chave" data-termos="cr-mac,cr-etiqueta">
+  <h2>O Mallory recalcula: o resumo precisa de uma chave</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 150">
+    <rect class="gr" x="4" y="20" width="50" height="28" rx="6"/><text x="29" y="34" style="font-size:11px">Alice</text>
+    <rect class="am" x="96" y="20" width="56" height="28" rx="6"/><text x="124" y="34" style="font-size:11px">Mallory</text>
+    <rect class="gr" x="190" y="20" width="46" height="28" rx="6"/><text x="213" y="34" style="font-size:11px">Bob</text>
+    <path class="s" d="M56 34 H94" marker-end="url(#mnarrow)"/><path class="s" d="M154 34 H188" marker-end="url(#mnarrow)"/>
+    <text class="tm" x="75" y="62">SIM, 8</text><text class="tam" x="171" y="62">NAO, 7</text>
+    <text class="tm" x="124" y="84">H(NAO) = 27 → 7</text>
+    <text class="tm" x="213" y="84">7 = 7: aceita</text>
+    <rect class="bl" x="30" y="104" width="180" height="30" rx="6"/><text class="tb" x="120" y="119" style="font-size:11px">com chave: só quem tem K acerta</text>
+  </svg>Slide 29, baseado na Figura 11.2b do livro.</aside>
+  <p class="cs-def">Sem chave, qualquer um recalcula o resumo: o Mallory troca SIM por NAO, calcula H(NAO) = 7 e o Bob aceita. Um <b>MAC</b> (código de autenticação de mensagem) é um valor calculado com uma chave secreta; só quem tem a chave produz o valor certo, chamado <b>etiqueta</b> (tag).</p>
+  <div class="cs-formula">
+    <div class="formula">M ‖ E(K, H(M)) &nbsp; &nbsp; ou &nbsp; &nbsp; M ‖ H(M ‖ S)</div>
+    <p>Figura 11.3b: manda a mensagem com o resumo encriptado pela chave K. Figura 11.3c: mistura um segredo S na conta, sem encriptar nada. Nos dois casos o Mallory, sem K ou S, não acerta o valor.</p>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Integridade: a mensagem não mudou. Autenticação: ela veio de quem diz. No download, a referência confiável garante a integridade; na rede, o resumo precisa de um segredo.</li>
+      <li>Com o MAC (vídeo da UNIVESP): a Alice manda M e a etiqueta T = MAC(K, M). O Bob, que tem K, calcula de novo e compara. Se o Mallory mexer em M, a etiqueta não bate; se mexer em T, ele não sabe calcular a certa.</li>
+      <li>O MAC dá integridade e autenticação, mas não sigilo: a mensagem vai às claras. Para os três, cifra e MAC juntos: é o que o seu navegador faz com o banco no HTTPS (vídeo da UNIVESP). Há também algoritmos que fazem as duas coisas numa passada só, a cifração autenticada (o GCM é o mais usado), e o vídeo cita um concurso público para escolher novos.</li>
+      <li>Como H, o MAC é muitos para um: domínio infinito, 2ⁿ etiquetas. Pela casa dos pombos, MAC(K, ·) não é injetora. A chave não tira as colisões; ela só impede quem não a tem de calcular.</li>
+    </ul>
+    <h3>As quatro formas do livro (Figura 11.3)</h3>
+    <div class="tbl prose"><table>
+      <thead><tr><th>Figura</th><th>O que vai no canal</th><th>Sigilo</th><th>Autenticação</th></tr></thead>
+      <tbody>
+        <tr><td>11.3a</td><td>E(K, M ‖ H(M)): encripta tudo</td><td>sim</td><td>sim</td></tr>
+        <tr><td>11.3b</td><td>M ‖ E(K, H(M)): encripta só o resumo</td><td>não</td><td>sim</td></tr>
+        <tr><td>11.3c</td><td>M ‖ H(M ‖ S): segredo S na conta</td><td>não</td><td>sim</td></tr>
+        <tr><td>11.3d</td><td>E(K, M ‖ H(M ‖ S)): segredo e encriptação</td><td>sim</td><td>sim</td></tr>
+      </tbody>
+    </table></div>
+    <p>O slide 30 mostra a b e a c. A c não encripta nada, e o livro lembra a vantagem: encriptar custa caro e às vezes não está disponível. Cuidado com a ordem dentro do H: com o segredo na frente, H(S ‖ M), aparece o ataque de <a href="#extensao">extensão</a>.</p>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>O MAC dos dois lados usa a mesma chave. Então ele não prova a um terceiro quem escreveu: o Bob também poderia ter gerado a etiqueta. Isso é papel da <a href="#usos">assinatura digital</a>.</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="cadeia" data-grupo="2.3 · A cadeia e a chave" data-termos="cr-cadeia,cr-compactacao,cr-iv">
+  <h2>A cadeia: o resumo é o último estado</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 120">
+    <rect class="k" x="4" y="58" width="30" height="26" rx="5"/><text x="19" y="71" style="font-size:11px">IV</text>
+    <rect class="am" x="52" y="8" width="26" height="22" rx="4"/><text x="65" y="19" style="font-size:11px">m₁</text>
+    <rect class="am" x="118" y="8" width="26" height="22" rx="4"/><text x="131" y="19" style="font-size:11px">m₂</text>
+    <rect class="am" x="190" y="8" width="26" height="22" rx="4"/><text x="203" y="19" style="font-size:11px">mₖ</text>
+    <rect class="bl" x="50" y="56" width="30" height="30" rx="6"/><text class="tb" x="65" y="71">f</text>
+    <rect class="bl" x="116" y="56" width="30" height="30" rx="6"/><text class="tb" x="131" y="71">f</text>
+    <rect class="bl" x="188" y="56" width="30" height="30" rx="6"/><text class="tb" x="203" y="71">f</text>
+    <path class="s" d="M65 32 V54" marker-end="url(#mnarrow)"/><path class="s" d="M131 32 V54" marker-end="url(#mnarrow)"/><path class="s" d="M203 32 V54" marker-end="url(#mnarrow)"/>
+    <path class="s" d="M36 71 H48" marker-end="url(#mnarrow)"/><path class="s" d="M82 71 H114" marker-end="url(#mnarrow)"/><text class="tm" x="98" y="63">h₁</text>
+    <path class="s" d="M148 71 H164"/><text class="tm" x="172" y="71">…</text><path class="s" d="M178 71 H186" marker-end="url(#mnarrow)"/>
+    <path class="ac" d="M203 88 V104" marker-end="url(#mnarrow)"/><text class="tam" x="160" y="112">H(M) = hₖ</text>
+  </svg>Figura 11.8 do livro, como no slide 31.</aside>
+  <p class="cs-def">A função de hash lê a mensagem em blocos de tamanho fixo, um de cada vez, numa <b>cadeia</b>: começa num <b>valor inicial</b> IV, fixo e público, e a cada bloco aplica a <b>função de compactação</b> f ao estado anterior e ao bloco. O resumo é o último estado. É a construção de Merkle e Damgård, usada no MD5, no SHA-1 e no SHA-2.</p>
+  <div class="cs-formula">
+    <div class="formula">h₀ = IV, &nbsp; hᵢ = f(hᵢ₋₁, mᵢ), &nbsp; H(M) = hₖ</div>
+    <p>Lê-se "h índice i é igual a f de h índice i menos 1 e m índice i". k é o número de blocos. O livro escreve CVᵢ = f(CVᵢ₋₁, Yᵢ₋₁) e chama o estado de variável de encadeamento.</p>
+    <div class="formula">H(M) = f(f(f(IV, m₁), m₂), m₃)</div>
+    <p>Para três blocos, H é a composição de f com ela mesma.</p>
+  </div>
+  <div class="cs-uso">
+    <p>A cadeia de brinquedo do slide 32: f(h, m) = (3h + m) mod 10, IV = 0, e cada dígito da mensagem 381 é um bloco.</p>
+    <ul class="b">
+      <li>Bloco 3: 3·0 + 3 = 3. Estado 3.</li>
+      <li>Bloco 8: 3·3 + 8 = 17 = 1·10 + 7. Estado 7.</li>
+      <li>Bloco 1: 3·7 + 1 = 22 = 2·10 + 2. Estado 2. O resumo de 381 é 2.</li>
+      <li>Como composição: H(381) = f(f(f(0, 3), 8), 1) = f(f(3, 8), 1) = f(7, 1) = 2.</li>
+      <li>A cadeia também colide: 13 e 20 dão 6 (3·1 + 3 = 6; 3·2 + 0 = 6). Nas mensagens de dois dígitos são 100 entradas para 10 resumos, 10 em cada.</li>
+      <li>No SHA-256 de verdade, o estado tem 256 bits e cada bloco 512. O SHA-512 usa estado de 512 e blocos de 1.024 (<a href="#sha512">por dentro</a>).</li>
+      <li>Por que encadear: um arquivo pode ter gigabytes. A cadeia lê bloco a bloco e só precisa guardar o estado. O vídeo da Computerphile descreve o SHA-1 assim: um estado interno que vai sendo atualizado até a mensagem acabar.</li>
+    </ul>
+    <p>Proposição (Merkle e Damgård): se f resiste à colisão, H também resiste. Ela exige que o último bloco inclua o tamanho da mensagem (<a href="#preenchimento">preenchimento</a>). Na prática, isso deixa o projetista se concentrar em fazer uma f boa para blocos de tamanho fixo.</p>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Erro comum do slide 58: somar os blocos (2 + 5 + 4 = 11, resumo 1). A cadeia multiplica o estado por 3 antes de somar: H(254) = 7.</li>
+    <li>O IV não é segredo: é fixo, igual para todo mundo, e está no padrão.</li>
+  </ul></div>
+  <figure class="fig" id="fig-cadeia">
+    <div class="fig-head"><span class="fig-title">Figura 2 · A cadeia de brinquedo calcula H(381)</span><div class="fig-tabs"></div></div>
+    <div class="fig-body">
+      <div class="fig-stage"><svg id="cad-svg" class="cd-svg" viewBox="0 0 640 280"></svg></div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+  <div class="curio"><p>Ralph Merkle e Ivan Damgård publicaram a construção de forma independente, os dois no CRYPTO '89; Merkle já a descrevia na tese de doutorado de 1979, em Stanford. Merkle é também um dos pioneiros da criptografia de chave pública, o assunto da semana 10. A "árvore de Merkle", feita de resumos de resumos, aparece no Bitcoin, e o git guarda o histórico numa estrutura parecida.</p><p class="cs-fonte">Slide 3; R. Merkle, "A Certified Digital Signature", CRYPTO '89; I. Damgård, "A Design Principle for Hash Functions", CRYPTO '89.</p></div>
+</section>
+
+<section class="cs" id="preenchimento" data-grupo="2.3 · A cadeia e a chave" data-termos="cr-preenchimento">
+  <h2>Preenchimento: a mensagem completa os blocos</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 100">
+    <rect class="bl" x="4" y="20" width="94" height="30" rx="3"/><text class="tb" x="51" y="35" style="font-size:11px">200 bits</text>
+    <rect class="am" x="98" y="20" width="10" height="30"/><text x="103" y="35" style="font-size:10px">1</text>
+    <rect class="k" x="108" y="20" width="96" height="30"/><text x="156" y="35" style="font-size:11px">247 zeros</text>
+    <rect class="am" x="204" y="20" width="32" height="30" rx="3"/><text x="220" y="35" style="font-size:10px">64</text>
+    <text class="tm" x="120" y="66">200 + 1 + 247 + 64 = 512 = 1 bloco</text>
+    <text class="tm" x="120" y="88">os 64 bits finais guardam ℓ = 200</text>
+  </svg>Slide 33: o bit 1, os zeros e o tamanho fecham o bloco.</aside>
+  <p class="cs-def">O <b>preenchimento</b> completa a mensagem até um múltiplo do tamanho do bloco: depois dos ℓ bits da mensagem entram um bit 1, k zeros e o tamanho ℓ escrito em binário. No SHA-256 o bloco tem 512 bits e o tamanho ocupa 64; no SHA-512, 1.024 e 128.</p>
+  <div class="cs-formula">
+    <div class="formula">SHA-256: ℓ + 1 + k + 64 = múltiplo de 512</div>
+    <div class="formula">SHA-512: ℓ + 1 + k + 128 = múltiplo de 1.024</div>
+    <p>ℓ ("ele") é o tamanho da mensagem em bits; k é o menor número de zeros que fecha a conta.</p>
+  </div>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>ℓ = 200 no SHA-256: 200 + 1 + 64 = 265 cabem em 512. k = 512 − 265 = 247 zeros, 1 bloco.</li>
+      <li>ℓ = 500: 500 + 1 + 64 = 565 passa de 512. Vai para 1.024: k = 1.024 − 565 = 459 zeros, 2 blocos.</li>
+      <li>"abc" no SHA-512 (exemplo do livro): ℓ = 24. 24 + 1 + 128 = 153, k = 1.024 − 153 = 871 zeros, 1 bloco.</li>
+      <li>O preenchimento é sempre feito, mesmo quando a mensagem já teria o tamanho certo: o bit 1 e o tamanho entram de qualquer jeito. Por isso, no SHA-512, ele tem de 1 a 1.024 bits.</li>
+      <li>Por que guardar o tamanho (vídeo da Computerphile): assim mensagens de tamanhos diferentes que terminam parecido não ficam com o mesmo bloco final. É o que a <a href="#cadeia">proposição</a> de Merkle e Damgård pede.</li>
+      <li>O SHA-256 aceita mensagens com menos de 2⁶⁴ bits (o tamanho cabe em 64 bits); o SHA-512, menos de 2¹²⁸.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Não esqueça o bit 1: ℓ + 64 = 264 daria k = 248, um zero a mais.</li>
+    <li>O livro descreve o SHA-512 (blocos de 1.024). O slide usa o SHA-256 (blocos de 512). A regra é a mesma; mudam os números.</li>
+  </ul></div>
+</section>
+
+<section class="cs" id="extensao" data-grupo="2.3 · A cadeia e a chave" data-termos="cr-extensao">
+  <h2>Pôr a chave na frente não basta</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 120">
+    <rect class="k" x="4" y="50" width="80" height="30" rx="6" style="stroke-dasharray:4 3"/><text x="44" y="65" style="font-size:10px">K ‖ M escondidos</text>
+    <path class="s" d="M86 65 H104" marker-end="url(#mnarrow)"/>
+    <rect class="bl" x="106" y="50" width="30" height="30" rx="6"/><text class="tb" x="121" y="65">6</text>
+    <path class="s" d="M138 65 H156" marker-end="url(#mnarrow)"/>
+    <rect class="rd" x="158" y="8" width="24" height="22" rx="4"/><text x="170" y="19" style="font-size:11px">5</text>
+    <path class="s" d="M170 32 V48" marker-end="url(#mnarrow)"/>
+    <rect class="rd" x="156" y="50" width="30" height="30" rx="6"/><text x="171" y="65">f</text>
+    <path class="s" d="M188 65 H204" marker-end="url(#mnarrow)"/>
+    <rect class="rd" x="206" y="50" width="30" height="30" rx="6"/><text x="221" y="65">3</text>
+    <text class="tm" x="121" y="96">publicado</text><text class="tm" x="200" y="96">sem a chave</text>
+    <text class="tm" x="120" y="114">3·6 + 5 = 23 = 2·10 + 3</text>
+  </svg>Slide 35: quem vê o resumo continua a cadeia.</aside>
+  <p class="cs-def">A forma ingênua de MAC publica H(K ‖ M). Só que o resumo é o último estado da <a href="#cadeia">cadeia</a>: quem o vê põe mais blocos e continua a conta, sem nunca saber K. É o <b>ataque de extensão</b> (de comprimento).</p>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Slide 35: K ‖ M fica escondido, mas o resumo publicado é 6. O Mallory acrescenta o bloco 5: 3·6 + 5 = 23 = 2·10 + 3. Ele tem o resumo 3 de K ‖ M ‖ 5, uma mensagem mais longa que ninguém autorizou, sem a chave.</li>
+      <li>Com o SHA-256 de verdade é a mesma coisa: o resumo são os 256 bits do estado. Basta continuar a cadeia a partir deles (com o detalhe de levar junto o preenchimento original).</li>
+      <li>Por isso o slide 58 fecha assim: quem vê o último estado continua a cadeia. O <a href="#hmac">HMAC</a> esconde esse estado.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Não é preciso colisão nenhuma: o Mallory não procura nada, só faz uma conta. Por isso o slide 28 diz que, sem chave, ele "nem precisa de colisão".</li>
+  </ul></div>
+  <div class="curio"><p>Em 2009, Thai Duong e Juliano Rizzo mostraram esse ataque contra a API do Flickr, que assinava os pedidos com MD5(segredo ‖ parâmetros): dava para acrescentar parâmetros a um pedido assinado e manter a assinatura válida.</p><p class="cs-fonte">T. Duong e J. Rizzo, "Flickr's API Signature Forgery Vulnerability", 2009.</p></div>
+</section>
+
+<section class="cs" id="hmac" data-grupo="2.3 · A cadeia e a chave" data-termos="cr-hmac">
+  <h2>HMAC: duas passadas com a chave</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 130">
+    <rect class="am" x="4" y="14" width="30" height="26" rx="5"/><text x="19" y="27" style="font-size:11px">K1</text>
+    <rect class="k" x="36" y="14" width="40" height="26" rx="5"/><text x="56" y="27" style="font-size:11px">M</text>
+    <path class="s" d="M78 27 H96" marker-end="url(#mnarrow)"/>
+    <rect class="bl" x="98" y="12" width="30" height="30" rx="6"/><text class="tb" x="113" y="27">H</text>
+    <path class="s" d="M113 44 V64"/><text class="tm" x="178" y="27">resumo interno,</text><text class="tm" x="178" y="41">escondido</text>
+    <rect class="am" x="64" y="70" width="30" height="26" rx="5"/><text x="79" y="83" style="font-size:11px">K2</text>
+    <rect class="k" x="96" y="70" width="34" height="26" rx="5"/><text x="113" y="83" style="font-size:11px">·</text>
+    <path class="s" d="M132 83 H150" marker-end="url(#mnarrow)"/>
+    <rect class="bl" x="152" y="68" width="30" height="30" rx="6"/><text class="tb" x="167" y="83">H</text>
+    <path class="ac" d="M184 83 H202" marker-end="url(#mnarrow)"/><text class="tam" x="220" y="83">HMAC</text>
+    <text class="tm" x="120" y="120">o de dentro nunca é publicado</text>
+  </svg>Figura 12.5 do livro, como no slide 34.</aside>
+  <p class="cs-def">O <b>HMAC</b> é o MAC construído com uma função de hash em duas passadas: a de dentro resume K1 ‖ M, a de fora resume K2 seguida do resumo de dentro. K1 e K2 vêm da mesma chave K. O resumo de dentro nunca é publicado, então ninguém continua a cadeia.</p>
+  <div class="cs-formula">
+    <div class="formula">HMAC(K, M) = H(K2 ‖ H(K1 ‖ M))</div>
+    <p>Lê-se "H de K 2 concatenado com H de K 1 concatenado com M". No livro, K1 = K⁺ ⊕ ipad e K2 = K⁺ ⊕ opad: K⁺ é a chave completada com zeros até o tamanho do bloco, e ipad e opad são duas constantes fixas (os bytes 36 e 5C em hexadecimal, repetidos).</p>
+  </div>
+  <div class="cs-uso">
+    <p>HMAC de brinquedo (atividade A4): f(h, m) = (3h + m) mod 10, IV = 0, K1 = 4, K2 = 6, M = 25.</p>
+    <ul class="b">
+      <li>Dentro: H(425). 4 → 3·4 + 2 = 14 → 4 → 3·4 + 5 = 17 → 7.</li>
+      <li>Fora: H(67). 6 → 3·6 + 7 = 25 → 5. A etiqueta é 5.</li>
+      <li>O Mallory troca 25 por 31 e mantém a etiqueta 5. O Bob refaz: H(431) = 6 e H(66) = 4 ≠ 5. Rejeita.</li>
+      <li>Por que o Mallory não refaz: ele precisaria de K1 para a passada de dentro e de K2 para a de fora. E o ataque de extensão não pega, porque o estado publicado é o da passada de fora, que termina num resumo e não na mensagem.</li>
+      <li>HMAC(K, ·) ainda tem colisões: 100 mensagens de dois dígitos para 10 etiquetas. HMAC(K, 18) = 5, igual ao do 25. A chave não torna o HMAC injetor; ela só impede quem não a tem de calcular a etiqueta.</li>
+      <li>O HMAC é o MAC que o seu navegador usa no HTTPS (vídeo da UNIVESP) e a construção que o livro detalha no §12.5. Ele funciona com qualquer função de hash: HMAC-SHA-256 é o HMAC com H = SHA-256.</li>
+    </ul>
+  </div>
+  <p class="prova">HMAC(K, M) = H(K2 ‖ H(K1 ‖ M)), com K1 e K2 vindos de K. O resumo de dentro nunca é publicado. Os dois lados têm a mesma chave: o HMAC autentica quem tem a chave, mas não prova a um terceiro quem escreveu.</p>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>O HMAC não prova a um terceiro quem escreveu: Alice e Bob têm a mesma chave, e qualquer um dos dois pode ter gerado a etiqueta.</li>
+    <li>A chave não acaba com as colisões. HMAC(K, 18) = HMAC(K, 25) = 5.</li>
+  </ul></div>
+  <figure class="fig" id="fig-hmac">
+    <div class="fig-head"><span class="fig-title">Figura 3 · HMAC de brinquedo: a etiqueta de 25 e a troca do Mallory</span><div class="fig-tabs"></div></div>
+    <div class="fig-body">
+      <div class="fig-stage"><svg id="hm-svg" class="cd-svg" viewBox="0 0 640 330"></svg></div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+  <div class="curio"><p>O HMAC é de Hugo Krawczyk, Mihir Bellare e Ran Canetti, de 1996; virou a RFC 2104 em 1997. Dez anos depois, Bellare provou que a segurança do HMAC não depende de a função por baixo resistir à colisão. Por isso o HMAC-MD5 resistiu bem mais que o próprio MD5.</p><p class="cs-fonte">Slide 34; M. Bellare, R. Canetti e H. Krawczyk, "Keying Hash Functions for Message Authentication", CRYPTO '96; M. Bellare, "New Proofs for NMAC and HMAC: Security without Collision-Resistance", CRYPTO 2006.</p></div>
+</section>
+
+<!-- ================= Atividades ================= -->
+<section class="cs" id="atividades" data-grupo="Atividades do slide" data-termos="">
+  <h2>Atividades do slide, resolvidas e explicadas</h2>
+  <p class="cs-def">A avaliação de saída, o Vote 1, o Vote extra e as atividades extras do apêndice (sal, A1 a A4), na ordem dos slides. Cada uma tem a pista de por onde começar e a resolução com o porquê; tente antes de abrir.</p>
+  <div class="cs-uso">
+    <h3>Vote extra (slides 17 a 19) · que função é o hash de brinquedo?</h3>
+    <details class="ds-item" open><summary>Com mensagens de uma letra, H : {A, …, Z} → {0, …, 9}. A) Bijetora. B) Sobrejetora e não injetora. C) Injetora e não sobrejetora. D) Nem injetora nem sobrejetora.</summary>
+      <p class="muted">Por onde começar: conte entradas e saídas, e veja se cada resumo recebe alguma letra.</p>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <p><span class="resp">B.</span> A a J valem 0 a 9: cada resumo recebe uma letra, então H é sobrejetora. K vale 10 = 1·10 + 0, então H(A) = H(K) = 0: não é injetora.</p>
+        <ul class="b"><li>A) e C) caem pelo mesmo contraexemplo H(A) = H(K). D) cai porque todo resumo de 0 a 9 é atingido.</li></ul>
+      </details>
+    </details>
+
+    <h3>Vote 1 (slides 25 e 26) · a função aniversário é injetora?</h3>
+    <details class="ds-item" open><summary>d : Turma → {1, …, 365} dá o dia do aniversário de 23 estudantes. A) Injetora com certeza. B) Não injetora com certeza. C) Não injetora com chance de cerca de 0,51. D) Bijetora.</summary>
+      <p class="muted">Por onde começar: d é injetora exatamente quando ninguém repete o dia. Qual é a chance disso?</p>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <p><span class="resp">C.</span> Pr[repetição] ≈ 1 − 0,4927 = 0,5073.</p>
+        <ul class="b">
+          <li>A) Nada impede dois estudantes no mesmo dia.</li>
+          <li>B) "Com certeza" só pela casa dos pombos, que exige mais de 365 estudantes.</li>
+          <li>D) 23 estudantes não cobrem 365 dias: d nem é sobrejetora.</li>
+        </ul>
+        <p class="muted">Argumento para a dupla: com 23 entradas a colisão não é certa, mas já é provável.</p>
+      </details>
+    </details>
+
+    <h3>Avaliação de saída (slides 37 e 38)</h3>
+    <details class="ds-item" open><summary>a) H : {0, 1}* → {0, 1}ⁿ pode ser injetora? Justifique.</summary>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <p><span class="resp">Não.</span> O domínio é infinito e o contradomínio tem 2ⁿ elementos. Pela casa dos pombos, duas mensagens caem no mesmo resumo.</p>
+      </details>
+    </details>
+    <details class="ds-item" open><summary>b) Num resumo de 40 bits, quanto custa uma pré-imagem em média? E uma colisão?</summary>
+      <p class="muted">Por onde começar: pré-imagem é metade do espaço; colisão é a raiz.</p>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <p>Pré-imagem: 2⁴⁰/2 = <span class="resp">2³⁹</span> testes. Colisão: 2⁴⁰ᐟ² = <span class="resp">2²⁰</span>, uns 1 milhão de resumos.</p>
+      </details>
+    </details>
+    <details class="ds-item" open><summary>c) Um invasor troca o arquivo e o SHA-256 da página. A conferência passa?</summary>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <p><span class="resp">Passa.</span> O invasor calcula o SHA-256 do arquivo falso e publica esse. O resumo precisa de outra fonte confiável, ou de uma chave.</p>
+        <p class="muted">Erro comum do slide: achar que um SHA-256 forte resolve. A força do hash não está em jogo; a referência está.</p>
+      </details>
+    </details>
+
+    <h3>Atividade extra · o sal (slides 46 a 48)</h3>
+    <p>10.000 registros, senhas de 5 dígitos e 10⁷ resumos por segundo.</p>
+    <details class="ds-item" open><summary>a) Quantas candidatas existem? b) Sem sal, quanto tempo leva testar todas?</summary>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <p>a) Cinco dígitos, 10 opções cada: 10⁵ = <span class="resp">100.000</span> candidatas. b) Uma conta para todos os registros: 10⁵/10⁷ = 10⁻² = <span class="resp">0,01 s</span>.</p>
+      </details>
+    </details>
+    <details class="ds-item" open><summary>c) Com um sal por registro, quanto tempo leva? d) No hash de brinquedo, liste H⁻¹(5) nas mensagens de uma letra.</summary>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <p>c) U·D = 10⁴ · 10⁵ = 10⁹ cálculos; 10⁹/10⁷ = 10² = <span class="resp">100 s</span>. d) Números com resto 5: 5, 15 e 25, ou seja, F, P e Z. <span class="resp">H⁻¹(5) = {F, P, Z}</span>.</p>
+        <p class="muted">Erro comum: somar U + D. O sal multiplica.</p>
+      </details>
+    </details>
+
+    <h3>Atividade extra A1 (slides 52 a 54) · colisões</h3>
+    <details class="ds-item" open><summary>a) SOL e BOI colidem? b) Dê um contraexemplo de duas palavras com o mesmo resumo.</summary>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <p>a) S = 18, O = 14, L = 11: 43 = 4·10 + 3. B = 1, O = 14, I = 8: 23 = 2·10 + 3. <span class="resp">Sim, resumo 3 nas duas.</span></p>
+        <p>b) AB: 0 + 1 = 1. BA: 1 + 0 = 1. <span class="resp">AB e BA colidem</span>: a soma não vê a ordem.</p>
+      </details>
+    </details>
+    <details class="ds-item" open><summary>c) Entradas de 8 bits vão por igual para resumos de 3 bits. Quantas por resumo? d) Nas palavras de 3 letras, a função é injetora?</summary>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <p>c) 2⁸/2³ = 256/8 = <span class="resp">32 entradas</span> por resumo (a regra 2ᵇ⁻ⁿ). d) 26³ = 17.576 palavras para 10 resumos. Pela casa dos pombos, <span class="resp">não é injetora</span>.</p>
+      </details>
+    </details>
+
+    <h3>Atividade extra A2 (slides 55 e 56) · o aniversário</h3>
+    <details class="ds-item" open><summary>a) Com 10 arquivos, quantos pares de resumos existem? b) Resumo de 64 bits: quanto custa uma pré-imagem em média? E uma colisão? c) Resumo de 4 bits e 17 arquivos: há colisão com certeza?</summary>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <p>a) 10·9/2 = <span class="resp">45 pares</span>. b) Pré-imagem 2⁶⁴/2 = <span class="resp">2⁶³</span>; colisão 2⁶⁴ᐟ² = <span class="resp">2³²</span>. c) 2⁴ = 16 resumos e 17 arquivos: pela casa dos pombos, <span class="resp">sim</span>.</p>
+        <p class="muted">Erro comum: usar 2ⁿᐟ² na pré-imagem. A raiz vale só para a colisão.</p>
+      </details>
+    </details>
+
+    <h3>Atividade extra A3 (slides 57 e 58) · a cadeia</h3>
+    <p>f(h, m) = (3h + m) mod 10, IV = 0.</p>
+    <details class="ds-item" open><summary>a) Calcule o resumo de 254. b) Escreva H(254) como composição de f. c) Ache duas mensagens de dois dígitos com o mesmo resumo. A cadeia é injetora?</summary>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <p>a) 3·0 + 2 = 2; 3·2 + 5 = 11 = 1·10 + 1; 3·1 + 4 = 7. <span class="resp">Resumo 7.</span></p>
+        <p>b) H(254) = f(f(f(0, 2), 5), 4) = f(f(2, 5), 4) = f(1, 4) = 7.</p>
+        <p>c) 13: 3·1 + 3 = 6. 20: 3·2 + 0 = 6. <span class="resp">13 e 20 colidem</span>: não é injetora.</p>
+        <p class="muted">Erro comum: somar os blocos, 2 + 5 + 4 = 11, resumo 1.</p>
+      </details>
+    </details>
+
+    <h3>Atividade extra A4 (slides 59 e 60) · o HMAC</h3>
+    <p>HMAC(K, M) = H(K2 ‖ H(K1 ‖ M)), com a mesma f, IV = 0, K1 = 4 e K2 = 6.</p>
+    <details class="ds-item" open><summary>a) Calcule HMAC(K, 25). b) O Mallory troca 25 por 31 e mantém a etiqueta. O Bob aceita?</summary>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <p>a) H(425): 4, 14 → 4, 17 → 7. H(67): 6, 25 → 5. <span class="resp">HMAC = 5.</span></p>
+        <p>b) H(431): 4, 15 → 5, 16 → 6. H(66): 6, 24 → 4 ≠ 5. <span class="resp">O Bob rejeita.</span></p>
+      </details>
+    </details>
+    <details class="ds-item" open><summary>c) Por que HMAC(K, ·) tem colisões? d) Quanto custa uma colisão genérica no SHA-256?</summary>
+      <details class="ds-resp"><summary>Resolução</summary>
+        <p>c) 100 mensagens de dois dígitos e 10 etiquetas: <span class="resp">casa dos pombos</span>. Exemplo: HMAC(K, 18) = 5, igual ao de 25.</p>
+        <p>d) 2²⁵⁶ᐟ² = <span class="resp">2¹²⁸ cálculos</span>.</p>
+        <p class="muted">Para guardar: a chave não torna o HMAC injetor. Sem K, o Mallory não calcula a etiqueta.</p>
+      </details>
+    </details>
+  </div>
+</section>
+
+<!-- ================= Além da aula ================= -->
+<section class="cs" id="familia-sha" data-grupo="Além da aula: o SHA por dentro" data-termos="cr-sha,cr-md5,cr-sha3">
+  <h2>A família SHA</h2>
+  <p class="cs-def">O <b>SHA</b> (Secure Hash Algorithm) é a família de funções de hash padronizada pelo NIST, o órgão de padrões dos Estados Unidos. O SHA-1 dá 160 bits e foi retirado por causa das colisões; o SHA-2 (SHA-224, 256, 384 e 512) está em uso; o <b>SHA-3</b> usa outra construção.</p>
+  <div class="cs-uso">
+    <div class="tbl prose"><table>
+      <thead><tr><th></th><th><b>MD5</b></th><th>SHA-1</th><th>SHA-256</th><th>SHA-512</th></tr></thead>
+      <tbody>
+        <tr><td>Resumo (bits)</td><td>128</td><td>160</td><td>256</td><td>512</td></tr>
+        <tr><td>Dígitos hexadecimais</td><td>32</td><td>40</td><td>64</td><td>128</td></tr>
+        <tr><td>Bloco (bits)</td><td>512</td><td>512</td><td>512</td><td>1.024</td></tr>
+        <tr><td>Palavra (bits)</td><td>32</td><td>32</td><td>32</td><td>64</td></tr>
+        <tr><td>Rodadas</td><td>64</td><td>80</td><td>64</td><td>80</td></tr>
+        <tr><td>Mensagem até</td><td>qualquer</td><td>2⁶⁴ bits</td><td>2⁶⁴ bits</td><td>2¹²⁸ bits</td></tr>
+        <tr><td>Colisão genérica</td><td>2⁶⁴</td><td>2⁸⁰</td><td>2¹²⁸</td><td>2²⁵⁶</td></tr>
+        <tr><td>Situação</td><td>quebrado</td><td>retirado (colisões)</td><td>em uso</td><td>em uso</td></tr>
+      </tbody>
+    </table></div>
+    <ul class="b">
+      <li>Linha do tempo (§11.5): 1993, FIPS 180, o primeiro SHA (hoje chamado SHA-0); 1995, SHA-1; 2002, SHA-256, SHA-384 e SHA-512; 2008, SHA-224; 2012, FIPS 180-4, que traz também o SHA-512/224 e o SHA-512/256.</li>
+      <li>O NIST recomendou trocar o SHA-1 pelo SHA-2 depois dos ataques de colisão de 2005 (slide 50). Os ataques exploram a estrutura da função e saem bem mais baratos que 2⁸⁰: o vídeo da Computerphile fala em algo perto de 2⁶⁰.</li>
+      <li>O SHA-1 foi feito pela NSA e publicado em 1995 como uma versão melhorada da ideia do MD5 (vídeo da Computerphile). O estado dele são cinco palavras de 32 bits, H0 a H4: 160 bits, o tamanho do resumo. SHA-1("abc") começa com a9993e36; troque o c por d e o resumo muda inteiro.</li>
+      <li>O MD5 (1992) é o avô da família, com a mesma estrutura de cadeia. Achar colisões nele hoje leva segundos. Os vídeos da UNIVESP e do Practical Networking lembram: MD5 e SHA-1 não devem ser usados para segurança.</li>
+      <li>Um certificado digital de banco hoje é assinado com SHA-256 (vídeo da UNIVESP). O Practical Networking mostra o MD5 de "hello" no terminal: com e sem a quebra de linha que o echo põe no fim, os resumos são completamente diferentes.</li>
+      <li>O SHA-3 (FIPS 202, 2015) venceu uma competição aberta do NIST com o algoritmo Keccak. Ele usa a construção esponja, e não a cadeia de Merkle e Damgård, então não sofre o <a href="#extensao">ataque de extensão</a> (Stallings §11.6, fora das seções desta aula).</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>SHA-2 não é "a versão 2 com 2 bits a mais": é o nome da família que inclui SHA-256 e SHA-512. O número depois do hífen é o tamanho do resumo.</li>
+    <li>"SHA-1 quebrado" quer dizer que se acham colisões. Pré-imagem no SHA-1 continua inviável; mesmo assim, ele saiu de uso, porque assinaturas dependem da colisão.</li>
+  </ul></div>
+  <div class="curio"><p>Em 2017, pesquisadores do Google e do instituto CWI de Amsterdã publicaram dois PDFs diferentes com o mesmo SHA-1, o ataque SHAttered. Custou cerca de 2⁶³ cálculos de SHA-1, o equivalente a 6.500 anos de processador. É desse ataque que fala o começo do vídeo da Computerphile ("acabou de ser quebrado").</p><p class="cs-fonte">M. Stevens et al., "The first collision for full SHA-1", CRYPTO 2017; shattered.io.</p></div>
+</section>
+
+<section class="cs" id="sha512" data-grupo="Além da aula: o SHA por dentro" data-termos="cr-buffer,cr-rodada,cr-ch,cr-maj,cr-agenda">
+  <h2>O SHA-512 por dentro</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 170">
+    <text class="tm" x="120" y="12">uma rodada: só a e e mudam</text>
+    <g style="font-family:var(--f-mono)">
+      <rect class="bl" x="8" y="22" width="24" height="22" rx="4"/><text class="tb" x="20" y="33">a</text>
+      <rect class="k" x="36" y="22" width="24" height="22" rx="4"/><text x="48" y="33">b</text>
+      <rect class="k" x="64" y="22" width="24" height="22" rx="4"/><text x="76" y="33">c</text>
+      <rect class="k" x="92" y="22" width="24" height="22" rx="4"/><text x="104" y="33">d</text>
+      <rect class="bl" x="124" y="22" width="24" height="22" rx="4"/><text class="tb" x="136" y="33">e</text>
+      <rect class="k" x="152" y="22" width="24" height="22" rx="4"/><text x="164" y="33">f</text>
+      <rect class="k" x="180" y="22" width="24" height="22" rx="4"/><text x="192" y="33">g</text>
+      <rect class="k" x="208" y="22" width="24" height="22" rx="4"/><text x="220" y="33">h</text>
+    </g>
+    <path class="s" d="M20 46 C28 60, 40 60, 48 70" marker-end="url(#mnarrow)"/><path class="s" d="M48 46 C56 60, 68 60, 76 70" marker-end="url(#mnarrow)"/><path class="s" d="M76 46 C84 60, 96 60, 104 70" marker-end="url(#mnarrow)"/>
+    <path class="s" d="M136 46 C144 60, 156 60, 164 70" marker-end="url(#mnarrow)"/><path class="s" d="M164 46 C172 60, 184 60, 192 70" marker-end="url(#mnarrow)"/><path class="s" d="M192 46 C200 60, 212 60, 220 70" marker-end="url(#mnarrow)"/>
+    <text class="tm" x="120" y="88">b ← a, c ← b, d ← c, f ← e, g ← f, h ← g</text>
+    <text class="tam" x="120" y="110">a ← T1 + T2</text><text class="tam" x="120" y="128">e ← d + T1</text>
+    <text class="tm" x="120" y="156">80 rodadas por bloco de 1.024 bits</text>
+  </svg>Seis palavras só descem uma casa; a e e recebem a mistura.</aside>
+  <p class="cs-def">O SHA-512 é a cadeia da parte 2.3 com números reais: preenche a mensagem até blocos de 1.024 bits, guarda o estado num <b>buffer</b> de oito palavras de 64 bits (a a h) e passa cada bloco por 80 <b>rodadas</b>. No fim de cada bloco, soma a saída ao estado de entrada; depois do último, o buffer é o resumo de 512 bits.</p>
+  <div class="cs-formula">
+    <div class="formula">H₀ = IV, &nbsp; Hᵢ = H₍ᵢ₋₁₎ + F(H₍ᵢ₋₁₎, Mᵢ) &nbsp; (palavra a palavra, módulo 2⁶⁴), &nbsp; resumo = H_N</div>
+    <p>Mᵢ é o i-ésimo bloco de 1.024 bits, F são as 80 rodadas e N o número de blocos. "+ módulo 2⁶⁴": soma de inteiros de 64 bits jogando fora o que passa, como o <a href="/m8/mat/01-fundamentos-criptografia/consulta#resto">mod</a> da aula 01 com n = 2⁶⁴.</p>
+    <div class="formula">T1 = h + Ch(e, f, g) + Σ1(e) + Wₜ + Kₜ &nbsp; &nbsp; T2 = Σ0(a) + Maj(a, b, c)</div>
+    <div class="formula">h = g, g = f, f = e, e = d + T1, d = c, c = b, b = a, a = T1 + T2</div>
+    <p>Wₜ é a palavra de 64 bits da rodada t; Kₜ é uma constante de 64 bits; Ch, Maj e Σ estão explicadas abaixo.</p>
+  </div>
+  <div class="cs-uso">
+    <h3>Os cinco passos do livro</h3>
+    <ol>
+      <li>Preencher: bit 1, zeros e o tamanho em 128 bits (<a href="#preenchimento">preenchimento</a>).</li>
+      <li>Anexar o tamanho: o bloco final termina com ℓ.</li>
+      <li>Iniciar o buffer: a a h recebem os 64 primeiros bits da parte fracionária da raiz quadrada dos 8 primeiros primos (a = 6a09e667f3bcc908 vem de √2).</li>
+      <li>Processar cada bloco: 80 rodadas, depois a soma com o estado de entrada.</li>
+      <li>Saída: o buffer depois do último bloco é o resumo.</li>
+    </ol>
+    <h3>As peças de uma rodada</h3>
+    <ul class="b">
+      <li><b>Ch</b>(e, f, g), de choose ("escolhe"): onde e tem 1, pega o bit de f; onde e tem 0, pega o de g. Com 8 bits: e = 11110000, f = 10101010, g = 11001100 dá Ch = 1010 1100.</li>
+      <li><b>Maj</b>(a, b, c), de majority ("maioria"): cada bit é o que aparece em pelo menos dois dos três. Com a = 11110000, b = 10101010, c = 11001100: Maj = 11101000.</li>
+      <li>Σ0(a) = ROTR²⁸(a) ⊕ ROTR³⁴(a) ⊕ ROTR³⁹(a) e Σ1(e) = ROTR¹⁴(e) ⊕ ROTR¹⁸(e) ⊕ ROTR⁴¹(e). ROTRⁿ é a <a href="#bits">rotação</a> de n bits para a direita: cada bit do resultado mistura três bits de lugares diferentes.</li>
+      <li>Kₜ: 80 constantes, os 64 primeiros bits da parte fracionária da raiz cúbica dos 80 primeiros primos.</li>
+      <li>A <b>agenda da mensagem</b> (message schedule) gera as 80 palavras Wₜ. As 16 primeiras são as 16 palavras de 64 bits do bloco. As outras 64 saem das anteriores: Wₜ = σ1(Wₜ₋₂) + Wₜ₋₇ + σ0(Wₜ₋₁₅) + Wₜ₋₁₆, com σ0(x) = ROTR¹(x) ⊕ ROTR⁸(x) ⊕ SHR⁷(x) e σ1(x) = ROTR¹⁹(x) ⊕ ROTR⁶¹(x) ⊕ SHR⁶(x). SHRⁿ é o deslocamento: empurra n bits para a direita e põe zeros na esquerda. Assim cada bit do bloco entra em muitas rodadas.</li>
+    </ul>
+    <h3>O exemplo do livro: "abc" e "cbc"</h3>
+    <ul class="b">
+      <li>SHA-512("abc") = <span class="mono">ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f</span>.</li>
+      <li>Troque "abc" por "cbc": a = 01100001 e c = 01100011 diferem em 1 bit, então o bloco de 1.024 bits muda em 1 bit. SHA-512("cbc") = <span class="mono">531668966ee79b700b8e5932611013544273f7ef7b31f2792a7ef68d53f93264319c165ad96d918755e6a204c2607e276e05cdf993a64c85ef9e1e125c0f925f</span>.</li>
+      <li>Dos 512 bits do resumo, 253 mudaram: quase exatamente metade. É o <a href="#hash">efeito avalanche</a> com números de verdade.</li>
+      <li>A figura abaixo calcula o SHA-512 de "abc" de verdade, no seu navegador, e mostra as rodadas 1, 2 e 80.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>A soma do fim do bloco (Hᵢ = Hᵢ₋₁ + saída) é que torna a rodada impossível de desfazer: quem vê o resultado não sabe separar as duas parcelas. O vídeo da Computerphile lembra que o "módulo 2³²" do SHA-1 joga informação fora: não precisa ter volta, porque hash não é encriptação.</li>
+    <li>Ch e Maj são funções bit a bit: o bit 5 da saída depende só dos bits 5 das entradas. Quem mistura posições diferentes são as rotações Σ.</li>
+  </ul></div>
+  <figure class="fig" id="fig-sha">
+    <div class="fig-head"><span class="fig-title">Figura 4 · SHA-512 de "abc": preenchimento, buffer, rodadas 1, 2 e 80</span><div class="fig-tabs"></div></div>
+    <div class="fig-body">
+      <div class="fig-stage"><svg id="sha-svg" viewBox="0 0 640 340"></svg></div>
+      <div class="fig-side"><div class="lab">Passo a passo</div><ol class="fig-notes"></ol></div>
+    </div>
+    <div class="fig-ctrl"></div>
+  </figure>
+  <div class="curio"><p>Por que raízes de primos? Para ninguém desconfiar das constantes. Se o NSA, que projetou o SHA-2, escolhesse números sem explicação, alguém poderia achar que eles escondem uma fraqueza. Números que qualquer um recalcula a partir de √2, √3, √5… são chamados de "nothing-up-my-sleeve numbers", "nada na manga", como no truque de mágica.</p><p class="cs-fonte">FIPS 180-4 (NIST, 2015), §4.2.3 e §5.3.5, que descrevem a origem das constantes.</p></div>
+</section>
+
+<section class="cs" id="aleatorios" data-grupo="Além da aula: o SHA por dentro" data-termos="cr-prng,cr-semente,cr-entropia">
+  <h2>Números aleatórios: a chave tem de ser imprevisível</h2>
+  <aside class="mn" aria-hidden="true"><svg viewBox="0 0 240 130">
+    <rect class="am" x="6" y="12" width="80" height="34" rx="6"/><text x="46" y="24" style="font-size:11px">entropia</text><text class="tm" x="46" y="38">mouse, rede…</text>
+    <path class="s" d="M88 29 H108" marker-end="url(#mnarrow)"/>
+    <rect class="bl" x="110" y="12" width="50" height="34" rx="6"/><text class="tb" x="135" y="29">semente</text>
+    <path class="s" d="M162 29 H178" marker-end="url(#mnarrow)"/>
+    <rect class="k" x="180" y="12" width="54" height="34" rx="6"/><text x="207" y="29" style="font-size:11px">PRNG</text>
+    <text class="tm" x="207" y="62">chave, chave, …</text>
+    <text class="tam" x="120" y="92">urna 2012: semente = hora em segundos</text>
+    <text class="tm" x="120" y="112">7h às 8h: 3.600 candidatas</text>
+  </svg>A chave é tão secreta quanto a semente de onde ela sai.</aside>
+  <p class="cs-def">Chaves precisam ser imprevisíveis. Na prática, o sistema junta <b>entropia</b> (fontes físicas e imprevisíveis) numa <b>semente</b> e, a partir dela, um <b>gerador de números pseudoaleatórios</b> (PRNG) produz quantos bits forem precisos. O livro lista o PRNG entre os usos do hash (§11.1).</p>
+  <div class="cs-uso">
+    <ul class="b">
+      <li>Pseudoaleatório: quem sabe a semente reproduz toda a sequência. Sem a semente, a sequência não se distingue de aleatória. Então a semente tem de ser grande e secreta.</li>
+      <li>Netscape, 1995 (vídeo da UNIVESP): as chaves de 128 bits das sessões HTTPS saíam do relógio do sistema. Sabendo o minuto, sobravam uns 60 milhões de possibilidades, cerca de 2²⁶: dava para achar a chave em 25 segundos. O atacante não testa as chaves; testa as entradas do gerador.</li>
+      <li>Urna eletrônica brasileira, 2012 (mesmo vídeo): o embaralhamento dos votos usava semente de 32 bits tirada da hora em segundos. Como a votação começa entre 7h e 8h, sobram 3.600 possibilidades, menos de 12 bits. A falha foi achada no teste público de 2012 pela equipe do professor Diego Aranha.</li>
+      <li>Como fazer certo: misturar várias fontes de entropia (ruído térmico, tempos de pacotes de rede, movimentos do mouse) e usar o gerador do sistema operacional, como o /dev/urandom do Linux.</li>
+    </ul>
+  </div>
+  <div class="cs-pegadinhas"><ul class="b">
+    <li>Chave de 128 bits com semente de 32 bits vale 32 bits de segurança. O tamanho da chave não importa se a origem é previsível.</li>
+  </ul></div>
+</section>

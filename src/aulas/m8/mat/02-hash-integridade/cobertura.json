@@ -1,0 +1,1018 @@
+{
+ "aula": "m8/mat/02-hash-integridade",
+ "criterio": "Conferência dos slides página a página e dos quatro vídeos de hash contra as seções do caderno. O livro não foi lido; a aula não promete equivalência a ele. O quinto vídeo está fora do tema.",
+ "fontes": [
+  {
+   "id": "slides-mundim-s07",
+   "url": "https://drive.google.com/drive/folders/1ZvYOtNSm-nme8hL5xEc4wZUBTWBbaZK-",
+   "escopo": "CC08-S07-hash-integridade.pdf (prof. Leandro Mundim), 60 slides, recebido da dona do caderno pela pasta Downloads em 26/11/2026.",
+   "acesso": "integral",
+   "metodo": "Extração de texto (pdftotext) de todas as páginas; figuras dos slides 3, 13, 16, 24, 31, 33, 35, 42, 45 e 50 conferidas em páginas renderizadas (PyMuPDF). Todas as contas refeitas por script (Python 3.13, hashlib). Não republicado.",
+   "totalUnidades": 60,
+   "unidades": [
+    {
+     "paginas": [
+      1,
+      2
+     ],
+     "assunto": "Capa e as quatro aulas do módulo (semanas 6, 7, 9, 10) com o problema de cada uma",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Estrutural; o mapa das semanas fecha a seção do encontro.",
+     "consulta": [
+      "hoje"
+     ],
+     "evidencias": [
+      "semana 9"
+     ]
+    },
+    {
+     "paginas": [
+      3
+     ],
+     "assunto": "Motivação: download de 64 dígitos, Merkle e Damgård 1989, chance 1/2^256, o Mallory",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "hash",
+      "cadeia",
+      "colisao",
+      "mac"
+     ],
+     "evidencias": [
+      "64 digitos",
+      "crypto '89",
+      "1979"
+     ]
+    },
+    {
+     "paginas": [
+      4
+     ],
+     "assunto": "Para que serve uma função de hash?",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "hoje",
+      "usos"
+     ],
+     "evidencias": [
+      "slide 4"
+     ]
+    },
+    {
+     "paginas": [
+      5
+     ],
+     "assunto": "Os quatro usos: autenticar, assinatura, senhas, intrusão e vírus",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "usos"
+     ],
+     "evidencias": [
+      "intrusao e virus",
+      "arquivo de senhas"
+     ]
+    },
+    {
+     "paginas": [
+      6
+     ],
+     "assunto": "A pergunta de hoje: o Mallory troca SIM por NAO e recalcula",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "hoje"
+     ],
+     "evidencias": [
+      "h(nao) = 7"
+     ]
+    },
+    {
+     "paginas": [
+      7
+     ],
+     "assunto": "Revisão de função, injetora, sobrejetora, bijetora; pergunta para 2.1",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "revisao-funcao"
+     ],
+     "evidencias": [
+      "slide 7"
+     ]
+    },
+    {
+     "paginas": [
+      8
+     ],
+     "assunto": "Classifique g : {1,2,3,4} → {a,b}",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "revisao-funcao"
+     ],
+     "evidencias": [
+      "g(1) = g(3)"
+     ]
+    },
+    {
+     "paginas": [
+      9
+     ],
+     "assunto": "Abertura da parte 2.1: por que toda função de hash tem colisões?",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "hoje"
+     ],
+     "evidencias": [
+      "22 min"
+     ]
+    },
+    {
+     "paginas": [
+      10
+     ],
+     "assunto": "O download: código publicado × código calculado",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "hash"
+     ],
+     "evidencias": [
+      "instalador"
+     ]
+    },
+    {
+     "paginas": [
+      11
+     ],
+     "assunto": "O resumo protege só com uma referência confiável",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "usos"
+     ],
+     "evidencias": [
+      "quem troca um troca o outro"
+     ]
+    },
+    {
+     "paginas": [
+      12
+     ],
+     "assunto": "Memorize: função de hash H : {0,1}* → {0,1}^n, determinística, resumo",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "hash"
+     ],
+     "evidencias": [
+      "deterministica",
+      "resumo"
+     ]
+    },
+    {
+     "paginas": [
+      13
+     ],
+     "assunto": "Hexadecimal (4 bits por dígito) e efeito avalanche CASA × CASC (117 bits)",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "bits",
+      "hash"
+     ],
+     "evidencias": [
+      "117 dos 256 bits",
+      "dividir os bits por 8"
+     ]
+    },
+    {
+     "paginas": [
+      14
+     ],
+     "assunto": "Hash de brinquedo: SIM, NAO, BIT; H e R",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "colisao"
+     ],
+     "evidencias": [
+      "sim e bit colidem",
+      "r vale 17"
+     ]
+    },
+    {
+     "paginas": [
+      15
+     ],
+     "assunto": "Memorize: colisão e casa dos pombos, 2^(b−n) por resumo",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "colisao"
+     ],
+     "evidencias": [
+      "casa dos pombos"
+     ]
+    },
+    {
+     "paginas": [
+      16
+     ],
+     "assunto": "XOR como função de hash simples e o bloco forjado do Mallory",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "bits",
+      "xor-simples"
+     ],
+     "evidencias": [
+      "1111 ⊕ 0000 ⊕ 0001 = 1110"
+     ]
+    },
+    {
+     "paginas": [
+      17,
+      18,
+      19
+     ],
+     "assunto": "Vote extra: o hash de brinquedo é sobrejetora e não injetora",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "atividades",
+      "colisao"
+     ],
+     "evidencias": [
+      "h(a) = h(k)"
+     ]
+    },
+    {
+     "paginas": [
+      20
+     ],
+     "assunto": "Prática deliberada, aba 1",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "hoje"
+     ],
+     "evidencias": [
+      "1 · o resumo"
+     ]
+    },
+    {
+     "paginas": [
+      21
+     ],
+     "assunto": "Abertura da parte 2.2: quanto custa achar uma colisão?",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "hoje"
+     ],
+     "evidencias": [
+      "23 min"
+     ]
+    },
+    {
+     "paginas": [
+      22
+     ],
+     "assunto": "Imagem inversa e os três ataques (Tabela 11.1)",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "ataques"
+     ],
+     "evidencias": [
+      "imagem inversa",
+      "segunda pre-imagem"
+     ]
+    },
+    {
+     "paginas": [
+      23
+     ],
+     "assunto": "Paradoxo do aniversário: 23 pessoas, 253 pares, 0,4927",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "aniversario"
+     ],
+     "evidencias": [
+      "0,4927",
+      "253 pares"
+     ]
+    },
+    {
+     "paginas": [
+      24
+     ],
+     "assunto": "Memorize: pares q(q−1)/2, colisão 2^(n/2), pré-imagem 2^(n−1), s = 112 pede n = 224",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "aniversario"
+     ],
+     "evidencias": [
+      "s = 112 pede n = 224"
+     ]
+    },
+    {
+     "paginas": [
+      25,
+      26
+     ],
+     "assunto": "Vote 1: a função aniversário é não injetora com chance ≈ 0,51",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "atividades",
+      "aniversario"
+     ],
+     "evidencias": [
+      "0,5073"
+     ]
+    },
+    {
+     "paginas": [
+      27
+     ],
+     "assunto": "Prática deliberada, aba 2",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "hoje"
+     ],
+     "evidencias": [
+      "2 · o aniversario"
+     ]
+    },
+    {
+     "paginas": [
+      28
+     ],
+     "assunto": "Abertura da parte 2.3: sem chave o Mallory nem precisa de colisão",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "hoje",
+      "extensao"
+     ],
+     "evidencias": [
+      "nem precisa de colisao"
+     ]
+    },
+    {
+     "paginas": [
+      29
+     ],
+     "assunto": "O Mallory recalcula; integridade × autenticação (Fig. 11.2b)",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "mac"
+     ],
+     "evidencias": [
+      "integridade: a mensagem nao mudou"
+     ]
+    },
+    {
+     "paginas": [
+      30
+     ],
+     "assunto": "MAC: Figuras 11.3b e 11.3c; MAC é muitos para um",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "mac"
+     ],
+     "evidencias": [
+      "11.3b",
+      "muitos para um"
+     ]
+    },
+    {
+     "paginas": [
+      31
+     ],
+     "assunto": "A cadeia: h0 = IV, hi = f(hi−1, mi); proposição de Merkle e Damgård",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "cadeia"
+     ],
+     "evidencias": [
+      "variavel de encadeamento",
+      "proposicao"
+     ]
+    },
+    {
+     "paginas": [
+      32
+     ],
+     "assunto": "Exemplo resolvido: cadeia de brinquedo, H(381) = 2",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "cadeia"
+     ],
+     "evidencias": [
+      "o resumo de 381 e 2"
+     ]
+    },
+    {
+     "paginas": [
+      33
+     ],
+     "assunto": "Preenchimento no SHA-256: ℓ = 200 e ℓ = 500",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "preenchimento"
+     ],
+     "evidencias": [
+      "247 zeros",
+      "459 zeros"
+     ]
+    },
+    {
+     "paginas": [
+      34
+     ],
+     "assunto": "Memorize: HMAC(K, M) = H(K2 ‖ H(K1 ‖ M)), ipad e opad",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "hmac"
+     ],
+     "evidencias": [
+      "ipad",
+      "nunca e publicado"
+     ]
+    },
+    {
+     "paginas": [
+      35
+     ],
+     "assunto": "Pôr a chave na frente não basta: extensão da cadeia",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "extensao"
+     ],
+     "evidencias": [
+      "3·6 + 5 = 23"
+     ]
+    },
+    {
+     "paginas": [
+      36
+     ],
+     "assunto": "Prática deliberada, aba 3",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "hoje"
+     ],
+     "evidencias": [
+      "3 · a cadeia e a chave"
+     ]
+    },
+    {
+     "paginas": [
+      37,
+      38
+     ],
+     "assunto": "Avaliação de saída e resposta",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "atividades"
+     ],
+     "evidencias": [
+      "avaliacao de saida"
+     ]
+    },
+    {
+     "paginas": [
+      39
+     ],
+     "assunto": "Encerramento: abas 1 a 3, Adalove, leitura §§11.1–11.3, §11.5, §12.5",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "hoje"
+     ],
+     "evidencias": [
+      "adalove"
+     ]
+    },
+    {
+     "paginas": [
+      40,
+      41
+     ],
+     "assunto": "Agradecimento e capa do apêndice",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Estrutural.",
+     "consulta": [
+      "hoje"
+     ],
+     "evidencias": [
+      "apendice"
+     ]
+    },
+    {
+     "paginas": [
+      42
+     ],
+     "assunto": "Dossiês secretos: atividade em grupo A a E",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "hoje"
+     ],
+     "evidencias": [
+      "dossies secretos",
+      "grupo e"
+     ]
+    },
+    {
+     "paginas": [
+      43
+     ],
+     "assunto": "Pergunta: o que o atacante precisa achar e quanto custa?",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "hoje",
+      "ataques"
+     ],
+     "evidencias": [
+      "slide 43"
+     ]
+    },
+    {
+     "paginas": [
+      44
+     ],
+     "assunto": "A busca: média de metade das candidatas; PIN de 6 dígitos; 2^256 tem 78 algarismos",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "ataques"
+     ],
+     "evidencias": [
+      "500.000 testes",
+      "78 algarismos"
+     ]
+    },
+    {
+     "paginas": [
+      45
+     ],
+     "assunto": "Sal: U · D, 10^-3 s × 1.000 s; bcrypt e Argon2",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "sal"
+     ],
+     "evidencias": [
+      "1.000 s",
+      "argon2"
+     ]
+    },
+    {
+     "paginas": [
+      46,
+      47,
+      48
+     ],
+     "assunto": "Atividade extra do sal e H⁻¹(5)",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "atividades"
+     ],
+     "evidencias": [
+      "{f, p, z}",
+      "100 s"
+     ]
+    },
+    {
+     "paginas": [
+      49
+     ],
+     "assunto": "Pergunta: como a função lê uma mensagem de qualquer tamanho?",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "hoje"
+     ],
+     "evidencias": [
+      "slide 49"
+     ]
+    },
+    {
+     "paginas": [
+      50
+     ],
+     "assunto": "A família SHA: SHA-1, SHA-256, SHA-512; ataques de 2005; SHA-3 esponja",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "familia-sha"
+     ],
+     "evidencias": [
+      "2005",
+      "esponja"
+     ]
+    },
+    {
+     "paginas": [
+      51
+     ],
+     "assunto": "Exemplo resolvido: chance exata de colisão com 4 bits e 3 arquivos",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "aniversario"
+     ],
+     "evidencias": [
+      "3.360/4.096"
+     ]
+    },
+    {
+     "paginas": [
+      52,
+      53,
+      54
+     ],
+     "assunto": "Atividade extra A1: SOL × BOI, AB × BA, 32 por resumo, 17.576 palavras",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "atividades"
+     ],
+     "evidencias": [
+      "17.576",
+      "ab e ba colidem"
+     ]
+    },
+    {
+     "paginas": [
+      55,
+      56
+     ],
+     "assunto": "Atividade extra A2: 45 pares, 2^63 e 2^32, 17 arquivos em 16 resumos",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "atividades"
+     ],
+     "evidencias": [
+      "45 pares"
+     ]
+    },
+    {
+     "paginas": [
+      57,
+      58
+     ],
+     "assunto": "Atividade extra A3: H(254) = 7, composição, 13 e 20 colidem",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "atividades"
+     ],
+     "evidencias": [
+      "13 e 20 colidem"
+     ]
+    },
+    {
+     "paginas": [
+      59,
+      60
+     ],
+     "assunto": "Atividade extra A4: HMAC de brinquedo, troca por 31, colisões, 2^128",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "atividades"
+     ],
+     "evidencias": [
+      "hmac(k, 18) = 5"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "univesp-hash",
+   "url": "https://www.youtube.com/watch?v=EH7_uI_N8gI",
+   "escopo": "UNIVESP, Segurança da Informação, Aula 03, 22 min 58 s.",
+   "acesso": "integral",
+   "metodo": "Legenda automática pt do YouTube lida inteira, em trechos de 1 a 8 min.",
+   "totalUnidades": 7,
+   "unidades": [
+    {
+     "paginas": [
+      1
+     ],
+     "assunto": "00:00–02:49 integridade, dígito verificador mod 11 e o ataque de propósito",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "hash"
+     ],
+     "evidencias": [
+      "digito verificador",
+      "resto 2"
+     ]
+    },
+    {
+     "paginas": [
+      2
+     ],
+     "assunto": "02:49–05:47 hash sem segredo; primeira inversão 2^n, segunda pré-imagem, colisão 2^(n/2); 256 bits; assinatura",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "ataques",
+      "aniversario",
+      "usos"
+     ],
+     "evidencias": [
+      "primeira inversao",
+      "256 bits"
+     ]
+    },
+    {
+     "paginas": [
+      3
+     ],
+     "assunto": "05:47–06:46 SHA-2 e SHA-3 recomendados; MD5 e SHA-1 fora; certificado digital",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "familia-sha"
+     ],
+     "evidencias": [
+      "certificado digital"
+     ]
+    },
+    {
+     "paginas": [
+      4
+     ],
+     "assunto": "06:46–08:42 downloads e torrent",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "usos"
+     ],
+     "evidencias": [
+      "torrent"
+     ]
+    },
+    {
+     "paginas": [
+      5
+     ],
+     "assunto": "08:42–12:48 hash sem chave não autentica; MAC; etiqueta; algoritmos; cifração autenticada e concurso",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "mac"
+     ],
+     "evidencias": [
+      "etiqueta",
+      "cifracao autenticada"
+     ]
+    },
+    {
+     "paginas": [
+      6
+     ],
+     "assunto": "12:48–14:48 HTTPS: cifra simétrica e MAC juntos",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "mac",
+      "hmac"
+     ],
+     "evidencias": [
+      "https"
+     ]
+    },
+    {
+     "paginas": [
+      7
+     ],
+     "assunto": "14:48–22:58 aleatoriedade: Netscape 1995, entropia, PRNG e semente, urna eletrônica 2012",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "aleatorios"
+     ],
+     "evidencias": [
+      "netscape",
+      "diego aranha",
+      "/dev/urandom"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "simplilearn-hashing",
+   "url": "https://www.youtube.com/watch?v=jmtzX-NPFDc",
+   "escopo": "Simplilearn, What Is Hashing?, 9 min 45 s, em inglês.",
+   "acesso": "integral",
+   "metodo": "Legenda automática en do YouTube lida inteira.",
+   "totalUnidades": 3,
+   "unidades": [
+    {
+     "paginas": [
+      1
+     ],
+     "assunto": "00:00–04:14 senhas em claro, encriptadas e em hash; login; conferência de arquivo",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "sal",
+      "usos"
+     ],
+     "evidencias": [
+      "em claro",
+      "login"
+     ]
+    },
+    {
+     "paginas": [
+      2
+     ],
+     "assunto": "04:14–07:00 blocos, MD5 e SHA, rápido mas não demais, avalanche, 'colisão' de senhas iguais",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "A definição errada de colisão vira pegadinha.",
+     "consulta": [
+      "colisao",
+      "sal"
+     ],
+     "evidencias": [
+      "simplilearn",
+      "derivacao lenta"
+     ]
+    },
+    {
+     "paginas": [
+      3
+     ],
+     "assunto": "07:00–09:45 sal e pimenta",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "sal"
+     ],
+     "evidencias": [
+      "pimenta",
+      "pepper"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "practical-networking-hashing",
+   "url": "https://www.youtube.com/watch?v=HHQ2QP_upGM",
+   "escopo": "Practical Networking, Hashing, Hashing Algorithms, and Collisions, 11 min 42 s, em inglês.",
+   "acesso": "integral",
+   "metodo": "Legenda automática en do YouTube lida inteira (a pt-BR é tradução automática).",
+   "totalUnidades": 3,
+   "unidades": [
+    {
+     "paginas": [
+      1
+     ],
+     "assunto": "00:00–04:13 hash de soma das letras (hello 52, cello 47) e os quatro requisitos",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "hash",
+      "ataques"
+     ],
+     "evidencias": [
+      "hello = 8",
+      "practical networking"
+     ]
+    },
+    {
+     "paginas": [
+      2
+     ],
+     "assunto": "04:13–07:58 MD5 no terminal com e sem quebra de linha; avalanche",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "familia-sha",
+      "hash"
+     ],
+     "evidencias": [
+      "quebra de linha",
+      "avalanche"
+     ]
+    },
+    {
+     "paginas": [
+      3
+     ],
+     "assunto": "07:58–11:42 colisões inevitáveis, hash de 3 bits, MD5, SHA-1, SHA-2",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "colisao",
+      "familia-sha"
+     ],
+     "evidencias": [
+      "2³ = 8"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "computerphile-sha",
+   "url": "https://www.youtube.com/watch?v=DMtFhACPnTY",
+   "escopo": "Computerphile, SHA: Secure Hashing Algorithm, 10 min 21 s, em inglês.",
+   "acesso": "integral",
+   "metodo": "Legenda en do YouTube lida inteira.",
+   "totalUnidades": 3,
+   "unidades": [
+    {
+     "paginas": [
+      1
+     ],
+     "assunto": "00:00–03:28 hash rápido de assinatura × hash lento de senha; pseudoaleatoriedade; SHA-1 de abc; NSA, 1995",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "sal",
+      "familia-sha"
+     ],
+     "evidencias": [
+      "computerphile",
+      "a9993e36"
+     ]
+    },
+    {
+     "paginas": [
+      2
+     ],
+     "assunto": "03:28–08:13 estado H0–H4, blocos de 512, compressão em 80 rodadas, soma módulo 2^32",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "cadeia",
+      "sha512",
+      "familia-sha"
+     ],
+     "evidencias": [
+      "h0 a h4",
+      "estado interno"
+     ]
+    },
+    {
+     "paginas": [
+      3
+     ],
+     "assunto": "08:13–10:21 preenchimento com o tamanho, Merkle e Damgård, ataque perto de 2^60",
+     "antes": "conteudo-novo-da-aula",
+     "justificativa": "Seção dona do conceito.",
+     "consulta": [
+      "preenchimento",
+      "familia-sha"
+     ],
+     "evidencias": [
+      "computerphile",
+      "2⁶⁰"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "3b1b-redes-neurais",
+   "url": "https://www.youtube.com/watch?v=aircAruvnKk",
+   "escopo": "3Blue1Brown, But what is a neural network? (Deep learning, cap. 1), 18 min 40 s.",
+   "acesso": "fora-do-tema",
+   "limitacao": "Lido o começo da legenda: o vídeo é sobre redes neurais e reconhecimento de dígitos, sem relação com hash. Não entrou na aula; a dona foi avisada para conferir se o link era outro."
+  },
+  {
+   "id": "stallings-2015-cap11-12",
+   "url": "https://plataforma.bvirtual.com.br/",
+   "escopo": "Stallings, Criptografia e segurança de redes, 6. ed., §11.1, §11.2 e §11.5 (pedidos no autoestudo), mais §11.3 e §12.5 citados pelos slides; p. 247–259 e 290–291.",
+   "acesso": "nao-acessado",
+   "limitacao": "Livro não lido. Figuras, tabelas e páginas vêm das referências dos slides. O SHA-512 da §11.5 foi conferido por implementação própria (constantes derivadas das raízes dos primos) comparada com o hashlib (inclusive abc × cbc, 253 bits); o XOR com rotação e a perda para 2^-112 com ASCII da §11.2 entram como descritos pelo slide 16 e pela Figura 11.5, sem conferência no livro."
+  }
+ ]
+}

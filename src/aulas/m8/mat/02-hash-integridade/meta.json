@@ -1,0 +1,57 @@
+{
+  "numero": "02",
+  "titulo": "Funções de hash e integridade: do resumo ao HMAC",
+  "tema": "Criptografia e sua matemática",
+  "modos": ["consulta"],
+  "resumo": "A função de hash como função de {0, 1}* em {0, 1}ⁿ: por que ela nunca é injetora (casa dos pombos), quanto custam pré-imagem e colisão (paradoxo do aniversário, 2ⁿ⁻¹ e 2ⁿᐟ²), o sal nas senhas, a cadeia de Merkle e Damgård, o preenchimento, o ataque de extensão, o MAC e o HMAC, com todas as atividades do slide resolvidas, a dinâmica em grupo e o SHA-512 por dentro.",
+  "topicos": ["Resumo e avalanche", "Referência confiável", "Colisão e casa dos pombos", "XOR de blocos", "Pré-imagem e colisão", "Paradoxo do aniversário", "Sal", "MAC", "Cadeia de Merkle e Damgård", "Preenchimento", "Ataque de extensão", "HMAC", "Atividades resolvidas", "Família SHA", "SHA-512 por dentro", "Números aleatórios"],
+  "secoes": [],
+  "fontes": [
+    {
+      "tipo": "Slides",
+      "titulo": "CC08 · Semana 7 · Funções de hash e integridade (prof. Leandro Resende Mundim)",
+      "url": "https://drive.google.com/drive/folders/1ZvYOtNSm-nme8hL5xEc4wZUBTWBbaZK-",
+      "secao": "hoje",
+      "nota": "PDF de 60 slides lido inteiro (texto extraído de todas as páginas, figuras conferidas nas páginas renderizadas). Todas as contas refeitas por script. Não republicado."
+    },
+    {
+      "tipo": "Livro",
+      "titulo": "Stallings, Criptografia e segurança de redes, 6. ed. (Pearson, 2015), §11.1, §11.2 e §11.5 (pedidos no autoestudo); os slides citam também §11.3 e §12.5, p. 247–259 e 290–291",
+      "secao": "usos",
+      "nota": "Livro não acessado. As figuras, tabelas e páginas citadas vêm das referências dos slides. O SHA-512 (§11.5) foi conferido por uma implementação própria, com as constantes derivadas das raízes dos primos e o resultado comparado com o hashlib; o exemplo abc × cbc (253 bits) foi refeito."
+    },
+    {
+      "tipo": "Vídeo",
+      "titulo": "UNIVESP · Segurança da Informação, Aula 03: funções de hash, códigos de autenticação e números aleatórios",
+      "url": "https://www.youtube.com/watch?v=EH7_uI_N8gI",
+      "duracao": "23 min",
+      "secao": "mac",
+      "nota": "Legenda automática do YouTube lida inteira. Dígito verificador, os três requisitos, downloads e torrent, MAC, HTTPS e os casos Netscape (1995) e urna eletrônica (2012)."
+    },
+    {
+      "tipo": "Vídeo",
+      "titulo": "Simplilearn · What Is Hashing? Hashing Explained Simply",
+      "url": "https://www.youtube.com/watch?v=jmtzX-NPFDc",
+      "duracao": "10 min",
+      "secao": "sal",
+      "nota": "Em inglês. Legenda automática lida inteira. Duas afirmações corrigidas no caderno: senha igual não é colisão, e o sal não reduz colisões."
+    },
+    {
+      "tipo": "Vídeo",
+      "titulo": "Practical Networking · Hashing, Hashing Algorithms, and Collisions (Practical TLS)",
+      "url": "https://www.youtube.com/watch?v=HHQ2QP_upGM",
+      "duracao": "12 min",
+      "secao": "ataques",
+      "nota": "Em inglês. Legenda automática lida inteira. Soma das letras (hello = 52), os quatro requisitos, MD5 no terminal, avalanche e colisões pela casa dos pombos."
+    },
+    {
+      "tipo": "Vídeo",
+      "titulo": "Computerphile · SHA: Secure Hashing Algorithm",
+      "url": "https://www.youtube.com/watch?v=DMtFhACPnTY",
+      "duracao": "10 min",
+      "secao": "cadeia",
+      "nota": "Em inglês. Legenda lida inteira. Estado interno do SHA-1, função de compressão, 80 rodadas, preenchimento com o tamanho e construção de Merkle e Damgård."
+    }
+  ],
+  "observacao": "O livro de Stallings não foi lido: a aula segue os slides, que citam o livro página a página, e não promete equivalência à leitura dos capítulos 11 e 12. O quinto link do autoestudo (3Blue1Brown, But what is a neural network?) é sobre redes neurais e não entrou. As soluções das atividades seguem as respostas dos slides; o raciocínio escrito, o exemplo do dígito verificador e as curiosidades (com fonte ao lado) são do caderno."
+}
